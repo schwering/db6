@@ -1,0 +1,99 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Making test tree
+for F in db-io-low_level db-util-timer; do make C/objects/$F.o || exit; done
+make[1]: `C/objects/db-io-low_level.o' is up to date.
+make[1]: `C/objects/db-util-timer.o' is up to date.
+for T in levenshtein prefix search tree ; do gnatmake -Pdb -XBUILD=release test_$T.adb || exit; done
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/test_levenshtein" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/test_prefix" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/test_search" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/test_tree" up to date.
+for T in levenshtein prefix search tree ; do gnatmake -Pdb -XBUILD=debug test_$T.adb || exit; done
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/test_levenshtein" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/test_prefix" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/test_search" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/test_tree" up to date.
+
+Dingsbumsing temp files
+
+Running test tree
+
+INSERTING.
+ 10000:  187.1 191.2
+ 20000:  434.2 442.5

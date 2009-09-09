@@ -1,0 +1,325 @@
+\documentclass[slidestop, 14pt]{beamer}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+\usetheme{default}
+%\usecolortheme[named=magenta]{structure}
+%\beamertemplateshadingbackground{yellow!50}{magenta!50}
+%\colorlet{structure}{green!60!black}
+\beamertemplateballitem
+
+\newlength{\framenumberoffset}
+\setlength{\framenumberoffset}{\textwidth}
+\addtolength{\framenumberoffset}{1cm}
+\defbeamertemplate*{footline}{infolines theme}{
+    \hspace{\framenumberoffset}\tiny
+    {\insertframenumber{}/\inserttotalframenumber}
+    \vspace{0.25em}
+}
+
+\AtBeginSection[]{
+    \begin{frame}[plain]
+    \tableofcontents[currentsection]
+    \addtocounter{framenumber}{-1}
+    \end{frame}
+}
+
+\newcommand \maketitleframe {
+    \begin{frame}[plain]
+    \maketitle
+    \addtocounter{framenumber}{-1}
+    \end{frame}
+}
+
+\newcounter{contcounter}
+\newcommand \ft[1] {
+    \only<1>{\setcounter{contcounter}{0}}
+    \addtocounter{contcounter}{1}
+    \frametitle{\hfill #1 \color{gray}
+    %\alt<1>{}{(\arabic{contcounter})}}
+    \alt<1>{}{(cont.)}}
+    \hrule \vspace{1em}
+}
+
+\newenvironment{framet}[1]{
+    \begin{frame} \ft{#1}
+}{
+    \end{frame}
+}
+
+\newenvironment{customblock}[1]{
+    \colorlet{ucol}{#1!80!black}
+    \colorlet{lcol}{#1!10!white}
+    \setbeamercolor{uppercol}{fg=white,bg=ucol}
+    \setbeamercolor{lowercol}{fg=black,bg=lcol}
+    \begin{beamerboxesrounded}[upper=uppercol, lower=lowercol, shadow=true]
+}{
+    \end{beamerboxesrounded}
+}
+
+\newenvironment{smallitemize}{
+    \begin{itemize}\small
+}{
+    \end{itemize}
+}
+
+\newcommand \grayed {\color{darkgray}}
+
+\newcommand \BTree { B\textsuperscript{+}-Tree }
+\newcommand \hence { $\Rightarrow$ }
+
+\DeclareMathOperator{\OO}{\mathcal{O}}
+
+\title{Dingsbums}
+\subtitle{A Data Storage System}
+\author{Christoph Schwering}
+\institute{RWTH Aachen}
+\date{\today}
+
+\begin{document}
+
+\maketitleframe
+
+\section{Introduction}
+\subsection{Data Model}
+\begin{framet}{Data Model}
+\only<1-2>{
+    \begin{itemize}
+    \item sparse table, record oriented
+    \item record $r_k = (k, (A_{k,1}, v_{k,1}), (A_{k,2}, v_{k,2}), \ldots)$
+        \begin{itemize}
+        \item $k$ is \structure{key}, identifies record $r_k$: $k \mapsto r_k$
+        \item $A_i$ is \structure{attribute}: $(k, A_{k,i}) \mapsto v_{k,i}$
+        \item $(A_{k,i}, v_{k,i})$ can be added/removed to/from record
+        \end{itemize}
+    \grayed{\small \item opt: attr + time:
+        $(A_{k,i}, v_{k,i}) \leadsto (A_{k,i}, t_{k,i}, v_{k,i})$}
+    \end{itemize}
+}
+\only<2-3>{
+    \begin{customblock}{blue}{Data Model}
+    \begin{smallitemize} 
+    \item sparse, 2-dim. {\grayed [3-dim.]} map: $(k, A{\grayed , t}) \mapsto v$
+    \item lightweight attributes, rather belong to record than table
+    \item btw it's read optimized (at least not write optimized)
+    \end{smallitemize}
+    \end{customblock}
+}
+\only<3-3>{
+    \vspace{1em}
+    in comparison to relational model:
+    \begin{smallitemize}
+    \item sparse: $r_{k_1}, r_{k_2}$ can have distinct attributes
+    \item attributes refer to tuple rather than relation\\
+        attributes are created on-the-fly
+    \item less typed: $r_{k_1}[A]$ can have different type than $r_{k_2}[A]$
+    \item weaker constraints: no integrity, only one key
+    \end{smallitemize}
+}
+\end{framet}
+
+\subsection{Hardware}
+\begin{framet}{Intended Hardware Audience}
+\begin{itemize}
+\item cheap PCs
+    \begin{itemize}
+    \item Google cheap $\neq$ student cheap
+    \end{itemize}
+\item Gigabit Ethernet
+\end{itemize}
+
+\begin{itemize}
+\item current testbed: two computers \`a
+    \begin{itemize}
+    \item two cores with 2.6 GHz
+    \item 2 resp. 4 GB memory
+    \item 640 GB disk
+    \item Gigabit Ethernet
+    \item Linux
+    \end{itemize}
+\end{itemize}
+\end{framet}
+
+\section{Data Structures}
+\subsection{Index File}
+\begin{framet}{Index File}
+\only<1>{
+    \begin{itemize}
+    \item \structure{sorted} index-structure for disk-memory
+    \item stores \structure{key / value pairs}
+    \item keys are unique
+    \item key / value pairs have variable \alert{bounded length}
+    \pause
+    \item {\small key in index $\neq$ key of record}
+    \item \structure{usual setup}:
+        \begin{itemize}
+        \item keys: max length $1000$ bytes
+        \item values: much bigger, outsourced to heap file
+        \item key type: $\underbrace{\text{string}}_{\text{key}}
+            \times \underbrace{\text{string}}_{\text{attribute}}
+            {\grayed \times \underbrace{\mathbb N}_{\text{time}}}$
+        \item value type: varies per $(k, A{\grayed , t})$\\
+            often address of data in heap file\\
+        \end{itemize}
+    \end{itemize}
+}
+\only<2>{
+    \begin{itemize}
+    \item \BTree variant, implemented in Ada 95
+    \item highly parameterizable:
+        \begin{itemize}
+        \item key type, value type
+        \item key and value serialization \hence compression
+        \item IO implementation
+        \end{itemize}
+    \item max entry size $\cong 1000$ bytes
+    \end{itemize}
+}
+\end{framet}
+
+\subsection{Heap File}
+\begin{framet}{Heap File}
+\only<1>{
+    \begin{itemize}
+    \item \structure{unsorted} storage on disk
+    \item item is interpreted as byte sequence
+    \item items have variable \structure{unbounded length}
+    \item items tend to be large, e.g. 4 KB or 2 MB or so
+    \item goal: read quickly, i.e. \structure{minimize disk seeks}
+    \end{itemize}
+}
+\only<2>{
+    \begin{itemize}
+    \item {\em chunk}: seq. of consecutive blocks
+    \item each value stored as $1$ chunk
+    \item indexes:
+        \begin{itemize}
+        \item info index: chunk addr $\mapsto$ used/free \& length
+        \item free index: free chunk size $\mapsto$ chunk addr
+        \end{itemize}
+    \end{itemize}
+    \pause
+    \begin{itemize}
+    \item read {\small is very fast} \begin{enumerate}[(i)]
+        \item look up length in info index
+        \item seek position in data file, read chunk
+        \end{enumerate}
+    \item write \& delete {\small are a little bit more complicated}
+        \begin{itemize}
+        \item free chunk administration
+        \end{itemize}
+    \end{itemize}
+}
+\end{framet}
+
+\section{File and Data Organisation}
+\subsection{Data Layout}
+\begin{framet}{Data Layout}
+\begin{itemize}
+\item \structure{vertical partitioning}
+    \begin{itemize}
+    \item group attributes to \structure{families}
+    \item the attrs of a family share the index and heap file
+    \item attr + pattern matching $\Rightarrow$ family
+        {\footnotesize (like in Haskell)}
+    \item one index [+ heap] $\leftrightarrow$ one column family
+    \end{itemize}
+\item \structure{horizontal partitioning}
+    \begin{itemize}
+    \item index and heap files are distributed over the cluster nodes
+    \end{itemize}
+\end{itemize}
+\end{framet}
+
+\subsection{Filesystems}
+\begin{framet}{Network File Abstraction}
+\only<1>{
+    \begin{itemize}
+    \item \structure{segment address} space in chunks, e.g. 64 MB
+        \begin{itemize}
+        \item this chunk $\neq$ heap chunk
+        \end{itemize}
+    \item copy of \structure{chunk index} stored at every node:
+        {\footnotesize\begin{align*}
+        S = 2^{26} = 128M\\
+        \text{Address} \ & \mapsto \text{Node}\\
+        0   \ldots (1 S - 1) \ & \mapsto 2\\
+        1 S \ldots (2 S - 1) \ & \mapsto 1\\
+        2 S \ldots (3 S - 1) \ & \mapsto 3\\
+        \ldots
+        \end{align*}}
+    \item local \structure{caching} at nodes
+    \item failover-redundant, \structure{self-managing}
+    \end{itemize}
+}
+\only<2>{
+    operations:
+    \begin{smallitemize}
+    \item \structure{read}:
+        \begin{enumerate}[(i)]
+        \item ask local cache
+        \item request block from node
+        \end{enumerate}
+    \item \structure{write}
+        \begin{enumerate}[(i)]
+        \item broadcast (addr,block); handle on receiving nodes:
+        \item if addr in local cache, invalidate copy
+        \item if addr on disk, write block to disk
+        \end{enumerate}
+    \item \structure{seek\_new}
+        \begin{enumerate}[(i)]
+        \item if last chunk on node has a free block, take this
+        \item create a new chunk on node, take first block
+        \end{enumerate}
+    \item \structure{locks}: read lock local, write/certify lock must be
+        confirmed by each node
+    \end{smallitemize}
+}
+\only<3>{
+    self-management, redundancy:
+    \begin{smallitemize}
+    \item ping
+    \item backoff copies
+    \end{smallitemize}
+}
+\end{framet}
+
+\begin{framet}{Chunk File System}
+\begin{itemize}
+\item goal: minimize seeks
+\item very simple
+    \begin{itemize}
+    \item no meta data
+    \item no directories
+    \item no POSIX-API etc., just a library
+    \end{itemize}
+\item chunks
+        \begin{itemize}
+        \item minimal allocation unit
+        \item chunks are large, e.g. 512 MB
+        \item this chunk $\neq$ network FS chunk $\neq$ heap chunk
+        \end{itemize}
+\item file $=$ filename + list of chunks
+\end{itemize}
+\end{framet}
+
+\subsection{Compression}
+\begin{framet}{Compression in \BTree}
+\begin{smallitemize}
+\item entries $(k, A{\grayed , t})$ primarily sorted by record key $k$
+\item record key $k$ of type string in many tables
+\end{smallitemize}
+\begin{itemize}
+\item \structure{no compression}: very fast :)
+\item \structure{prefix compression}: should be quite good in many cases,
+    especially when keys are reversed URLs {\tt com.dingbum.search/foo/bar.html}
+\item \structure{delta compression}: current Levenshtein implementation rather
+    slow $\OO(n^2)$
+\end{itemize}
+\end{framet}
+
+\end{document}
+
+

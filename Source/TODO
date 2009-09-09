@@ -1,0 +1,55 @@
+* Transaktionen:
+  Gen_Buffers: Gen_Transactions mit einer Write-Liste und einem kleinen Cache
+  Gen_Heaps:   auch auf OO umstellen (?)
+* Shadowing:
+  1. Fuer alle Versionen des Trees gibt es eine gemeinsame Refcount-Map:
+     Phys-Addr -> Refcount
+  2. Fuer jede Version des Trees gibt es eine Map
+     Virt-Addr -> Phys-Addr
+     Koennte man so realisieren: insgesamt nur eine Map
+     (Tree-Version-ID, Virt-Addr) -> Phys-Addr
+     wenn dann (ID, Addr) gelookupt werden soll und nicht in der Map enthalten
+     ist, wird bei Vorgaengern geschaut, bis gefunden, und dann 
+     (ID, Addr) -> Phys-Addr eingefuegt
+  3. Vorgaenger-Map: 
+     (Tree-Version-ID) -> (Tree-Version-ID)
+     wenn geshadowed wird, ist die neue Tree-Version-ID der maximale Key in
+     der Map + 1
+  
+* Storage_Pools fuer Caches
+
+* Die Heap-Geschichte mit 32 Bit TESTEN TESTEN TEST
+
+ERLEDIGT:
+* Auf 32-Bit-Systemen gibt es ne Exception im Heap, wenn die Chunks >4GB werden,
+  weil IO.Blocks.Size_Type verwendet wird.
+* Is_Context_Free_Serialization
+  Wahrscheinlich mit Degree >= 2 bestmoeglich gefixt
+* Unset_Free_Following koennte die Transaktion unkontrolliert aufblasen!!
+  Doch nicht zu Gebieten zusammenfassen?
+  STIMMT DOCH NICHT, GLAUB ICH
+* Gen_Heaps Cursor => Problem irgendwie beheben, eine Moeglichkeit waere
+  in Gen_BTrees Transaktions-Cursor zu bauen
+
+
+Alt, aber vielleicht noch interessant und auf jeden Fall noch nicht erledigt:
+
+* Table_Tree
+	* Siehe Timed_Table_Tree und streiche die Times.
+* Timed_Table_Tree
+	* Gen_BTree mit zwei Dimensionen Row, Column, Time
+	* Iterator bekommt einen Selektor uebergeben, der anhand von Columns und
+	  Times rausfiltern kann
+	* Vorgefertigte Selektoren fuer Times (Time <= Now, aktuellsten 3
+	  Eintraege usw.) und Columns (beginnt-mit)
+* Bitmap
+	* Verkettete Liste von Bloecken
+	* Komprimierung: statt (0, ..., 0) oder (1, ..., 1) (n, 0) bzw. (n, 1)
+	* Oder diese baumartige Bitmap
+	* Iterator: von n-tem Eintrag bis m-ten Eintrag
+	* Reorganize Prozedure
+* Cache(s)
+	* Eine besondere Realisierung von Gen_IO; der Cache bekommt ein anderes
+	  Gen_IO uebergeben, das er cacht, ist aber gleichzeitig selbst ein
+	  Gen_IO.
+

@@ -1,0 +1,16 @@
+Sat Jan 24 17:42:29 CET 2009
+Using existing BTree /home/chs/Disk/btree
+Init = 1200000001
+INSERTING 10000000 10: 4814.4 = 82.2min
+SEARCH    10000000 10: 1602.4 = 26.7min
+Sat Jan 24 19:29:25 CET 2009
+21354M /home/chs/Disk/btree
+
+Sat Jan 24 20:45:36 CET 2009
+Using existing BTree /home/chs/Disk/btree
+Init = 1300100001
+INSERTING 10000000 10: 5509.1 = 91.8min
+SEARCH    10000000 10: 1645.2 = 27.4min
+Sat Jan 24 22:44:49 CET 2009
+22997M /home/chs/Disk/btree
+

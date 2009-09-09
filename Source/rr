@@ -1,0 +1,6 @@
+echo "Making test $1"
+make || exit
+echo ""
+echo "Running test $1"
+build/release/./$1
+

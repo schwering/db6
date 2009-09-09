@@ -1,0 +1,97 @@
+-- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
+
+package body DB.Gen_BTree.Gen_Traversal is
+
+   procedure Traverse_Depth_First
+     (Tree  : in out Tree_Type;
+      Visit : access procedure (A : in Node.Valid_Address_Type;
+                                N : in Node.Node_Type;
+                                L : in Height_Type))
+   is
+      procedure Traverse
+        (Tree : in out Tree_Type;
+         N_A  : in     Node.Valid_Address_Type;
+         L    : in     Height_Type)
+      is
+         function Read_Node is new Read_Node_From_Tree(Tree);
+         use type Node.Degree_Type;
+         N : constant Node.Node_Type := Read_Node(N_A);
+      begin
+         if not Node.Is_Root(N) or Node.Degree(N) > 0 then
+            Visit(N_A, N, L);
+         end if;
+         if Node.Is_Inner(N) then
+            for I in 1 .. Node.Degree(N) loop
+               Traverse(Tree, Node.Child(N, I), L+1);
+            end loop;
+         end if;
+      end Traverse;
+
+   begin
+      Traverse(Tree, Root_Address, 1);
+   end Traverse_Depth_First;
+
+
+   procedure Traverse_Breadth_First
+     (Tree  : in out Tree_Type;
+      Visit : access procedure (A : in Node.Valid_Address_Type;
+                                N : in Node.Node_Type;
+                                L : in Height_Type))
+   is
+      function Read_Node is new Read_Node_From_Tree(Tree);
+      H   : Height_Type := 1;
+      F_A : Node.Valid_Address_Type := Root_Address;
+      N_A : Node.Valid_Address_Type := Root_Address;
+   begin
+      loop
+         declare
+            use type Node.Degree_Type;
+            N : constant Node.Node_Type := Read_Node(N_A);
+         begin
+            -- avoid empty root
+            if not Node.Is_Root(N) or Node.Degree(N) > 0 then
+               Visit(N_A, N, H);
+            end if;
+
+            if Node.Is_Valid(Node.Right_Neighbor(N)) then
+               N_A := Node.To_Valid_Address(Node.Right_Neighbor(N));
+            elsif Node.Is_Inner(N) then
+               declare
+                  F : constant Node.Node_Type := Read_Node(F_A);
+               begin
+                  F_A := Node.Child(F, 1);
+                  N_A := F_A;
+                  H   := H + 1;
+               end;
+            else
+               exit;
+            end if;
+         end;
+      end loop;
+   end Traverse_Breadth_First;
+
+
+   procedure Traverse_Free
+     (Tree  : in out Tree_Type;
+      Visit : access procedure (A : in Node.Valid_Address_Type;
+                                N : in Node.Node_Type))
+   is
+      N_A : Node.Valid_Address_Type := Free_Address;
+   begin
+      loop
+         declare
+            function Read_Node is new Read_Node_From_Tree(Tree);
+            use type Node.Valid_Address_Type;
+            N : constant Node.Node_Type := Read_Node(N_A);
+         begin
+            if N_A /= Free_Address then
+               Visit(N_A, N);
+            end if;
+            exit when not Node.Is_Valid(Node.Right_Neighbor(N));
+            N_A := Node.To_Valid_Address(Node.Right_Neighbor(N));
+         end;
+      end loop;
+   end Traverse_Free;
+
+end DB.Gen_BTree.Gen_Tree.Gen_Traversal;
+

@@ -1,0 +1,19 @@
+A (new) naming convention.
+For example,
+	100k_disk_rr_mb_none
+means that
+	* '100k' = 100,000 entries were inserted (at max)
+	  alternative is '1m' for 1,000,000
+	* data was written to 'disk'
+	  alternative is 'devi' for device file (bypassing file system)
+	  alternative is 'vola' for volatile (memory) storage
+	* 'rr' script was used, i.e. no debugging but optimization (2)
+	  alternative is 'rd' for debugging
+	* 'mb' = MacBook Pro was the host machine
+	  alternative is 'mm' for Mac Mini
+	  alternative is 'pm' for Mike's PowerMac
+	  alternative is 'ap' for old IBM Aptiva
+	* 'none' means that no row-key compression was used
+	  alternative is 'prefix' for prefix compression
+	  alternative is 'leve' for levenshtein delta encoding
+

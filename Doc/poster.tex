@@ -1,0 +1,179 @@
+\documentclass[mathserif]{beamer}
+\usepackage[orientation=landscape,
+            size=custom, width=48, height=27,
+            scale=0.6, debug]{beamerposter}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+\usepackage{beamerthemesplit}
+\setbeamertemplate{navigation symbols}{}
+
+\usetheme{Frankfurt}
+
+\newcommand \BTree { B\textsuperscript{+}-Tree }
+\title[Dingsbums \BTree]{\BTree with variable-length entries}
+\author{Christoph Schwering}
+\institute{RWTH Aachen}
+\date{\today}
+
+\begin{document}
+\section{Dingsbums \BTree}
+\subsection{\BTree with variable-length entries}
+\begin{frame}[t]{}
+\begin{columns}[t]
+
+\begin{column}{.27\linewidth}
+
+    \begin{block}{Subject}
+    \begin{itemize}
+    \item \BTree with bounded-length entries
+    \item each node is stored in one disk block
+    \item at least $\tfrac{3}{8}$ of each block is used
+    \item only sizes of keys \& values vary!
+    \end{itemize}
+    \end{block}
+
+    \begin{block}{Definitions}
+    \begin{itemize}
+    \item $N$ is a node $N$ with sorted entries $e \in N$
+    \item following accessor functions: $parent(N)$, $left(N)$, $right(N)$,
+        $key(e)$, $value(e)$ (leafs only), $count(e)$ \& $child(e)$ (inner nodes
+        only)
+    \item $size(N) = \text{fix overhead} + \sum_{e \in N} size(e)$\\
+        $size(e) = \text{fix overhead} + size(key(e)) + size(value(e))$\\
+    \item $B = \text{disk block size} - \text{fix node overhead}$
+    \end{itemize}
+    \end{block}
+
+    \begin{alertblock}{Bounds}
+    For root $R$, node $N \neq R$ and any entry $e$, these invariants must hold:
+    \[\begin{array}{rclr}
+    & size(e) & \leq \lfloor \tfrac{1}{4} B \rfloor\\
+    \lfloor \tfrac{3}{8} B \rfloor \leq & size(N) & \leq B
+        & \hspace{2cm}\text{(*)}\\
+    0 \leq & size(R) & \leq B
+    \end{array}\]
+    \end{alertblock}
+
+    \begin{block}{Overflow-Theorem}
+    A node with entries \mbox{$N \cup \{ e \}$} with
+    \[ size(N) \leq B \text{ but } size(N \cup \{e\}) > B \]
+    can be split into two nodes such that both fulfill (*).
+    \end{block}
+
+    \begin{block}{Underflow-Theorem}
+    When an entry $e$ is removed from a non-root-node with entry set $L$ such
+    that $size(L) \geq \lfloor \tfrac{3}{8} B \rfloor$ but
+    $size(L \setminus \{e\}) < \lfloor \tfrac{3}{8} B \rfloor$, either
+    entries from a neighbor can be moved or $L$ can be merged with a neighbor.
+    \end{block}
+
+\end{column}
+
+\begin{column}{.27\linewidth}
+    \vfill
+    \Large
+    \begin{itemize}
+    \item Someone has an idea what to put here?
+        \\
+    \item That's my name,\\ask me again and I'll tell you the same.
+        \\
+    \item San Diego here I come,\\Melmac's where I started from.
+        \\
+    \item Kate, you've got to hear this.
+    \end{itemize}
+\end{column}
+
+\begin{column}{.27\linewidth}
+
+    \footnotesize
+
+    \begin{block}{Proof of Overflow-Theorem}
+    For \mbox{$N \cup \{e\} = \{ e_1, \ldots, e_n \}$}, set
+    \mbox{$L := \{ e_1, \ldots, e_i \}$} such that
+    \[ size(L) \geq \lfloor \tfrac{3}{8} B \rfloor \text{ but }
+            size(L \setminus \{e_i\}) < \lfloor \tfrac{3}{8} B \rfloor \]
+    and \mbox{$R := (N \cup \{e\}) \setminus L$}.
+    Then $L$ and $R$ fulfill (*):
+    \begin{align*}
+    size(L) &\stackrel{\mathrm{def}}{\geq} \lfloor \tfrac{3}{8} B \rfloor\\
+    size(L) &< \lfloor \tfrac{3}{8} B \rfloor
+                + \underbrace{size(e_i)}_{\leq \lfloor \frac{1}{4} B \rfloor}
+            \leq \lfloor \tfrac{5}{8} B \rfloor\\
+    size(R) &= \overbrace{size(N \cup \{e\})}^{> B}
+                    - \overbrace{size(L)}^{< \lfloor \frac{5}{8} B \rfloor}
+            > \lceil \tfrac{3}{8} B \rceil\\
+    size(R) &= \underbrace{size(N \cup \{e\})}_{
+                            \leq B + \lfloor \frac{1}{4} B \rfloor}
+                    - \underbrace{size(L)}_{\geq \lfloor \frac{3}{8} B \rfloor}
+            \leq \lceil \tfrac{7}{8} B \rceil
+    \end{align*}
+    \end{block}
+
+    \begin{block}{Proof of Underflow-Theorem}
+    Let $\delta := \lfloor \tfrac{3}{8} B \rfloor - size(L \setminus \{e\})$
+    be the space in \mbox{$L \setminus \{e\}$} that needs to be filled to 
+    fulfill (*).
+    Without loss of generality, we assume that the right neighbor with entry
+    set $R$ of $L$ exists; otherwise all left/right and min/max
+    relations turn around.
+
+    \begin{enumerate}
+    \item
+    If \mbox{$size(R) \leq \lceil \frac{5}{8} B \rceil + \delta$}, the nodes
+    can be merged to a single node \mbox{$E := (L \setminus \{e\}) \cup R$}
+    that fulfills (*):
+    \begin{align*}
+    size(E)
+            &= \overbrace{size(L \setminus \{e\})}^{
+                            \geq \lfloor \frac{3}{8} B \rfloor 
+                                    - \lfloor \frac{1}{4} B \rfloor}
+                    + \overbrace{size(R)}^{
+                            \geq \lfloor \frac{3}{8} B \rfloor}
+            \geq \lfloor \tfrac{1}{2} B \rfloor\\
+    size(E)
+            &= \underbrace{size(L \setminus \{e\})}_{
+                            \leq \lfloor \frac{3}{8} B \rfloor - \delta}
+                    + \underbrace{size(R)}_{
+                            \leq \lceil \frac{5}{8} B \rceil + \delta}
+            \leq B
+    \end{align*}
+    \item
+    If \mbox{$size(R) > \lceil \frac{5}{8} B \rceil + \delta$}, a set
+    \mbox{$S \subseteq R$} must be moved from $R$ to $L$.
+    Set \mbox{$L' := (L \setminus \{e\}) \cup S$} and
+    \mbox{$R' := R \setminus S$}.
+    $S$ must be chosen so that it holds
+    \[ size(L') \geq \lfloor \tfrac{3}{8} B \rfloor \text{ but }
+            size(L' \setminus \max S) < \lfloor \tfrac{3}{8} B \rfloor. \]
+    Hence, we have
+    \[ \delta \leq size(S) < \delta + \lfloor \tfrac{1}{4} B \rfloor. \]
+    It follows that $L'$ and $R'$ fulfill (*):
+    \begin{align*}
+    size(L')
+            &\stackrel{\mathrm{def}}{\geq} \lfloor \tfrac{3}{8} B \rfloor\\
+    size(L')
+            &= \underbrace{size(L \setminus \{e\})}_{
+                            = \lfloor \frac{3}{8} B \rfloor - \delta}
+                    + \underbrace{size(S)}_{
+                            < \delta + \lfloor \frac{1}{4} B \rfloor}
+            < \lfloor \tfrac{5}{8} B \rfloor\\
+    size(R')
+            &= \overbrace{size(R)}^{
+                            > \lceil \frac{5}{8} B \rceil + \delta}
+                    - \overbrace{size(S)}^{
+                            < \delta + \lfloor \frac{1}{4} B \rfloor}
+            > \lfloor \tfrac{3}{8} B \rfloor\\
+    size(R')
+            &< size(R) \leq B
+    \end{align*}
+    \end{enumerate}
+    \end{block}
+
+\end{column}
+
+
+\end{columns}
+\end{frame}
+\end{document}
+

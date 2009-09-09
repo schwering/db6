@@ -1,0 +1,92 @@
+-- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
+
+with Ada.Text_IO;
+
+with DB.IO.Low_Level;
+with DB.IO.Block;
+with DB.IO.Block.Gen_IO;
+with DB.IO.Block.Direct_IO;
+with DB.BTree.Node;
+with DB.Types;
+with DB.Types.Column;
+with DB.Types.Row;
+with DB.Types.Time;
+with DB.Types.Key;
+
+procedure Node
+is
+   use Ada.Text_IO;
+   use DB.BTree.Node;
+   use DB.Types.Key;
+
+   function Make_Key
+     (Row  : String;
+      Col  : String;
+      Time : Natural)
+      return Key_Type
+   is
+      Key : Key_Type;
+   begin
+      Key.Row.Length                     := Row'Length;
+      Key.Row.Buffer(1 .. Row'Length)    := DB.Types.Row.Indefinite_Buffer_Type(Row);
+      Key.Column.Length                  := Col'Length;
+      Key.Column.Buffer(1 .. Col'Length) := DB.Types.Column.Indefinite_Buffer_Type(Col);
+      Key.Time                           := DB.Types.Time.Time_Type(Time);
+      return Key;
+   end Make_Key;
+
+   procedure Print (Key : Key_Type)
+   is begin
+      Put_Line("  Key "
+              &String(Key.Row.Buffer(1..Key.Row.Length)) &"."
+              &String(Key.Column.Buffer(1..Key.Column.Length)) 
+              &DB.Types.Time.Time_Type'Image(Key.Time));
+   end Print;
+
+   procedure Print (Node : Node_Type)
+   is begin
+      Ada.Text_IO.Put_Line("Node:");
+      for I in 1 .. Degree(Node) loop
+         Put_Line("  Child"&Degree_Type'Image(I));
+         --Put_Line("  Addr"&Address_Type'Image(Child(Node,I)));
+         Put_Line("  Cnt"&Count_Type'Image(DB.BTree.Node.Count(Node,I)));
+         Print(Key(Node, I));
+         New_Line;
+      end loop;
+   end Print;
+
+   Root : constant Node_Type := Root_Node(False);
+   Node : constant Node_Type :=
+      Update(
+         Insertion(
+            Insertion(
+               Root,
+               1, Make_Key("Row", "Col", 100), 3, 5),
+            2, Make_Key("Row2", "Col2", 200), 123, 456),
+         1, Make_Key("Upd", "ate", 1), 1337, 1337
+      );
+   Block : DB.IO.Block.Block_Type;
+   Block2 : DB.IO.Block.Block_Type;
+   FD : DB.IO.Low_Level.File_Descriptor_Type;
+
+begin
+   Ada.Text_IO.Put_Line("Huhu");
+   Print(Root);
+   Ada.Text_IO.Put_Line("Huhu");
+   Print(Node);
+   Ada.Text_IO.Put_Line("Huhu");
+
+   DB.IO.Low_Level.Open("Tmp/MyTestFile", DB.IO.Low_Level.Read_Write, FD);
+   Block := To_Block(Node);
+   DB.IO.Block.Direct_IO.Write(FD, Block);
+   DB.IO.Block.Direct_IO.Seek(FD, 1);
+   DB.IO.Block.Direct_IO.Read(FD, Block2);
+   declare
+      Test_Node : constant Node_Type := From_Block(Block2);
+   begin
+      Ada.Text_IO.Put_Line("Test:");
+      Print(Node);
+   end;
+   DB.IO.Low_Level.Close(FD);
+end Node;
+

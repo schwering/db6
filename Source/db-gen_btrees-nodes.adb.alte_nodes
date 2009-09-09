@@ -1,0 +1,888 @@
+with DB.Util.Binary_Search;
+
+separate (DB.Gen_BTrees)
+package body Nodes is
+
+   function Root_Node
+     (Is_Leaf : Boolean)
+      return Node_Type
+   is
+      Root : Node_Type(Degree => 0, Is_Leaf => Is_Leaf);
+   begin
+      return Root;
+   end Root_Node;
+
+
+   function Free_Node
+      return Node_Type
+   is
+      Free : Node_Type(Degree => 0, Is_Leaf => False);
+   begin
+      Set_Free(Free, True);
+      return Free;
+   end Free_Node;
+
+
+   procedure Set_Free
+     (Node    : in out Node_Type;
+      Is_Free : in     Boolean)
+   is begin
+      Node.Meta_Data.Is_Free := Is_Free;
+   end Set_Free;
+
+
+   function Is_Free
+     (Node : Node_Type)
+      return Boolean
+   is begin
+      return Node.Meta_Data.Is_Free;
+   end Is_Free;
+
+
+   function Degree
+     (Node : Node_Type)
+      return Degree_Type
+   is begin
+      return Node.Degree;
+   end Degree;
+
+
+   function Is_Leaf
+     (Node : Node_Type)
+      return Boolean
+   is begin
+      return Node.Meta_Data.Is_Leaf;
+   end Is_Leaf;
+
+
+   function Is_Inner
+     (Node : Node_Type)
+      return Boolean
+   is begin
+      return not Node.Meta_Data.Is_Leaf;
+   end Is_Inner;
+
+
+   procedure Set_Parent
+     (Node   : in out Node_Type;
+      Parent : in     Address_Type)
+   is begin
+      Node.Meta_Data.Parent := Parent;
+   end Set_Parent;
+
+
+   procedure Set_Parent
+     (Node   : in out Node_Type;
+      Parent : in     Valid_Address_Type)
+   is begin
+      Node.Meta_Data.Parent := To_Address(Parent);
+   end Set_Parent;
+
+
+   function Parent
+     (Node : Node_Type)
+      return Address_Type
+   is begin
+      return Node.Meta_Data.Parent;
+   end Parent;
+
+
+   function Valid_Parent
+     (Node : Node_Type)
+      return Valid_Address_Type
+   is begin
+      return To_Valid_Address(Node.Meta_Data.Parent);
+   end Valid_Parent;
+
+
+   function Is_Root
+     (Node : Node_Type)
+      return Boolean
+   is
+      use type Address_Type;
+   begin
+      return not Is_Valid(Left_Neighbor(Node))
+         and not Is_Valid(Right_Neighbor(Node));
+   end Is_Root;
+
+
+   procedure Set_Left_Neighbor
+     (Node     : in out Node_Type;
+      Neighbor : in     Address_Type)
+   is begin
+      Node.Meta_Data.Left := Neighbor;
+   end Set_Left_Neighbor;
+
+
+   procedure Set_Left_Neighbor
+     (Node     : in out Node_Type;
+      Neighbor : in     Valid_Address_Type)
+   is begin
+      Node.Meta_Data.Left := To_Address(Neighbor);
+   end Set_Left_Neighbor;
+
+
+   function Left_Neighbor
+     (Node : Node_Type)
+      return Address_Type
+   is begin
+      return Node.Meta_Data.Left;
+   end Left_Neighbor;
+
+
+   function Valid_Left_Neighbor
+     (Node : Node_Type)
+      return Valid_Address_Type
+   is begin
+      return To_Valid_Address(Node.Meta_Data.Left);
+   end Valid_Left_Neighbor;
+
+
+   procedure Set_Right_Neighbor
+     (Node     : in out Node_Type;
+      Neighbor : in     Address_Type)
+   is begin
+      Node.Meta_Data.Right := Neighbor;
+   end Set_Right_Neighbor;
+
+
+   procedure Set_Right_Neighbor
+     (Node     : in out Node_Type;
+      Neighbor : in     Valid_Address_Type)
+   is begin
+      Node.Meta_Data.Right := To_Address(Neighbor);
+   end Set_Right_Neighbor;
+
+
+   function Right_Neighbor
+     (Node : Node_Type)
+      return Address_Type
+   is begin
+      return Node.Meta_Data.Right;
+   end Right_Neighbor;
+
+
+   function Valid_Right_Neighbor
+     (Node : Node_Type)
+      return Valid_Address_Type
+   is begin
+      return To_Valid_Address(Node.Meta_Data.Right);
+   end Valid_Right_Neighbor;
+
+
+   function Is_Valid
+     (Address : Address_Type)
+      return Boolean
+   is begin
+      return Block_IO.Is_Valid_Address(Block_IO.Address_Type(Address));
+   end Is_Valid;
+
+
+   function To_Valid_Address
+     (Address : Address_Type)
+      return Valid_Address_Type
+   is begin
+      return Valid_Address_Type(
+         Block_IO.To_Valid_Address(Block_IO.Address_Type(Address)));
+   end To_Valid_Address;
+
+
+   function To_Address
+     (Address : Valid_Address_Type)
+      return Address_Type
+   is begin
+      return Address_Type(
+         Block_IO.To_Address(Block_IO.Valid_Address_Type(Address)));
+   end To_Address;
+
+
+   function Key
+     (Node  : Node_Type;
+      Index : Valid_Index_Type)
+      return Key_Type
+   is begin
+      return Node.Keys(Index);
+   end Key;
+
+
+   function Child
+     (Node  : Node_Type;
+      Index : Valid_Index_Type)
+      return Valid_Address_Type
+   is begin
+      return Node.Children(Index).Address;
+   end Child;
+
+
+   function Count
+     (Node  : Node_Type;
+      Index : Valid_Index_Type)
+      return Count_Type
+   is begin
+      return Node.Children(Index).Count;
+   end Count;
+
+
+   function Count_Sum
+     (Node : Node_Type)
+      return Count_Type
+   is begin
+      if Is_Inner(Node) then
+         declare
+            Count : Count_Type := 0;
+         begin
+            for I in Node.Children'Range loop
+               Count := Count + Node.Children(I).Count;
+            end loop;
+            return Count;
+         end;
+      else
+         return Count_Type(Degree(Node));
+      end if;
+   end Count_Sum;
+
+
+   function Count_Sum
+     (Node     : Node_Type;
+      To_Index : Index_Type)
+      return Count_Type
+   is begin
+      if Is_Inner(Node) then
+         declare
+            Count : Count_Type := 0;
+         begin
+            for I in Node.Children'First .. To_Index loop
+               Count := Count + Node.Children(I).Count;
+            end loop;
+            return Count;
+         end;
+      else
+         return Count_Type(To_Index);
+      end if;
+   end Count_Sum;
+
+
+   function Value
+     (Node  : Node_Type;
+      Index : Valid_Index_Type)
+      return Value_Type
+   is begin
+      return Node.Values(Index);
+   end Value;
+
+
+   function Key_Position_Binary
+     (Node : Node_Type;
+      Key  : Key_Type)
+      return Index_Type
+   is
+      procedure Find is new Util.Binary_Search.Find_Best
+         (Index_Type => Valid_Index_Type,
+          Item_Type  => Key_Type,
+          Array_Type => Key_Array_Type,
+          "<="       => "<=");
+
+      Found : Boolean;
+      Index : Index_Type;
+   begin
+      Find(Node.Keys, Key, Found, Index);
+      if Found then
+         return Index;
+      else
+         return Invalid_Index;
+      end if;
+   end Key_Position_Binary;
+
+
+   function Key_Position_Linear
+     (Node : Node_Type;
+      Key  : Key_Type)
+      return Index_Type
+   is begin
+      for I in Node.Keys'Range loop
+         if Key <= Node.Keys(I) then
+            return I;
+         end if;
+      end loop;
+      return Invalid_Index;
+   end Key_Position_Linear;
+
+
+   function Key_Position
+     (Node : Node_Type;
+      Key  : Key_Type)
+      return Index_Type
+   renames Key_Position_Binary;
+   pragma Unreferenced (Key_Position_Linear);
+
+
+   function Count_Position
+     (Node  : Node_Type;
+      Count : Count_Type)
+      return Index_Type
+   is begin
+      if Is_Inner(Node) then
+         declare
+            Sum : Count_Type := 0;
+         begin
+            for I in Node.Children'Range loop
+               Sum := Sum + Node.Children(I).Count;
+               if Count <= Sum then
+                  return I;
+               end if;
+            end loop;
+            return Invalid_Index;
+         end;
+      else
+         return Index_Type(Count);
+      end if;
+   end Count_Position;
+
+
+   function Child_Position
+     (Node  : Node_Type;
+      Child : Valid_Address_Type)
+      return Valid_Index_Type
+   is begin
+      for I in Node.Children'Range loop
+         if Child = Node.Children(I).Address then
+            return I;
+         end if;
+      end loop;
+      raise Node_Error;
+   end Child_Position;
+
+
+   function Split_Position
+     (Node : Node_Type)
+      return Valid_Index_Type
+   is
+      use type IO.Blocks.Size_Type;
+
+      function Min (S, T : IO.Blocks.Size_Type) return IO.Blocks.Size_Type
+      is
+         pragma Inline (Min);
+      begin
+         if S <= T then
+            return S;
+         else
+            return T;
+         end if;
+      end Min;
+
+      Sizes      : array (1 .. Degree(Node)) of IO.Blocks.Size_Type;
+      Total_Size : IO.Blocks.Size_Type := 0;
+   begin
+      declare
+         Key_Context : Key_Context_Type;
+      begin
+         for I in Node.Keys'Range loop
+            Get_Size_Of_Key(Key_Context, Node.Keys(I), Sizes(I));
+            Total_Size := Total_Size + Sizes(I);
+         end loop;
+      end;
+
+      if Is_Inner(Node) then
+         declare
+            function Size_Of_Child is new IO.Blocks.Size_Of(Address_Count_Type);
+            pragma Inline (Size_Of_Child);
+
+            Child_Size : IO.Blocks.Size_Type;
+         begin
+            for I in Node.Children'Range loop
+               Child_Size := Size_Of_Child(Node.Children(I));
+               Sizes(I)   := Sizes(I) + Child_Size;
+               Total_Size := Total_Size + Child_Size;
+            end loop;
+         end;
+      else
+         declare
+            Value_Context : Value_Context_Type;
+            Value_Size    : IO.Blocks.Size_Type;
+         begin
+            for I in Node.Values'Range loop
+               Get_Size_Of_Value(Value_Context, Node.Values(I), Value_Size);
+               Sizes(I)   := Sizes(I) + Value_Size;
+               Total_Size := Total_Size + Value_Size;
+            end loop;
+         end;
+      end if;
+
+      declare
+         Size_Sum : IO.Blocks.Size_Type := 0;
+         Prev_Min : IO.Blocks.Size_Type := 0;
+      begin
+         for I in Sizes'Range loop
+            declare
+               This_Min : IO.Blocks.Size_Type;
+            begin
+               Size_Sum := Size_Sum + Sizes(I);
+               This_Min := Min(Size_Sum, Total_Size - Size_Sum);
+               if Prev_Min > This_Min then
+                  return I;
+               end if;
+               Prev_Min := This_Min;
+            end;
+         end loop;
+      end;
+      raise Tree_Error; -- never reached
+   end Split_Position;
+
+
+   function Is_Valid
+     (Index : Index_Type)
+      return Boolean
+   is begin
+      return Index /= Invalid_Index;
+   end Is_Valid;
+
+
+   procedure Set_Key
+     (Node  : in out Node_Type;
+      Index : in     Valid_Index_Type;
+      Key   : in     Key_Type)
+   is begin
+      Node.Keys(Index) := Key;
+   end Set_Key;
+
+
+   procedure Set_Count
+     (Node  : in out Node_Type;
+      Index : in     Valid_Index_Type;
+      Count : in     Count_Type)
+   is begin
+      Node.Children(Index).Count := Count;
+   end Set_Count;
+
+
+   procedure Set_Child_And_Count
+     (Node  : in out Node_Type;
+      Index : in     Valid_Index_Type;
+      Child : in     Valid_Address_Type;
+      Count : in     Count_Type)
+   is begin
+      Node.Children(Index) := (Child, Count);
+   end Set_Child_And_Count;
+
+
+   procedure Set_Value
+     (Node  : in out Node_Type;
+      Index : in     Valid_Index_Type;
+      Value : in     Value_Type)
+   is begin
+      Node.Values(Index) := Value;
+   end Set_Value;
+
+
+   procedure Set_Key_And_Value
+     (Node  : in out Node_Type;
+      Index : in     Valid_Index_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type)
+   is begin
+      Set_Key(Node, Index, Key);
+      Set_Value(Node, Index, Value);
+   end Set_Key_And_Value;
+
+
+   function Common_Insertion
+     (Node  : Node_Type;
+      Index : Valid_Index_Type;
+      Key   : Key_Type)
+      return Node_Type
+   is
+      pragma Inline (Common_Insertion);
+      N : Node_Type(Degree(Node) + 1, Is_Leaf(Node));
+   begin
+      N.Meta_Data                    := Node.Meta_Data;
+      N.Meta_Data.Degree             := Node.Meta_Data.Degree + 1;
+      N.Keys(1 .. Index-1)           := Node.Keys(1 .. Index-1);
+      N.Keys(Index)                  := Key;
+      N.Keys(Index+1 .. N.Keys'Last) := Node.Keys(Index .. Node.Keys'Last);
+      return N;
+   end Common_Insertion;
+
+
+   function Insertion
+     (Node  : Node_Type;
+      Index : Valid_Index_Type;
+      Key   : Key_Type;
+      Child : Valid_Address_Type;
+      Count : Count_Type)
+      return Node_Type
+   is
+      N : Node_Type := Common_Insertion(Node, Index, Key);
+   begin
+      N.Children(1 .. Index-1) := Node.Children(1 .. Index-1);
+      N.Children(Index)        := (Child, Count);
+      N.Children(Index+1 .. N.Children'Last)
+                               := Node.Children(Index .. Node.Children'Last);
+      return N;
+   end Insertion;
+
+
+   function Insertion
+     (Node  : Node_Type;
+      Index : Valid_Index_Type;
+      Key   : Key_Type;
+      Value : Value_Type)
+      return Node_Type
+   is
+      N : Node_Type := Common_Insertion(Node, Index, Key);
+   begin
+      N.Values(1 .. Index-1) := Node.Values(1 .. Index-1);
+      N.Values(Index)        := Value;
+      N.Values(Index+1 .. N.Values'Last)
+                             := Node.Values(Index .. Node.Values'Last);
+      return N;
+   end Insertion;
+
+
+   function Deletion
+     (Node  : Node_Type;
+      Index : Valid_Index_Type)
+      return Node_Type
+   is
+      N : Node_Type(Degree(Node) - 1, Is_Leaf(Node));
+   begin
+      N.Meta_Data                  := Node.Meta_Data;
+      N.Meta_Data.Degree           := Node.Meta_Data.Degree - 1;
+      N.Keys(1 .. Index-1)         := Node.Keys(1 .. Index-1);
+      N.Keys(Index .. N.Keys'Last) := Node.Keys(Index+1 .. Node.Keys'Last);
+      if Is_Inner(Node) then
+         N.Children(1 .. Index-1)  := Node.Children(1 .. Index-1);
+         N.Children(Index .. N.Children'Last)
+                                   := Node.Children(Index+1
+                                                    .. Node.Children'Last);
+      else
+         N.Values(1 .. Index-1)    := Node.Values(1 .. Index-1);
+         N.Values(Index .. N.Values'Last)
+                                   := Node.Values(Index+1 .. Node.Values'Last);
+      end if;
+      return N;
+   end Deletion;
+
+
+   function Copy
+     (Node : Node_Type;
+      From : Index_Type;
+      To   : Index_Type)
+      return Node_Type
+   is
+      N : Node_Type(To - From + 1, Is_Leaf(Node));
+   begin
+      N.Meta_Data                       := Node.Meta_Data;
+      N.Meta_Data.Degree                := To - From + 1;
+      N.Keys(1 .. To - From + 1)        := Node.Keys(From .. To);
+      if Is_Inner(Node) then
+         N.Children(1 .. To - From + 1) := Node.Children(From .. To);
+      else
+         N.Values(1 .. To - From + 1)   := Node.Values(From .. To);
+      end if;
+      return N;
+   end Copy;
+
+
+   function Combination
+     (Left_Node  : Node_Type;
+      Right_Node : Node_Type)
+      return Node_Type
+   is
+      use type Block_IO.Address_Type;
+      subtype Left_Range is Index_Type range 1 .. Degree(Left_Node);
+      subtype Right_Range is Index_Type
+                              range Degree(Left_Node) + 1
+                                 .. Degree(Left_Node) + Degree(Right_Node);
+      N : Node_Type(Degree  => Degree(Left_Node) + Degree(Right_Node),
+                    Is_Leaf => Is_Leaf(Left_Node));
+   begin
+      if Is_Free(Left_Node) or Is_Free(Right_Node) or
+         Is_Leaf(Left_Node) /= Is_Leaf(Right_Node) then
+         raise Node_Error;
+      end if;
+
+      N.Meta_Data                := Right_Node.Meta_Data;
+      N.Meta_Data.Parent         := Parent(Right_Node);
+      N.Meta_Data.Left           := Left_Neighbor(Left_Node);
+      N.Meta_Data.Right          := Right_Neighbor(Right_Node);
+      N.Meta_Data.Degree         := Degree(Left_Node) + Degree(Right_Node);
+      N.Keys(Left_Range)         := Left_Node.Keys;
+      N.Keys(Right_Range)        := Right_Node.Keys;
+      if Is_Inner(N) then
+         N.Children(Left_Range)  := Left_Node.Children;
+         N.Children(Right_Range) := Right_Node.Children;
+      else
+         N.Values(Left_Range)    := Left_Node.Values;
+         N.Values(Right_Range)   := Right_Node.Values;
+      end if;
+      return N;
+   end Combination;
+
+
+   function Size_Of
+     (Node : Node_Type)
+      return IO.Blocks.Size_Type
+   is
+      function Size_Of_Meta_Data is new IO.Blocks.Size_Of(Meta_Data_Type);
+      pragma Inline (Size_Of_Meta_Data);
+      use type IO.Blocks.Size_Type;
+      Needed : IO.Blocks.Size_Type :=  Size_Of_Meta_Data(Node.Meta_Data);
+   begin
+      if Is_Free(Node) then
+         return Needed;
+      end if;
+
+      declare
+         Key_Context : Key_Context_Type;
+         Key_Size    : IO.Blocks.Size_Type;
+      begin
+         for I in Node.Keys'Range loop
+            Get_Size_Of_Key(Key_Context, Node.Keys(I), Key_Size);
+            Needed := Needed + Key_Size;
+         end loop;
+      end;
+
+      if Is_Inner(Node) then
+         declare
+            function Size_Of_Child is new IO.Blocks.Size_Of(Address_Count_Type);
+            pragma Inline (Size_Of_Child);
+         begin
+            for I in Node.Children'Range loop
+               Needed := Needed + Size_Of_Child(Node.Children(I));
+            end loop;
+         end;
+      else
+         declare
+            Value_Context : Value_Context_Type;
+            Value_Size    : IO.Blocks.Size_Type;
+         begin
+            for I in Node.Values'Range loop
+               Get_Size_Of_Value(Value_Context, Node.Values(I), Value_Size);
+               Needed := Needed + Value_Size;
+            end loop;
+         end;
+      end if;
+
+      return Needed;
+   end Size_Of;
+
+
+   function Is_Valid
+     (Node           : Node_Type;
+      Force_Non_Root : Boolean := False)
+      return Boolean
+   is begin
+      return Validation(Node, Force_Non_Root) = Valid;
+   end Is_Valid;
+
+
+   function Validation
+     (Node           : Node_Type;
+      Force_Non_Root : Boolean := False)
+      return Validation_Result_Type
+   is
+      function Size_Of_Meta_Data is new IO.Blocks.Size_Of(Meta_Data_Type);
+      pragma Inline (Size_Of_Meta_Data);
+
+      use type IO.Blocks.Size_Type;
+
+      Min_Degree : Degree_Type;
+      Min_Space  : IO.Blocks.Size_Type;
+      Max_Space  : constant IO.Blocks.Size_Type
+                 := IO.Blocks.Block_Size - Size_Of_Meta_Data(Node.Meta_Data);
+      Needed     : IO.Blocks.Size_Type := 0;
+   begin
+      if Is_Free(Node) then
+         return Valid;
+      end if;
+
+      if (Is_Root(Node) and not Force_Non_Root) then
+         Min_Degree := 0;
+         Min_Space  := 0;
+      elsif not Is_Context_Free_Serialization then
+         Min_Degree := 2;
+         Min_Space  := 0;
+      else
+         Min_Degree := 2;
+         Min_Space  := Max_Space * 3 / 8;
+      end if;
+
+      declare
+         Key_Context : Key_Context_Type;
+         Key_Size    : IO.Blocks.Size_Type;
+      begin
+         for I in Node.Keys'Range loop
+            Get_Size_Of_Key(Key_Context, Node.Keys(I), Key_Size);
+            Needed := Needed + Key_Size;
+         end loop;
+      end;
+
+      if Is_Inner(Node) then
+         declare
+            function Size_Of_Child is new IO.Blocks.Size_Of(Address_Count_Type);
+            pragma Inline (Size_Of_Child);
+         begin
+            for I in Node.Children'Range loop
+               Needed := Needed + Size_Of_Child(Node.Children(I));
+            end loop;
+         end;
+      else
+         declare
+            Value_Context : Value_Context_Type;
+            Value_Size    : IO.Blocks.Size_Type;
+         begin
+            for I in Node.Values'Range loop
+               Get_Size_Of_Value(Value_Context, Node.Values(I), Value_Size);
+               Needed := Needed + Value_Size;
+            end loop;
+         end;
+      end if;
+
+      if Needed < Min_Space or Degree(Node) < Min_Degree then
+         return Too_Small;
+      elsif Needed > Max_Space then
+         return Too_Large;
+      else
+         return Valid;
+      end if;
+   end Validation;
+
+
+   function Max_Key_Size
+     (Max_Value_Size : IO.Blocks.Size_Type)
+      return IO.Blocks.Size_Type
+   is
+      function Max_Entry_Size
+         return IO.Blocks.Size_Type
+      is
+         pragma Inline (Max_Entry_Size);
+
+         function Size_Of_Meta_Data is new IO.Blocks.Size_Of(Meta_Data_Type);
+         pragma Inline (Size_Of_Meta_Data);
+
+         use type IO.Blocks.Size_Type;
+
+         Meta_Data       : Meta_Data_Type;
+         Effective_Space : constant IO.Blocks.Size_Type
+                         := IO.Blocks.Block_Size - Size_Of_Meta_Data(Meta_Data);
+      begin
+         return Effective_Space * 1 / 4;
+      end Max_Entry_Size;
+
+      function Size_Of_Child is new IO.Blocks.Size_Of(Address_Count_Type);
+      pragma Inline (Size_Of_Child);
+
+      use type IO.Blocks.Size_Type;
+
+      Some_Address : constant Valid_Address_Type  := Root_Address;
+      Some_Count   : constant Count_Type          := 0;
+      Child        : constant Address_Count_Type  := (Some_Address, Some_Count);
+      Child_Size   : constant IO.Blocks.Size_Type := Size_Of_Child(Child);
+   begin
+      if Child_Size > Max_Value_Size then
+         return Max_Entry_Size - Child_Size;
+      else
+         return Max_Entry_Size - Max_Value_Size;
+      end if;
+   end Max_Key_Size;
+
+
+   function To_Block
+     (Node : Node_Type)
+      return IO.Blocks.Block_Type
+   is
+      procedure Append_Meta_Data is new IO.Blocks.Append(Meta_Data_Type);
+      pragma Inline (Append_Meta_Data);
+
+      Block  : IO.Blocks.Block_Type;
+      Cursor : IO.Blocks.Cursor_Type;
+   begin
+      Append_Meta_Data(Block, Cursor, Node.Meta_Data);
+
+      if Is_Free(Node) or else Degree(Node) = 0 then
+         return Block;
+      end if;
+
+      declare
+         Key_Context : Key_Context_Type;
+      begin
+         for I in Node.Keys'Range loop
+            Append_Key(Key_Context, Block, Cursor, Node.Keys(I));
+         end loop;
+      end;
+      
+      if Is_Inner(Node) then
+         declare
+            procedure Append_Child is new IO.Blocks.Append(Address_Count_Type);
+            pragma Inline (Append_Child);
+         begin
+            for I in Node.Children'Range loop
+               Append_Child(Block, Cursor, Node.Children(I));
+            end loop;
+         end;
+      else
+         declare
+            Value_Context : Value_Context_Type;
+         begin
+            for I in Node.Values'Range loop
+               Append_Value(Value_Context, Block, Cursor, Node.Values(I));
+            end loop;
+         end;
+      end if;
+      return Block;
+   end To_Block;
+
+
+   function From_Block
+     (Block : IO.Blocks.Block_Type)
+      return Node_Type
+   is
+      procedure Extract_Meta_Data is new IO.Blocks.Extract(Meta_Data_Type);
+      pragma Inline (Extract_Meta_Data);
+
+      Cursor    : IO.Blocks.Cursor_Type;
+      Meta_Data : Meta_Data_Type;
+   begin
+      Extract_Meta_Data(Block, Cursor, Meta_Data);
+      declare
+         Node : Node_Type(Meta_Data.Degree, Meta_Data.Is_Leaf);
+      begin
+         Node.Meta_Data := Meta_Data;
+
+         if Is_Free(Node) or else Degree(Node) = 0 then
+            return Node;
+         end if;
+
+         declare
+            Key_Context : Key_Context_Type;
+         begin
+            for I in Node.Keys'Range loop
+               Extract_Key(Key_Context, Block, Cursor, Node.Keys(I));
+            end loop;
+         end;
+
+         if Is_Inner(Node) then
+            declare
+               procedure Extract_Child is
+                  new IO.Blocks.Extract(Address_Count_Type);
+               pragma Inline (Extract_Child);
+            begin
+               for I in Node.Children'Range loop
+                  Extract_Child(Block, Cursor, Node.Children(I));
+               end loop;
+            end;
+         else
+            declare
+               Value_Context : Value_Context_Type;
+            begin
+               for I in Node.Values'Range loop
+                  Extract_Value(Value_Context, Block, Cursor, Node.Values(I));
+               end loop;
+            end;
+         end if;
+         return Node;
+      end;
+   end From_Block;
+
+end Nodes;
+

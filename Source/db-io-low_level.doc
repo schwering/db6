@@ -1,0 +1,20 @@
+RATIONALE DB.IO.Low_Level
+
+Simple wrapping of system calls via the C-functions open(), read(), write(),
+lseek().
+Also see C/db-io-low_level.c.
+
+The C code expects HAVE_OFF64_T to be set or not depending on whether on the
+system off64_t is defined. If HAVE_OFF64_T is not defined, it defines off64_t
+as off_t and lseek64() as lseek().
+This is only relevant for seeking in the file. The C code uses lseek64() and
+off64_t, of course.
+In the Ada code, this requires File_Position_Type to be defined manually to
+mod 2**64. Note that really weird errors occur when File_Position_Type and
+off_t do not match in size.
+
+There are procedures that allow for locking files on the OS-level (preventing
+other processes from opening the respective file). At least under Windows,
+locking is not supported and does nothing (not even warn you). On other
+OSs, the flock() system call is invoked.
+

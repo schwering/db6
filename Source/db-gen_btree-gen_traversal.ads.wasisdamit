@@ -1,0 +1,25 @@
+-- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
+
+generic
+package DB.Gen_BTree.Gen_Traversal is
+   --pragma Preelaborate;
+
+   procedure Traverse_Depth_First
+     (Tree  : in out Tree_Type;
+      Visit : access procedure (A : in Node.Valid_Address_Type;
+                                N : in Node.Node_Type;
+                                L : in Height_Type));
+
+   procedure Traverse_Breadth_First
+     (Tree  : in out Tree_Type;
+      Visit : access procedure (A : in Node.Valid_Address_Type;
+                                N : in Node.Node_Type;
+                                L : in Height_Type));
+
+   procedure Traverse_Free
+     (Tree  : in out Tree_Type;
+      Visit : access procedure (A : in Node.Valid_Address_Type;
+                                N : in Node.Node_Type));
+
+end DB.Gen_BTree.Gen_Traversal;
+

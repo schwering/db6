@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+<title>Dingsbums</title>
+<style text="text/css">
+	body {
+		width: 98%; height: 98%; font-family: sans-serif; 
+		position: absolute; }
+	.box {
+		position: relative;
+		top: 10%;
+		margin-left: auto;
+		margin-right: auto;
+		width: 24em; min-width: 24em; max-width: 24em;
+		/*width: 60%; min-width: 300px; max-width: 500px;*/
+		text-align: center; }
+	.boxhead {
+		color: white; background-color: blue;
+		font-size: 200%; font-weight: bold; 
+		padding: 10px 10px 10px 10px;
+		border-top-left-radius: 20px;
+		border-top-right-radius: 20px; 
+		-webkit-border-top-left-radius: 20px;
+		-webkit-border-top-right-radius: 20px;
+		-moz-border-radius-topleft: 20px;
+		-moz-border-radius-topright: 20px; }
+	.boxbody {
+		color: black; background-color: lightblue;
+		font-size: 100%;
+		padding: 20px 10px 10px 10px;
+		border-bottom-left-radius: 20px;
+		border-bottom-right-radius: 20px;
+		-webkit-border-bottom-left-radius: 20px;
+		-webkit-border-bottom-right-radius: 20px;
+		-moz-border-radius-bottomleft: 20px;
+		-moz-border-radius-bottomright: 20px; }
+	.boxhead a {
+		color: white; } 
+	.boxbody a {
+		color: black; } 
+	.boxbody input {
+		color: black; background-color: white;
+		border: 0px #000000 solid;
+		padding-left: 5px; padding-right: 5px;
+		border-radius: 5px 10px;
+		-webkit-border-radius: 5px 10px;
+		-moz-border-radius: 5px; }
+	.small {
+		font-size: 70%; font-weight: normal; }
+	a:link,
+	a:visited {
+		text-decoration: underline; } 
+	a:active,
+	a:hover {
+		text-decoration: none; } 
+	.b {
+		border: 1pt black solid; }
+
+	h1 {
+		font-size: 140%;
+		padding-top: 25pt; }
+	p {
+		text-align: justify;
+		font-size: 90%;
+		line-height: 150%; }
+</style>
+</head>
+<body>
+<div class="box">
+	<div class="boxhead">
+		dingsbums
+	</div>
+	<div class="boxbody">
+		<form method="get" action="search">
+		<input type="text" name="q" style="width: 70%;" />
+		<input type="submit" value="Search" />
+		</form>
+		<div class="small" style="padding-top: 10px;">
+			<a href="about.html">About</a> - 
+			<a href="privacy.html">Privacy</a>
+		</div>
+	</div>
+
+	<h1>About</h1>
+	<p> Dingsbums is a web search engine for news-sites and blogs.
+	It crawls the web, searches for RSS and Atom feeds, subscribes and then
+	supervises them. </p>
+	<p> The software behind Dingsbums is written from scratch.
+	The part that I'm interested most in is the storage engine (DBMS).
+	All software is written in Ada. 
+	The operating system is Linux using XFS. </p>
+	<p> The hardware is currently two normal computers; they cost about
+	250 &euro; a piece. The internet connection speed is, depending on where
+	the computers are, fast or slow. Very fast. Or very slow. </p>
+	<p> My name is Christoph Schwering. I'm studying Computer Science at
+	RWTH Aachen University.
+	I'm writing Dingsbums because I'd like to play around with "large"
+	amounts of data.
+	My e-mail address is
+	<nobr><em>schwering (&auml;t) gmail.com</em></nobr>. </p>
+
+	<h1>Privacy</h1>
+	<p> Hey, this is a one-man-show.
+	I don't even have time to deal with cookies and this stuff. </p>
+</div>
+</body>
+</html>
+

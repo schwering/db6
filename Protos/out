@@ -1,0 +1,28 @@
+[chs@thinkpad Protos]$ gnatmake trans2.adb && ./trans2 
+gcc -c trans2.adb
+gnatbind -x trans2.ali
+gnatlink trans2.ali
+Transaction Supervisor supervisors(1)_099E9A90
+Transaction Supervisor supervisors(2)_099ECB08
+Executing
+Executing
+Ok, starting resolver
+T 2: executor_task_B7700468 having 1
+T 2: executor_task_B7700468
+T 2: Okay, Houston, we've had a problem here
+T 2: This is Houston. Say again please.
+T 2: executor_task_B7700468 waiting for 2
+T 1: executor_task_B7300468 having 2
+T 1: executor_task_B7300468
+T 1: Okay, Houston, we've had a problem here
+T 1: This is Houston. Say again please.
+T 1: executor_task_B7300468 waiting for 1
+
+
+
+Aborting executor_task_B7700468
+Auto unlock
+Completed = FALSE
+Executing
+^C
+

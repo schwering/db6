@@ -1,0 +1,32 @@
+[chs@thinkpad Protos]$ gnatmake trans2.adb && ./trans2 
+gnatmake: "trans2" up to date.
+Transaction Supervisor supervisors(1)_0844DAA0
+Transaction Supervisor supervisors(2)_08450B18
+Ok, starting resolver
+Executing
+Executing
+                                                                                T 2 [executor_task_B7200468]: having 1
+                                        T 1 [executor_task_B7600468]: having 2
+                                                                                T 2 [executor_task_B7200468]: Okay, Houston, we've had a problem here
+                                        T 1 [executor_task_B7600468]: Okay, Houston, we've had a problem here
+                                                                                T 2 [executor_task_B7200468]: This is Houston. Say again please.
+                                        T 1 [executor_task_B7600468]: This is Houston. Say again please.
+                                                                                T 2 [executor_task_B7200468]: waiting for 2
+                                        T 1 [executor_task_B7600468]: waiting for 1
+Aborting executor_task_B7200468
+                                        T 1 [executor_task_B7600468]: got for 1
+                                        T 1 [executor_task_B7600468]: Houston, we've had a problem. We've had a main B bus undervolt.
+Completed = TRUE
+Executed
+Completed = FALSE
+Executing
+                                                                                T 2 [executor_task_B7200468]: having 1
+                                                                                T 2 [executor_task_B7200468]: Okay, Houston, we've had a problem here
+                                                                                T 2 [executor_task_B7200468]: This is Houston. Say again please.
+                                                                                T 2 [executor_task_B7200468]: waiting for 2
+Aborting executor_task_B7600468
+                                                                                T 2 [executor_task_B7200468]: got for 2
+                                                                                T 2 [executor_task_B7200468]: Houston, we've had a problem. We've had a main B bus undervolt.
+Completed = TRUE
+Executed
+

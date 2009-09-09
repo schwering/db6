@@ -1,0 +1,7 @@
+100,000 entries
+		4k-unbounded 	4k-bounded	32k-bounded	32k-unbounded
+inserting	54		23		77		139
+search		40		21		26		 82
+delete		55		26		82		174
+antisearch	 5		 5		6		  6
+reinsert	54		22		79		140

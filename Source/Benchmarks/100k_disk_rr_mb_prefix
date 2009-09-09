@@ -1,0 +1,247 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Making test tree
+for F in db-io-low_level db-util-timer; do make C/objects/$F.o || exit; done
+cc -c -Wall -D_FILE_OFFSET_BITS=64 C/db-io-low_level.c -o C/objects/db-io-low_level.o
+cc -c -Wall -D_FILE_OFFSET_BITS=64 C/db-util-timer.c -o C/objects/db-util-timer.o
+for T in levenshtein prefix search tree ; do gnatmake -Pdb -XBUILD=release test_$T.adb || exit; done
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_levenshtein.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-compression.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-compression-levenshtein.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types.ads
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/release/test_levenshtein.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/release/test_levenshtein.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/release/test_levenshtein
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_prefix.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-compression-prefix.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-gen_string.adb
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/release/test_prefix.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/release/test_prefix.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/release/test_prefix
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_search.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-util.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-util-search.adb
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/release/test_search.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/release/test_search.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/release/test_search
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_tree.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-node.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-tree.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-tree-check.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-tree-stats.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-tree-traverse.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block-direct_io.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-low_level.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-column.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-key.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-row.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-time.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-value.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-util-timer.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-util-traceback.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-node.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-tree.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-tree-check.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-tree-stats.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-tree-traverse.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree.ads
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block-gen_io.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_node.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_tree.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block-gen_buffer.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_tree-gen_check.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_tree-gen_stats.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_tree-gen_traverse.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-gen_prefix_compressed_string.adb
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block-memory_io.adb
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/release/test_tree.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/release/test_tree.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/release/test_tree
+for T in levenshtein prefix search tree ; do gnatmake -Pdb -XBUILD=debug test_$T.adb || exit; done
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_levenshtein.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-compression.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-compression-levenshtein.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types.ads
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/debug/test_levenshtein.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/debug/test_levenshtein.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/debug/test_levenshtein
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_prefix.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-compression-prefix.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-gen_string.adb
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/debug/test_prefix.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/debug/test_prefix.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/debug/test_prefix
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_search.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-util.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-util-search.adb
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/debug/test_search.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/debug/test_search.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/debug/test_search
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_tree.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-node.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-tree.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-tree-check.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-tree-stats.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-btree-tree-traverse.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block-direct_io.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-low_level.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-column.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-key.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-row.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-time.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-value.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-util-timer.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-util-traceback.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-node.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-tree.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-tree-check.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-tree-stats.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-volatile_btree-tree-traverse.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree.ads
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block-gen_io.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_node.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_tree.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block-gen_buffer.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_tree-gen_check.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_tree-gen_stats.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-gen_btree-gen_tree-gen_traverse.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-types-gen_prefix_compressed_string.adb
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/db-io-block-memory_io.adb
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/debug/test_tree.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/debug/test_tree.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/debug/test_tree
+
+Dingsbumsing temp files
+
+Running test tree
+
+INSERTING.
+ 10000:  5.4 5.1
+ 20000:  10.2 10.4
+ 30000:  16.4 16.4
+ 40000:  22.4 23.1
+ 50000:  28.0 30.3
+OK 50000 4 1504 1504 0 57 34 2 955972 6156288 635 1.55029E-01
+ 60000:  34.2 36.0
+ 70000:  41.4 42.4
+ 80000:  47.1 49.2
+ 90000:  53.2 55.1
+ 100000:  59.5 62.0
+OK 100000 4 3077 3077 0 55 33 4 2117852 12599296 688 1.67969E-01
+
+SEARCH.
+ 10000:  1.3 1.3
+ 20000:  3.3 3.4
+ 30000:  4.0 4.0
+ 40000:  5.4 5.4
+ 50000:  7.3 7.3
+ 60000:  8.0 8.1
+ 70000:  9.3 9.4
+ 80000:  11.3 11.3
+ 90000:  12.0 12.0
+ 100000:  13.3 13.4
+
+DELETING.
+ 10000:  7.0 7.0
+ 20000:  14.3 14.2
+ 30000:  20.1 20.3
+ 40000:  27.4 27.3
+ 50000:  33.0 34.3
+OK 50000 4 3077 1827 1250 52 16 4 2151357 7479296 1177 2.87354E-01
+
+ANTISEARCH.
+
+REINSERTING.
+ 10000:  5.3 5.3
+ 20000:  11.2 11.2
+ 30000:  17.3 17.3
+ 40000:  23.5 24.5
+ 50000:  30.3 30.5
+OK 100000 4 3085 3085 0 53 33 4 2155348 12632064 698 1.70410E-01
+
+SEARCH.
+ 50000:  7.5 7.5
+OK 100000 4 3085 3085 0 53 33 4 2155348 12632064 698 1.70410E-01
+
+ 100000:  13.2 13.2
+OK 100000 4 3085 3085 0 53 33 4 2155348 12632064 698 1.70410E-01
+
+OK 100000 4 3085 3085 0 53 33 4 2155348 12632064 698 1.70410E-01
+Finished.

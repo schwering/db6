@@ -1,0 +1,91 @@
+Making test tree
+for F in db-io-low_level db-util-timer; do make C/objects/$F.o || exit; done
+make[1]: `C/objects/db-io-low_level.o' is up to date.
+make[1]: `C/objects/db-util-timer.o' is up to date.
+for T in levenshtein prefix search tree dtree vtree ; do gnatmake -Pdb -XBUILD=release $T.adb || exit; done
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/levenshtein" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/prefix" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/search" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/tree" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/dtree" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/vtree" up to date.
+for T in levenshtein prefix search tree dtree vtree ; do gnatmake -Pdb -XBUILD=debug $T.adb || exit; done
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/levenshtein" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/prefix" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/search" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/tree" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/dtree" up to date.
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/vtree" up to date.
+
+Running test tree
+Check successful
+
+INSERTING.
+ 10000:  1.1 1.1
+ 20000:  2.4 2.5
+ 30000:  4.2 4.1
+ 40000:  5.1 5.4
+ 50000:  7.4 7.1
+ 60000:  8.0 8.4
+ 70000:  10.5 10.1
+ 80000:  11.1 12.4
+ 90000:  13.5 13.1
+ 100000:  14.0 15.4
+Check successful
+OK 100000 4 5250 5250 0 47 20 7 3812179 21499904 726 1.77246E-01
+
+SEARCH.
+ 10000:  0.3 0.3
+ 20000:  1.4 1.4
+ 30000:  1.1 1.0
+ 40000:  1.2 1.4
+ 50000:  1.5 2.3
+ 60000:  2.2 2.0
+ 70000:  2.1 2.3
+ 80000:  2.4 3.4
+ 90000:  3.3 3.0
+ 100000:  3.1 3.3
+
+DELETING.
+ 10000:  2.3 2.2
+ 20000:  3.3 3.4
+ 30000:  5.3 5.2
+ 40000:  6.0 6.3
+ 50000:  7.5 8.3
+ 60000:  9.2 9.1
+ 70000:  10.1 11.5
+ 80000:  11.4 12.1
+ 90000:  13.3 13.2
+
+ANTIUPDATE.
+ 10000:  0.2 0.2
+ 20000:  0.4 0.5
+ 30000:  1.4 1.3
+ 40000:  1.2 1.1
+ 50000:  1.0 1.2
+ 60000:  1.3 1.4
+ 70000:  2.5 2.4
+ 80000:  2.2 2.1
+ 90000:  2.0 2.1
+
+UPDATE.
+ 100000:  0.4 0.4
+
+ANTISEARCH.
+Check successful
+
+REINSERTING.
+ 10000:  1.2 1.3
+ 20000:  3.4 3.3
+ 30000:  4.1 4.1
+ 40000:  5.4 6.4
+ 50000:  7.2 7.1
+ 60000:  8.3 9.3
+ 70000:  10.3 10.2
+ 80000:  11.1 12.3
+ 90000:  13.4 13.2
+
+SEARCH.
+ 90000:  3.3 3.1
+OK 100000 4 5250 5243 7 48 20 7 3785173 21471232 721 1.76025E-01
+Finished.

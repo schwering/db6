@@ -1,0 +1,247 @@
+V "GNAT Lib v2009"
+M P W=b
+P SS ZX
+R vvvnnnvnnnnnvnnvvnvvvnvvnvvnvnvvnvnnvnvvnvnnnnvnvnnnnnnvnvnnnnnnv3nnnv3nv1+nv1+nv1+nn
+
+U trans2%b		trans2.adb		4ac6dae3 NE OO SU
+W ada%s			ada.ads			ada.ali
+W ada.calendar.delays%s	a-caldel.adb		a-caldel.ali
+W ada.exceptions%s	a-except.adb		a-except.ali
+W ada.exceptions.traceback%s  a-exctra.adb	a-exctra.ali
+W ada.finalization%s	a-finali.adb		a-finali.ali
+W ada.finalization.list_controller%s  a-filico.adb  a-filico.ali
+W ada.real_time%s	a-reatim.adb		a-reatim.ali
+W ada.tags%s		a-tags.adb		a-tags.ali
+W ada.task_identification%s  a-taside.adb	a-taside.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W interfaces%s		interfac.ads		interfac.ali
+W system%s		system.ads		system.ali
+W system.concat_2%s	s-conca2.adb		s-conca2.ali
+W system.concat_4%s	s-conca4.adb		s-conca4.ali
+W system.concat_7%s	s-conca7.adb		s-conca7.ali
+W system.exception_table%s  s-exctab.adb	s-exctab.ali
+W system.finalization_implementation%s  s-finimp.adb  s-finimp.ali
+W system.finalization_root%s  s-finroo.adb	s-finroo.ali
+W system.img_bool%s	s-imgboo.adb		s-imgboo.ali
+W system.img_int%s	s-imgint.adb		s-imgint.ali
+W system.parameters%s	s-parame.adb		s-parame.ali
+W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+W system.soft_links%s	s-soflin.adb		s-soflin.ali
+W system.standard_library%s  s-stalib.adb	s-stalib.ali
+W system.task_info%s	s-tasinf.adb		s-tasinf.ali
+W system.tasking%s	s-taskin.adb		s-taskin.ali
+W system.tasking.async_delays%s  s-taasde.adb	s-taasde.ali
+W system.tasking.protected_objects%s  s-taprob.adb  s-taprob.ali
+W system.tasking.protected_objects.entries%s  s-tpoben.adb  s-tpoben.ali
+W system.tasking.protected_objects.operations%s  s-tpobop.adb  s-tpobop.ali
+W system.tasking.rendezvous%s  s-tasren.adb	s-tasren.ali
+W system.tasking.stages%s  s-tassta.adb		s-tassta.ali
+
+D ada.ads		20090519112355 9c7dd3ea
+D a-calend.ads		20090519112250 19486c30
+D a-caldel.ads		20090519112249 c565f6eb
+D a-except.ads		20090519112305 b54b55de
+D a-exctra.ads		20090519112306 14dfe11b
+D a-finali.ads		20090519112309 bfd2ca79
+D a-filico.ads		20090519112308 4ff02a40
+D a-ioexce.ads		20090519112311 be0900a0
+D a-reatim.ads		20090519112319 7c462ab4
+D a-stream.ads		20090519112324 34aca5be
+D a-tags.ads		20090519112335 bfa07446
+D a-taside.ads		20090519112336 ed6367a8
+D a-textio.ads		20090519112337 fe8af46e
+D a-unccon.ads		20090519112342 51e09df2
+D interfac.ads		20090519112459 a69cad5c
+D i-c.ads		20090519112452 bc3ef662
+D i-cstrea.ads		20090519112454 e1e064a9
+D system.ads		20090519112725 83f59500
+D s-atacco.ads		20090519112525 60789a20
+D s-conca2.ads		20090519112533 3d28f3da
+D s-conca4.ads		20090519112533 4d10618f
+D s-conca7.ads		20090519112534 2db504a8
+D s-crtl.ads		20090519112535 89a96a96
+D s-exctab.ads		20090519112537 4b7fd51d
+D s-ficobl.ads		20090519112540 8bb681e5
+D s-finimp.ads		20090519112541 90fd9896
+D s-finroo.ads		20090519112541 1408f9d1
+D s-imgboo.ads		20090519112546 a8111aea
+D s-imgint.ads		20090519112547 f77d133c
+D s-linux.ads		20090519112554 ad070dbe
+D s-osinte.ads		20090519112558 9854f6ef
+D s-parame.ads		20090519112621 f32e56e9
+D s-secsta.ads		20090519112625 d2c357fb
+D s-soflin.ads		20090519112627 61e5c9e8
+D s-stache.ads		20090519112629 481f9e9d
+D s-stausa.ads		20090519112629 146a8ff1
+D s-stalib.ads		20090519112629 9cbc334a
+D s-stoele.ads		20090519112630 a4d57c26
+D s-stoele.adb		20090519112630 49ef69d7
+D s-stratt.ads		20090519112631 fef7c1da
+D s-tasinf.ads		20090519112639 268f0cd4
+D s-taspri.ads		20090519112642 5459bcd0
+D s-taprop.ads		20090519112637 25a7965c
+D s-taskin.ads		20090519112641 78c4deed
+D s-taasde.ads		20090519112633 3871b753
+D s-taprob.ads		20090519112635 5e00115c
+D s-tpoben.ads		20090519112646 18aadfe3
+D s-tpobop.ads		20090519112646 ccd38b83
+D s-tasren.ads		20090519112643 5bda31d2
+D s-tassta.ads		20090519112643 71d2b71d
+D s-traent.ads		20090519112649 a66ef260
+D s-unstyp.ads		20090519112650 c0f9fae5
+D s-wchcon.ads		20090519112659 30c48dc1
+D trans2.adb		20090723164114 47693799
+X 1 ada.ads
+16K9*Ada 19e8 54|1r6 1r23 2r6 3r6 4r6 5r6 12r28 14r40 17r12 20r12 24r14 25r11
+. 29r12 307r25 328r19 396r31 397r31
+X 4 a-except.ads
+56K13*Exceptions 354e19 54|4w10 5r10 307r29 328r23 396r35 397r35
+100V13*Exception_Message{string} 54|397r46
+110V13*Exception_Information{string} 54|307r40 328r34 396r46
+X 5 a-exctra.ads
+43K24*Traceback 58e29 54|5w21
+X 6 a-finali.ads
+45K13*Finalization 74e21 54|3w10
+X 12 a-taside.ads
+42K13*Task_Identification 75e28 54|2w10 12r32 14r44 17r16 20r16 24r18 25r15
+. 29r16
+46P9*Task_Id(44|882R9) 54|12r52
+49p4*Null_Task_Id{46P9} 54|14r64
+51V13*"="{boolean} 54|113r57
+54V13*Image{string} 54|20r36 24r38
+56V13*Current_Task{46P9} 54|17r36 25r35
+59U14*Abort_Task 54|29r36
+X 13 a-textio.ads
+51K13*Text_IO 509e16 54|1w10 1r27
+266U14*Put_Line 54|97r10 110r22 287r7 296r13 305r22 312r13 323r13 326r16
+. 344r10 396r7 397r7
+X 44 s-taskin.ads
+882R9*Ada_Task_Control_Block
+X 54 trans2.adb
+7U11*Trans2 7b11 398l5 398t11
+9N4 Column_Width 342r33
+12P12 Task_Id_Type{12|46P9} 13r13 14r19 16r36 19r34 28r39 38r41 41r19 66r41
+. 107r39
+14p4 Null_Task_Id=14:64{12|46P9} 41r35 58r23
+16V13 Current_Task_Id=17:36{12|46P9} 52r23
+19V13 Task_Name=20:36{string} 110r44
+19p24 Task_Id{12P12}
+22V13 Current_Task_Name{string} 22b13 26l8 26t25 287r43 306r25 327r19 344r45
+28U14 Abort_Task=29:36 111r22
+28p26 Task_Id{12P12}
+33K12 Locks 45l8 45e13 47b17 71l8 71t13 77r30 89r46 92r40 334r44 336r8
+34W22 Lock_Type 42l11 42e20 44r43 48b22 70l11 70t20 334r50 336r14
+35Y16 Lock 49b16 53l14 53t18 340r9 355r24 358r24 367r24 371r24
+36U20 Unlock 55b20 59l14 59t20 114r42 346r9 376r21 377r21
+37Y16 Wait_For_Unlock 61b16 64l14 64t29 119r33
+38V19 Owning_Task_Id{12P12} 66b19 69l14 69t28 108r59 113r42
+40b10 Locked{boolean} 49r30 51r13 57r13 61r41
+41p10 Owner{12P12} 52r13 58r13 68r20
+44P12 Lock_Access_Type(34W22) 77r36 89r52 92r46
+75t9 Deadlock_Resolver_Task 81b14 124l8 124t30 385r4 387r7 389r4
+76Y13 Set_Count 76>24 85b14 87l11 87t20 385r27
+76i24 N{natural} 86r20
+77Y13 Add_Lock 77>23 92b20 94l17 94t25 387r30
+77p23 Lock{44P12} 93r33
+78Y13 Start 96b17 389r27
+83i7 Length{natural} 86m10 89r35
+85i25 N{natural}
+89a10 Lock_Array(44P12) 91r19 93m16 100r22 108r45 112r31 113r28 114r28 119r19
+91i14 I{integer} 93r27
+92p30 Lock{44P12}
+100i17 I{integer} 108r56 119r30
+107p22 Owning_Task_Id{12P12} 110r54 111r33 113r59
+112i26 J{integer} 113r39 114r39
+130+12 Item_Type 136r61 137r62 141r33 142r34 146r20 151r61 156r62 162r33
+. 167r34
+131k12 Gen_Events 130z12 148l8 148e18 150b17 182l8 182t18 242r29
+132W12*Event_Type 136r38 137r40 147l11 147e21 151r38 156r40 161b22 164r21
+. 173r13 177r27 181l11 181t21 243r36[242]
+134X7*Event_Error 170r22
+136U17*Wait 136=23 136<50 151b17 154l11 154t15
+136w23 Event{132W12} 151b23 153r10
+136*50 Item{130+12} 151b50 153m21
+137U17*Signal 137=25 137>52 156b17 159l11 159t17 320r39[242]
+137w25 Event{132W12} 156b25 158r10
+137*52 Item{130+12} 156b52 158r23
+141Y16 Wait 141<22 153r16 162b16 165l14 165t18 177r38
+141*22 Item{130+12} 164m13
+142Y16 Signal 142>24 158r16 167b16 175l14 175t20
+142*24 Item{130+12} 173r32
+144Y16 Reset 177b16 180l14 180t19
+145b10 Occured{boolean} 162r49 169r16 172m13 179m13
+146*10 Item{130+12} 164r32 173m24
+162*22 Item{130+12}
+167*24 Item{130+12}
+187+12 Item_Type 191r63 192r64 195r48 199r35 200r36 210r63 215r64 221r35
+. 228r36
+188M12 Index_Type 195r33 196r36 204r22 205r22
+189k12 Gen_Queues 187z12 188z12 207l8 207e18 209b17 235l8 235t18 259r41
+190W12 Queue_Type 191r41 192r41 206l11 206e21 210r41 215r41 220b22 234l11
+. 234t21 261r31[259]
+191U17*Enqueue 191=26 191>53 210b17 213l11 213t18 266r29[259]
+191w26 Queue{190W12} 210b26 212r10
+191*53 Item{187+12} 210b53 212r24
+192U17*Dequeue 192=26 192<53 215b17 218l11 218t18 274r29[259]
+192w26 Queue{190W12} 215b26 217r10
+192*53 Item{187+12} 215b53 217m24
+195A12 Items_Type(187+12)<188M12> 202r22
+196A12 Booleans_Type(boolean)<188M12> 203r22
+199Y16 Enqueue 199>25 212r16 221b16 226l14 226t21
+199*25 Item{187+12} 223r33
+200Y16 Dequeue 200<25 217r16 228b16 233l14 233t21
+200*25 Item{187+12} 230m13
+202a10 Items{195A12} 223m13 230r32
+203a10 Used{196A12} 221r55 224m13 228r52 231m13
+204*10 Enq_Index{188M12} 221r60 223r19 224r18 225m13 225r33
+205*10 Deq_Index{188M12} 228r57 230r38 231r18 232m13 232r32
+221*25 Item{187+12}
+228*25 Item{187+12}
+239K12 Transactions 250l8 250e20 252b17 278l8 278t20 290r37 291r37 294r13
+. 317r25 320r19 391r4 392r4
+240P12 Transaction_Proc_Type 246r33 248r34 256r17 263r33 269r34 290r50
+241B15 Success_Type{boolean} 242r40
+242K15 Events[131] 243r29 320r32
+243W15 Event_Type{132W12[242]} 244r44
+244P12 Event_Access_Type(243W15) 247r33 249r34 257r17 264r33 270r34 291r50
+. 317r38
+246U17 Enqueue 246>26 247>26 263b17 267l11 267t18 391r17 392r17
+246p26 T{240P12} 263b26 266r42
+247p26 E{244P12} 264b26 266r45
+248U17 Dequeue 248<26 249<26 269b17 277l11 277t18 294r26
+248p26 T{240P12} 269b26 275m10
+249p26 E{244P12} 270b26 276m10
+253M12 Transaction_Queue_Index 260r22
+254R12 Item_Type 258e20 260r11 272r14
+256p13 T{240P12} 275r17
+257p13 E{244P12} 276r17
+259K15 Transaction_Queues[189] 261r12 266r10 274r10
+261w7 Ts{190W12[259]} 266m37 274m37
+272r10 I{254R12} 274m41 275r15 276r15
+284T14 Transaction_Supervisor_Type 285b14 331l8 331t35 333r36
+290p13 Transaction_Procedure{240P12} 294m34 301r19
+291p13 Event_Access{244P12} 294m57 319r19 320r46
+292b13 Completed{boolean} 302m19 312r38 313r20 320r64
+295L15 Try_Again 314r21
+298t21 Executor_Task 299b26 308l20 308t33
+304r24 Error{4|69R9} 307r62
+325r18 Error{4|69R9} 328r56
+333a4 Supervisors(284T14)
+334a4 Lock_Array(34W22) 355r10 358r10 367r10 371r10 376r7 377r7 385r37 386r13
+. 387m39
+336w4 L{34W22} 340r7 346r7
+338U14 Put_Line 338b14 338>24 338>38 347l8 347t16 356r10 359r10 361r7 363r7
+. 366r10 368r10 370r10 372r10 374r7
+338i24 I{positive} 342r31 344r32
+338s38 S{string} 344r71
+342a10 Spaces{string} 344r19
+350i7 I{positive} 354r10 356r19 359r19 361r16 363r16 365r10 366r19 368r19
+. 370r19 372r19 374r16
+351u14 Transaction 352b14 378l8 378t19 380r24 381r24 382r24 383r24
+380U14 T1[351] 352b14 391r25
+381U14 T2[351] 352b14 392r25
+382U14 T3[351] 352b14
+383U14 T4[351] 352b14
+386i8 I{integer} 387r50
+395r9 Error{4|69R9} 396r68 397r64
+

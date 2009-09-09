@@ -1,0 +1,531 @@
+% vim:foldmethod=marker:tabstop=4:shiftwidth=4
+\documentclass[a4paper, 8pt]{scrartcl}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{amsthm,amsmath,amssymb}
+\usepackage{typearea}
+\usepackage{multicol}
+\usepackage{natbib}
+\usepackage{times}
+
+
+\setlength{\columnsep}{9mm}
+%\setlength{\columnseprule}{.1pt}
+\areaset{0.8\paperwidth}{0.8\paperheight}
+
+\theoremstyle{plain}
+
+\theoremstyle{definition}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{algo}[thm]{Algorithm}
+\newtheorem{proc}[thm]{Procedure}
+\newtheorem{defi}[thm]{Definition}
+\newtheorem{notation}[thm]{Notation}
+
+\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remark}
+
+\newcommand \BTree { B\textsuperscript{+}-Tree }
+\newcommand \BTrees { B\textsuperscript{+}-Trees }
+\newcommand \Beff { B_{\text{eff}} }
+
+\newcommand \sfrac[2] { {}^{#1}\!\!\!\diagup\!\!_{#2} }
+
+% don't hyphenate so much - default = 200, max (never hyphenate) = 10,000
+%\hyphenpenalty=10000
+
+\title{Dingsbums \BTree}
+\date{October 15, 2008}
+\author{Christoph Schwering\\{schwering@gmail.com}}
+
+\begin{document}
+\bibliographystyle{plain}
+
+
+\maketitle
+
+\begin{abstract}
+This article gives a formal description of the \BTree used in the Dingsbums 6
+database system.
+A \BTree is an order-preserving index structure for block oriented storage
+devices.
+The B-Tree was first described by Bayer and McCreight \cite{Bayer}.
+Several variants of the B-Tree appeared in the aftermath, in particular the
+\BTree \cite{Cormen, KnuthBTree}, which differs from the B-Tree in that it
+carries the values only in its leaves.
+Knuth also mentions a variant that is capable of storing variable-length
+keys, but does not describe it further \cite{KnuthBTree}.
+
+The \BTree described in this article supports bounded length entries 
+and access by the index number of entries (both features are independent from
+another, though).
+Ignoring some rather small internal overhead and the value sizes for the 
+moment, each entry's size is bounded by $\tfrac{1}{4}$ of the node size
+in storage elements, and the usage of each node in the tree is at least
+$\tfrac{3}{8}$ of its size in storage elements.
+\end{abstract}
+
+
+\begin{multicols}{2}
+
+
+\section{Definition} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{defi}[Node]
+A node $N$ is a set \mbox{$\{ e_1, \ldots, e_d \}$} of entries. 
+The degree of $N$ is the count of entries \mbox{$deg(N) = d$}.
+
+Besides the entries, there is some meta data $meta(N)$ that contains the
+degree $deg(N)$, the neighbors' addresses $left(N)$ and $right(N)$ and its
+parent's address $parent(N)$.
+If such a neighbor or parent nodes does not exist, the respective value is
+$\bot$.
+
+The form of an entry depends on the position of the node.
+An entry $e_i$ of a {\em inner node} consists of
+\begin{itemize}
+\item a key value $key(e_i)$,
+\item a count $count(e_i)$, and
+\item an address $child(e_i)$.
+\end{itemize}
+An entry $e_i$ of a {\em leaf node} consists of
+\begin{itemize}
+\item a key value $key(e_i)$, and
+\item a data value $value(e_i)$.
+\end{itemize}
+For inner nodes, we write \mbox{$e = (k, c, a)$} and for leaf nodes 
+\mbox{$e = (k, v)$}.
+If the context permits it, we do not distinguish between addresses and nodes,
+i.e. \mbox{$parent(child(e_i)) = N$}, for example.
+If $N$ is a leaf node, $count(e)$ is defined as $1$.
+\end{defi}
+
+\begin{defi}[Tree]
+A \BTree is defined over a domain $K$ of keys that is fully ordered by
+\mbox{$\leq \ \subseteq K \times K$} and a domain $V$ of values.
+We write \mbox{$e_i \leq e_j$} in the following iff
+\mbox{$key(e_i) \leq key(e_j)$}.
+The tree supports the operations {\em insertion}, {\em deletion} and 
+{\em search}. We can define these operations by looking at the states of the
+tree:
+\begin{itemize}
+\item In state $S_0$, the tree is empty and for all $k$,
+	\mbox{$search(S_0, k) = \bot$} (i.e. no value $v$ for $k$ can be found).
+\item In a state $S_i$, the operation \mbox{$insert(S_i, k, v)$} reaches a
+	state $S_{i+1}$ in which \mbox{$search(S_{i+1}, k) = v$},
+	if \mbox{$search(S_i, k) = \bot$}. Otherwise, the insertion fails and the
+	tree state does not change.
+\item In a state $S_i$, the operation \mbox{$delete(S_i, k)$} returns $v$ and
+	reaches a state $S_{i+1}$ in which \mbox{$search(S_{i+1}, k) = \bot$}.
+\end{itemize}
+In all states, the key condition which makes searching efficient must hold
+for all nodes $N$ in the tree:
+\begin{align*}
+\forall e \in N: \ & child(e) = N'\\
+     \Rightarrow \ & \forall e' \in N': e' \leq e.
+\end{align*}
+Furthermore, the counts must be consistent in all states:
+\begin{align*}
+\forall e \in N: \ & child(e) = N'\\
+     \Rightarrow \ & count(e) = \sum_{e' \in N'} count(e').
+\end{align*}
+
+\begin{figure*}[t]
+\newdimen \shortlinewidth \shortlinewidth=0.60\linewidth
+\centering
+\begin{minipage}{\shortlinewidth}
+\begin{flalign}
+& size(e) \leq \lfloor \tfrac{1}{4} \Beff \rfloor
+	&& \text{ for all } e \in N \label{maxsize}
+    &\\
+& \lfloor \tfrac{3}{8} \Beff \rfloor \leq size(N) \leq \Beff
+	&& \text{ for all } N \text{ except the root} \label{minsize}
+    &\\
+& 0 \leq size(R) \leq \Beff
+	&& \text{ for the root node } R \label{rootminsize}
+    &
+\end{flalign}
+\caption{Node filling requirements}
+\hspace{2cm}
+\hrule
+\end{minipage}
+\label{fill}
+\end{figure*}
+
+
+\noindent {\em Size Limits.}
+Normal \BTrees require their nodes to have a certain fixed minimum and maximum
+degree, because each node is intended to be stored in one hard disk block of
+size $B$ (typically $4096$ bytes).
+In contrast, our tree requires each node's storage space to be used to a
+minimum.
+This enables the tree to support {\em keys and values of variable length}.
+
+Note that for all nodes $N$, $size_\text{meta} = size(meta(N))$ is constant,
+and for all count values $c$ and child addresses $a$, $size_\text{count} =
+size(c)$ and $size_\text{addr} = size(a)$ are constant.
+
+We write $\Beff = B - size_\text{meta}$ for the effective node size and leave
+out the size of meta data in $size(N) = \sum_{e \in N} size(e)$ because we
+always compare it to $\Beff$.
+For each $e \in N$, the size is determined by
+\[ size(e) = \begin{cases}
+size(k) + size_\text{count} + size_\text{addr} & \text{if } e = (k,c,a)\\
+size(k) + size(v)                              & \text{if } e = (k,v)
+\end{cases}. \]
+
+Finally, we require for each node $N$ two hold the requirements depicted in
+figure~\ref{fill} on page~\pageref{fill}.
+\end{defi}
+
+
+\begin{rem}[Key size]
+Note that req.~\ref{maxsize} refers to a node element $e$ which consists
+of either \mbox{$e = (k, c, a)$} or \mbox{$e = (k, v)$}.
+It follows that the maximum key size is
+\begin{align*}
+size(k) + size_\text{count} + size_\text{addr}
+    &\leq \lfloor \tfrac{1}{4} \Beff \rfloor & \text{ and}\\
+size(k) + size(v)
+    &\leq \lfloor \tfrac{1}{4} \Beff \rfloor.
+\end{align*}
+Hence, if the size $size(v)$ of all data values $v$ is bounded by
+$size_\text{value}$, the maximum key size is bounded as follows:
+\[ size(k) \leq \lfloor \tfrac{1}{4} \Beff \rfloor 
+    - \max \{ size_\text{count} + size_\text{addr}, size_\text{value} \}. \]
+\end{rem}
+
+
+\begin{rem}[Degeneration]
+The tree cannot perform worse than a binary tree, because even in the worst
+case, each node except for the root node must hold at least two elements.
+This is because the minimal node usage is greater than the maximum entry size.
+\end{rem}
+
+
+
+\section{Theorems} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{thm}[Node-Overflow]
+A node with entry set \mbox{$N \cup \{ e \}$} with
+\[ size(N) \leq \Beff \text{ but } size(N \cup \{e\}) > \Beff \]
+can be split into two nodes such that both fulfill req.~\ref{minsize}.
+
+\begin{proof}
+For \mbox{$N \cup \{e\} = \{ e_1, \ldots, e_n \}$}, set
+\mbox{$L := \{ e_1, \ldots, e_i \}$} such that
+\[ size(L) \geq \lfloor \tfrac{3}{8} \Beff \rfloor \text{ but }
+	size(L \setminus \{e_i\}) < \lfloor \tfrac{3}{8} \Beff \rfloor \]
+and \mbox{$R := (N \cup \{e\}) \setminus L$}.
+Then the sizes are bounded as follows:
+\begin{align*}
+size(L) &\stackrel{\mathrm{def}}{\geq} \lfloor \tfrac{3}{8} \Beff \rfloor\\
+size(L) &< \lfloor \tfrac{3}{8} \Beff \rfloor
+		+ \underbrace{size(e_i)}_{\leq \lfloor \frac{1}{4} \Beff \rfloor}
+	\leq \lfloor \tfrac{5}{8} \Beff \rfloor\\
+size(R) &= \overbrace{size(N \cup \{e\})}^{> \Beff}
+		- \overbrace{size(L)}^{< \lfloor \frac{5}{8} \Beff \rfloor}
+	> \lceil \tfrac{3}{8} \Beff \rceil\\
+size(R) &= \underbrace{size(N \cup \{e\})}_{
+			\leq \Beff + \lfloor \frac{1}{4} \Beff \rfloor}
+		- \underbrace{size(L)}_{\geq \lfloor \frac{3}{8} \Beff \rfloor}
+	\leq \lceil \tfrac{7}{8} \Beff \rceil
+\end{align*}
+By this, it directly follows that 
+\mbox{$\lfloor \tfrac{3}{8} \Beff \rfloor \leq size(L), size(R) \leq \Beff$}, 
+i.e.  $L$ and $R$ fulfill req.~\ref{minsize}.
+\end{proof}
+\end{thm}
+
+
+\begin{thm}[Node-Underflow]
+When an entry $e$ is removed from a non-root-node with entry set $L$ such that 
+$size(L) \geq \lfloor \tfrac{3}{8} \Beff \rfloor$ but
+$size(L \setminus \{e\}) < \lfloor \tfrac{3}{8} \Beff \rfloor$, either entries
+from a neighbor can be moved or $L$ can be merged with a neighbor.
+
+\begin{proof}
+Let \[\delta := \lfloor \tfrac{3}{8} \Beff \rfloor - size(L \setminus \{e\})\]
+be the space in \mbox{$L \setminus \{e\}$} that needs to be filled so that
+\mbox{$L \setminus \{e\}$} fulfills req.~\ref{minsize}.
+Without loss of generality, we assume that the right neighbor with entry set $R$
+of $L$ exists; otherwise, a left neighbor exists and instead of the neighbor's
+minimal elements its maximal elements must be moved to $L$.
+
+Depending on $size(R)$, either entries must be moved or nodes must be merged:
+\begin{enumerate}
+\item If \mbox{$size(R) \leq \lceil \frac{5}{8} \Beff \rceil + \delta$},
+the nodes can be merged to a single node
+\mbox{$N := (L \setminus \{e\}) \cup R$}:
+\begin{align*}
+size(N)
+	&= \overbrace{size(L \setminus \{e\})}^{
+			\geq \lfloor \frac{3}{8} \Beff \rfloor 
+				- \lfloor \frac{1}{4} \Beff \rfloor}
+		+ \overbrace{size(R)}^{
+			\geq \lfloor \frac{3}{8} \Beff \rfloor}
+	\geq \lfloor \tfrac{1}{2} \Beff \rfloor\\
+size(N)
+	&= \underbrace{size(L \setminus \{e\})}_{
+			\leq \lfloor \frac{3}{8} \Beff \rfloor - \delta}
+		+ \underbrace{size(R)}_{
+			\leq \lceil \frac{5}{8} \Beff \rceil + \delta}
+	\leq \Beff
+\end{align*}
+
+\item
+If \mbox{$size(R) > \lceil \frac{5}{8} \Beff \rceil + \delta$}, a set
+\mbox{$S \subseteq R$} must be moved from $R$ to $L$.
+We then set \mbox{$L' := (L \setminus \{e\}) \cup S$} and
+\mbox{$R' := R \setminus S$}.
+The set $S$ must be minimal, i.e.
+\[ size(L') \geq \lfloor \tfrac{3}{8} \Beff \rfloor \text{ but }
+	size(L' \setminus \max S) < \lfloor \tfrac{3}{8} \Beff \rfloor. \]
+It follows that
+\[ \delta \leq size(S) < \delta + \lfloor \tfrac{1}{4} \Beff \rfloor. \]
+Hence, $L'$ and $R'$ meet req.~\ref{minsize}:
+\begin{align*}
+size(L')
+	&\stackrel{\mathrm{def}}{\geq} \lfloor \tfrac{3}{8} \Beff \rfloor\\
+size(L')
+	&= \underbrace{size(L \setminus \{e\})}_{
+			= \lfloor \frac{3}{8} \Beff \rfloor - \delta}
+		+ \underbrace{size(S)}_{
+			< \delta + \lfloor \frac{1}{4} \Beff \rfloor}
+	< \lfloor \tfrac{5}{8} \Beff \rfloor\\
+size(R')
+	&= \overbrace{size(R)}^{
+			> \lceil \frac{5}{8} \Beff \rceil + \delta}
+		- \overbrace{size(S)}^{
+			< \delta + \lfloor \frac{1}{4} \Beff \rfloor}
+	> \lfloor \tfrac{3}{8} \Beff \rfloor\\
+size(R')
+	&< size(R) \leq \Beff
+\end{align*}
+\end{enumerate}
+\end{proof}
+\end{thm}
+
+
+
+\section{Algorithms} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{proc}[Insertion] \label{ins}
+To insert a key-value-pair \mbox{$(k, v)$}, in the first step the corresponding
+leaf node is searched (proc~\ref{sea}).
+Then the node increase handling (proc.~\ref{inc}) is performed.
+\end{proc}
+
+
+\begin{proc}[Deletion] \label{del}
+To delete a key $k$, in the first step the corresponding
+leaf node is searched (proc~\ref{sea}).
+If such a leaf is found, the key-value-pair is removed and then the node
+decrease handling (proc.~\ref{dec}) is performed.
+\end{proc}
+
+
+\begin{proc}[Search] \label{sea}
+The search for a key $k$ can be carried out by performing the following steps:
+\begin{enumerate}
+\item Set $N$ to the root node with \mbox{$N = \{e_1, \ldots, e_d\}$}.
+\item \label{sea:loop} Choose \mbox{$n := \arg \max_{i} k \leq key(e_i)$}.
+\item If no such $n$ exists
+	\begin{itemize}
+	\item and the best future position for $k$ is searched,
+		set \mbox{$n := deg(N)$} if $N$ is an inner node and
+		set \mbox{$n := deg(N) + 1$} if $N$ is a leaf,
+	\item and the value for $k$ is searched, exit with an error.
+	\end{itemize}
+\item If $N$ is a leaf, return $value(e_n)$.
+\item Set \mbox{$N := child(e_n)$} and go to step~\ref{sea:loop}.
+\end{enumerate}
+\end{proc}
+
+
+\begin{proc}[Node Increase Handling] \label{inc}
+Input is a node $N$ to which an element was inserted.
+Then, the following options are tried; each one is only realized if the 
+resulting nodes are valid.
+\begin{enumerate}
+\item Maybe the node is valid.
+\item Try to shift the \mbox{$\min N$ to $left(N)$}.
+\item Try to shift the \mbox{$\max N$ to $right(N)$}.
+\item Split $N$ into two.
+\end{enumerate}
+This order chosen to minimize the creation of new nodes (in the first place and
+disk accesses in the second place).
+
+These steps are in detail (the synchronization and redistributions are 
+described below):
+\begin{enumerate}
+\item[ad 1.] Write $N$ to its (old) place and synchronize with parent
+	(proc.~\ref{sync}).
+\item[ad 2.] Redistribute $left(N)$ and $N$ (proc.~\ref{dist},
+	redistribution cares about synchronization).
+\item[ad 3.] Redistribute $N$ and $right(N)$ (proc.~\ref{dist},
+	redistribution cares about synchronization).
+\item[ad 4.] Split $N$ to two nodes $L$ and $R$ (proc.~\ref{split}).
+	$R$ replaces $N$, while $L$ is a new node.
+	If $N$ was root, create a new root node with the entries $L$ and $R$ and
+	set their parents appropriately (this is the only moment when the
+	{\em tree grows in height}).
+	Otherwise, insert $L$ into its parent and synchronize $R$ with its parent
+	(proc.~\ref{ins} and proc.~\ref{sync}; insertion of $L$ cares about its
+	synchronization, note that the insertion of $L$ into $parent(L)$
+	{\em might have changed} $parent(R)$).
+\end{enumerate}
+\end{proc}
+
+
+\begin{proc}[Node Decrease Handling] \label{dec}
+Input is a node $N$ from which an element was deleted.
+Then, the following options are tried; each one is only realized if the
+resulting nodes are valid.
+\begin{enumerate}
+\item Maybe $N$ is root and \mbox{$deg(N) \leq 1$}.
+\item Try to merge $N$ with $left(N)$.
+\item Try to merge $N$ with $right(N)$.
+\item Maybe the node is valid.
+\item Try to shift \mbox{$\min right(N)$} to $N$.
+\item Shift \mbox{$\max left(N)$} to $N$.
+\end{enumerate}
+The order is chosen to maximize the removal of nodes (in the first place and
+disk accesses in the second place).
+
+These steps are in detail (the synchronization and redistributions are 
+described below):
+\begin{itemize}
+\item[ad 1:] If \mbox{$deg(N) = 0$}, do nothing ($N$ must also be a leaf in
+	this case).
+	If \mbox{$deg(N) = 1$}, remove $N$ and make its single child new root
+	unless the root is already a leaf (this is the only moment the 
+	{\em tree decreases in height}).
+\item[ad 2+3:] Let \mbox{$L = left(N)$} and \mbox{$R = N$} respectively
+	\mbox{$L = N$} and $R = right(N)$.
+	Add the the entries of $L$ to $R$.
+	Note that, in general, \mbox{$parent(L) \neq parent(R)$}.
+	Synchronize $R$ with $parent(R)$ and delete $L$ from $parent(L)$
+	and remove the node $L$ 
+	(proc.~\ref{sync} and proc.~\ref{del}; deletion of $L$ cares about its
+	synchronization, note that the synchronization of $R$ with $parent(R)$
+	{\em might have changed} $parent(L)$).
+\item[ad 4:] Write $N$ to its (old) place and synchronize with parent
+	(proc.~\ref{sync}).
+\item[ad 5:] Redistribute $N$ and $right(N)$ (proc.~\ref{dist},
+	redistribution cares about synchronization).
+\item[ad 6:] Redistribute $left(N)$ and $N$ (proc.~\ref{dist},
+	redistribution cares about synchronization).
+\end{itemize}
+\end{proc}
+
+
+\begin{proc}[Optimal Split of One Node] \label{split}
+Let \mbox{$N = \{ e_1, \ldots, e_d \}$} be the node that should be split to
+two nodes $L$ and $R$.
+The goal is to calculate
+\[ \arg \max_n \underbrace{\min_n \{ size(\{e_1, \ldots, e_{n-1}\}),
+	size(\{e_n, \ldots, e_d\}) \}}_{=: d(n)}. \]
+\begin{enumerate}
+\item Set \mbox{$n := 0$}.
+\item \label{split:loop} If \mbox{$d(n) > d(n+1)$}, exit with $n$.
+\item Otherwise set \mbox{$n := n + 1$}. 
+\item Go to \ref{split:loop}.
+\end{enumerate}
+Then set \mbox{$L := \{e_1, \ldots, e_{n-1}\}$}
+and \mbox{$R := \{e_n, \ldots, e_d\}$}.
+Set \mbox{$parent(L) := parent(R) := parent(N)$}, \mbox{$left(L) := left(N)$}
+\mbox{$right(L) := R$}, \mbox{$left(R) := L$}, \mbox{$right(R) := right(N)$}.
+
+\begin{proof}
+For the initial setting $n = 1$, $L$ contains no elements.
+In the $n$-th iteration, the $n$-th element is moved from $R$ to $L$.
+The procedure stops in the $n$-th iteration if the $n+1$-th iteration would
+worsen the situation, i.e. would make the smaller node even smaller.
+As $L$ grows with each iteration, $R$ would be the smaller node in the
+$n+1$-th iteration. In any further iteration, $R$ would become even smaller.
+It follows that no further iteration would improve the situation.
+\end{proof}
+\end{proc}
+
+
+\begin{proc}[Node Redistribution] \label{dist}
+Let $L$ and $R$ be two nodes. They are combined two a single node $N$
+(which is overflown).
+This is split optimally to $L'$ and $R'$ (proc.~\ref{split}).
+Note that either children move from $L$ to $R'$ or from $R$ to $L'$.
+Synchronize $L$ and $R$ with $parent(L)$ and $parent(R)$ (proc.~\ref{sync};
+note that the synchronization of $L$ with $parent(L)$ {\em might have changed}
+$parent(R)$).
+\end{proc}
+
+
+\begin{proc}[Node Synchronization] \label{sync}
+Let $N$ be a node and $P = parent(N)$ its parent.
+Then let \mbox{$e_i \in P$} with \mbox{$child(e_i) = N$} be the entry of
+$N$ in $P$.
+The main task of the synchronization is to
+\begin{itemize}
+\item set \mbox{$key(e_i) := \max N$}, and
+\item set \mbox{$count(e_i) := \sum_{e \in N} count(e)$}.
+\end{itemize}
+Let $e_i'$ be the entry $e_i$ before its modifications.
+
+The modifications might have the effect that the $P$ is {\em not valid anymore}:
+\begin{itemize}
+\item If \mbox{$size(\max N) < size(key(e_i'))$},
+	$P$ might violate req.~\ref{minsize} after the update.
+	A node decrease handling (proc.~\ref{dec}) of $P$ must be performed.
+\item If \mbox{$size(\max N) > size(key(e_i'))$},
+	$P$ might violate req.~\ref{maxsize} after the update.
+	A node increase handling (proc.~\ref{inc}) of $P$ must be performed.
+\item Otherwise, the $P$ must be written back and, if $i = deg(N)$ (and
+	$key(e_i) \neq key(e_i')$) or if $count(e_i) \neq count(e_i')$, $P$
+	must be synchronized with its parent (proc.~\ref{sync}).
+\end{itemize}
+
+The increase and decrease handling procedures care about writing back $P$
+and further synchronizations.
+
+Note that the increase and decrease handlings might have effect on the
+neighbors of $P$, and also on their children and parents.
+This means that a synchronization of a node $L$ might have the effect that
+the parent $parent(R)$ of some sibling $R$ of $L$ changes.
+\end{proc}
+
+
+
+\section{Summary}
+
+One disadvantage of storing the indexes of the elements to offer access by
+the index number is that each insertion and each deletion needs to write
+all nodes along a path from the root to the leaf.
+The reorganization operations due to variable length keys even increase the 
+number of nodes visited on the way from the leaf node back to the root.
+
+This not only leads to many IO operations and thereby slows down insertion and
+deletion; it also raises problems with concurrency, because the root node
+becomes to a bottleneck that has to be locked for each operation.
+
+Currently the concurrency issue is dealt with as follows: during an insertion or
+deletion other writers are locked out, but readers are still allowed. The
+operations have effect only on copies of the nodes in main memory. Before 
+writing them back to disk, also concurrent readers are locked out.
+
+Another way to deal with concurrency would be to slightly modify the \BTree so
+that leaf nodes have no lower bound in size and apply locking as proposed in
+\cite{Lehman}.
+
+Obviously, the described \BTree is only suitable for cases in which much more
+searches than insertion or deletions are performed.
+The Dingsbums 6 database system uses an Ada 95 implementation of this
+\BTree as its core data structure.
+
+%\nocite{*}
+\bibliography{bibliography}
+\end{multicols}
+
+\end{document}
+

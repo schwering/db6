@@ -1,0 +1,147 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Making test tree
+for F in db-io-low_level db-util-timer; do make C/objects/$F.o || exit; done
+make[1]: `C/objects/db-io-low_level.o' is up to date.
+make[1]: `C/objects/db-util-timer.o' is up to date.
+for T in compression tree search ; do gnatmake -Pdb -XBUILD=release test_$T.adb || exit; done
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/test_compression" up to date.
+gcc -c -O2 -gnatp -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_tree.adb
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/release/test_tree.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/release/test_tree.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/release/test_tree
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/release/test_search" up to date.
+for T in compression tree search ; do gnatmake -Pdb -XBUILD=debug test_$T.adb || exit; done
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/test_compression" up to date.
+gcc -c -fstack-check -gnata -gnatD -gnatwFa -gnatE -I- -gnatA /Users/chs/Documents/Ada/db6/Source/Tests/test_tree.adb
+gnatbind -I- -x /Users/chs/Documents/Ada/db6/Source/build/debug/test_tree.ali
+gnatlink /Users/chs/Documents/Ada/db6/Source/build/debug/test_tree.ali /Users/chs/Documents/Ada/db6/Source/C/objects/db-io-low_level.o /Users/chs/Documents/Ada/db6/Source/C/objects/db-util-timer.o -o /Users/chs/Documents/Ada/db6/Source/build/debug/test_tree
+gnatmake: "/Users/chs/Documents/Ada/db6/Source/build/debug/test_search" up to date.
+
+Dingsbumsing temp files
+
+Running test tree
+
+INSERTING.
+ 10000:  4.3 4.3
+ 20000:  8.1 8.1
+ 30000:  13.4 13.4
+ 40000:  17.2 17.2
+ 50000:  22.2 22.1
+OK 50000 4 2614 2614 0 52 20 7 1898815 10702848 726 1.77246E-01
+ 60000:  26.4 27.5
+ 70000:  31.0 31.2
+ 80000:  36.2 36.0
+ 90000:  40.4 41.3
+ 100000:  45.2 45.5
+OK 100000 4 5252 5252 0 47 20 7 3817164 21508096 726 1.77246E-01
+
+SEARCH.
+ 10000:  1.1 1.0
+ 20000:  2.1 2.0
+ 30000:  3.1 3.1
+ 40000:  4.1 4.1
+ 50000:  5.1 5.1
+ 60000:  6.1 6.1
+ 70000:  7.2 7.1
+ 80000:  8.2 8.1
+ 90000:  9.3 9.1
+ 100000:  10.3 10.1
+
+DELETING.
+ 10000:  5.1 5.1
+ 20000:  10.1 10.0
+ 30000:  15.1 15.0
+ 40000:  20.1 20.1
+ 50000:  25.3 25.3
+OK 50000 4 5252 3143 2109 46 10 6 3885634 12869632 1236 3.01758E-01
+
+ANTISEARCH.
+
+REINSERTING.
+ 10000:  4.1 4.1
+ 20000:  9.4 9.4
+ 30000:  13.2 13.2
+ 40000:  18.3 18.2
+ 50000:  22.3 22.5
+OK 100000 4 5252 5214 38 46 20 7 3673873 21352448 704 1.71875E-01
+
+SEARCH.
+ 50000:  5.2 5.2
+OK 100000 4 5252 5214 38 46 20 7 3673873 21352448 704 1.71875E-01
+
+ 100000:  10.4 10.2
+OK 100000 4 5252 5214 38 46 20 7 3673873 21352448 704 1.71875E-01
+
+OK 100000 4 5252 5214 38 46 20 7 3673873 21352448 704 1.71875E-01
+Finished.

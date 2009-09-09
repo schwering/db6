@@ -1,0 +1,667 @@
+% vim:foldmethod=marker:tabstop=4:shiftwidth=4
+\documentclass[a4paper, 9pt]{scrartcl}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{amsthm,amsmath,amssymb}
+\usepackage{typearea}
+\usepackage{multicol}
+\usepackage{natbib}
+\usepackage{times}
+
+
+\setlength{\columnsep}{9mm}
+%\setlength{\columnseprule}{.1pt}
+\areaset{0.8\paperwidth}{0.8\paperheight}
+
+\makeatletter
+\newenvironment{tablehere}{\def\@captype{table}}{}
+\newenvironment{figurehere}{\def\@captype{figure}}{}
+\makeatother 
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{algo}[thm]{Algorithm}
+
+\theoremstyle{definition}
+\newtheorem{defi}[thm]{Definition}
+\newtheorem{notation}[thm]{Notation}
+
+\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remark}
+
+\newcommand{\Beff}{ B_{\text{eff}} }
+
+% don't hyphenate so much - default = 200, max (never hyphenate) = 10,000
+%\hyphenpenalty=10000
+
+\title{Dingsbums 6}
+\date{October 15, 2008}
+\author{Christoph Schwering}
+
+\begin{document}
+\bibliographystyle{plain}
+
+
+\maketitle
+
+
+\begin{multicols}{2}
+
+\section{Introduction}
+This article describes {\em Dingsbums}, a database that differs in some points
+from traditional relational database management systems.
+
+In the next section, we will shortly sketch the data model of Dingsbums.
+Section~\ref{sec:arch} will outline the software architecture of the
+database which means the core data structures and their relations and usage
+are described.
+In section~\ref{sec:btree} the B\textsuperscript{+}-tree, the central
+data structure, is defined.
+
+Dingsbums is influenced by BigTable \cite{BigTable} and C-Store \cite{CStore}.
+
+
+
+\section{Data Model} \label{sec:dm}
+The goal is to design a disk-storage, read-optimized, distributed sparse map.
+The data is stored in {\em tables}.
+The data model is geared to the relational model described by Codd \cite{Codd},
+but is less expressive.
+In comparison to traditional relational OLTP databases, the concept of an
+{\em attribute} at least partly moves from the table schema to the data level.
+
+Each atomary piece of data, a {\em data object} in a table is uniquely
+identified by a {\em row key object} and {\em column key object}.
+The concept of row keys is analoguous to the primary keys of relational
+databases, while the column key corresponds to the attributes of relational
+schemas.
+
+However, in contrast to relational databases' attributes, column keys  are not
+part of the schema but can appear and disappear in different table states.
+Hence, column keys can carry data, too.
+
+A time value is planned in addition to the row and column key objects
+in order to support historical queries. For now, we notionally move the
+time value into the column key and ignore it.
+
+The suspected operations are:
+\begin{itemize}
+\item insertion of objects
+\item deletion of objects
+\item selection $\sigma$ of rows by a given row key object ($\leq$, $=$, $\geq$)
+\item selection $\sigma$ of rows by a given column key objects or data objects 
+	(arbitrary relation)
+\item projection $\pi$ of columns by a given column key object
+	(arbitrary relation)
+\item join $\bowtie$ of tables on two row key objects ($=$)
+\item join $\bowtie$ of tables on a row key object and a data object ($=$)
+\end{itemize}
+Renaming $\rho$ is not planned, neither are the set intersection $\cap$ and
+difference $-$. The set union $\cup$ might be provided as it is easy to 
+implement and perform and it might prove helpful in supporting disjunctive
+selection and join conditions.
+Obviously, the data model is {not relational complete}.
+
+
+
+\section{Architecture} \label{sec:arch}
+The core data structure of Dingsbums is the B\textsuperscript{+}-tree
+which stores $(k_r, k_c, v)$ triples (for row key objects $k_r$, column key
+objects $k_c$ and data objects $v$) and makes the $v$ quickly accessible under
+search for $(k_r, k_c)$.
+Since the order of the $(k_r, k_c)$ keys is determined by the row keys in
+the first place, it is easy and quick to iterate over all $(k_c, v)$ pairs
+of a certain $k_r$.
+
+These characteristics of the B\textsuperscript{+}-tree directly support
+the selection by given row keys (including range queries), projection and the 
+joins of tables.
+
+The selection by given column key objects or data objects -- i.e. those
+operations that involve searching of this unsortedly stored data -- is
+still missing.
+Both, hash tables and bitmaps are useful in this case.
+Whereas hash tables are good at searching (while bitmaps definitely are not),
+bitmaps can efficiently compute disjunctions or conjunctions of selection
+queries. Both data structures have in common that for each relation one
+physical instance has to be created.
+
+In many cases it might be reasonable to split a table $T$ vertically into
+tablets $T_1, \ldots, T_n$. Using pattern matching on the column key object
+$k_c$, a single $T_i$ is chosen deterministically into which the tuple
+$(k_r, k_c, v)$ is inserted.
+
+In addition to vertical splitting, horizontal partitioning is planned.
+The tables should be distributed on a number of servers in a shard-nothing
+architecture.
+
+
+
+\section{B\textsuperscript{+}-Tree} \label{sec:btree}
+\subsection{Formal Definition} \label{ssec:formal}
+A B\textsuperscript{+}-tree is an order-preserving index structure.
+The B-tree was first described by Bayer and McCreight \cite{Bayer}.
+Several variants of the B-tree appeared in the aftermath, the most important
+being the B\textsuperscript{+}-tree \cite{Cormen, KnuthBTree}.
+Knuth also mentions a variant that is capable of storing variable-length
+keys \cite{KnuthBTree}.
+
+Here, we give a definition of our view of the B\textsuperscript{+}-tree and
+the algorithms.
+
+\begin{defi}[Node]
+A node \mbox{$N = (M, E)$} of degree \mbox{$d = deg(N)$} consists of some
+meta data $M$ and an entry set \mbox{$E = \{ e_1, \ldots, e_d \}$} of
+$d$ entries.
+
+The meta data stores the degree $deg(N)$ of the node and the left neighbor,
+the right neighbor and the parent, denoted by $left(N)$, $right(N)$, $parent(N)$
+respectively. If such a neighbor or parent node does not exist, the
+value is $\bot$.
+
+The form of an entry depends on the position of the node.
+An entry $e_i$ of a {\em inner node} consists of
+\begin{itemize}
+\item a key value $key(e_i)$,
+\item a count $count(e_i)$, and
+\item an address $child(e_i)$.
+\end{itemize}
+An entry $e_i$ of a {\em leaf node} consists of
+\begin{itemize}
+\item a key value $key(e_i)$, and
+\item a data value $value(e_i)$.
+\end{itemize}
+For inner nodes, we write \mbox{$e = (k, c, a)$} and for inner nodes 
+\mbox{$e = (k, v)$}
+if the context permits it.
+If the context permits it, we do not distinguish between addresses and nodes,
+i.e. \mbox{$parent(child(e_i)) = N$}, for example.
+If $N$ is a leaf node, $count(e)$ is defined as $1$.
+\end{defi}
+
+
+\begin{figure*}
+\newdimen \shortlinewidth \shortlinewidth=0.75\linewidth
+\centering
+\begin{minipage}{\shortlinewidth}
+\begin{align}
+& size(e) \leq \lfloor \tfrac{1}{8} \Beff \rfloor
+	&& \text{ for all } e \in N \label{bt:maxsize}\\
+& \lfloor \tfrac{3}{8} \Beff \rfloor \leq size(N) \leq \Beff
+	&& \text{ for all } N \text{ except the root} \label{bt:minsize}\\
+& 0 \leq size(R) \leq \Beff
+	&& \text{ for the root node } R \label{bt:rootminsize}
+\end{align}
+\end{minipage}
+\caption{Node filling requirements}
+\label{bt:fill}
+\end{figure*}
+
+\begin{defi}[Tree]
+A B\textsuperscript{+}-tree is defined over a domain $K$ of keys that is fully
+ordered by \mbox{$\leq \ \subseteq K \times K$} and a domain $V$ of values.
+We write \mbox{$e_i \leq e_j$} in the following iff
+\mbox{$child(e_i) \leq child(e_j)$}.
+The tree supports the operations {\em insertion}, {\em deletion} and 
+{\em search}. We can define these operations by looking at the states of the
+tree:
+\begin{itemize}
+\item In state $S_0$, the tree is empty and for all $k$,
+	\mbox{$search(S_0, k) = \bot$} (i.e. no value $v$ for $k$ can be found)
+\item In a state $S_i$, the operation \mbox{$insert(S_i, k, v)$} reaches a
+	state $S_{i+1}$ in which \mbox{$search(S_{i+1}, k) = v$},
+	if \mbox{$search(S_i, k) = \bot$}. Otherwise, the insertion fails and the
+	tree state does not change.
+\item In a state $S_i$, the operation \mbox{$delete(S_i, k)$} returns $v$ and
+	reaches a state $S_{i+1}$ in which \mbox{$search(S_{i+1}, k) = \bot$}.
+\end{itemize}
+In all states, the key condition which makes searching efficient must hold
+for all nodes \mbox{$N = (M, E)$} in the tree:
+\begin{align*}
+\forall e \in E: \ & (child(e) = (M_e, E_e))\\
+     \Rightarrow \ & (\forall c \in E_e: c \leq e).
+\end{align*}
+Furthermore, the counts must be consistent in all states:
+\begin{align*}
+\forall e \in E: \ & child(e) = (N' = (M', E'))\\
+     \Rightarrow \ & count(e) = \sum_{e' \in E'} count(e').
+\end{align*}
+
+\noindent {\em Size Limits.}
+Normal B\textsuperscript{+}-trees require their nodes to have a certain fixed
+minimum and maximum degree, because each node is intended to be stored in one
+hard disk block of size $B$ (typically $4096$ bytes).
+In contrast, our tree is not intended to support keys of a fixed size
+but {\em variable length keys}.
+(Note that the sizes of child addresses, count values and data values must be
+fixed, though.)
+
+Hence, if $size(k)$ is the size of a certain key $k \in K$, we can uniquely
+determine the size of each entry $e$ which will be denoted by $size(e)$.
+Then \mbox{$size(E) = \sum_{e \in E} size(e)$} denotes the size of a complete
+entries \mbox{$N = (M, E)$}.
+Since the size of the meta data is fixed, it is easy to compute 
+\mbox{$size(N) = size(M) + size(E)$}.
+Furthermore we will write \mbox{$\Beff = B - size(M)$}.
+Finally, we require for each node \mbox{$N = (M, E)$} two hold the requirements
+depicted in figure~\ref{bt:fill}.
+\end{defi}
+
+
+\begin{rem}[Key size]
+Note that req.~\ref{bt:maxsize} refers to a node element $e$ which consists
+of can be either \mbox{$e = (k, c, a)$} for a key $k$, a count value $c$ and
+a child address $a$ or \mbox{$e = (k, v)$} for a key $k$ and a value $v$.
+It follows that the maximum key size is
+\[ size(k) \leq \lfloor \tfrac{1}{8} \Beff \rfloor
+		- \max \{ size(c) + size(a), size(v) \}. \]
+This upper bound is statically determined, because the sizes of child addresses,
+count values and data values must be fixed.
+\end{rem}
+
+
+\ifx \nothingblabla
+\begin{thm}[Node-Overflow]
+A node \mbox{$N' = (M, E \cup \{ e \})$} with \mbox{$size(E) \leq \Beff$} but
+\mbox{$size(E \cup \{e\}) > \Beff$} can be split into two nodes such that both
+fulfill req.~\ref{bt:minsize}. Let $L$ and $U$ denote the entry sets of the
+two nodes.
+
+\begin{proof}
+Let \mbox{$L \subset E \cup \{e\}$} be the {\em maximum set} such that
+\begin{align*}
+L = \{ e_1, e_2, \ldots \} & \quad \text{ and}\\
+size(L) \leq \lfloor \tfrac{1}{2} \Beff \rfloor.
+\end{align*}
+Such a partition is trivial.
+Then, the following cases arise:
+\begin{description}
+\item[Case 1:]
+If \mbox{$size(L) = \lfloor \tfrac{1}{2} \Beff \rfloor$}, we're fine and
+\mbox{$U := (E \cup \{e\}) \setminus L$}.
+Obviously, $L$ fulfills req.~\ref{bt:minsize}, and $U$ does so, too:
+\begin{align*}
+size(U) & = \overbrace{size(E \cup \{e\})}^{> \Beff}
+	- \overbrace{size(L)}^{= \lfloor \frac{1}{2} \Beff \rfloor}
+	> \lceil \tfrac{1}{2} \Beff \rceil
+	\geq \lfloor \tfrac{3}{8} \Beff \rfloor	\text{\quad and}\\
+\\
+size(U) & = \overbrace{size(E)}^{\leq \Beff}
+	+ \overbrace{size(e)}^{\leq \lfloor \frac{1}{4} \Beff \rfloor}
+	- \overbrace{size(L)}^{= \lfloor \frac{1}{2} \Beff \rfloor}
+	\stackrel{\quad size(e) \leq size(L) \quad}{\leq} \Beff.
+\end{align*}
+
+\item[Case 2:]
+Otherwise, there is a critical entry $e_m$ which ``crosses'' the
+\mbox{$\lfloor \tfrac{1}{2} \Beff \rfloor$} border.
+We know \mbox{$size(e_m) \leq \lfloor \tfrac{1}{4} \Beff \rfloor$}.
+Let's say that \mbox{$l + u = size(e_m)$} such that $l$ is the count of bytes of
+$e_m$ that are at the lower (left) side of the
+\mbox{$\lfloor \tfrac{1}{2} \Beff \rfloor$} border, $u$ the rest at the upper
+(right) side of the border.
+We know that \mbox{$\min \{l, u\}
+\leq \lfloor \tfrac{1}{8} \Beff \rfloor
+\leq \tfrac{1}{2} \cdot \lfloor \tfrac{1}{4} \Beff \rfloor$}.
+
+\begin{itemize}
+\item If \mbox{$l = \max \{l, u\}$}, we set \mbox{$L := L \cup \{ e_m \}$}.\\
+	$L$ obviously fulfills req.~\ref{bt:minsize}:
+	\[ \lfloor \tfrac{3}{8} \Beff \rfloor
+		\leq \lfloor \tfrac{1}{2} \Beff \rfloor
+		\leq size(L)
+		\leq \lfloor \tfrac{1}{2} \Beff \rfloor
+			+ \lfloor \tfrac{1}{4} \Beff \rfloor
+		\leq \Beff. \]
+	Because \mbox{$u = \min \{l, u\} \leq \lfloor \tfrac{1}{8} \Beff \rfloor$}, 
+	we know that 
+	\begin{align*}
+	size(U) &= \overbrace{size(E \cup \{e\})}^{> \Beff}
+		- \overbrace{size(L)}^{= \lfloor \frac{1}{2} \Beff \rfloor + u}\\
+		& \geq \lceil \tfrac{1}{2} \Beff \rceil - u\\
+		& \geq \lceil \tfrac{1}{2} \Beff \rceil
+			- \lfloor \tfrac{1}{8} \Beff \rfloor\\
+		& \geq \lceil \tfrac{3}{8} \Beff \rceil\\
+		& \geq \lfloor \tfrac{3}{8} \Beff \rfloor \text{\quad and}\\
+	\\
+	size(U) & = \overbrace{size(E)}^{\leq \Beff}
+		+ \overbrace{size(e)}^{\leq \lfloor \frac{1}{4} \Beff \rfloor}
+		- \overbrace{size(L)}^{= \lfloor \frac{1}{2} \Beff \rfloor}
+		\stackrel{\quad size(e) \leq size(L) \quad}{\leq} \Beff.
+	\end{align*}
+	Therefore, $U$ fulfills req.~\ref{bt:minsize}.
+\item Otherwise, we set \mbox{$U := U \cup \{ e_m \}$}.\\
+	$U$ obviously fulfills req.~\ref{bt:minsize}:
+	\[ \lfloor \tfrac{3}{8} \Beff \rfloor
+		\leq \lfloor \tfrac{1}{2} \Beff \rfloor
+		\leq size(U)
+		\leq \lfloor \tfrac{1}{2} \Beff \rfloor
+			+ \lfloor \tfrac{1}{4} \Beff \rfloor
+		\leq \Beff. \]
+	Because \mbox{$l = \min \{l, u\} \leq \lfloor \tfrac{1}{8} \Beff \rfloor$}, 
+	we know that 
+	\begin{align*}
+	size(L) &= \overbrace{size(E \cup \{e\})}^{> \Beff}
+		- \overbrace{size(U)}^{= \lfloor \frac{1}{2} \Beff \rfloor + l}\\
+		& \geq \lceil \tfrac{1}{2} \Beff \rceil - l\\
+		& \geq \lceil \tfrac{1}{2} \Beff \rceil
+			- \lfloor \tfrac{1}{8} \Beff \rfloor\\
+		& \geq \lceil \tfrac{3}{8} \Beff \rceil\\
+		& \geq \lfloor \tfrac{3}{8} \Beff \rfloor \text{\quad and}\\
+	\\
+	size(L) & = \overbrace{size(E)}^{\leq \Beff}
+		+ \overbrace{size(e)}^{\leq \lfloor \frac{1}{4} \Beff \rfloor}
+		- \overbrace{size(U)}^{= \lfloor \frac{1}{2} \Beff \rfloor}
+		\stackrel{\quad size(e) \leq size(U) \quad}{\leq} \Beff.
+	\end{align*}
+	Therefore, $L$ fulfills req.~\ref{bt:minsize}.
+\end{itemize}
+\end{description}
+\end{proof}
+\end{thm}
+\fi
+
+
+\begin{thm}[Node-Overflow]
+A node \mbox{$N' = (M, E \cup \{ e \})$} with 
+\[ size(E) \leq \Beff \text{ but } size(E \cup \{e\}) > \Beff \]
+can be split into two nodes such that both fulfill req.~\ref{bt:minsize}.
+
+\begin{proof}
+If \mbox{$E \cup \{e\} = \{ e_1, \ldots, e_n \}$}, set
+\mbox{$L := \{ e_1, \ldots, e_i \}$} such that
+\[ size(L) \geq \lfloor \tfrac{1}{2} \Beff \rfloor \text{ but }
+size(L \setminus \{e_i\}) < \lfloor \tfrac{1}{2} \Beff \rfloor \]
+and \mbox{$R := (E \cup \{e\}) \setminus L$}.
+The sizes are bounded as follows:
+\begin{align*}
+size(L) &\stackrel{\mathrm{def}}{\geq} \lfloor \tfrac{4}{8} \Beff \rfloor\\
+size(L) &< \lfloor \tfrac{4}{8} \Beff \rfloor
+		+ \underbrace{size(e_i)}_{\leq \lfloor \frac{1}{8} \Beff \rfloor}
+	< \lfloor \tfrac{5}{8} \Beff \rfloor\\
+size(R) &= \overbrace{size(E \cup \{e\})}^{> \Beff}
+		- \overbrace{size(L)}^{< \lfloor \frac{5}{8} \Beff \rfloor}
+	> \lceil \tfrac{3}{8} \Beff \rceil\\
+size(R) &= \underbrace{size(E \cup \{e\})}_{
+			\leq \Beff + \lfloor \frac{1}{8} \Beff \rfloor}
+		- \underbrace{size(L)}_{\leq \lfloor \frac{4}{8} \Beff \rfloor}
+	\leq \lceil \tfrac{4}{8} \Beff \rceil + \lfloor \tfrac{1}{8} \Beff \rfloor
+	\leq \lceil \tfrac{5}{8} \Beff \rceil
+\end{align*}
+By this, it directly follows that 
+\mbox{$\lfloor \tfrac{3}{8} \Beff \rfloor \leq size(L), size(R) \leq \Beff$}, 
+i.e.  $L$ and $R$ fulfill req.~\ref{bt:minsize}.
+\end{proof}
+\end{thm}
+
+
+\begin{thm}[Node-Underflow]
+When an entry $e$ is removed from a non-root-node with entry set $L$ such that 
+$size(L) \geq \lfloor \tfrac{3}{8} \Beff \rfloor$ but
+$size(L \setminus \{e\}) < \lfloor \tfrac{3}{8} \Beff \rfloor$, either entries
+from a neighbor can be moved or $L$ can be merged with a neighbor.
+
+\begin{proof}
+Let $R$ be the entry set of a neighbor of $L$.
+Depending on $size(R)$, either entries must be moved or nodes must be merged:
+\begin{enumerate}
+\item
+If $\lfloor \tfrac{3}{8} \Beff \rfloor \leq size(R) 
+\leq \lfloor \tfrac{5}{8} \Beff \rfloor$, the nodes $L$ and $R$ can be
+merged to a node \mbox{$N := (L \setminus \{e\}) \cup R$}.
+The following equation shows that $N$ fulfills req.~\ref{bt:minsize}:
+\[ \lfloor \tfrac{3}{8} \Beff \rfloor 
+\leq size(N)
+= \underbrace{size(L \setminus \{e\})}_{< \lfloor \frac{3}{8} \Beff \rfloor}
+	+ \underbrace{size(R)}_{\leq \lfloor \frac{5}{8} \Beff \rfloor}
+\leq \Beff.\]
+
+\item
+If \mbox{$size(R) > \lfloor \tfrac{5}{8} \Beff \rfloor$}, one or more entries
+can be moved from $R$ to $L$.
+We know that
+\[ size(L \setminus \{e\})
+= \underbrace{size(L)}_{\geq \lfloor \tfrac{3}{8} \Beff \rfloor}
+	- \underbrace{size(e)}_{\leq \lfloor \tfrac{1}{8} \Beff \rfloor}
+\geq \lfloor \tfrac{2}{8} \Beff \rfloor. \]
+Entries with a cumulated size \mbox{$\geq size(e)$} must be moved from 
+$R$ to $L$.
+If \mbox{$R = \{e_1, \ldots, e_n\}$}, the set \mbox{$S := \{e_1, \ldots, e_i\}$}
+such that
+\[ size(S) \geq size(e) \text{ but } size(S \setminus \{e_i\}) < size(e) \]
+is the minimum set that must be moved from $R$ to $L$ to make $L$ valid.
+In the worst case, \mbox{$S \setminus \{e_i\}$} is verly large but not large
+enough, i.e.  \mbox{$size(S \setminus \{e_i\}) + \varepsilon = size(e)$}, and
+the last entry $e_i$ is unnecessarily large
+\mbox{$size(e_i) = \lfloor \tfrac{1}{8} \Beff \rfloor$}.
+Hence, the size of $S$ is bounded by
+\[ size(S) < 2 \cdot \lfloor \tfrac{1}{8} \Beff \rfloor
+< \lfloor \tfrac{2}{8} \Beff \rfloor. \]
+
+Set \mbox{$L' := (L \setminus \{e\}) \cup S$} and \mbox{$R := R \setminus S$}.
+Then the sizes are bounded as follows:
+\begin{align*}
+size(L') &= \overbrace{size(L \setminus \{e\})}^{
+			< \lfloor \frac{3}{8} \Beff \rfloor}
+		+ \overbrace{size(S)}^{\leq \lfloor \frac{2}{8} \Beff \rfloor}
+	< \lfloor \tfrac{5}{8} \Beff \rfloor\\
+size(L') &= size(L \setminus \{e\}) + size(S)
+	\stackrel{\mathrm{def}}{\geq} \lfloor \tfrac{3}{8} \Beff \rfloor\\
+size(R') &< size(R) \leq \Beff\\
+size(R') &= \underbrace{size(R)}_{> \lfloor \tfrac{5}{8} \Beff \rfloor}
+		- \underbrace{size(S)}_{\leq \lfloor \tfrac{2}{8} \Beff \rfloor}
+	\geq \lfloor \tfrac{3}{8} \Beff \rfloor
+\end{align*}
+By this, it directly follows that $L'$ and $R'$ fulfill req.~\ref{bt:minsize}.
+\end{enumerate}
+\end{proof}
+\end{thm}
+
+
+\begin{algo}[Optimal Split of One Node]
+Let \mbox{$E = \{ e_1, \ldots, e_m \}$} be the entries that should be
+distribed on two nodes with entry sets $E_1, E_2$.
+The goal is to calculate
+\[ \arg \max_{n} d(n) \]
+where
+\mbox{$d(n) = \min_{F \in \{E_1, E_2\}} size(F)$}
+and \mbox{$E_1 = \{e_1, \ldots, e_n\}$},
+\mbox{$E_2 = \{e_{n+1}, \ldots, e_m\}$}.
+\begin{enumerate}
+\item \mbox{$n := 1$}
+\item \label{os1:loop} if \mbox{$d(n+1) < d(n)$},  \mbox{$n := n + 1$} 
+\item otherwise return $n$
+\item go to \ref{os1:loop}
+\end{enumerate}
+
+\begin{proof}
+Obvious.
+\end{proof}
+\end{algo}
+
+
+\begin{algo}[Insertion]
+To insert a key-value-pair \mbox{$(k, v)$}, in the first step the corresponding
+leaf node is searched. Then the node increase handling is performed.
+\end{algo}
+
+
+\begin{algo}[Deletion]
+To delete a key $k$, in the first step the corresponding
+leaf node is searched. If such a leaf is found, the key-value-pair is removed
+and then the node decrease handling is performed.
+\end{algo}
+
+
+\begin{algo}[Node Increase Handling]
+Input is a node \mbox{$N = (M, E)$} to which an element was inserted.
+\begin{itemize}
+\item[1:] Maybe the node is valid.
+\item[2:] Try to shift the \mbox{$\min E$ to $left(N)$}.
+\item[3:] Try to shift the \mbox{$\max E$ to $right(N)$}.
+\item[4:] Split $N$ into two.
+\end{itemize}
+This order chosen to minimize the creation of new nodes.
+
+These steps are in detail (the synchronization and redistributions are 
+described below):
+\begin{itemize}
+\item[ad 1:] Write $N$ to its (old) place and synchronize with parent.
+\item[ad 2:] Redistribute $left(N)$ and $N$ (redistribution cares about
+	synchronization).
+\item[ad 3:] Redistribute $N$ and $right(N)$ (redistribution cares about
+	synchronization).
+\item[ad 4:] Split $N$ to two nodes $L$ and $R$. $R$ replaces $N$, while
+	$L$ will is a new node. Create a new root node with entries $L$ and $R$
+	if $N$ was root. Insert $L$ into parent and synchronize $R$ with parent
+	otherwise (insertion of $L$ cares about its synchronization;
+	note that the insertion of $L$ into $parent(R)$ {\em might have changed}
+	$parent(R)$).
+	This is the only moment when the {\em tree grows in height}!
+\end{itemize}
+\end{algo}
+
+
+\begin{algo}[Node Decrease Handling]
+Input is a node \mbox{$N = (M, E)$} from which an element was deleted.
+\begin{itemize}
+\item[1:] Maybe $N$ is root and \mbox{$deg(N) \leq 1$}.
+\item[2:] Try to merge $N$ with $left(N)$.
+\item[3:] Try to merge $N$ with $right(N)$.
+\item[4:] Maybe the node is valid.
+\item[5:] Try to shift \mbox{$\min right(N)$} to $N$.
+\item[6:] Shift \mbox{$\max left(N)$} to $N$.
+\end{itemize}
+The order is chosen to maximize the removal of nodes (in the first place and
+disk accesses in the second place).
+
+These steps are in detail (the synchronization and redistributions are 
+described below):
+\begin{itemize}
+\item[ad 1:] If \mbox{$deg(N) = 0$}, remove $N$ and the tree is empty.
+	If \mbox{$deg(N) = 1$}, remove $N$ and make its single child new root.
+\item[ad 2:] Split $N$ to two nodes $L$ and $R$. $R$ replaces $N$, while
+	$L$ will is a new node. Create a new root node with entries $L$ and $R$
+	if $N$ was root. Insert $L$ into parent and synchronize $R$ with parent
+	otherwise (insertion of $L$ cares about its synchronization).
+\item[ad 3+4:] Let \mbox{$L = left(N)$} and \mbox{$R = N$} respectively
+	\mbox{$L = N$} and $R = right(N)$.
+	Combine them to a single $N'$. Note that, in general,
+	\mbox{$parent(L) \neq parent(R)$}. Synchronize $R$ with $parent(R)$ and
+	delete $L$ from $parent(L)$ (deletion of $L$ cares about its
+	synchronization; note that the synchronization of $L$ with $parent(L)$
+	{\em might have changed} $parent(R)$).
+	This is the only moment the {\em tree decreases in height}!
+\item[ad 5:] Redistribute $N$ and $right(N)$ (redistribution cares about
+	synchronization).
+\item[ad 6:] Redistribute $left(N)$ and $N$ (redistribution cares about
+	synchronization).
+\end{itemize}
+\end{algo}
+
+
+\begin{algo}[Node Redistribution]
+Let $L$ and $R$ be two nodes. They are combined two a single node $N$
+(which is overflown). This is split optimally to $L'$ and $R'$.
+Note that either children move from $L$ to $R'$ or from $R$ to $L'$.
+Synchronize $L$ and $R$ with $parent(L)$ and $parent(R)$ (note that the
+synchronization of $L$ with $parent(L)$ {\em might have changed} $parent(R)$).
+\end{algo}
+
+
+\begin{algo}[Node Synchronization]
+Let \mbox{$N = (M_N, E_N)$} be a node and \mbox{$P = (M_P, E_P)  = parent(N)$}
+its parent.
+Then let \mbox{$e_i \in E_P$} with \mbox{$child(e_i) = N$} be the entry of
+$N$ in $P$.
+The main task of the synchronization is to
+\begin{itemize}
+\item set \mbox{$key(e_i) := \max N$}, and
+\item set \mbox{$count(e_i) := \sum_{e \in E_N} count(e)$}
+\end{itemize}
+
+While this is quite simple, the update of $key(e_i)$ might have the 
+importante effect that $P$ is {\em no more valid}:
+\begin{itemize}
+\item If \mbox{$size(\max N) < size(key(e_i))$} (where $key(e_i)$ denotes the
+	{\em old} key value), $P$ might violate req.~\ref{bt:minsize}
+	after the update.
+\item If \mbox{$size(\max N) > size(key(e_i))$} (where $key(e_i)$ denotes the
+	{\em old} key value), $P$ might violate req.~\ref{bt:maxsize}
+	after the update.
+\end{itemize}
+Hence, in the first case, a node decrease handling of $P$ must be performed;
+in the second case, a node increase handling, respectively.
+
+Note that these handlings might have effect on the neighbors of $P$,
+and also on their children and parents.
+\end{algo}
+
+
+\subsection{Implementation}
+The B\textsuperscript{+}-tree is implemented in Ada 95.
+The implementation makes heavy use of generics; in total the following
+parameters can be provided in form of actuals for formal generic parameters:
+\begin{itemize}
+\item the key and value type and functions that define an order on the
+	key space,
+\item serialization procedures for key and value objects
+\item a block-IO package instance.
+\end{itemize}
+The block-IO package could simply open files and read and write $4k$ blocks
+from respectively to it.
+More sophisticated implementations could add a caching layer or distribute the
+data over network.
+Generally, one node is stored in one block. The serialization procedures
+care about bringing key and value objects to the block and back again.
+They could also implement some compression algorithm.
+
+
+Nodes that are not needed anymore are arranged in a linked list. When a
+new block is allocated, one of the blocks in this list is taken if possible.
+
+There are two constant block addresses: the first block always contains the
+root node. This root node always exists, even if the tree is empty.
+The second block is the head of the list of free blocks. This block cannot
+be allocated; it will always remain the header in the list.
+These two invariants allow us to store no more tree meta data.
+Furthermore, they allow instant access to the tree without much initialization.
+
+
+\subsection{Compression}
+The serialization procedures can implement compression of the data of a
+single node.
+Currently, there are three kinds serialization for string-keys implemented:
+\begin{itemize}
+\item no compression, just copy the data,
+\item prefix compression, and
+\item Levenshtein delta encoding.
+\end{itemize}
+
+\begin{rem}[Compression Condition]
+Let
+\begin{align*}
+c: \ & \{ E : (M, E) \text{ is a node} \} \rightarrow\\
+     & \{ (b_1, \ldots, b_n) : b_i \in \mathbb{B}^8 \}
+\end{align*}
+be a compression algorithm that maps the entries of a node to a sequence of
+bytes. Let \mbox{$|c(E)| = n$ if $c(E) = (b_1, \ldots, b_n)$} denote the length of
+the sequence of bytes.
+Then the following condition must hold for all sets of entries $E$ and arbitrary
+entries $e$:
+\[ |c(E \setminus \{e\})| \leq |c(E)| \leq |c(E \cup \{e\})| \]
+\end{rem}
+
+The remark says that a node may not shrink (grow) in size on disk when
+an entry is added (removed).
+
+
+
+%\nocite{*}
+\bibliography{bibliography}
+\end{multicols}
+
+\end{document}
+

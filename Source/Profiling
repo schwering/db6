@@ -1,0 +1,5 @@
+strace -p10624 -i -T
+watch zum wiederholten ausfuehren
+sysstat:	iostat
+		mpstat
+http://www.novell.com/coolsolutions/tools/15964.html
