@@ -1,7 +1,0 @@
--- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
-
-with DB.Gen_BTree.Gen_Traversal;
-
-package DB.BTree.Traversal is new BTree.Gen_Traversal;
---pragma Preelaborate (DB.BTree.Traversal);
-
