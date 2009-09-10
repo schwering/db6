@@ -633,10 +633,10 @@ package body Cursors is
             when Abstract_Bound =>
                Look_Up_Abstract_From_Bound(Tree, Transaction, Cursor, State);
          end case;
-         Cursor.Has_Node := True;
+         Cursor.Has_Node := (State = Success);
       elsif Cursor.Force_Recalibrate then
          Recalibrate(Tree, Transaction, Cursor, State);
-         Cursor.Force_Recalibrate := False;
+         Cursor.Force_Recalibrate := (State = Success);
       else
          Move_To_Next(Tree, Transaction, Cursor, State);
       end if;
