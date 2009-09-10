@@ -12,7 +12,7 @@ CURSOR_TESTS=cursor controlled
 THREAD_TESTS=thread thread2 thread3
 COMPRESSION_TESTS=prefix levenshtein 
 STRING_TESTS=unbounded_string
-MIXED_TESTS=locks search hash modular rtest i_bm check data mkfs
+MIXED_TESTS=locks search hash modular rtest i_bm check data mkfs bitmap
 
 TESTS=$(HEAP_TESTS)\
       $(TREE_TESTS)\

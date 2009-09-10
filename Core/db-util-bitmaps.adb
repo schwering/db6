@@ -74,9 +74,7 @@ package body DB.Util.Bitmaps is
                   declare
                      I : constant Index_Type := W * Word_Length + B;
                   begin
-                     if I >= Bitmap.Size then
-                        raise Constraint_Error;
-                     end if;
+                     exit when I >= Bitmap.Size;
                      return I;
                   end;
                end if;
