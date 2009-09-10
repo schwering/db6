@@ -129,13 +129,13 @@ begin
       end;
    end loop;
 
-   Put_Line("DELETES");
    --New_Line;
    --Put_Line("LULU0");
    --Heaps.Print_Info_Index(Heap);
    --Heaps.Print_Free_Index(Heap);
 
    -- [0.0, 0.25]
+   Put_Line("DELETES [0.0, 0.25)");
    for I in Count*0/4+1 .. Count*1/4 loop
       declare
          S     : constant Size_Type := Size_Type(I);
@@ -154,6 +154,7 @@ begin
    --Heaps.Print_Free_Index(Heap);
 
    -- (0.75, 1.0]
+   Put_Line("DELETES (0.75, 1.0]");
    for I in Count*3/4+1 .. Count*4/4 loop
       declare
          S     : constant Size_Type := Size_Type(I);
@@ -172,6 +173,7 @@ begin
    --Heaps.Print_Free_Index(Heap);
 
    -- (0.25, 0.75], even
+   Put_Line("DELETES (0.25, 0.75] even");
    for I in Count*1/4+1 .. Count*3/4 loop
       if I mod 2 = 0 then
          declare
@@ -182,7 +184,6 @@ begin
             if State /= Heaps.Success then
                Put_Line("Delete"& Size_Type'Image(S) &" = "&
                         Heaps.Result_Type'Image(State));
-               return;
             end if;
          end;
       end if;
@@ -193,6 +194,7 @@ begin
    --Heaps.Print_Free_Index(Heap);
 
    -- (0.25, 0.75], odd
+   Put_Line("DELETES (0.25, 0.75] odd");
    for I in Count*1/4+1 .. Count*3/4 loop
       if I mod 2 = 1 then
          declare
@@ -203,7 +205,6 @@ begin
             if State /= Heaps.Success then
                Put_Line("Delete"& Size_Type'Image(S) &" = "&
                         Heaps.Result_Type'Image(State));
-               return;
             end if;
          end;
       end if;

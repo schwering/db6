@@ -816,7 +816,7 @@ package body DB.Gen_Heaps is
             if Reverse_Direction then
                Address := Addr;
             end if;
-            Length     := Length + Info.Length;
+            Length := Length + Info.Length;
 
             Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
                                Cursor, St);
@@ -908,7 +908,8 @@ package body DB.Gen_Heaps is
 
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
-      Arr     : constant System.Storage_Elements.Storage_Array := To_Storage_Array(Item);
+      Arr     : constant System.Storage_Elements.Storage_Array
+              := To_Storage_Array(Item);
       Length  : constant IO.Blocks.Size_Type                   := Arr'Length;
    begin
       declare
@@ -1022,7 +1023,7 @@ package body DB.Gen_Heaps is
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
       Chunk_Address : Block_IO.Valid_Address_Type := Address;
-      Length        : Length_Type := 0;
+      Length        : Length_Type;
    begin
       -- Remove from free index
       Unset_Used(Heap, Transaction, Address, Length, State);

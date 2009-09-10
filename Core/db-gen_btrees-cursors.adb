@@ -263,10 +263,9 @@ package body Cursors is
                      L   : Nodes.Node_Type;
                   begin
                      Read_Node(Tree, Transaction, L_A, L);
-                     Cursor.Has_Node := True;
-                     Cursor.Node     := L;
-                     Cursor.Index    := Nodes.Degree(L);
-                     State           := Success;
+                     Cursor.Node  := L;
+                     Cursor.Index := Nodes.Degree(L);
+                     State        := Success;
                   end;
                else
                   Cursor.Final := True;
@@ -305,10 +304,9 @@ package body Cursors is
                      R   : Nodes.Node_Type;
                   begin
                      Read_Node(Tree, Transaction, R_A, R);
-                     Cursor.Has_Node := True;
-                     Cursor.Node     := R;
-                     Cursor.Index    := 1;
-                     State           := Success;
+                     Cursor.Node  := R;
+                     Cursor.Index := 1;
+                     State        := Success;
                   end;
                else
                   Cursor.Final := True;
@@ -635,6 +633,7 @@ package body Cursors is
             when Abstract_Bound =>
                Look_Up_Abstract_From_Bound(Tree, Transaction, Cursor, State);
          end case;
+         Cursor.Has_Node := True;
       elsif Cursor.Force_Recalibrate then
          Recalibrate(Tree, Transaction, Cursor, State);
          Cursor.Force_Recalibrate := False;
