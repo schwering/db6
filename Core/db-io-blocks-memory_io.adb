@@ -12,7 +12,7 @@ package body DB.IO.Blocks.Memory_IO is
       array (Positive range 1 .. Max_File_Count) of Entry_Ref_Type;
 
    Files : Entry_Ref_Array_Type := (others => null);
- 
+
    procedure Create
      (ID   : in  String;
       File : out File_Type)

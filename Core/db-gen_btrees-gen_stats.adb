@@ -50,7 +50,7 @@ begin -- Gen_Traverse
                if not Nodes.Is_Root(N) then
                   Bytes_In_Blocks := Bytes_In_Blocks
                      + Long_Integer(DB.IO.Blocks.Block_Size);
-                  Bytes_Wasted_In_Blocks := Bytes_Wasted_In_Blocks 
+                  Bytes_Wasted_In_Blocks := Bytes_Wasted_In_Blocks
                      + Long_Integer(DB.IO.Blocks.Block_Size - Nodes.Size_Of(N));
                end if;
             end if;

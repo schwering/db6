@@ -15,7 +15,7 @@ package body DB.Locks.Mutexes is
 
 
    protected body Mutex_Type is
-      
+
       entry Lock when not Locked
       is begin
          Locked := True;

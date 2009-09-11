@@ -1,5 +1,5 @@
 package body DB.IO.Blocks.Device_IO is
- 
+
    procedure Create
      (ID   : in  String;
       File : out File_Type)
@@ -104,8 +104,8 @@ package body DB.IO.Blocks.Device_IO is
    begin
       Locks.Mutexes.Lock(File.Mutex);
 
-      if File.Max_Address_Initialized 
-      and then File.Max_Address < Address then
+      if File.Max_Address_Initialized and then
+         File.Max_Address < Address then
          raise IO_Error;
       end if;
       Low_Level.Seek(File.FD, To_File_Position(Address));

@@ -35,7 +35,7 @@ package body DB.IO.Blocks.CFS_IO is
       end loop;
       raise IO_Error;
    end Disk_Name;
- 
+
 
    function File_Name (ID : String) return File_Name_Type
    is begin
@@ -155,7 +155,7 @@ package body DB.IO.Blocks.CFS_IO is
          end;
       end loop;
 
-      raise IO_Error; 
+      raise IO_Error;
    end Get_Disk_Handle;
 
 
@@ -211,7 +211,7 @@ package body DB.IO.Blocks.CFS_IO is
       Low_Level.Close(FD);
    end Make_Filesystem;
 
- 
+
    procedure Create
      (ID   : in  String;
       File : out File_Type)
@@ -438,8 +438,8 @@ package body DB.IO.Blocks.CFS_IO is
    begin
       Locks.Mutexes.Lock(File.Mutex);
 
-      if File.Max_Address_Initialized 
-      and then File.Max_Address < Address then
+      if File.Max_Address_Initialized and then
+         File.Max_Address < Address then
          raise IO_Error;
       end if;
       Convert_Block_Address_To_Disk_Position(File, Address, Pos,

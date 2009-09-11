@@ -1,6 +1,6 @@
 package DB.Util.Timers is
    --pragma Pure;
-   
+
    type Ticks_Type is mod 2**64;
    type Time_Type is mod 2**64;
 
@@ -15,7 +15,7 @@ package DB.Util.Timers is
          Real_Duration      : Time_Type := 0;
       end record;
 
-   
+
    procedure Start (Timer : in out Timer_Type);
    procedure Stop (Timer : in out Timer_Type);
    procedure Reset (Timer : out Timer_Type);

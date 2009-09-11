@@ -4,6 +4,27 @@
 * Shadowing:
   1. Fuer alle Versionen des Trees gibt es eine gemeinsame Refcount-Map:
      Phys-Addr -> Refcount
+     Die Refcount eines Knotens zeigt an, wie viele andere KNOTEN auf diesen
+     Knoten zeigen.
+     Fuer Knoten N sei L logische und P physische Adreses.
+     Clone:
+       kopiere Wurzel N mit L an neue P und setze Refcount(P) := Degree(N)
+     Relocate:
+       schreibe N mit L an neue P und setze Refcount(P) := Pointer_Count(N)
+       wobei Pointer_Count(N) := |Pointers(N)|
+       wobei Pointers(N) := Children(N) \cup { Left(N), Right(N), Parent(N) falls Valid }
+     Write:
+       if Refcount(P) = Pointer_Count(N):
+         Simply_Write
+         P \in (Pointers(N') \ Pointers(N)): Dec_Refcount(P);
+         P \in (Pointers(N) \ Pointers(N')): Inc_Refcount(P);
+       else
+         ach alles Kacke verdammte
+     Dec_Refcount:
+       Refcount(N) := Refcount(N) - 1
+       if Refcount(N) = 0 then Free_Node(N)
+     Inc_Refcount:
+       Refcount(N) := Refcount(N) + 1
   2. Fuer jede Version des Trees gibt es eine Map
      Virt-Addr -> Phys-Addr
      Koennte man so realisieren: insgesamt nur eine Map

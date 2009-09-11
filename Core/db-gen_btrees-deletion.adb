@@ -215,7 +215,7 @@ package body Deletion is
 
 
       -- Simply delete.
-      -- Since this terminates the path unwinding, the parent-synchronization 
+      -- Since this terminates the path unwinding, the parent-synchronization
       -- is performed recursively to the root node.
       procedure Direct_Delete
         (Tree  : in out Tree_Type;
@@ -234,7 +234,7 @@ package body Deletion is
 
 
       -- Redistributes the entries of the given node and its right neighbor.
-      -- Since this terminates the path unwinding, the parent-synchronization 
+      -- Since this terminates the path unwinding, the parent-synchronization
       -- is performed recursively to the root node. Since the right neighbor
       -- and the current node might have different parents, both nodes have
       -- to be synchronized recursively.
@@ -261,7 +261,7 @@ package body Deletion is
 
 
       -- Redistributes the entries of the given node and its left neighbor.
-      -- Since this terminates the path unwinding, the parent-synchronization 
+      -- Since this terminates the path unwinding, the parent-synchronization
       -- is performed recursively to the root node. Since the left neighbor
       -- and the current node might have different parents, both nodes have
       -- to be synchronized recursively.

@@ -155,7 +155,7 @@ package DB.IO.Blocks.CFS_IO is
 private
    type Name_Length_Type is range 0 .. Max_Name_Length;
    subtype Name_String_Type is String(1 .. Max_Name_Length);
-   type Name_Type is 
+   type Name_Type is
       record
          Len : Name_Length_Type;
          Str : Name_String_Type;

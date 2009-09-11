@@ -84,7 +84,7 @@ package body DB.Gen_BTrees.Gen_Controlled is
      (Tree : Tree_Type'Class)
       return RO_Transaction_Type
    is begin
-      return (AF.Limited_Controlled with 
+      return (AF.Limited_Controlled with
               Gen_BTrees.New_RO_Transaction(Tree.Tree));
    end New_RO_Transaction;
 
@@ -93,7 +93,7 @@ package body DB.Gen_BTrees.Gen_Controlled is
      (Tree : Tree_Type'Class)
       return RW_Transaction_Type
    is begin
-      return (AF.Limited_Controlled with 
+      return (AF.Limited_Controlled with
               Gen_BTrees.New_RW_Transaction(Tree.Tree));
    end New_RW_Transaction;
 
@@ -149,7 +149,7 @@ package body DB.Gen_BTrees.Gen_Controlled is
       State    :    out Result_Type)
    is begin
       Gen_BTrees.Look_Up(Tree.Tree, Key, Value,
-                         Gen_BTrees.Count_Type(Position), 
+                         Gen_BTrees.Count_Type(Position),
                          Gen_BTrees.Result_Type(State));
    end Look_Up;
 
@@ -260,7 +260,7 @@ package body DB.Gen_BTrees.Gen_Controlled is
                         Gen_BTrees.Count_Type(Position),
                         Gen_BTrees.Result_Type(State));
    end Insert;
- 
+
    procedure Insert
      (Tree        : in out Tree_Type'Class;
       Transaction : in out RW_Transaction_Type'Class;
@@ -269,7 +269,7 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is begin
-      Gen_BTrees.Insert(Tree.Tree, Transaction.Transaction, 
+      Gen_BTrees.Insert(Tree.Tree, Transaction.Transaction,
                         Key, Value, Gen_BTrees.Count_Type(Position),
                         Gen_BTrees.Result_Type(State));
    end Insert;
@@ -405,7 +405,7 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Reverse_Direction : Boolean := False)
       return Cursor_Type
    is begin
-      return (AF.Limited_Controlled with 
+      return (AF.Limited_Controlled with
               Gen_BTrees.New_Cursor(Tree.Tree,
                                     Transaction_Impl(Transaction).all,
                                     Thread_Safe,

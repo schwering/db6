@@ -59,14 +59,14 @@ package DB.Gen_BTrees is
    type RO_Transaction_Type is new Transaction_Type with private;
    type RW_Transaction_Type is new Transaction_Type with private;
 
-   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal, 
+   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
    type Bound_Type (<>) is private;
    type Cursor_Type (<>) is limited private;
 
 
    Tree_Error : exception;
-   -- This exception is only raised when there are extremely serious 
+   -- This exception is only raised when there are extremely serious
    -- errors in the tree such as dangling references to child or neighbor
    -- nodes.
 
@@ -91,7 +91,7 @@ package DB.Gen_BTrees is
      (Max_Value_Size : IO.Blocks.Size_Type
                      := IO.Blocks.Bits_To_Units(Value_Type'Size))
       return IO.Blocks.Size_Type;
-   -- Returns the maximum allowed size of keys if the maximum size of 
+   -- Returns the maximum allowed size of keys if the maximum size of
    -- values is Max_Value_Size.
 
 
@@ -226,7 +226,7 @@ package DB.Gen_BTrees is
    -- exists.
    -- This procedure starts and commits a new transaction and might therefore
    -- block.
- 
+
    procedure Insert
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type'Class;
@@ -329,7 +329,7 @@ package DB.Gen_BTrees is
      (Comparison : Comparison_Type;
       Key        : Key_Type)
       return Bound_Type;
-   -- Creates a concrete bound. The bound New_Bound(Greater, Min) is a 
+   -- Creates a concrete bound. The bound New_Bound(Greater, Min) is a
    -- lower bound, because this means that all keys Key hit by the cursor
    -- must satisfy: Key > Min.
 
@@ -398,7 +398,7 @@ package DB.Gen_BTrees is
       Value       :    out Value_Type;
       State       :    out Result_Type);
    -- Steps forward to the next Key/Value-pair and sets State to Success.
-   -- If no such pair exists (with regard to the set bounds), State is set to 
+   -- If no such pair exists (with regard to the set bounds), State is set to
    -- Failure or Error.
    -- If Delete was called before, Next must recalibrate, i.e. find the
    -- key/value-pair that should be visited next.
@@ -417,7 +417,7 @@ package DB.Gen_BTrees is
    -- key/value-pair that should be visited next.
    -- The deletion involves the start and commit of a sub-transaction, hence
    -- the lock hold by the ticket of the Cursor is upgraded to a write-lock
-   -- and then a certify-lock for a short time. 
+   -- and then a certify-lock for a short time.
    -- Note that this might lead to deadlocks or starvation if two cursors
    -- simultaneously iterate over the elements of a Tree and perform deletions.
    -- Only valid for non-transactional cursors.
@@ -736,7 +736,7 @@ private
          return Node_Type;
       -- Returns a copy of the nodes which is trimmed to the entries From .. To.
       -- For both indexes it holds that the index refers to Left_Node if it is
-      -- 1 .. Degree(Left_Node) and to Right_Node if it is in 
+      -- 1 .. Degree(Left_Node) and to Right_Node if it is in
       -- Degree(Left_Node) + 1 .. Degree(Left_Node) + Degree(Right_Node).
       -- This function works for both, leaves and inner nodes.
 
@@ -894,7 +894,7 @@ private
    type RW_Transaction_Type is new Transaction_Type with
       record
          Buffer  : IO_Buffers.Buffer_Type;
-         RW_Self : RW_Transaction_Ref_Type 
+         RW_Self : RW_Transaction_Ref_Type
                  := RW_Transaction_Type'Unchecked_Access;
       end record;
 
@@ -921,8 +921,8 @@ private
    function New_RW_Transaction
      (Tree : Tree_Type)
       return Sub_RW_Transaction_Type;
-   -- Raises a Tree_Error, must never be used. Ada enforces us to override 
-   -- New_RW_Transaction from RW_Transaction_Type (an alternative would be 
+   -- Raises a Tree_Error, must never be used. Ada enforces us to override
+   -- New_RW_Transaction from RW_Transaction_Type (an alternative would be
    -- to source out the constructors so that they are not class members, but
    -- this makes the public part of this specification rather ugly.
 

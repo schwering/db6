@@ -3,7 +3,9 @@ package body DB.Util.Bitmaps is
    function Index_To_Word
      (Index : Index_Type)
       return Index_Type
-   is begin
+   is
+      pragma Inline (Index_To_Word);
+   begin
       return Index / Word_Length;
    end Index_To_Word;
 
@@ -11,7 +13,9 @@ package body DB.Util.Bitmaps is
    function Index_To_Bit
      (Index : Index_Type)
       return Index_Type
-   is begin
+   is
+      pragma Inline (Index_To_Bit);
+   begin
       return Index mod Word_Length;
    end Index_To_Bit;
 

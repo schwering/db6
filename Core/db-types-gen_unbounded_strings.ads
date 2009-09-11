@@ -145,7 +145,7 @@ private
    type Refcount_Type is new Positive;
    type Refcount_Ref_Type is access Refcount_Type;
    pragma Controlled (Refcount_Ref_Type);
-   type String_Type is new Ada.Finalization.Controlled with 
+   type String_Type is new Ada.Finalization.Controlled with
       record
          Buffer   : Buffer_Ref_Type;
          Refcount : Refcount_Ref_Type;

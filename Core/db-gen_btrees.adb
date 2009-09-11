@@ -741,7 +741,7 @@ package body DB.Gen_BTrees is
 
    -- Redistribute the entries of two neighbors. This is analoguous to
    -- shift in standard B-Trees.
-   -- Since this terminates the path unwinding, the parent-synchronization 
+   -- Since this terminates the path unwinding, the parent-synchronization
    -- is performed recursively to the root node. Since the right neighbor
    -- and the current node might have different parents, both nodes have
    -- to be synchronized recursively.
@@ -1012,7 +1012,7 @@ package body DB.Gen_BTrees is
       return Cursor_Type
    renames Cursors.New_Cursor;
 
-   
+
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
       Enabled : in     Boolean)
@@ -1105,4 +1105,4 @@ package body DB.Gen_BTrees is
    package body Misc is separate;
 
 end DB.Gen_BTrees;
- 
+

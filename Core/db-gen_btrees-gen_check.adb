@@ -316,13 +316,13 @@ declare
          B);
       return Nodes.From_Block(B);
    end R;
-   S : String := Message("PARENT PARENT PARENT", 
+   S : String := Message("PARENT PARENT PARENT",
                          R(Nodes.Parent(N)));
-   U : String := Message("LEFT LEFT LEFT", 
+   U : String := Message("LEFT LEFT LEFT",
                          R(Nodes.Left_Neighbor(N)));
-   T : String := Message("NODE NODE NODE", 
+   T : String := Message("NODE NODE NODE",
                          N);
-   V : String := Message("RIGHT RIGHT RIGHT", 
+   V : String := Message("RIGHT RIGHT RIGHT",
                          R(Nodes.Right_Neighbor(N)));
 begin
    for I in 1 .. Nodes.Degree(N) loop

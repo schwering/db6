@@ -104,10 +104,10 @@ package DB.IO.Blocks.Gen_IO is
       Address : in     Address_Type)
    renames P_Set_Block_Count;
    -- While the name of the procedure says that it informs the File object
-   -- about the count of blocks in file, This is somewhat ambiguous: 
-   -- In fact, Address is the last (i.e. greatest with regard to "<") 
+   -- about the count of blocks in file, This is somewhat ambiguous:
+   -- In fact, Address is the last (i.e. greatest with regard to "<")
    -- address in File that contains data.
-   -- This procedure generally has no effect if Needs_Explicit_Block_Count 
+   -- This procedure generally has no effect if Needs_Explicit_Block_Count
    -- is False.
 
    procedure Close
@@ -188,7 +188,7 @@ package DB.IO.Blocks.Gen_IO is
    renames P_Seek_New;
    -- Sets Address to a new position in File at which further Write calls
    -- will not fail and at which further Read calls will do fail before the
-   -- next Write. No further assumptions can be done (in particular, no 
+   -- next Write. No further assumptions can be done (in particular, no
    -- assumptions with regard to the ordering and successor-relation).
    -- If this fails for whatever reason, an IO_Error is raised.
 

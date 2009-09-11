@@ -1,24 +1,33 @@
 with DB.IO.Blocks;
 
 generic
-   
+   with function Refcount_Map_ID
+          (ID : String)
+           return String;
+   with function Address_Map_ID
+          (ID : String)
+           return String;
+   with function Ancestor_Map_ID
+          (ID : String)
+           return String;
 package DB.Gen_BTrees.Gen_Shadowing is
    --pragma Preelaborate;
 
-   type Tree_Type is new Gen_BTrees.Tree_Type;
+   type Tree_Type is limited private;
    subtype Transaction_Type is Gen_BTrees.Transaction_Type;
    type RO_Transaction_Type is new Gen_BTrees.RO_Transaction_Type with private;
    type RW_Transaction_Type is new Gen_BTrees.RW_Transaction_Type with private;
 
-   type Version_Type is mod 2**8;
-   type Result_Type is new Gen_BTrees.Result_Type;
-   type Count_Type is new Gen_BTrees.Count_Type;
-   type Height_Type is new Gen_BTrees.Height_Type;
+   type Version_Type is range 0 .. 2**8 - 1;
+   for Version_Type'Storage_Size use 8;
+   subtype Result_Type is Gen_BTrees.Result_Type;
+   subtype Count_Type is Gen_BTrees.Count_Type;
+   subtype Height_Type is Gen_BTrees.Height_Type;
 
-   type Comparison_Type is new Gen_BTrees.Comparison_Type;
-   type Bound_Type is new Gen_BTrees.Bound_Type;
+   subtype Comparison_Type is Gen_BTrees.Comparison_Type;
+   subtype Bound_Type is Gen_BTrees.Bound_Type;
 
-   type Cursor_Type is new Gen_BTrees.Cursor_Type;
+   subtype Cursor_Type is Gen_BTrees.Cursor_Type;
 
 
    Tree_Error : exception renames Gen_BTrees.Tree_Error;
@@ -35,8 +44,9 @@ package DB.Gen_BTrees.Gen_Shadowing is
      (Tree : in out Tree_Type);
 
    procedure Shadow
-     (Tree    : in out Tree_Type;
-      Version :    out Version_Type);
+     (Tree            : in out Tree_Type;
+      Current_Version : in     Version_Type;
+      New_Version     :    out Version_Type);
 
    function Max_Key_Size
      (Max_Value_Size : IO.Blocks.Size_Type
@@ -152,49 +162,13 @@ package DB.Gen_BTrees.Gen_Shadowing is
       Value    : in     Value_Type;
       Position :    out Count_Type;
       State    :    out Result_Type);
- 
+
    procedure Insert
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type);
-
-   procedure Update
-     (Tree      : in out Tree_Type;
-      Version   : in     Version_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
-      Old_Value :    out Value_Type;
-      Position  :    out Count_Type;
-      State     :    out Result_Type);
-
-   procedure Update
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Key         : in     Key_Type;
-      Value       : in     Value_Type;
-      Old_Value   :    out Value_Type;
-      Position    :    out Count_Type;
-      State       :    out Result_Type);
-
-   procedure Update
-     (Tree      : in out Tree_Type;
-      Version   : in     Version_Type;
-      Position  : in     Count_Type;
-      Value     : in     Value_Type;
-      Old_Value :    out Value_Type;
-      Key       :    out Key_Type;
-      State     :    out Result_Type);
-
-   procedure Update
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       : in     Value_Type;
-      Old_Value   :    out Value_Type;
-      Key         :    out Key_Type;
       State       :    out Result_Type);
 
    procedure Delete
@@ -307,7 +281,211 @@ package DB.Gen_BTrees.Gen_Shadowing is
       State       :    out Result_Type);
 
 private
-   type Tree_Type is new Gen_BTrees.Tree_Type with null record;
+   type Refcount_Type is new Natural;
+   type Physical_Address_Type is new Nodes.Valid_Address_Type;
+   type Logical_Address_Type is new Nodes.Valid_Address_Type;
+
+
+   package Refcount_Map_Types is
+      subtype Key_Type is Physical_Address_Type;
+      type Key_Context_Type is null record;
+      subtype Value_Type is Refcount_Type;
+      type Value_Context_Type is null record;
+
+      function "=" (A, B : Key_Type) return Boolean;
+      pragma Inline ("=");
+      function "<=" (A, B : Key_Type) return Boolean;
+      pragma Inline ("<=");
+
+      procedure Read_Key
+        (Context : in out Key_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Key     :    out Key_Type);
+
+      procedure Skip_Key
+        (Context : in out Key_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type);
+
+      procedure Write_Key
+        (Context : in out Key_Context_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Key     : in     Key_Type);
+
+      procedure Read_Value
+        (Context : in out Value_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Value   :    out Value_Type);
+
+      procedure Skip_Value
+        (Context : in out Value_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type);
+
+      procedure Write_Value
+        (Context : in out Value_Context_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Value   : in     Value_Type);
+   end Refcount_Map_Types;
+
+   package Refcount_Maps is new Gen_BTrees
+     (Key_Type                      => Refcount_Map_Types.Key_Type,
+      Key_Context_Type              => Refcount_Map_Types.Key_Context_Type,
+      Write_Key                     => Refcount_Map_Types.Write_Key,
+      Read_Key                      => Refcount_Map_Types.Read_Key,
+      Skip_Key                      => Refcount_Map_Types.Skip_Key,
+      "="                           => Refcount_Map_Types."=",
+      "<="                          => Refcount_Map_Types."<=",
+      Value_Type                    => Refcount_Map_Types.Value_Type,
+      Value_Context_Type            => Refcount_Map_Types.Value_Context_Type,
+      Write_Value                   => Refcount_Map_Types.Write_Value,
+      Read_Value                    => Refcount_Map_Types.Read_Value,
+      Skip_Value                    => Refcount_Map_Types.Skip_Value,
+      Is_Context_Free_Serialization => True,
+      Block_IO                      => Block_IO);
+
+
+   package Address_Map_Types is
+      type Key_Type is
+         record
+            Version         : Version_Type;
+            Logical_Address : Logical_Address_Type;
+         end record;
+      type Key_Context_Type is null record;
+      subtype Value_Type is Physical_Address_Type;
+      type Value_Context_Type is null record;
+
+      function "=" (A, B : Key_Type) return Boolean;
+      pragma Inline ("=");
+      function "<=" (A, B : Key_Type) return Boolean;
+      pragma Inline ("<=");
+
+      procedure Read_Key
+        (Context : in out Key_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Key     :    out Key_Type);
+
+      procedure Skip_Key
+        (Context : in out Key_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type);
+
+      procedure Write_Key
+        (Context : in out Key_Context_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Key     : in     Key_Type);
+
+      procedure Read_Value
+        (Context : in out Value_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Value   :    out Value_Type);
+
+      procedure Skip_Value
+        (Context : in out Value_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type);
+
+      procedure Write_Value
+        (Context : in out Value_Context_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Value   : in     Value_Type);
+   end Address_Map_Types;
+
+   package Address_Maps is new Gen_BTrees
+     (Key_Type                      => Address_Map_Types.Key_Type,
+      Key_Context_Type              => Address_Map_Types.Key_Context_Type,
+      Write_Key                     => Address_Map_Types.Write_Key,
+      Read_Key                      => Address_Map_Types.Read_Key,
+      Skip_Key                      => Address_Map_Types.Skip_Key,
+      "="                           => Address_Map_Types."=",
+      "<="                          => Address_Map_Types."<=",
+      Value_Type                    => Address_Map_Types.Value_Type,
+      Value_Context_Type            => Address_Map_Types.Value_Context_Type,
+      Write_Value                   => Address_Map_Types.Write_Value,
+      Read_Value                    => Address_Map_Types.Read_Value,
+      Skip_Value                    => Address_Map_Types.Skip_Value,
+      Is_Context_Free_Serialization => True,
+      Block_IO                      => Block_IO);
+
+
+   package Ancestor_Map_Types is
+      subtype Key_Type is Logical_Address_Type;
+      type Key_Context_Type is null record;
+      subtype Value_Type is Physical_Address_Type;
+      type Value_Context_Type is null record;
+
+      function "=" (A, B : Key_Type) return Boolean;
+      pragma Inline ("=");
+      function "<=" (A, B : Key_Type) return Boolean;
+      pragma Inline ("<=");
+
+      procedure Read_Key
+        (Context : in out Key_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Key     :    out Key_Type);
+
+      procedure Skip_Key
+        (Context : in out Key_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type);
+
+      procedure Write_Key
+        (Context : in out Key_Context_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Key     : in     Key_Type);
+
+      procedure Read_Value
+        (Context : in out Value_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Value   :    out Value_Type);
+
+      procedure Skip_Value
+        (Context : in out Value_Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type);
+
+      procedure Write_Value
+        (Context : in out Value_Context_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Value   : in     Value_Type);
+   end Ancestor_Map_Types;
+
+   package Ancestor_Maps is new Gen_BTrees
+     (Key_Type                      => Ancestor_Map_Types.Key_Type,
+      Key_Context_Type              => Ancestor_Map_Types.Key_Context_Type,
+      Write_Key                     => Ancestor_Map_Types.Write_Key,
+      Read_Key                      => Ancestor_Map_Types.Read_Key,
+      Skip_Key                      => Ancestor_Map_Types.Skip_Key,
+      "="                           => Ancestor_Map_Types."=",
+      "<="                          => Ancestor_Map_Types."<=",
+      Value_Type                    => Ancestor_Map_Types.Value_Type,
+      Value_Context_Type            => Ancestor_Map_Types.Value_Context_Type,
+      Write_Value                   => Ancestor_Map_Types.Write_Value,
+      Read_Value                    => Ancestor_Map_Types.Read_Value,
+      Skip_Value                    => Ancestor_Map_Types.Skip_Value,
+      Is_Context_Free_Serialization => True,
+      Block_IO                      => Block_IO);
+
+
+   type Tree_Type is limited
+      record
+         Tree         : Gen_BTrees.Tree_Type;
+         Refcount_Map : Refcount_Maps.Tree_Type;
+         Address_Map  : Address_Maps.Tree_Type;
+         Ancestor_Map : Ancestor_Maps.Tree_Type;
+      end record;
 
    type RO_Transaction_Type is new Gen_BTrees.RO_Transaction_Type with
       record

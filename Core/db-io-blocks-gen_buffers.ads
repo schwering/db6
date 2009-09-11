@@ -8,7 +8,7 @@ generic
    with function To_Block (I : Item_Type) return Block_Type;
    with function From_Block (B : Block_Type) return Item_Type;
    Item_Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
-   Node_Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class; 
+   Node_Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.IO.Blocks.Gen_Buffers is
    pragma Preelaborate;
 

@@ -133,7 +133,7 @@ package DB.Gen_BTrees.Gen_Controlled is
       Value    : in     Value_Type;
       Position :    out Count_Type;
       State    :    out Result_Type);
- 
+
    procedure Insert
      (Tree        : in out Tree_Type'Class;
       Transaction : in out RW_Transaction_Type'Class;

@@ -74,7 +74,7 @@ package body DB.Gen_Heaps is
       begin
          Write(Block, Cursor, Value);
       end Write_Value;
-      
+
 
       function "=" (A, B : Key_Type) return Boolean
       is begin
@@ -165,7 +165,7 @@ package body DB.Gen_Heaps is
       begin
          Write(Block, Cursor, Value);
       end Write_Value;
-      
+
 
       function "=" (A, B : Key_Type) return Boolean
       is
@@ -268,7 +268,7 @@ package body DB.Gen_Heaps is
          begin
             Info_BTrees.Maximum(Heap.Info_Tree, Address, Info, Pos, St);
             if St = Info_BTrees.Success then
-               Address := Succ(Address, Chunk_Length(Info.Length) / 
+               Address := Succ(Address, Chunk_Length(Info.Length) /
                                           Length_Type(IO.Blocks.Block_Size));
                Block_IO.Set_Block_Count(Heap.File,
                                         Block_IO.To_Address(Address));
@@ -793,11 +793,11 @@ package body DB.Gen_Heaps is
              := Upper_Bound(Address, Reverse_Direction);
       Cursor : Info_BTrees.Cursor_Type
              := Info_BTrees.New_Cursor
-                  (Tree              => Heap.Info_Tree, 
+                  (Tree              => Heap.Info_Tree,
                    Transaction       => Transaction.Info_Transaction,
                    Thread_Safe       => False,
-                   Lower_Bound       => LB, 
-                   Upper_Bound       => UB, 
+                   Lower_Bound       => LB,
+                   Upper_Bound       => UB,
                    Reverse_Direction => Reverse_Direction);
    begin
       loop
@@ -875,17 +875,17 @@ package body DB.Gen_Heaps is
                 := Free_BTrees.Positive_Infinity_Bound;
          Cursor : Free_BTrees.Cursor_Type
                 := Free_BTrees.New_Cursor
-                    (Tree              => Heap.Free_Tree, 
+                    (Tree              => Heap.Free_Tree,
                      Transaction       => Transaction.Free_Transaction,
                      Thread_Safe       => False,
-                     Lower_Bound       => LB, 
-                     Upper_Bound       => UB, 
+                     Lower_Bound       => LB,
+                     Upper_Bound       => UB,
                      Reverse_Direction => False);
          Key    : Free_BTree_Types.Key_Type;
          Val    : Free_BTree_Types.Value_Type;
          St     : Free_BTrees.Result_Type;
       begin
-         Free_BTrees.Next(Heap.Free_Tree, Transaction.Free_Transaction, 
+         Free_BTrees.Next(Heap.Free_Tree, Transaction.Free_Transaction,
                           Cursor, Key, Val, St);
          Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
          if St /= Free_BTrees.Success then
@@ -932,9 +932,9 @@ package body DB.Gen_Heaps is
                   Free_Address        : Block_IO.Valid_Address_Type
                                       := Succ(Address, Block_Count);
                begin
-                  Unset_Free_Following(Heap              => Heap, 
+                  Unset_Free_Following(Heap              => Heap,
                                        Transaction       => Transaction,
-                                       Address           => Free_Address, 
+                                       Address           => Free_Address,
                                        Reverse_Direction => False,
                                        Length            => Free_Chunk_Length,
                                        State             => State);
@@ -991,7 +991,7 @@ package body DB.Gen_Heaps is
          raise;
    end Put;
 
- 
+
    procedure Delete
      (Heap    : in out Heap_Type;
       Address : in     Block_IO.Valid_Address_Type;
@@ -1032,9 +1032,9 @@ package body DB.Gen_Heaps is
       end if;
       Length := Chunk_Length(Length);
       -- Prepare merge with next blocks
-      Unset_Free_Following(Heap              => Heap, 
+      Unset_Free_Following(Heap              => Heap,
                            Transaction       => Transaction,
-                           Address           => Chunk_Address, 
+                           Address           => Chunk_Address,
                            Reverse_Direction => False,
                            Length            => Length,
                            State             => State);
@@ -1042,9 +1042,9 @@ package body DB.Gen_Heaps is
          return;
       end if;
       -- Prepare merge with previous blocks
-      Unset_Free_Following(Heap              => Heap, 
+      Unset_Free_Following(Heap              => Heap,
                            Transaction       => Transaction,
-                           Address           => Chunk_Address, 
+                           Address           => Chunk_Address,
                            Reverse_Direction => True,
                            Length            => Length,
                            State             => State);
@@ -1073,11 +1073,11 @@ package body DB.Gen_Heaps is
       Trans  : Info_BTrees.RO_Transaction_Type
              := Info_BTrees.New_RO_Transaction(Heap.Info_Tree);
       Cursor : Info_BTrees.Cursor_Type
-             := Info_BTrees.New_Cursor(Tree              => Heap.Info_Tree, 
+             := Info_BTrees.New_Cursor(Tree              => Heap.Info_Tree,
                                        Thread_Safe       => False,
                                        Transaction       => Trans,
-                                       Lower_Bound       => LB, 
-                                       Upper_Bound       => UB, 
+                                       Lower_Bound       => LB,
+                                       Upper_Bound       => UB,
                                        Reverse_Direction => False);
       Address : Block_IO.Valid_Address_Type;
       Info    : Chunk_Info_Type;
@@ -1119,11 +1119,11 @@ package body DB.Gen_Heaps is
       Trans  : Free_BTrees.RO_Transaction_Type
              := Free_BTrees.New_RO_Transaction(Heap.Free_Tree);
       Cursor : Free_BTrees.Cursor_Type
-             := Free_BTrees.New_Cursor(Tree              => Heap.Free_Tree, 
+             := Free_BTrees.New_Cursor(Tree              => Heap.Free_Tree,
                                        Thread_Safe       => False,
                                        Transaction       => Trans,
-                                       Lower_Bound       => LB, 
-                                       Upper_Bound       => UB, 
+                                       Lower_Bound       => LB,
+                                       Upper_Bound       => UB,
                                        Reverse_Direction => False);
       Length  : Length_Type;
       Address : Block_IO.Valid_Address_Type;
@@ -1157,4 +1157,4 @@ package body DB.Gen_Heaps is
    end Print_Free_Index;
 
 end DB.Gen_Heaps;
- 
+

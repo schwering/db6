@@ -4,7 +4,7 @@ with DB.IO.Blocks.Gen_Climb_Caches;
 with DB.Locks.Mutexes;
 with DB.Locks.Semaphores;
 
-package DB.IO.Blocks.Asynchronous_IO is 
+package DB.IO.Blocks.Asynchronous_IO is
    pragma Preelaborate;
 
    type Address_Type is new Natural;

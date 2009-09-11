@@ -22,11 +22,13 @@ package body DB.Gen_BTrees.Gen_Shadowing is
 
 
    procedure Shadow
-     (Tree    : in out Tree_Type;
-      Version :    out Version_Type)
+     (Tree            : in out Tree_Type;
+      Current_Version : in     Version_Type;
+      New_Version     :    out Version_Type);
    is begin
       null;
    end Shadow;
+
 
 
    function Max_Key_Size
@@ -122,7 +124,7 @@ package body DB.Gen_BTrees.Gen_Shadowing is
       State    :    out Result_Type)
    is begin
       Gen_BTrees.Look_Up(Tree, Key, Value,
-                         Gen_BTrees.Count_Type(Position), 
+                         Gen_BTrees.Count_Type(Position),
                          Gen_BTrees.Result_Type(State));
    end Look_Up;
 
@@ -237,7 +239,7 @@ package body DB.Gen_BTrees.Gen_Shadowing is
                         Gen_BTrees.Count_Type(Position),
                         Gen_BTrees.Result_Type(State));
    end Insert;
- 
+
    procedure Insert
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type'Class;
@@ -246,69 +248,10 @@ package body DB.Gen_BTrees.Gen_Shadowing is
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is begin
-      Gen_BTrees.Insert(Tree, Transaction.Transaction, 
+      Gen_BTrees.Insert(Tree, Transaction.Transaction,
                         Key, Value, Gen_BTrees.Count_Type(Position),
                         Gen_BTrees.Result_Type(State));
    end Insert;
-
-
-   procedure Update
-     (Tree      : in out Tree_Type;
-      Version   : in     Version_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
-      Old_Value :    out Value_Type;
-      Position  :    out Count_Type;
-      State     :    out Result_Type)
-   is begin
-      Gen_BTrees.Update(Tree, Key, Value, Old_Value,
-                        Gen_BTrees.Count_Type(Position),
-                        Gen_BTrees.Result_Type(State));
-   end Update;
-
-
-   procedure Update
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Key         : in     Key_Type;
-      Value       : in     Value_Type;
-      Old_Value   :    out Value_Type;
-      Position    :    out Count_Type;
-      State       :    out Result_Type)
-   is begin
-      Gen_BTrees.Update(Tree, Transaction.Transaction,
-                        Key, Value, Old_Value, Gen_BTrees.Count_Type(Position),
-                        Gen_BTrees.Result_Type(State));
-   end Update;
-
-
-   procedure Update
-     (Tree      : in out Tree_Type;
-      Version   : in     Version_Type;
-      Position  : in     Count_Type;
-      Value     : in     Value_Type;
-      Old_Value :    out Value_Type;
-      Key       :    out Key_Type;
-      State     :    out Result_Type)
-   is begin
-      Gen_BTrees.Update(Tree, Gen_BTrees.Count_Type(Position),
-                        Value, Old_Value, Key, Gen_BTrees.Result_Type(State));
-   end Update;
-
-
-   procedure Update
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       : in     Value_Type;
-      Old_Value   :    out Value_Type;
-      Key         :    out Key_Type;
-      State       :    out Result_Type)
-   is begin
-      Gen_BTrees.Update(Tree, Transaction.Transaction, 
-                        Gen_BTrees.Count_Type(Position), Value, Old_Value, Key,
-                        Gen_BTrees.Result_Type(State));
-   end Update;
 
 
    procedure Delete

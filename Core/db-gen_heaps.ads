@@ -29,7 +29,7 @@ package DB.Gen_Heaps is
    type Result_Type is (Success, Failure, Error);
 
    Heap_Error : exception;
-   -- This exception is only raised when there are extremely serious 
+   -- This exception is only raised when there are extremely serious
    -- errors in the heap such as dangling references to child or neighbor
    -- nodes.
 
@@ -64,7 +64,7 @@ package DB.Gen_Heaps is
    -- Starts a new Transaction on Heap. This call is blocking if it cannot
    -- immediately acquire write-lock. Until a call of Abort_Transaction or
    -- Commit_Transaction, other no other transaction can be executed, i.e.
-   -- subsequent Start_Transaction calls block. However, elements can be 
+   -- subsequent Start_Transaction calls block. However, elements can be
    -- read from the heap. Reads during a transaction read from the state of
    -- the Heap before the transaction started.
    -- Each Start_Transaction call must have a corresponding Abort_Transaction
@@ -92,7 +92,7 @@ package DB.Gen_Heaps is
       Address : in     Block_IO.Valid_Address_Type;
       Item    :    out Item_Type;
       State   :    out Result_Type);
-   -- Get the Item stored under Address or set State = Failure if no such 
+   -- Get the Item stored under Address or set State = Failure if no such
    -- Item exists.
    -- This procedure acquires a read-lock and might therefore block due to
    -- uncommitted transactions.
@@ -103,7 +103,7 @@ package DB.Gen_Heaps is
       Address     : in     Block_IO.Valid_Address_Type;
       Item        :    out Item_Type;
       State       :    out Result_Type);
-   -- Get the Item stored under Address or set State = Failure if no such 
+   -- Get the Item stored under Address or set State = Failure if no such
    -- Item exists.
 
    procedure Put
@@ -126,7 +126,7 @@ package DB.Gen_Heaps is
    -- Inserts Item and sets Address to the address of Item.
    -- Generally, State = Failure should never occur because there is nothing
    -- that could fail.
- 
+
    procedure Delete
      (Heap    : in out Heap_Type;
       Address : in     Block_IO.Valid_Address_Type;

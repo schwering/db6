@@ -126,7 +126,7 @@ package body Insertion is
 
 
       -- Redistributes the entries of the given node and its right neighbor.
-      -- Since this terminates the path unwinding, the parent-synchronization 
+      -- Since this terminates the path unwinding, the parent-synchronization
       -- is performed recursively to the root node. Since the right neighbor
       -- and the current node might have different parents, both nodes have
       -- to be synchronized recursively.
@@ -153,7 +153,7 @@ package body Insertion is
 
 
       -- Redistributes the entries of the given node and its left neighbor.
-      -- Since this terminates the path unwinding, the parent-synchronization 
+      -- Since this terminates the path unwinding, the parent-synchronization
       -- is performed recursively to the root node. Since the left neighbor
       -- and the current node might have different parents, both nodes have
       -- to be synchronized recursively.
@@ -184,7 +184,7 @@ package body Insertion is
       -- After the update of N to R, the count in the parent of R must be
       -- synchronized. However, this does not have to be done recursively,
       -- because L is inserted into R's parent, and as a part of this
-      -- insertion, the count of L in the parent will be synchronized 
+      -- insertion, the count of L in the parent will be synchronized
       -- recursively, and this will also synchronize the count of the parent
       -- in the grandparent and all other nodes in the path up to the root.
       procedure Split
