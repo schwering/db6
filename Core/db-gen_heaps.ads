@@ -25,7 +25,9 @@ package DB.Gen_Heaps is
    --pragma Preelaborate;
 
    type Heap_Type is limited private;
-   type Transaction_Type is limited private;
+   type Transaction_Type is abstract tagged limited private;
+   type RO_Transaction_Type is new Transaction_Type with private;
+   type RW_Transaction_Type is new Transaction_Type with private;
    type Result_Type is (Success, Failure, Error);
 
    Heap_Error : exception;
@@ -51,38 +53,36 @@ package DB.Gen_Heaps is
    -- Finalizes Heap, i.e. closes opened files.
 
 
-   -- Transaction: New_Transaction, Start_Transaction, Abort_Transaction,
+   -- Transaction: New_R[O|W]Transaction, Start_Transaction, Abort_Transaction,
    -- Commit_Transaction.
 
-   function New_Transaction
+   function New_RO_Transaction
      (Heap : Heap_Type)
-      return Transaction_Type;
+      return RO_Transaction_Type;
 
    procedure Start_Transaction
      (Heap        : in out Heap_Type;
-      Transaction :    out Transaction_Type);
-   -- Starts a new Transaction on Heap. This call is blocking if it cannot
-   -- immediately acquire write-lock. Until a call of Abort_Transaction or
-   -- Commit_Transaction, other no other transaction can be executed, i.e.
-   -- subsequent Start_Transaction calls block. However, elements can be
-   -- read from the heap. Reads during a transaction read from the state of
-   -- the Heap before the transaction started.
-   -- Each Start_Transaction call must have a corresponding Abort_Transaction
-   -- or Commit_Transaction to free the ressources and release the locks.
+      Transaction : in out RO_Transaction_Type);
+
+   procedure Finish_Transaction
+     (Heap        : in out Heap_Type;
+      Transaction : in out RO_Transaction_Type);
+
+   function New_RW_Transaction
+     (Heap : Heap_Type)
+      return RW_Transaction_Type;
+
+   procedure Start_Transaction
+     (Heap        : in out Heap_Type;
+      Transaction : in out RW_Transaction_Type);
 
    procedure Abort_Transaction
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type);
-   -- Aborts a Transaction on Heap. This includes releasing the write-lock
-   -- and thereby allowing Start_Transaction calls to unblock.
+      Transaction : in out RW_Transaction_Type);
 
    procedure Commit_Transaction
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type);
-   -- Commits a Transaction by writing the changes to disk. During this
-   -- operation, a certify-lock is acquired, i.e. during the execution of
-   -- this procedure neither other transactions nor read-accesses can be
-   -- performed.
+      Transaction : in out RW_Transaction_Type);
 
 
    -- Operations: Get, Put and Delete.
@@ -99,7 +99,7 @@ package DB.Gen_Heaps is
 
    procedure Get
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out Transaction_Type'Class;
       Address     : in     Block_IO.Valid_Address_Type;
       Item        :    out Item_Type;
       State       :    out Result_Type);
@@ -119,7 +119,7 @@ package DB.Gen_Heaps is
 
    procedure Put
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out RW_Transaction_Type'Class;
       Item        : in     Item_Type;
       Address     :    out Block_IO.Valid_Address_Type;
       State       :    out Result_Type);
@@ -138,7 +138,7 @@ package DB.Gen_Heaps is
 
    procedure Delete
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Block_IO.Valid_Address_Type;
       State       :    out Result_Type);
    -- Deletes Item at Address and set Item to the deleted one or set
@@ -326,14 +326,24 @@ private
       Node_Storage_Pool => Heap_Ref_Type'Storage_Pool);
    subtype Block_Constant_Ref is IO_Buffers.Item_Constant_Ref_Type;
 
-   type Transaction_Type is limited
+   type Transaction_Type is abstract tagged limited
       record
-         Buffer           : IO_Buffers.Buffer_Type;
          Ticket           : Block_IO.Ticket_Type;
-         Info_Transaction : Info_BTrees.RW_Transaction_Type;
-         Free_Transaction : Free_BTrees.RW_Transaction_Type;
          Owning_Heap      : Heap_Ref_Type;
          Initialized      : Boolean := False;
+         Started          : Boolean := False;
+      end record;
+
+   type RO_Transaction_Type is new Transaction_Type with
+      record
+         Info_Transaction : aliased Info_BTrees.RO_Transaction_Type;
+      end record;
+
+   type RW_Transaction_Type is new Transaction_Type with
+      record
+         Buffer           : IO_Buffers.Buffer_Type;
+         Info_Transaction : Info_BTrees.RW_Transaction_Type;
+         Free_Transaction : Free_BTrees.RW_Transaction_Type;
       end record;
 
 end DB.Gen_Heaps;

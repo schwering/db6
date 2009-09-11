@@ -294,29 +294,80 @@ package body DB.Gen_Heaps is
    end Finalize;
 
 
-   function New_Transaction
+   function New_RO_Transaction
      (Heap : Heap_Type)
-      return Transaction_Type
+      return RO_Transaction_Type
    is
       pragma Assert (Heap.Initialized);
    begin
-      return (Owning_Heap      => Heap.Self,
-             Info_Transaction => Info_BTrees.New_RW_Transaction(Heap.Info_Tree),
-             Free_Transaction => Free_BTrees.New_RW_Transaction(Heap.Free_Tree),
-              others           => <>);
-   end New_Transaction;
+      return
+         (Owning_Heap      => Heap.Self,
+          Initialized      => True,
+          Info_Transaction => Info_BTrees.New_RO_Transaction(Heap.Info_Tree),
+          others           => <>);
+   end New_RO_Transaction;
 
 
    procedure Start_Transaction
      (Heap        : in out Heap_Type;
-      Transaction :    out Transaction_Type)
+      Transaction : in out RO_Transaction_Type)
    is
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
-      pragma Assert (not Transaction.Initialized);
+      pragma Assert (Transaction.Initialized);
+      pragma Assert (not Transaction.Started);
    begin
-      Transaction.Buffer      := IO_Buffers.New_Buffer;
-      Transaction.Initialized := True;
+      Transaction.Started := True;
+      Block_IO.Acquire_Ticket(Heap.File, Transaction.Ticket);
+      Block_IO.Read_Lock(Heap.File, Transaction.Ticket);
+      Info_BTrees.Start_Transaction(Heap.Info_Tree,
+                                    Transaction.Info_Transaction);
+   end Start_Transaction;
+
+
+   procedure Finish_Transaction
+     (Heap        : in out Heap_Type;
+      Transaction : in out RO_Transaction_Type)
+   is
+      pragma Assert (Heap.Initialized);
+      pragma Assert (Transaction.Owning_Heap = Heap.Self);
+      pragma Assert (Transaction.Initialized);
+      pragma Assert (Transaction.Started);
+   begin
+      Info_BTrees.Finish_Transaction(Heap.Info_Tree,
+                                     Transaction.Info_Transaction);
+      Block_IO.Unlock(Heap.File, Transaction.Ticket);
+      Block_IO.Release_Ticket(Heap.File, Transaction.Ticket);
+      Transaction.Started := False;
+   end Finish_Transaction;
+
+
+   function New_RW_Transaction
+     (Heap : Heap_Type)
+      return RW_Transaction_Type
+   is
+      pragma Assert (Heap.Initialized);
+   begin
+      return
+         (Owning_Heap      => Heap.Self,
+          Initialized      => True,
+          Info_Transaction => Info_BTrees.New_RW_Transaction(Heap.Info_Tree),
+          Free_Transaction => Free_BTrees.New_RW_Transaction(Heap.Free_Tree),
+          others           => <>);
+   end New_RW_Transaction;
+
+
+   procedure Start_Transaction
+     (Heap        : in out Heap_Type;
+      Transaction : in out RW_Transaction_Type)
+   is
+      pragma Assert (Heap.Initialized);
+      pragma Assert (Transaction.Owning_Heap = Heap.Self);
+      pragma Assert (Transaction.Initialized);
+      pragma Assert (not Transaction.Started);
+   begin
+      Transaction.Buffer  := IO_Buffers.New_Buffer;
+      Transaction.Started := True;
       Block_IO.Acquire_Ticket(Heap.File, Transaction.Ticket);
       Block_IO.Write_Lock(Heap.File, Transaction.Ticket);
       Info_BTrees.Start_Transaction(Heap.Info_Tree,
@@ -328,11 +379,12 @@ package body DB.Gen_Heaps is
 
    procedure Abort_Transaction
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type)
+      Transaction : in out RW_Transaction_Type)
    is
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
       pragma Assert (Transaction.Initialized);
+      pragma Assert (Transaction.Started);
    begin
       Info_BTrees.Abort_Transaction(Heap.Info_Tree,
                                     Transaction.Info_Transaction);
@@ -341,17 +393,18 @@ package body DB.Gen_Heaps is
       Block_IO.Unlock(Heap.File, Transaction.Ticket);
       Block_IO.Release_Ticket(Heap.File, Transaction.Ticket);
       IO_Buffers.Free(Transaction.Buffer);
-      Transaction.Initialized := False;
+      Transaction.Started := False;
    end Abort_Transaction;
 
 
    procedure Commit_Transaction
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type)
+      Transaction : in out RW_Transaction_Type)
    is
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
       pragma Assert (Transaction.Initialized);
+      pragma Assert (Transaction.Started);
    begin
       Block_IO.Certify_Lock(Heap.File, Transaction.Ticket);
       Info_BTrees.Commit_Transaction(Heap.Info_Tree,
@@ -362,7 +415,7 @@ package body DB.Gen_Heaps is
       Block_IO.Unlock(Heap.File, Transaction.Ticket);
       Block_IO.Release_Ticket(Heap.File, Transaction.Ticket);
       IO_Buffers.Free(Transaction.Buffer);
-      Transaction.Initialized := False;
+      Transaction.Started := False;
    end Commit_Transaction;
 
 
@@ -450,7 +503,7 @@ package body DB.Gen_Heaps is
    end Result;
 
 
-   procedure Get
+   procedure Get2
      (Heap    : in out Heap_Type;
       Address : in     Block_IO.Valid_Address_Type;
       Item    :    out Item_Type;
@@ -513,12 +566,30 @@ package body DB.Gen_Heaps is
          Block_IO.Unlock(Heap.File, Ticket);
          Block_IO.Release_Ticket(Heap.File, Ticket);
          raise;
+   end Get2;
+
+
+   procedure Get
+     (Heap    : in out Heap_Type;
+      Address : in     Block_IO.Valid_Address_Type;
+      Item    :    out Item_Type;
+      State   :    out Result_Type)
+   is
+      Transaction : RO_Transaction_Type := New_RO_Transaction(Heap);
+   begin
+      Start_Transaction(Heap, Transaction);
+      Get(Heap, Transaction, Address, Item, State);
+      Finish_Transaction(Heap, Transaction);
+   exception
+      when others =>
+         Finish_Transaction(Heap, Transaction);
+         raise;
    end Get;
 
 
    procedure Get
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out Transaction_Type'Class;
       Address     : in     Block_IO.Valid_Address_Type;
       Item        :    out Item_Type;
       State       :    out Result_Type)
@@ -533,8 +604,15 @@ package body DB.Gen_Heaps is
          St  : Info_BTrees.Result_Type;
          CI  : Chunk_Info_Type;
       begin
-         Info_BTrees.Look_Up(Heap.Info_Tree, Transaction.Info_Transaction,
-                             Address, CI, Pos, St);
+         if Transaction in RW_Transaction_Type'Class then
+            Info_BTrees.Look_Up(Heap.Info_Tree,
+                              RW_Transaction_Type(Transaction).Info_Transaction,
+                              Address, CI, Pos, St);
+         else
+            Info_BTrees.Look_Up(Heap.Info_Tree,
+                              RO_Transaction_Type(Transaction).Info_Transaction,
+                              Address, CI, Pos, St);
+         end if;
          if St /= Info_BTrees.Success or else CI.State /= Used then
             State := Error;
             return;
@@ -549,12 +627,18 @@ package body DB.Gen_Heaps is
       begin
          while Length > 0 loop
             declare
-               Block_Ref : Block_Constant_Ref;
+               Block : IO.Blocks.Block_Type;
             begin
-               IO_Buffers.Read(Heap.File, Transaction.Buffer, Addr, Block_Ref);
+               if Transaction in RW_Transaction_Type'Class then
+                  IO_Buffers.Read(Heap.File,
+                                  RW_Transaction_Type(Transaction).Buffer,
+                                  Addr, Block);
+               else
+                  Block_IO.Read(Heap.File, Addr, Block);
+               end if;
                declare
                   Sub_Arr : constant System.Storage_Elements.Storage_Array
-                          := Data(Block_Ref.all, Length);
+                          := Data(Block, Length);
                   From    : constant IO.Blocks.Size_Type
                           := Arr'First + Arr'Length - Length;
                   To      : constant IO.Blocks.Size_Type
@@ -585,7 +669,7 @@ package body DB.Gen_Heaps is
       Address :    out Block_IO.Valid_Address_Type;
       State   :    out Result_Type)
    is
-      Transaction : Transaction_Type := New_Transaction(Heap);
+      Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
    begin
       Start_Transaction(Heap, Transaction);
       Put(Heap, Transaction, Item, Address, State);
@@ -603,7 +687,7 @@ package body DB.Gen_Heaps is
 
    procedure Set_Used
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Block_IO.Valid_Address_Type;
       Length      : in     IO.Blocks.Size_Type;
       State       :    out Result_Type)
@@ -631,7 +715,7 @@ package body DB.Gen_Heaps is
 
    procedure Unset_Used
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Block_IO.Valid_Address_Type;
       Length      :    out Length_Type;
       State       :    out Result_Type)
@@ -661,7 +745,7 @@ package body DB.Gen_Heaps is
 
    procedure Set_Free
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Block_IO.Valid_Address_Type;
       Length      : in     Length_Type;
       State       :    out Result_Type)
@@ -707,7 +791,7 @@ package body DB.Gen_Heaps is
 
    procedure Unset_Free
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Block_IO.Valid_Address_Type;
       Length      : in     Length_Type;
       State       :    out Result_Type)
@@ -754,7 +838,7 @@ package body DB.Gen_Heaps is
 
    procedure Unset_Free_Following
      (Heap              : in out Heap_Type;
-      Transaction       : in out Transaction_Type;
+      Transaction       : in out RW_Transaction_Type'Class;
       Address           : in out Block_IO.Valid_Address_Type;
       Reverse_Direction : in     Boolean;
       Length            : in out Length_Type;
@@ -853,7 +937,7 @@ package body DB.Gen_Heaps is
 
    procedure Put
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out RW_Transaction_Type'Class;
       Item        : in     Item_Type;
       Address     :    out Block_IO.Valid_Address_Type;
       State       :    out Result_Type)
@@ -861,7 +945,7 @@ package body DB.Gen_Heaps is
 
       procedure Recycle_Free_Chunk
         (Heap        : in out Heap_Type;
-         Transaction : in out Transaction_Type;
+         Transaction : in out RW_Transaction_Type'Class;
          Min_Length  : in     Length_Type;
          Address     :    out Block_IO.Valid_Address_Type;
          Length      :    out Length_Type;
@@ -998,7 +1082,7 @@ package body DB.Gen_Heaps is
       State   :    out Result_Type)
    is
       pragma Assert (Heap.Initialized);
-      Transaction : Transaction_Type := New_Transaction(Heap);
+      Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
    begin
       Start_Transaction(Heap, Transaction);
       Delete(Heap, Transaction, Address, State);
@@ -1016,7 +1100,7 @@ package body DB.Gen_Heaps is
 
    procedure Delete
      (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type;
+      Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Block_IO.Valid_Address_Type;
       State       :    out Result_Type)
    is

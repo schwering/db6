@@ -1,6 +1,5 @@
 * Transaktionen:
   Gen_Buffers: Gen_Transactions mit einer Write-Liste und einem kleinen Cache
-  Gen_Heaps:   auch auf OO umstellen (?)
 * Shadowing:
   1. Fuer alle Versionen des Trees gibt es eine gemeinsame Refcount-Map:
      Phys-Addr -> Refcount
@@ -42,6 +41,8 @@
 * Die Heap-Geschichte mit 32 Bit TESTEN TESTEN TEST
 
 ERLEDIGT:
+* Gen_Heaps:   auch auf OO umstellen (?) <- wenn auch unschoen gemacht 
+  (if Read-Transaction then bla else blupp in Gen_Heaps.Get)
 * Auf 32-Bit-Systemen gibt es ne Exception im Heap, wenn die Chunks >4GB werden,
   weil IO.Blocks.Size_Type verwendet wird.
 * Is_Context_Free_Serialization
