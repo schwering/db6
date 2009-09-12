@@ -1,6 +1,8 @@
 * Transaktionen:
   Gen_Buffers: Gen_Transactions mit einer Write-Liste und einem kleinen Cache
 * Shadowing:
+  Einfaches Shadowing aus Folien nicht uebertragbar, da offensives Splitten
+  nicht moeglich ist und wir einen Blink-Tree haben.
   1. Fuer alle Versionen des Trees gibt es eine gemeinsame Refcount-Map:
      Phys-Addr -> Refcount
      Die Refcount eines Knotens zeigt an, wie viele andere KNOTEN auf diesen
