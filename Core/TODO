@@ -1,5 +1,3 @@
-* Transaktionen:
-  Gen_Buffers: Gen_Transactions mit einer Write-Liste und einem kleinen Cache
 * Shadowing:
   Einfaches Shadowing aus Folien nicht uebertragbar, da offensives Splitten
   nicht moeglich ist und wir einen Blink-Tree haben.
@@ -43,6 +41,10 @@
 * Die Heap-Geschichte mit 32 Bit TESTEN TESTEN TEST
 
 ERLEDIGT:
+* Transaktionen: Gen_Buffers: mit einer Write-Liste und einem kleinen Cache
+  <- die Idee war ja, dass Read nicht den Buffer zumuellt. Das war auch nie
+  der Fall auszer fuer die Read-Prozedur, die ein Item_Constant_Access_Type
+  setzt (die muss das auch machen).
 * Gen_Heaps:   auch auf OO umstellen (?) <- wenn auch unschoen gemacht 
   (if Read-Transaction then bla else blupp in Gen_Heaps.Get)
 * Auf 32-Bit-Systemen gibt es ne Exception im Heap, wenn die Chunks >4GB werden,

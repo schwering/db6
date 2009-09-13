@@ -24,18 +24,24 @@ package DB.IO.Blocks.Gen_Buffers is
 
    function New_Buffer
       return Buffer_Type;
+   -- Creates a new buffer.
 
    procedure Free
      (Buffer : in out Buffer_Type);
+   -- Frees all resources hold by the buffer.
 
    procedure Commit
      (File   : in out Block_IO.File_Type;
       Buffer : in     Buffer_Type);
+   -- Flushes all dirty items in the buffer. See Write and Read.
 
    procedure Seek_New
      (File    : in out Block_IO.File_Type;
       Buffer  : in out Buffer_Type;
       Address :    out Block_IO.Valid_Address_Type);
+   -- Sets Address to the value it would be set to by Block_IO.Seek_New if
+   -- those items that are currently in the Buffer were written to file
+   -- directly.
 
    function "<="
      (A, B : Block_IO.Valid_Address_Type)
@@ -47,24 +53,37 @@ package DB.IO.Blocks.Gen_Buffers is
    function Gen_Read
      (Address : Block_IO.Valid_Address_Type)
       return Item_Type;
+   -- Reads an item from the Buffer or from file if no item corresponding 
+   -- with Address is present in the Buffer. The read item is not stored
+   -- in the Buffer.
+   -- Hence, this function has side effects, of course.
+   -- It should be used for indefinite item types.
 
    procedure Read
      (File    : in out Block_IO.File_Type;
       Buffer  : in out Buffer_Type;
       Address : in     Block_IO.Valid_Address_Type;
       Item    :    out Item_Type);
+   -- Reads an item from the Buffer or from file if no item corresponding 
+   -- with Address is present in the Buffer. The read item is not stored
+   -- in the Buffer.
 
    procedure Read
      (File     : in out Block_IO.File_Type;
       Buffer   : in out Buffer_Type;
       Address  : in     Block_IO.Valid_Address_Type;
       Item_Ref :    out Item_Constant_Ref_Type);
+   -- Reads an item from the Buffer or from file if no item corresponding 
+   -- with Address is present in the Buffer. In contrast to the other two
+   -- Read subprograms, this function stores the read item in the Buffer. 
+   -- (This is necessary so that the item will be freed later.)
 
    procedure Write
      (File    : in out Block_IO.File_Type;
       Buffer  : in out Buffer_Type;
       Address : in     Block_IO.Valid_Address_Type;
       Item    : in     Item_Type);
+   -- Writes an item to the Buffer, not to the file itself.
 
 private
    type Entry_Type;
