@@ -97,7 +97,7 @@ public class Main {
 		Logger.setSensitivity(2);
 		crawler.setFilter(filter);
 		crawler.addListener(listener);
-		crawler.setThreadCount(1000);
+		crawler.setThreadCount(100);
 		crawler.start();
 		supervise();
 	}
