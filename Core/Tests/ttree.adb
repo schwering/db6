@@ -14,7 +14,6 @@ with DB.IO.Blocks;
 with DB.BTrees;
 with DB.Gen_BTrees.Gen_Check;
 with DB.BTrees.Stats;
-with DB.Gen_Blob_Trees;
 
 with DB.Types;
 with DB.Types.Keys;

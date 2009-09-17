@@ -8,6 +8,7 @@ C_OBJECTS=db-io-low_level db-util-timers
 HEAP_TESTS=heap cheap
 TREE_TESTS=tree vtree dtree
 MULTITHREADED_TREE_TESTS=ttree vttree cttree
+BLOB_TREE_TESTS=blob_ttree
 CURSOR_TESTS=cursor controlled
 THREAD_TESTS=thread thread2 thread3
 COMPRESSION_TESTS=prefix levenshtein 
@@ -17,20 +18,12 @@ MIXED_TESTS=locks search hash modular rtest i_bm check data mkfs bitmap
 TESTS=$(HEAP_TESTS)\
       $(TREE_TESTS)\
       $(MULTITHREADED_TREE_TESTS)\
+      $(BLOB_TREE_TESTS)\
       $(CURSOR_TESTS)\
       $(THREAD_TESTS)\
       $(COMPRESSION_TESTS)\
       $(STRING_TESTS)\
       $(MIXED_TESTS)
-TESTS=$(HEAP_TESTS)\
-      $(TREE_TESTS)\
-      $(MULTITHREADED_TREE_TESTS)\
-      $(CURSOR_TESTS)\
-      $(THREAD_TESTS)\
-      $(COMPRESSION_TESTS)\
-      $(STRING_TESTS)\
-      $(MIXED_TESTS)
-
 
 # Set the DEFINITIONS variable appropriate to the operating system.
 # They're used for steering the C low level routines.
