@@ -234,77 +234,76 @@ is
                --Put_Line("Key: "& To_Strings.To_String(Key));
             when BTrees.Failure =>
                Put_Line("N   Failure"& Natural'Image(I));
-               BTrees.Finalize(Tree, Cursor);
-               return;
+               exit;
             when BTrees.Error =>
                Put_Line("N   Error"& Natural'Image(I));
-               BTrees.Finalize(Tree, Cursor);
-               return;
+               exit;
          end case;
 
          if I > 1 and then ((not Reverse_Direction and then Key <= Prev_Key)
                    or else (Reverse_Direction and then Prev_Key <= Key)) then
             Put_Line("Key error: "& To_Strings.To_String(Prev_Key) &
                      " and "& To_Strings.To_String(Key));
-            BTrees.Finalize(Tree, Cursor);
-            return;
+            exit;
          end if;
          Prev_Key := Key;
 
          -- Delete the element using Cursor's deletion.
          if Deletions /= 0 and then I mod Deletions = 0 then
-            BTrees.Delete(Tree, Trans, Cursor, State);
+            Put_Line("Deletion");
+            BTrees.Delete(Tree, Trans, Cursor, Key, Value, Pos, State);
+            Put_Line("Done Deletion");
             case State is
                when BTrees.Success =>
                   null;--Put_Line("D   Success"& Natural'Image(I));
                when BTrees.Failure =>
                   Put_Line("D   Failure"& Natural'Image(I));
-                  BTrees.Finalize(Tree, Cursor);
-                  return;
+                  exit;
                when BTrees.Error =>
                   Put_Line("D   Error"& Natural'Image(I));
-                  BTrees.Finalize(Tree, Cursor);
-                  return;
+                  exit;
             end case;
 
             -- Reinsert deleted element and check whether it's there by 
             -- looking it up. Includes Pause and Unpause.
             if Reinsertions /= 0 and then I mod Reinsertions = 0 then
+               Put_Line("Pause");
                BTrees.Pause(Tree, Cursor);
+               Put_Line("Insert");
                BTrees.Insert(Tree, Key, Value, Pos, State);
                case State is
                   when BTrees.Success =>
                      null;--Put_Line("I   Success"& Natural'Image(I));
                   when BTrees.Failure =>
                      Put_Line("I   Failure"& Natural'Image(I));
-                     BTrees.Finalize(Tree, Cursor);
-                     return;
+                     exit;
                   when BTrees.Error =>
                      Put_Line("I   Error"& Natural'Image(I));
-                     BTrees.Finalize(Tree, Cursor);
-                     return;
+                     exit;
                end case;
+               Put_Line("Unpause");
                BTrees.Unpause(Tree, Trans, Cursor);
 
+               Put_Line("Lookup");
                BTrees.Look_Up(Tree, Trans, Key, Value, Pos, State);
                case State is
                   when BTrees.Success =>
                      null;--Put_Line("S   Success"& Natural'Image(I));
                   when BTrees.Failure =>
                      Put_Line("S   Failure"& Natural'Image(I));
-                     BTrees.Finalize(Tree, Cursor);
-                     return;
+                     exit;
                   when BTrees.Error =>
                      Put_Line("S   Error"& Natural'Image(I));
-                     BTrees.Finalize(Tree, Cursor);
-                     return;
+                     exit;
                end case;
             end if;
          end if;
       end loop;
+      BTrees.Finalize(Tree, Cursor);
       BTrees.Finish_Transaction(Tree, Trans);
    exception
       when others =>
+         BTrees.Finalize(Tree, Cursor);
          BTrees.Finish_Transaction(Tree, Trans);
    end Iterate;
 

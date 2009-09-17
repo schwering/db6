@@ -259,7 +259,7 @@ is
 
          -- Delete the element using Cursor's deletion.
          if Deletions /= 0 and then I mod Deletions = 0 then
-            BTrees.Delete(Tree, Trans, Cursor, State);
+            BTrees.Delete(Tree, Trans, Cursor, Key, Value, Pos, State);
             case State is
                when BTrees.Success =>
                   null;--Put_Line("D   Success"& Natural'Image(I));
