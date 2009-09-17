@@ -152,8 +152,9 @@ package body DB.Gen_Blob_Trees is
    function Max_Key_Size
       return IO.Blocks.Size_Type
    is begin
-      return BTrees.Max_Key_Size(IO.Blocks.Bits_To_Units(Value_Type'Size));
-   end Max_Key_Size;
+      return BTrees.Max_Key_Size(IO.Blocks.Bits_To_Units
+                                       (BTree_Utils.Value_Type'Size));
+      end Max_Key_Size;
 
 
    function To_State
