@@ -1,3 +1,5 @@
+with Ada.Unchecked_Conversion;
+
 package body DB.Gen_Blob_Trees is
 
    package body BTree_Utils is
@@ -569,15 +571,29 @@ package body DB.Gen_Blob_Trees is
 
    function Positive_Infinity_Bound
       return Bound_Type
-   is begin
-      return Bound_Type(BTrees.Positive_Infinity_Bound);
+   is
+      -- We use Unchecked_Conversion because a normal cast leads to a
+      -- compilation error of the generic instances for some reason (has
+      -- something to do with the hidden constraints of BTrees.Bound_Type).
+      function Convert is new Ada.Unchecked_Conversion
+         (BTrees.Bound_Type, Bound_Type);
+      Bound : constant BTrees.Bound_Type := BTrees.Positive_Infinity_Bound;
+   begin
+      return Convert(Bound);
    end Positive_Infinity_Bound;
 
 
    function Negative_Infinity_Bound
       return Bound_Type
-   is begin
-      return Bound_Type(BTrees.Negative_Infinity_Bound);
+   is
+      -- We use Unchecked_Conversion because a normal cast leads to a
+      -- compilation error of the generic instances for some reason (has
+      -- something to do with the hidden constraints of BTrees.Bound_Type).
+      function Convert is new Ada.Unchecked_Conversion
+         (BTrees.Bound_Type, Bound_Type);
+      Bound : constant BTrees.Bound_Type := BTrees.Negative_Infinity_Bound;
+   begin
+      return Convert(Bound);
    end Negative_Infinity_Bound;
 
 
@@ -586,7 +602,7 @@ package body DB.Gen_Blob_Trees is
       Key        : Key_Type)
       return Bound_Type
    is
-      C : BTrees.Comparison_Type;
+      C     : BTrees.Comparison_Type;
    begin
       case Comparison is
          when Less             => C := BTrees.Less;
@@ -595,7 +611,16 @@ package body DB.Gen_Blob_Trees is
          when Greater_Or_Equal => C := BTrees.Greater_Or_Equal;
          when Greater          => C := BTrees.Greater;
       end case;
-      return Bound_Type(BTrees.New_Bound(C, Key));
+      declare
+         -- We use Unchecked_Conversion because a normal cast leads to a
+         -- compilation error of the generic instances for some reason (has
+         -- something to do with the hidden constraints of BTrees.Bound_Type).
+         function Convert is new Ada.Unchecked_Conversion
+            (BTrees.Bound_Type, Bound_Type);
+         Bound : constant BTrees.Bound_Type := BTrees.New_Bound(C, Key);
+      begin
+         return Convert(Bound);
+      end;
    end New_Bound;
 
 

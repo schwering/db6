@@ -6,9 +6,9 @@ C_OBJECTS=db-io-low_level db-util-timers
 # For each f in the list, Tests/f.adb must exist.
 # A binary with its name is created in build/[release|debug]/.
 HEAP_TESTS=heap cheap
-TREE_TESTS=tree vtree dtree
+TREE_TESTS=tree vtree dtree blob_ttree
 MULTITHREADED_TREE_TESTS=ttree vttree cttree
-CURSOR_TESTS=cursor controlled
+CURSOR_TESTS=cursor controlled blob_cursor
 THREAD_TESTS=thread thread2 thread3
 COMPRESSION_TESTS=prefix levenshtein 
 STRING_TESTS=unbounded_string
@@ -17,20 +17,12 @@ MIXED_TESTS=locks search hash modular rtest i_bm check data mkfs bitmap
 TESTS=$(HEAP_TESTS)\
       $(TREE_TESTS)\
       $(MULTITHREADED_TREE_TESTS)\
+      $(BLOB_TREE_TESTS)\
       $(CURSOR_TESTS)\
       $(THREAD_TESTS)\
       $(COMPRESSION_TESTS)\
       $(STRING_TESTS)\
       $(MIXED_TESTS)
-TESTS=$(HEAP_TESTS)\
-      $(TREE_TESTS)\
-      $(MULTITHREADED_TREE_TESTS)\
-      $(CURSOR_TESTS)\
-      $(THREAD_TESTS)\
-      $(COMPRESSION_TESTS)\
-      $(STRING_TESTS)\
-      $(MIXED_TESTS)
-
 
 # Set the DEFINITIONS variable appropriate to the operating system.
 # They're used for steering the C low level routines.

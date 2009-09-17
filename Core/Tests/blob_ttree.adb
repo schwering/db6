@@ -5,15 +5,13 @@ with Ada.Exceptions; use Ada.Exceptions;
 --with Ada.Command_Line; use Ada.Command_Line;
 
 with Random; use Random;
-with To_Strings;
 with Gen_Args;
 with Gen_Jobs;
 
 with DB.IO.Blocks;
+with DB.IO.Blocks.Direct_IO;
 
-with DB.BTrees;
-with DB.Gen_BTrees.Gen_Check;
-with DB.BTrees.Stats;
+with DB.Gen_Blob_Trees;
 
 with DB.Types;
 with DB.Types.Keys;
@@ -21,84 +19,61 @@ with DB.Types.Values;
 
 with DB.Util.Traceback;
 
+with System.Storage_Elements;
 
-procedure TTree
+procedure Blob_TTree
 is
-   package BTrees renames DB.BTrees;
-   package Jobs is new Gen_Jobs;
-   package Args is new Gen_Args(Jobs);
-
-   Stop_Now : exception;
-
    subtype Key_Type is DB.Types.Keys.Key_Type;
    subtype Value_Type is DB.Types.Values.Number_Type;
    use type Key_Type;
    use type Value_Type;
 
-   Tree : BTrees.Tree_Type;
-
-   procedure Check
+   function To_Storage_Array
+     (Value : Value_Type)
+      return System.Storage_Elements.Storage_Array
    is
-      procedure Check_Proc is
-         new BTrees.Gen_Check(Key_To_String     => To_Strings.To_String,
-                              Value_To_String   => To_Strings.To_String,
-                              Address_To_String => To_Strings.To_String);
+      Len    : constant DB.IO.Blocks.Position_Type
+             := DB.IO.Blocks.Position_Type
+                   (DB.IO.Blocks.Bits_To_Units(Value'Size));
+      Cursor : DB.IO.Blocks.Cursor_Type;
+      Block  : DB.IO.Blocks.Base_Block_Type(1 .. Len);
+      procedure Write is new DB.IO.Blocks.Write(Value_Type);
    begin
-      Check_Proc(Tree);
-      Put_Line("Check successful");
-   exception
-      when Error : others =>
-         Put_Line("Check failed");
-         Put_Line("Exception: "& Exception_Message(Error));
-         raise Stop_Now;
-   end Check;
-
-
-   procedure Stats
-   is
-      Count                                    : BTrees.Count_Type;
-      Height, Blocks, Free_Blocks, Used_Blocks : Natural;
-      Max_Degree, Min_Degree, Avg_Degree       : Natural;
-      Waste, Waste_Per_Block, Bytes            : Long_Integer;
-      Relative_Waste_Per_Block                 : Float;
-   begin
-      BTrees.Stats(Tree                   => Tree,
-                   Height                 => Height,
-                   Blocks                 => Blocks,
-                   Free_Blocks            => Free_Blocks,
-                   Max_Degree             => Max_Degree,
-                   Min_Degree             => Min_Degree,
-                   Avg_Degree             => Avg_Degree,
-                   Bytes_Wasted_In_Blocks => Waste,
-                   Bytes_In_Blocks        => Bytes);
-      BTrees.Count(Tree, Count);
-      Used_Blocks              := Blocks - Free_Blocks;
-      if Used_Blocks > 0 then
-         Waste_Per_Block       := Waste / Long_Integer(Used_Blocks);
-      else
-         Waste_Per_Block       := 0;
-      end if;
-      Relative_Waste_Per_Block := Float(Waste_Per_Block)
-                                / Float(DB.IO.Blocks.Block_Size);
-      -- The lines contain the following
-      -- "OK" Count Height Blocks Used_Blocks Free_Blocks Max_Deg Avg_Dev\
-      -- Min_Deg Total_Waste Total_Sizes Waste_per_Block Rel_Waste_per_Block
-      Put("OK");
-      Put(BTrees.Count_Type'Image(Count));
-      Put(Natural'Image(Height));
-      Put(Natural'Image(Blocks));
-      Put(Natural'Image(Used_Blocks));
-      Put(Natural'Image(Free_Blocks));
-      Put(Natural'Image(Max_Degree));
-      Put(Natural'Image(Avg_Degree));
-      Put(Natural'Image(Min_Degree));
-      Put(Long_Integer'Image(Waste));
-      Put(Long_Integer'Image(Bytes));
-      Put(Long_Integer'Image(Waste_Per_Block));
-      Put(Float'Image(Relative_Waste_Per_Block));
-      New_Line;
+      Write(Block, Cursor, Value);
+      return System.Storage_Elements.Storage_Array(Block);
    end;
 
+   function From_Storage_Array
+     (Block : System.Storage_Elements.Storage_Array)
+      return Value_Type
+   is
+      procedure Read is new DB.IO.Blocks.Read(Value_Type);
+      Cursor : DB.IO.Blocks.Cursor_Type;
+      Value  : Value_Type;
+   begin
+      Read(DB.IO.Blocks.Base_Block_Type(Block), Cursor, Value);
+      return Value;
+   end;
+
+   package BTrees is new DB.Gen_Blob_Trees
+     (Key_Type                      => Key_Type,
+      Key_Context_Type              => DB.Types.Keys.Context_Type,
+      Write_Key                     => DB.Types.Keys.Write,
+      Read_Key                      => DB.Types.Keys.Read,
+      Skip_Key                      => DB.Types.Keys.Skip,
+      "="                           => DB.Types.Keys."=",
+      "<="                          => DB.Types.Keys."<=",
+      Value_Type                    => Value_Type,
+      To_Storage_Array              => To_Storage_Array,
+      From_Storage_Array            => From_Storage_Array,
+      Is_Context_Free_Serialization =>
+                     DB.Types.Keys.Is_Context_Free_Serialization,
+      Block_IO                      => DB.IO.Blocks.Direct_IO.IO);
+
+   package Jobs is new Gen_Jobs;
+   package Args is new Gen_Args(Jobs);
+
+   Tree : BTrees.Tree_Type;
 
    --Max_Size : DB.IO.Blocks.Size_Type := 0;
    procedure Insert
@@ -179,9 +154,7 @@ is
 
    use type BTrees.Result_Type;
    Map      : constant Jobs.Map_Type
-            := ((Jobs.To_Description("Stats"),      Stats'Access),
-                (Jobs.To_Description("Check"),      Check'Access),
-                (Jobs.To_Description("Insert"),     Insert'Access),
+            := ((Jobs.To_Description("Insert"),     Insert'Access),
                 (Jobs.To_Description("Delete"),     Delete'Access),
                 (Jobs.To_Description("Search"),     Search'Access),
                 (Jobs.To_Description("Antisearch"), Antisearch'Access));
@@ -213,11 +186,9 @@ begin
    BTrees.Finalize(Tree);
 
 exception
-   when Stop_Now =>
-      null;
    when Error : others =>
       Put_Line("Exception: "& Exception_Message(Error));
       Put_Line("Exception: "& Exception_Information(Error));
       DB.Util.Traceback.Print_Traceback(Error);
-end TTree;
+end Blob_TTree;
 
