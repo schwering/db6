@@ -458,10 +458,15 @@ package body DB.Gen_BTrees.Gen_Controlled is
      (Tree        : in out Tree_Type'Class;
       Transaction : in out RO_Transaction_Type'Class;
       Cursor      : in out Cursor_Type'Class;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type)
    is begin
       Gen_BTrees.Delete(Tree.Tree, Transaction.Transaction,
-                        Cursor.Cursor, Gen_BTrees.Result_Type(State));
+                        Cursor.Cursor, Key, Value,
+                        Gen_BTrees.Count_Type(Position),
+                        Gen_BTrees.Result_Type(State));
    end Delete;
 
 
@@ -469,10 +474,15 @@ package body DB.Gen_BTrees.Gen_Controlled is
      (Tree        : in out Tree_Type'Class;
       Transaction : in out RW_Transaction_Type'Class;
       Cursor      : in out Cursor_Type'Class;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type)
    is begin
       Gen_BTrees.Delete(Tree.Tree, Transaction.Transaction,
-                        Cursor.Cursor, Gen_BTrees.Result_Type(State));
+                        Cursor.Cursor, Key, Value,
+                        Gen_BTrees.Count_Type(Position),
+                        Gen_BTrees.Result_Type(State));
    end Delete;
 
 end DB.Gen_BTrees.Gen_Controlled;

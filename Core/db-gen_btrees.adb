@@ -191,12 +191,18 @@ package body DB.Gen_BTrees is
         (Tree        : in out Tree_Type;
          Transaction : in out RO_Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
+         Key         :    out Key_Type;
+         Value       :    out Value_Type;
+         Position    :    out Count_Type;
          State       :    out Result_Type);
 
       procedure Delete
         (Tree        : in out Tree_Type;
          Transaction : in out RW_Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
+         Key         :    out Key_Type;
+         Value       :    out Value_Type;
+         Position    :    out Count_Type;
          State       :    out Result_Type);
    end Cursors;
 
@@ -864,9 +870,9 @@ package body DB.Gen_BTrees is
    procedure Look_Up
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Position    : in     Count_Type;
+      Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Key         :    out Key_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type)
    renames Search.Look_Up;
 
@@ -883,9 +889,9 @@ package body DB.Gen_BTrees is
    procedure Look_Up
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Key         : in     Key_Type;
+      Position    : in     Count_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
+      Key         :    out Key_Type;
       State       :    out Result_Type)
    renames Search.Look_Up;
 
@@ -1052,6 +1058,9 @@ package body DB.Gen_BTrees is
      (Tree        : in out Tree_Type;
       Transaction : in out RO_Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type)
    renames Cursors.Delete;
 
@@ -1060,6 +1069,9 @@ package body DB.Gen_BTrees is
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type)
    renames Cursors.Delete;
 

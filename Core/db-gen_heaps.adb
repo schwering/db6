@@ -836,13 +836,19 @@ package body DB.Gen_Heaps is
             end if;
             Length := Length + Info.Length;
 
-            Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
-                               Cursor, St);
-            if St /= Info_BTrees.Success then
-               State := Error;
-               Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
-               return;
-            end if;
+            declare
+               Key : Block_IO.Valid_Address_Type;
+               Val : Chunk_Info_Type;
+               Pos : Info_BTrees.Count_Type;
+            begin
+               Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
+                                  Cursor, Key, Val, Pos, St);
+               if St /= Info_BTrees.Success then
+                  State := Error;
+                  Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
+                  return;
+               end if;
+            end;
 
             declare
                use type Free_BTrees.Result_Type;

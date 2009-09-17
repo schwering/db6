@@ -239,12 +239,18 @@ package DB.Gen_BTrees.Gen_Controlled is
      (Tree        : in out Tree_Type'Class;
       Transaction : in out RO_Transaction_Type'Class;
       Cursor      : in out Cursor_Type'Class;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type);
 
    procedure Delete
      (Tree        : in out Tree_Type'Class;
       Transaction : in out RW_Transaction_Type'Class;
       Cursor      : in out Cursor_Type'Class;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type);
 
 private

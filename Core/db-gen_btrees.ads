@@ -62,7 +62,7 @@ package DB.Gen_BTrees is
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
    type Bound_Type (<>) is private;
-   type Cursor_Type (<>) is limited private;
+   type Cursor_Type is limited private;
 
 
    Tree_Error : exception;
@@ -408,6 +408,9 @@ package DB.Gen_BTrees is
      (Tree        : in out Tree_Type;
       Transaction : in out RO_Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it
@@ -426,6 +429,9 @@ package DB.Gen_BTrees is
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it

@@ -655,6 +655,9 @@ package body Cursors is
      (Tree        : in out Tree_Type;
       Transaction : in out RO_Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type)
    is
       pragma Assert (Tree.Initialized);
@@ -662,9 +665,6 @@ package body Cursors is
       pragma Assert (Cursor.Owning_Tree = Tree.Self);
       Sub_Transaction : Sub_RW_Transaction_Type
                       := New_Sub_RW_Transaction(Tree, Transaction);
-      Key             : Key_Type;
-      Value           : Value_Type;
-      Position        : Count_Type;
    begin
       Lock_Mutex(Cursor);
       if not Cursor.Has_Node then
@@ -702,6 +702,9 @@ package body Cursors is
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type;
+      Position    :    out Count_Type;
       State       :    out Result_Type)
    is
       pragma Assert (Tree.Initialized);
@@ -711,9 +714,6 @@ package body Cursors is
       pragma Assert (Cursor.Owning_Tree = Tree.Self);
       pragma Assert (Cursor.Owning_Transaction =
                      Nullable_Transaction_Ref_Type(Transaction.Self));
-      Key         : Key_Type;
-      Value       : Value_Type;
-      Position    : Count_Type;
    begin
       Lock_Mutex(Cursor);
       if not Cursor.Has_Node then
