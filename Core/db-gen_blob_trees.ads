@@ -367,14 +367,12 @@ package DB.Gen_Blob_Trees is
    -- try to recalibrate the Cursor, i.e. find the key/value-pair that should
    -- be visited next. Hence, it is allowed to delete elements from Tree
    -- in between two Pause and Unpause calls.
-   -- Only valid for non-transactional cursors.
 
    procedure Unpause
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
       Cursor      : in out Cursor_Type);
    -- Acquires the needed read-lock again after a Pause call.
-   -- Only valid for non-transactional cursors.
 
    procedure Next
      (Tree        : in out Tree_Type;
@@ -388,7 +386,6 @@ package DB.Gen_Blob_Trees is
    -- Failure or Error.
    -- If Delete was called before, Next must recalibrate, i.e. find the
    -- key/value-pair that should be visited next.
-   -- Only valid for transactional cursors.
 
    procedure Delete
      (Tree        : in out Tree_Type;
@@ -404,7 +401,6 @@ package DB.Gen_Blob_Trees is
    -- set to Failure.
    -- The next Next operation will need to recalibrate, i.e. find the
    -- key/value-pair that should be visited next.
-   -- Only valid for transactional cursors.
 
 private
    package BTree_Utils is
