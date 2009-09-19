@@ -1537,7 +1537,7 @@ package body Nodes is
       end loop;
 
       Phys.Write_Entry(Key_Write_Context, N.Block, Index, Key,
-                     Phys.Child_Type'(Child, Count), N.Ok);
+                       Phys.Child_Type'(Child, Count), N.Ok);
       if not N.Ok then
          return N;
       end if;
@@ -1584,7 +1584,7 @@ package body Nodes is
       end loop;
 
       Phys.Write_Entry(Key_Write_Context, Value_Write_Context, N.Block,
-                     Index, Key, Value, N.Ok);
+                       Index, Key, Value, N.Ok);
       if not N.Ok then
          return N;
       end if;
@@ -1678,7 +1678,7 @@ package body Nodes is
       end loop;
 
       Phys.Write_Entry(Key_Write_Context, Value_Write_Context, N.Block, Index,
-                     Key, Value, N.Ok);
+                       Key, Value, N.Ok);
       if not N.Ok then
          return N;
       end if;

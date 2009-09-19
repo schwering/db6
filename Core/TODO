@@ -1,3 +1,4 @@
+
 * Shadowing:
   Einfaches Shadowing aus Folien nicht uebertragbar, da offensives Splitten
   nicht moeglich ist und wir einen Blink-Tree haben.
