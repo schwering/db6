@@ -1,5 +1,11 @@
 C_DIR=C
-C_OBJECT_DIR=$(C_DIR)/objects
+OBJECT_DIR=.objects
+C_OBJECT_DIR=$(OBJECT_DIR)/c
+RELEASE_OBJECT_DIR=$(OBJECT_DIR)/release
+DEBUG_OBJECT_DIR=$(OBJECT_DIR)/debug
+BIN_DIR=bin
+RELEASE_BIN_DIR=$(BIN_DIR)/release
+DEBUG_BIN_DIR=$(BIN_DIR)/debug
 C_OBJECTS=db-io-low_level db-util-timers
 
 
@@ -57,14 +63,28 @@ CFLAGS=-c $(COMMONFLAGS)
 
 all: release debug
 
-debug: cobjs
+lib: dirs cobjs
+	$(GNATMAKE) -Pdb -XBUILD=release
+
+debug: dirs cobjs
 	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=debug $$T.adb || exit; done
 
-release: cobjs
+release: dirs cobjs
 	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=release $$T.adb || exit; done
 
-cobjs:
+cobjs: dirs
 	for F in $(C_OBJECTS); do make $(C_OBJECT_DIR)/$$F.o || exit; done
+
+dirs:
+	if test \! -d $(OBJECT_DIR);         then mkdir $(OBJECT_DIR);         fi
+	if test \! -d $(C_OBJECT_DIR);       then mkdir $(C_OBJECT_DIR);       fi
+	if test \! -d $(RELEASE_OBJECT_DIR); then mkdir $(RELEASE_OBJECT_DIR); fi
+	if test \! -d $(DEBUG_OBJECT_DIR);   then mkdir $(DEBUG_OBJECT_DIR);   fi
+	if test \! -d $(BIN_DIR);            then mkdir $(BIN_DIR);            fi
+	if test \! -d $(RELEASE_BIN_DIR);    then mkdir $(RELEASE_BIN_DIR);    fi
+	if test \! -d $(DEBUG_BIN_DIR);      then mkdir $(DEBUG_BIN_DIR);      fi
+	if test \! -d .tmp;                  then mkdir .tmp;                  fi
+
 
 $(C_OBJECT_DIR)/%.o: $(C_DIR)/%.c
 	$(CC) $(CFLAGS) $^ -o $@
@@ -88,5 +108,5 @@ statsbl:
 	@cat *.adb | grep -c ";"
 
 clean:
-	rm -f build/*/*
-	rm -f $(C_OBJECT_DIR)/*.o
+	rm -rf $(OBJECT_DIR) $(BIN_DIR)
+

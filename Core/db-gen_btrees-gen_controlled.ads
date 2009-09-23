@@ -4,7 +4,7 @@ with DB.IO.Blocks;
 
 generic
 package DB.Gen_BTrees.Gen_Controlled is
-   --pragma Preelaborate;
+   pragma Preelaborate;
 
    type Tree_Type is tagged limited private;
    type Transaction_Type is abstract tagged limited private;

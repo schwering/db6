@@ -24,7 +24,7 @@ package body DB.Gen_BTrees.Gen_Shadowing is
    procedure Shadow
      (Tree            : in out Tree_Type;
       Current_Version : in     Version_Type;
-      New_Version     :    out Version_Type);
+      New_Version     :    out Version_Type)
    is begin
       null;
    end Shadow;

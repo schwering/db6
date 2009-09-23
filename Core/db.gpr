@@ -7,15 +7,22 @@ project DB is
 
    OS    : OS_Type    := External("OS", "GNU/Linux");
    Build : Build_Type := External("BUILD", "debug");
-   Object_Path   := "build/"& Build;
-   C_Object_Path := "C/objects";
+   Ada_Object_Path    := ".objects/"& Build;
+   C_Object_Path      := ".objects/c";
+   Bin_Path           := "bin/"& Build;
+   --Lib_Path           := "bin/"& Build;
+   --Lib_Name           := "dbcore"; 
+   --Lib_Version        := "1";
 
    for Languages use ("Ada", "C");
    for Source_Dirs use (".", "C", "Tests");
-   for Object_Dir use Object_Path;
+   for Object_Dir use Ada_Object_Path;
+   for Exec_Dir use Bin_Path;
 
-   --for Library_Name use "dingsbums";
-   --for Library_Kind use "static";
+   --for Library_Name use Lib_Name;
+   --for Library_Dir use Lib_Path;
+   --for Library_Kind use "dynamic";
+   --for Library_Version use Lib_Name &".so."& Lib_Version;
 
    package Compiler is
       case Build is
@@ -50,7 +57,7 @@ project DB is
             for Default_Switches ("Ada") use
                ("-u0",            -- should make per-thread-stack-usage
                 "-d8m",           -- stack size per thread
-                "-E");           -- needed for traceback
+                "-E");            -- needed for traceback
       end case;
    end Binder;
 

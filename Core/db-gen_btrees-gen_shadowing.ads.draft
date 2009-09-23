@@ -11,7 +11,7 @@ generic
           (ID : String)
            return String;
 package DB.Gen_BTrees.Gen_Shadowing is
-   --pragma Preelaborate;
+   pragma Preelaborate;
 
    type Tree_Type is limited private;
    subtype Transaction_Type is Gen_BTrees.Transaction_Type;

@@ -27,6 +27,7 @@ package DB.IO.Blocks.Asynchronous_IO is
    type File_Type is limited
       record
          FD                      : Low_Level.File_Descriptor_Type;
+         Semaphore               : Locks.Semaphores.Semaphore_Type;
          Mutex                   : Locks.Mutexes.Mutex_Type;
          IO_Task                 : IO_Task_Type;
          Max_Address_Initialized : Boolean      := False;

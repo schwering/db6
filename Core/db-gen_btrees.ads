@@ -1,5 +1,4 @@
 with System.Storage_Pools;
-with System.Pool_Global;
 
 with DB.IO.Blocks;
 with DB.IO.Blocks.Gen_Buffers;
@@ -48,7 +47,7 @@ generic
 
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
 package DB.Gen_BTrees is
-   --pragma Preelaborate;
+   pragma Preelaborate;
    pragma Unreferenced (Skip_Value);
 
    type Tree_Type is limited private;

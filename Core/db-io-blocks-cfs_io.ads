@@ -4,6 +4,7 @@ with DB.Locks.Mutexes;
 with DB.Locks.Semaphores;
 
 package DB.IO.Blocks.CFS_IO is
+   pragma Preelaborate;
 
    Max_Name_Length      : constant := 16;
    Max_Count_Files      : constant := 128;

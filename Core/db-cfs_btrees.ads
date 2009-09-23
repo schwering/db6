@@ -17,7 +17,7 @@ package DB.CFS_BTrees is new Gen_BTrees
    Read_Value                    => Types.Values.Read,
    Skip_Value                    => Types.Values.Skip,
    Is_Context_Free_Serialization => Types.Keys.Is_Context_Free_Serialization
-                                 and Types.Values.Is_Context_Free_Serialization,
+                                and Types.Values.Is_Context_Free_Serialization,
    Block_IO                      => IO.Blocks.CFS_IO.IO);
 --pragma Preelaborate (DB.CFS_BTrees);
 

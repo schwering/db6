@@ -48,8 +48,8 @@ package body DB.IO.Blocks.Asynchronous_IO is
          return Low_Level.File_Position_Type(Address - 1) * Block_Size;
       end To_File_Position;
 
-      procedure LL_Read is new Low_Level.Read(Buffer_Type);
-      procedure LL_Write is new Low_Level.Write(Buffer_Type);
+      procedure LL_Read is new Low_Level.Read(Block_Type);
+      procedure LL_Write is new Low_Level.Write(Block_Type);
       procedure Free is new Ada.Unchecked_Deallocation
         (Block_Type, Block_Ref_Type);
 
@@ -64,7 +64,7 @@ package body DB.IO.Blocks.Asynchronous_IO is
                      Block := HT.Get(Table, Key_Type'(FD, Address)).all;
                   else
                      Low_Level.Seek(FD, To_File_Position(Address));
-                     LL_Read(FD, Block.Buffer);
+                     LL_Read(FD, Block);
                   end if;
                end Read;
          or
@@ -85,7 +85,7 @@ package body DB.IO.Blocks.Asynchronous_IO is
                   begin
                      HT.Pop(Table, Key, Block);
                      Low_Level.Seek(Key.FD, To_File_Position(Key.Address));
-                     LL_Write(Key.FD, Block.Buffer);
+                     LL_Write(Key.FD, Block.all);
                      Free(Block);
                   end;
                end Write_Any;
@@ -99,7 +99,7 @@ package body DB.IO.Blocks.Asynchronous_IO is
                      begin
                         HT.Pop(Table, Key, Block);
                         Low_Level.Seek(Key.FD, To_File_Position(Key.Address));
-                        LL_Write(Key.FD, Block.Buffer);
+                        LL_Write(Key.FD, Block.all);
                         Free(Block);
                      end;
                   end loop;
