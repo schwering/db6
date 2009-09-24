@@ -1,14 +1,14 @@
 package org.schwering.crawler;
 
-import java.util.HashSet;
-import java.util.Set;
+//import java.util.HashSet;
+//import java.util.Set;
 
 public class URLHostCountFilter implements URLFilter {
-	private Set<String> hosts = new HashSet<String>();
-	private int limit;
+//	private Set<String> hosts = new HashSet<String>();
+//	private int limit;
 	
 	public URLHostCountFilter(int limit) {
-		this.limit = limit;
+//		this.limit = limit;
 	}
 	
 	@Override
