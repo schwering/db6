@@ -28,13 +28,11 @@ begin
    for I in 1 .. Count loop
       declare
          KV            : constant Key_Value_Type := Random_Entry;
-         Key_Context   : DB.Types.Keys.Context_Type;
-         Value_Context : DB.Types.Values.Context_Type;
-         Key_Size      : DB.IO.Blocks.Size_Type;
-         Value_Size    : DB.IO.Blocks.Size_Type;
+         Key_Size      : constant DB.IO.Blocks.Size_Type
+                       := DB.Types.Keys.Size_Of(KV.Key);
+         Value_Size    : constant DB.IO.Blocks.Size_Type
+                       := DB.Types.Values.Size_Of(KV.Value);
       begin
-         DB.Types.Keys.Get_Size_Of(Key_Context, KV.Key, Key_Size);
-         DB.Types.Values.Get_Size_Of(Value_Context, KV.Value, Value_Size);
          Key_Average := Double(Counter) / Double(Counter+1) * Key_Average
                       + Double(Key_Size) / Double(Counter+1);
          Key_Squared := Double(Counter) / Double(Counter+1) * Key_Squared

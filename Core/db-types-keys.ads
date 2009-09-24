@@ -20,10 +20,9 @@ package DB.Types.Keys is
    function "<=" (Left, Right : Key_Type) return Boolean;
    function "="  (Left, Right : Key_Type) return Boolean;
 
-   procedure Get_Size_Of
-     (Context : in out Context_Type;
-      Key     : in     Key_Type;
-      Size    :    out IO.Blocks.Size_Type);
+   function Size_Of
+     (Key : Key_Type)
+      return IO.Blocks.Size_Type;
 
    procedure Write
      (Context : in out Context_Type;
@@ -60,7 +59,7 @@ private
 
    pragma Inline ("<=");
    pragma Inline ("=");
-   pragma Inline (Get_Size_Of);
+   pragma Inline (Size_Of);
    pragma Inline (Write);
    pragma Inline (Read);
    pragma Inline (Skip);

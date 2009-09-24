@@ -1,15 +1,13 @@
 package body DB.Types.Numbers is
 
-   procedure Get_Size_Of
-     (Context : in out Context_Type;
-      Number  : in     Number_Type;
-      Size    :    out IO.Blocks.Size_Type)
+   function Size_Of
+     (Number : Number_Type)
+      return IO.Blocks.Size_Type
    is
-      pragma Unreferenced (Context);
       function Size_Of is new IO.Blocks.Size_Of(Number_Type);
    begin
-      Size := Size_Of(Number);
-   end Get_Size_Of;
+      return Size_Of(Number);
+   end Size_Of;
 
 
    procedure Write

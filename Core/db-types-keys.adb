@@ -31,20 +31,16 @@ package body DB.Types.Keys is
    end "=";
 
 
-   procedure Get_Size_Of
-     (Context : in out Context_Type;
-      Key     : in     Key_Type;
-      Size    :    out IO.Blocks.Size_Type)
+   function Size_Of
+     (Key : Key_Type)
+      return IO.Blocks.Size_Type
    is
       use type IO.Blocks.Size_Type;
-      Tmp : IO.Blocks.Size_Type;
    begin
-      Row_Serialization.Size_Of(Context.Row_Context, Key.Row, Size);
-      --Column_Serialization.Size_Of(Context.Column_Context, Key.Column, Tmp);
-      --Size := Size + Tmp;
-      Times.Get_Size_Of(Context.Time_Context, Key.Time, Tmp);
-      Size := Size + Tmp;
-   end Get_Size_Of;
+      return Row_Serialization.Size_Of(Key.Row) +
+           --Column_Serialization.Size_Of(Key.Column) + 
+             Times.Size_Of(Key.Time);
+   end Size_Of;
 
 
    procedure Write

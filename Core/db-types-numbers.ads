@@ -11,10 +11,9 @@ package DB.Types.Numbers is
 
    Is_Context_Free_Serialization : constant Boolean := True;
 
-   procedure Get_Size_Of
-     (Context : in out Context_Type;
-      Number  : in     Number_Type;
-      Size    :    out IO.Blocks.Size_Type);
+   function Size_Of
+     (Number : Number_Type)
+      return IO.Blocks.Size_Type;
 
    procedure Write
      (Context : in out Context_Type;
@@ -36,7 +35,7 @@ package DB.Types.Numbers is
 private
    type Context_Type is null record;
 
-   pragma Inline (Get_Size_Of);
+   pragma Inline (Size_Of);
    pragma Inline (Write);
    pragma Inline (Read);
    pragma Inline (Skip);
