@@ -1,19 +1,25 @@
 with Ada.Unchecked_Deallocation;
 
+
 package body DB.Types.Gen_Unbounded_Strings is
 
-   overriding procedure Initialize (String : in out String_Type)
+   overriding
+   procedure Initialize (String : in out String_Type)
    is begin
       String.Buffer   := null;
       String.Refcount := new Refcount_Type'(1);
    end;
 
-   overriding procedure Adjust (String : in out String_Type)
+
+   overriding
+   procedure Adjust (String : in out String_Type)
    is begin
       String.Refcount.all := String.Refcount.all + 1;
    end;
 
-   overriding procedure Finalize (String : in out String_Type)
+
+   overriding
+   procedure Finalize (String : in out String_Type)
    is
       procedure Free_Buffer is new Ada.Unchecked_Deallocation
         (Buffer_Type, Buffer_Ref_Type);
@@ -31,29 +37,6 @@ package body DB.Types.Gen_Unbounded_Strings is
          end if;
       end if;
    end;
-
-
-   function Min (I, J : Length_Type) return Length_Type
-   is begin
-      if I < J then
-         return I;
-      else
-         return J;
-      end if;
-   end Min;
-
-
-   function "<" (Left, Right : Buffer_Type) return Boolean
-   is begin
-      for I in 1 .. Min(Left'Length, Right'Length) loop
-         if Left(I) < Right(I) then
-            return True;
-         elsif Left(I) > Right(I) then
-            return False;
-         end if;
-      end loop;
-      return Left'Length < Right'Length;
-   end "<";
 
 
    function "<" (Left, Right : String_Type) return Boolean

@@ -1,6 +1,5 @@
-with DB.Types.Numbers;
+with DB.Types.Gen_Numbers;
 
-package DB.Types.Times is new Numbers
-  (Time_Type);
+package DB.Types.Times is new Gen_Numbers(Time_Type);
 pragma Preelaborate (DB.Types.Times);
 

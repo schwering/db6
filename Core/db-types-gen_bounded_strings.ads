@@ -1,10 +1,7 @@
 with DB.IO.Blocks;
 
 generic
-   type Item_Type is private;
-   with function "<" (Left, Right : Item_Type) return Boolean is <>;
-   with function "=" (Left, Right : Item_Type) return Boolean is <>;
-   with function ">" (Left, Right : Item_Type) return Boolean is <>;
+   type Item_Type is (<>);
    Max_Length : in Positive := 255;
 package DB.Types.Gen_Bounded_Strings is
    pragma Preelaborate;

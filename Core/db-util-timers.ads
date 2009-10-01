@@ -1,18 +1,17 @@
 package DB.Util.Timers is
-   --pragma Pure;
 
    type Ticks_Type is mod 2**64;
    type Time_Type is mod 2**64;
 
    type Timer_Type is
       record
-         Running            : Boolean    := False;
+         Running         : Boolean    := False;
 
-         CPU_Start_Time     : Ticks_Type := 0;
-         CPU_Duration       : Ticks_Type := 0;
+         CPU_Start_Time  : Ticks_Type := 0;
+         CPU_Duration    : Ticks_Type := 0;
 
-         Real_Start_Time    : Time_Type := 0;
-         Real_Duration      : Time_Type := 0;
+         Real_Start_Time : Time_Type := 0;
+         Real_Duration   : Time_Type := 0;
       end record;
 
 

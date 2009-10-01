@@ -31,7 +31,7 @@ package body Gen_Jobs is
    function New_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
-      Reset                     : in Boolean  := True)
+      Reset                     : in Boolean := True)
       return Job_Type
    is begin
       return New_Job(Description, Short_Job, 1, 1, Reset);

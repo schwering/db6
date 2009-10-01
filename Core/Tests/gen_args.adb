@@ -106,9 +106,9 @@ package body Gen_Args is
             Concurrency_Degree := 10; --Positive(To_Number(S(From .. To - 1)));
 
             From := To + 1;
-            if S(From .. S'Last) = "True" then
+            if S(From .. S'Last) = "Reset" then
                Reset := True;
-            elsif S(From .. S'Last) = "False" then
+            elsif S(From .. S'Last) = "Cont" then
                Reset := False;
             else
                raise Parse_Error;

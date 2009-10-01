@@ -20,9 +20,6 @@ package body Random is
    generic
       with package Str is new DB.Types.Gen_Bounded_Strings
         (Item_Type  => Char_Type,
-         "<"        => "<",
-         "="        => "=",
-         ">"        => ">",
          Max_Length => Max_Size);
       Random_Factor : in Natural := 1;
    function Make_String (I : Natural) return Str.String_Type;
@@ -64,10 +61,7 @@ package body Random is
 
    generic
       with package Str is new DB.Types.Gen_Unbounded_Strings
-        (Item_Type  => Char_Type,
-         "<"        => "<",
-         "="        => "=",
-         ">"        => ">");
+        (Item_Type  => Char_Type);
       Random_Factor : in Natural := 1;
    function Make_UString (I : Natural) return Str.String_Type;
 

@@ -1,4 +1,4 @@
-package body DB.Types.Numbers is
+package body DB.Types.Gen_Numbers is
 
    function Size_Of
      (Number : Number_Type)
@@ -46,5 +46,5 @@ package body DB.Types.Numbers is
       Read(Context, Block, Cursor, Number);
    end Skip;
 
-end DB.Types.Numbers;
+end DB.Types.Gen_Numbers;
 

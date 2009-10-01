@@ -9,7 +9,10 @@ public class FeedReader {
 	public static void main(String[] args) {
 		try {
 			if (args.length == 0) {
-				String defaultUrl = "http://rss.cnn.com/rss/edition.rss";//http://www.nrw.de/rss-feeds/cat/0,3,174.xml";
+				String defaultUrl = 
+				"http://topthemenrss.sueddeutsche.de/pf/449042/http://rss.sueddeutsche.de/rss/Topthemen";
+				//http://rss.cnn.com/rss/edition.rss";
+				//http://www.nrw.de/rss-feeds/cat/0,3,174.xml";
 				fetch(new URL(defaultUrl));
 			} else {
 				for (String arg : args) {

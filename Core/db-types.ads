@@ -2,8 +2,8 @@ package DB.Types is
    pragma Pure;
 
    type Letter_Type is
-      ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-       'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+      ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+       'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
        '-', '_', '.', ':', '/', '&');
 
    type Letter_Array_Type is array (Positive range <>) of Letter_Type;

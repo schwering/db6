@@ -1,35 +1,5 @@
 package body DB.Types.Gen_Bounded_Strings is
 
-   function "<" (Left, Right : Indefinite_Buffer_Type) return Boolean
-   is
-      pragma Inline ("<");
-   begin
-      for I in Left'Range loop
-         if Left(I) < Right(I) then
-            return True;
-         elsif Left(I) > Right(I) then
-            return False;
-         end if;
-      end loop;
-      return False;
-   end "<";
-
-
-   function "<=" (Left, Right : Indefinite_Buffer_Type) return Boolean
-   is
-      pragma Inline ("<=");
-   begin
-      for I in Left'Range loop
-         if Left(I) < Right(I) then
-            return True;
-         elsif Left(I) > Right(I) then
-            return False;
-         end if;
-      end loop;
-      return True;
-   end "<=";
-
-
    function "<" (Left, Right : String_Type) return Boolean
    is begin
       if Left.Length < Right.Length then
@@ -37,7 +7,6 @@ package body DB.Types.Gen_Bounded_Strings is
       else
          return Left.Buffer(1..Right.Length) < Right.Buffer(1..Right.Length);
       end if;
-
    end "<";
 
 

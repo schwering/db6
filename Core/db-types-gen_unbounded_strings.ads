@@ -3,10 +3,7 @@ with Ada.Finalization;
 with DB.IO.Blocks;
 
 generic
-   type Item_Type is private;
-   with function "<" (Left, Right : Item_Type) return Boolean is <>;
-   with function "=" (Left, Right : Item_Type) return Boolean is <>;
-   with function ">" (Left, Right : Item_Type) return Boolean is <>;
+   type Item_Type is (<>);
 package DB.Types.Gen_Unbounded_Strings is
    pragma Preelaborate;
 

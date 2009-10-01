@@ -2,7 +2,7 @@ with DB.IO.Blocks;
 
 generic
    type P_Number_Type is (<>);
-package DB.Types.Numbers is
+package DB.Types.Gen_Numbers is
    pragma Pure;
 
    type Number_Type is new P_Number_Type;
@@ -40,5 +40,5 @@ private
    pragma Inline (Read);
    pragma Inline (Skip);
 
-end DB.Types.Numbers;
+end DB.Types.Gen_Numbers;
 
