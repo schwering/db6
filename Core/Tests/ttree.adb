@@ -15,7 +15,7 @@ with DB.BTrees;
 with DB.Gen_BTrees.Gen_Check;
 with DB.BTrees.Stats;
 
-with DB.Tables.Maps;
+--with DB.Tables.Maps;
 
 with DB.Types;
 with DB.Types.Keys;
