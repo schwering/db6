@@ -21,7 +21,7 @@ package To_Strings is
 
    function To_String (Key : DB.Types.Keys.Key_Type) return String;
 
-   function To_String (Value : DB.Types.Values.Number_Type) return String;
+   function To_String (Value : DB.Types.Values.Value_Type) return String;
 
    function To_String (Address : DB.IO.Blocks.Direct_IO.Address_Type)
       return String;

@@ -119,14 +119,14 @@ package body Random is
    end Reset_String_Generation;
 
 
-   function To_Value (Count : Count_Type) return DB.Types.Values.Number_Type
+   function To_Value (Count : Count_Type) return DB.Types.Values.Value_Type
    is
       Last : constant Count_Type
-           := Count_Type(DB.Types.Values.Number_Type'Last);
+           := Count_Type(DB.Types.Values.Value_Type'Last);
       Off  : constant Count_Type
-           := Count_Type(DB.Types.Values.Number_Type'First);
+           := Count_Type(DB.Types.Values.Value_Type'First);
    begin
-      return DB.Types.Values.Number_Type((Count mod (Last)) + Off);
+      return DB.Types.Values.Value_Type((Count mod (Last)) + Off);
    end To_Value;
 
 

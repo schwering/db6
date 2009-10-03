@@ -11,7 +11,7 @@ package DB.Volatile_BTrees is new Gen_BTrees
    Skip_Key                      => Types.Keys.Skip,
    "="                           => Types.Keys."=",
    "<="                          => Types.Keys."<=",
-   Value_Type                    => Types.Values.Number_Type,
+   Value_Type                    => Types.Values.Value_Type,
    Value_Context_Type            => Types.Values.Context_Type,
    Write_Value                   => Types.Values.Write,
    Read_Value                    => Types.Values.Read,

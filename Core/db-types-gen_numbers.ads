@@ -1,5 +1,7 @@
 with DB.IO.Blocks;
 
+with System.Storage_Elements;
+
 generic
    type P_Number_Type is (<>);
 package DB.Types.Gen_Numbers is
@@ -31,6 +33,14 @@ package DB.Types.Gen_Numbers is
      (Context : in out Context_Type;
       Block   : in     IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type);
+
+   function To_Storage_Array
+     (Number : Number_Type)
+      return System.Storage_Elements.Storage_Array;
+
+   function From_Storage_Array
+     (Arr : System.Storage_Elements.Storage_Array)
+      return Number_Type;
 
 private
    type Context_Type is null record;

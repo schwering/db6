@@ -24,9 +24,9 @@ package body To_Strings is
              To_String(Key.Time);
    end To_String;
 
-   function To_String (Value : DB.Types.Values.Number_Type) return String
+   function To_String (Value : DB.Types.Values.Value_Type) return String
    is begin
-      return DB.Types.Values.Number_Type'Image(Value);
+      return DB.Types.Values.Value_Type'Image(Value);
    end To_String;
 
    function To_String (Address : DB.IO.Blocks.Direct_IO.Address_Type)

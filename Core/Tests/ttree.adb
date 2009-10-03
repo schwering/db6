@@ -15,6 +15,8 @@ with DB.BTrees;
 with DB.Gen_BTrees.Gen_Check;
 with DB.BTrees.Stats;
 
+with DB.Tables.Maps;
+
 with DB.Types;
 with DB.Types.Keys;
 with DB.Types.Values;
@@ -31,7 +33,7 @@ is
    Stop_Now : exception;
 
    subtype Key_Type is DB.Types.Keys.Key_Type;
-   subtype Value_Type is DB.Types.Values.Number_Type;
+   subtype Value_Type is DB.Types.Values.Value_Type;
    use type Key_Type;
    use type Value_Type;
 

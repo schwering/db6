@@ -51,7 +51,7 @@ is
       for I in 1 .. Count/2 loop
          declare
             KV    : constant Key_Value_Type := Random_Entry;
-            Val   : DB.Types.Values.Number_Type;
+            Val   : DB.Types.Values.Value_Type;
             Pos   : BTrees.Count_Type;
             State : BTrees.Result_Type;
          begin

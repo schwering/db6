@@ -7,7 +7,7 @@ with DB.IO.Blocks.Gen_Buffers;
 with DB.IO.Blocks.Gen_IO;
 
 generic
-   type Item_Type is private;
+   type Item_Type (<>) is private;
    with function To_Storage_Array
           (Item : Item_Type)
            return System.Storage_Elements.Storage_Array;

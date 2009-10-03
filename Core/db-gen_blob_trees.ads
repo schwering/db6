@@ -50,8 +50,8 @@ package DB.Gen_Blob_Trees is
 
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
-   type Bound_Type (<>) is private;
-   type Cursor_Type (<>) is limited private;
+   type Bound_Type is private;
+   type Cursor_Type is limited private;
 
 
    Tree_Error : exception;

@@ -9,7 +9,7 @@ package Random is
    type Key_Value_Type is
       record
          Key   : DB.Types.Keys.Key_Type;
-         Value : DB.Types.Values.Number_Type;
+         Value : DB.Types.Values.Value_Type;
       end record;
    type Key_Value_Array_Type is array (Positive range <>) of Key_Value_Type;
    type Key_Value_Array_Access_Type is access Key_Value_Array_Type;

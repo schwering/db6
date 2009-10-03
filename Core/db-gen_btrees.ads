@@ -60,7 +60,7 @@ package DB.Gen_BTrees is
 
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
-   type Bound_Type (<>) is private;
+   type Bound_Type is private;
    type Cursor_Type is limited private;
 
 

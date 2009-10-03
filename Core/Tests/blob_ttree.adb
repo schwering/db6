@@ -24,7 +24,7 @@ with System.Storage_Elements;
 procedure Blob_TTree
 is
    subtype Key_Type is DB.Types.Keys.Key_Type;
-   subtype Value_Type is DB.Types.Values.Number_Type;
+   subtype Value_Type is DB.Types.Values.Value_Type;
    use type Key_Type;
    use type Value_Type;
 

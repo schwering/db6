@@ -2,5 +2,5 @@ echo "Making test $1"
 make || exit
 echo ""
 echo "Running test $1"
-build/debug/./$1
+bin/debug/./$1
 
