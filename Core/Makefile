@@ -1,12 +1,23 @@
-C_DIR=C
-OBJECT_DIR=.objects
-C_OBJECT_DIR=$(OBJECT_DIR)/c
-RELEASE_OBJECT_DIR=$(OBJECT_DIR)/release
-DEBUG_OBJECT_DIR=$(OBJECT_DIR)/debug
-BIN_DIR=bin
-RELEASE_BIN_DIR=$(BIN_DIR)/release
-DEBUG_BIN_DIR=$(BIN_DIR)/debug
-C_OBJECTS=db-io-low_level db-util-timers
+LIBDB_DIR         =libdb
+TEST_DIR          =bin
+
+RELEASE_DIR       =release
+DEBUG_DIR         =debug
+OBJECT_DIR        =objects
+
+DATA_DIR          =.tmp
+
+DIRS=$(LIBDB_DIR)\
+     $(LIBDB_DIR)/$(DEBUG_DIR)\
+     $(LIBDB_DIR)/$(DEBUG_DIR)/$(OBJECT_DIR)\
+     $(LIBDB_DIR)/$(RELEASE_DIR)\
+     $(LIBDB_DIR)/$(RELEASE_DIR)/$(OBJECT_DIR)\
+     $(TEST_DIR)\
+     $(TEST_DIR)/$(RELEASE_DIR)\
+     $(TEST_DIR)/$(DEBUG_DIR)\
+     $(DATA_DIR)
+
+C_OBJECTS=db-compression-deflate-c db-io-low_level-c db-util-timers-c
 
 
 # For each f in the list, Tests/f.adb must exist.
@@ -63,30 +74,27 @@ CFLAGS=-c $(COMMONFLAGS)
 
 all: release debug
 
-lib: dirs cobjs
-	$(GNATMAKE) -Pdb -XBUILD=release
-
 debug: dirs cobjs
 	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=debug $$T.adb || exit; done
 
 release: dirs cobjs
 	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=release $$T.adb || exit; done
 
-cobjs: dirs
-	for F in $(C_OBJECTS); do make $(C_OBJECT_DIR)/$$F.o || exit; done
+libdb_release: dirs
+	for F in $(C_OBJECTS); do make $(LIBDB_DIR)/$(RELEASE_DIR)/$(OBJECT_DIR)/$$F.o || exit; done
+	$(GNATMAKE) -Plibdb -XBUILD=release
+
+libdb_debug: dirs
+	for F in $(C_OBJECTS); do make $(LIBDB_DIR)/$(DEBUG_DIR)/$(OBJECT_DIR)/$$F.o || exit; done
+	$(GNATMAKE) -Plibdb -XBUILD=debug
 
 dirs:
-	if test \! -d $(OBJECT_DIR);         then mkdir $(OBJECT_DIR);         fi
-	if test \! -d $(C_OBJECT_DIR);       then mkdir $(C_OBJECT_DIR);       fi
-	if test \! -d $(RELEASE_OBJECT_DIR); then mkdir $(RELEASE_OBJECT_DIR); fi
-	if test \! -d $(DEBUG_OBJECT_DIR);   then mkdir $(DEBUG_OBJECT_DIR);   fi
-	if test \! -d $(BIN_DIR);            then mkdir $(BIN_DIR);            fi
-	if test \! -d $(RELEASE_BIN_DIR);    then mkdir $(RELEASE_BIN_DIR);    fi
-	if test \! -d $(DEBUG_BIN_DIR);      then mkdir $(DEBUG_BIN_DIR);      fi
-	if test \! -d .tmp;                  then mkdir .tmp;                  fi
+	for D in $(DIRS); do if test \! -d $$D; then mkdir $$D; fi done
 
+$(LIBDB_DIR)/$(RELEASE_DIR)/$(OBJECT_DIR)/%.o: %.c
+	$(CC) $(CFLAGS) $^ -o $@
 
-$(C_OBJECT_DIR)/%.o: $(C_DIR)/%.c
+$(LIBDB_DIR)/$(DEBUG_DIR)/$(OBJECT_DIR)/%.o: %.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 tags: *.ads *.adb Makefile
@@ -100,7 +108,7 @@ sstats:
 	ls *.ads *.adb | xargs wc | sort -n
 
 stats:
-	ls *.ads *.adb C/*.[hc] | xargs wc | sort -n
+	ls *.ads *.adb *.[hc] | xargs wc | sort -n
 
 statsbl:
 	@grep -c ";" *.adb | sort -t \: -k 2 -n
@@ -108,5 +116,5 @@ statsbl:
 	@cat *.adb | grep -c ";"
 
 clean:
-	rm -rf $(OBJECT_DIR) $(BIN_DIR)
+	rm -rf $(LIBDB_DIR) $(TEST_DIR)
 

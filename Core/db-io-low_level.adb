@@ -24,6 +24,18 @@ package body DB.IO.Low_Level is
       FLAGS_OPEN_RW : constant int;
       pragma Import (C, FLAGS_OPEN_RW, "db_io_low_level_open_rw_flags");
 
+      FLAGS_CREATE_DIRECT : constant int;
+      pragma Import (C, FLAGS_CREATE_DIRECT,
+                     "db_io_low_level_create_direct_flags");
+
+      FLAGS_OPEN_RO_DIRECT : constant int;
+      pragma Import (C, FLAGS_OPEN_RO_DIRECT,
+                     "db_io_low_level_open_ro_direct_flags");
+
+      FLAGS_OPEN_RW_DIRECT : constant int;
+      pragma Import (C, FLAGS_OPEN_RW_DIRECT,
+                     "db_io_low_level_open_rw_direct_flags");
+
       MODE : constant int;
       pragma Import (C, MODE, "db_io_low_level_file_mode");
 
@@ -68,6 +80,22 @@ package body DB.IO.Low_Level is
                        Offset : off_t) return ssize_t;
       pragma Import (C, pwrite, "db_io_low_level_pwrite");
 
+      function read_direct (FD : int; Buf : void_ptr;
+                            NBytes : size_t) return ssize_t;
+      pragma Import(C, read_direct, "db_io_low_level_read_direct");
+
+      function pread_direct (FD : int; Buf : void_ptr; NBytes : size_t;
+                             Offset : off_t) return ssize_t;
+      pragma Import(C, pread_direct, "db_io_low_level_pread_direct");
+
+      function write_direct (FD : int; Buf : void_ptr;
+                             NBytes : size_t) return ssize_t;
+      pragma Import (C, write_direct, "db_io_low_level_write_direct");
+
+      function pwrite_direct (FD : int; Buf : void_ptr; NBytes : size_t;
+                              Offset : off_t) return ssize_t;
+      pragma Import (C, pwrite_direct, "db_io_low_level_pwrite_direct");
+
       function errno return int;
       pragma Import (C, errno, "db_io_low_level_errno");
 
@@ -105,6 +133,29 @@ package body DB.IO.Low_Level is
       end if;
       File := File_Descriptor_Type(FD);
    end Open;
+
+
+   procedure Open_Direct
+     (Path      : in  String;
+      Open_Kind : in  Open_Kind_Type := Read_Write;
+      File      : out File_Descriptor_Type)
+   is
+      use type C.int;
+      Str   : constant C.char_ptr := C.To_C(Path);
+      Flags : C.int;
+      FD    : C.int;
+   begin
+      case Open_Kind is
+         when Create =>     Flags := C.FLAGS_CREATE_DIRECT;
+         when Read_Only =>  Flags := C.FLAGS_OPEN_RO_DIRECT;
+         when Read_Write => Flags := C.FLAGS_OPEN_RW_DIRECT;
+      end case;
+      FD := C.open(Str, Flags, C.MODE);
+      if FD = -1 then
+         raise IO_Error;
+      end if;
+      File := File_Descriptor_Type(FD);
+   end Open_Direct;
 
 
    procedure Close
@@ -272,6 +323,74 @@ package body DB.IO.Low_Level is
          raise IO_Error;
       end if;
    end PWrite;
+
+
+   procedure Read_Direct
+     (File : in  File_Descriptor_Type;
+      Item : out Item_Type)
+   is
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type
+            := Signed_Size_Type(C.read_direct(C.int(File),
+                                              Item'Address,
+                                              C.size_t(Size)));
+   begin
+      if Count < 0 or else Size_Type(Count) /= Size then
+         raise IO_Error;
+      end if;
+   end Read_Direct;
+
+
+   procedure PRead_Direct
+     (File : in  File_Descriptor_Type;
+      Pos  : in  File_Position_Type;
+      Item : out Item_Type)
+   is
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type
+            := Signed_Size_Type(C.pread_direct(C.int(File),
+                                               Item'Address,
+                                               C.size_t(Size),
+                                               C.off_t(Pos)));
+   begin
+      if Count < 0 or else Size_Type(Count) /= Size then
+         raise IO_Error;
+      end if;
+   end PRead_Direct;
+
+
+   procedure Write_Direct
+     (File : in File_Descriptor_Type;
+      Item : in Item_Type)
+   is
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type
+            := Signed_Size_Type(C.write_direct(C.int(File),
+                                               Item'Address,
+                                               C.size_t(Size)));
+   begin
+      if Count < 0 or else Size_Type(Count) /= Size then
+         raise IO_Error;
+      end if;
+   end Write_Direct;
+
+
+   procedure PWrite_Direct
+     (File : in File_Descriptor_Type;
+      Pos  : in File_Position_Type;
+      Item : in Item_Type)
+   is
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type
+            := Signed_Size_Type(C.Pwrite_direct(C.int(File),
+                                                Item'Address,
+                                                C.size_t(Size),
+                                                C.off_t(Pos)));
+   begin
+      if Count < 0 or else Size_Type(Count) /= Size then
+         raise IO_Error;
+      end if;
+   end PWrite_Direct;
 
 
    function Strerror

@@ -1,5 +1,5 @@
-BIN=bin/release/./vttree
-FILE=.tmp/Volatile
+BIN=bin/release/./ttree
+FILE=.tmp/btree
 C1=50k
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
@@ -11,7 +11,7 @@ C1=50k
 # 6. Check that there are no items left in the
 #    tree (just for fun, check for four instead of
 #    three blocks of insertions)
-$BIN $FILE 0\
+C="$BIN $FILE 0\
         \
 	Insert,$C1,Cont\
 	Search,$C1,Reset\
@@ -39,5 +39,7 @@ $BIN $FILE 0\
 	Antisearch,$C1,Reset\
 	Antisearch,$C1,Cont\
 	Antisearch,$C1,Cont\
-	Antisearch,$C1,Cont
+	Antisearch,$C1,Cont"
+echo $C
+$C
 

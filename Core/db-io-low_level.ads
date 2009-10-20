@@ -14,6 +14,11 @@ package DB.IO.Low_Level is
       Open_Kind : in  Open_Kind_Type := Read_Write;
       File      : out File_Descriptor_Type);
 
+   procedure Open_Direct
+     (Path      : in  String;
+      Open_Kind : in  Open_Kind_Type := Read_Write;
+      File      : out File_Descriptor_Type);
+
    procedure Close
      (File : in File_Descriptor_Type);
 
@@ -49,7 +54,6 @@ package DB.IO.Low_Level is
      (File : File_Descriptor_Type)
       return File_Position_Type;
 
-
    generic
       type Item_Type is limited private;
    procedure Read
@@ -72,6 +76,32 @@ package DB.IO.Low_Level is
    generic
       type Item_Type is limited private;
    procedure PWrite
+     (File : in File_Descriptor_Type;
+      Pos  : in File_Position_Type;
+      Item : in Item_Type);
+
+   generic
+      type Item_Type is limited private;
+   procedure Read_Direct
+     (File : in  File_Descriptor_Type;
+      Item : out Item_Type);
+
+   generic
+      type Item_Type is limited private;
+   procedure PRead_Direct
+     (File : in  File_Descriptor_Type;
+      Pos  : in  File_Position_Type;
+      Item : out Item_Type);
+
+   generic
+      type Item_Type is limited private;
+   procedure Write_Direct
+     (File : in File_Descriptor_Type;
+      Item : in Item_Type);
+
+   generic
+      type Item_Type is limited private;
+   procedure PWrite_Direct
      (File : in File_Descriptor_Type;
       Pos  : in File_Position_Type;
       Item : in Item_Type);

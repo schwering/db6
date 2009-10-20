@@ -1,0 +1,2 @@
+cc -Wall net.c client.c -o client
+cc -Wall net.c server.c -o server
