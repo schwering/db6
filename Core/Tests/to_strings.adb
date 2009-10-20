@@ -29,6 +29,12 @@ package body To_Strings is
       return DB.Types.Values.Value_Type'Image(Value);
    end To_String;
 
+   function To_String (Address : DB.IO.Blocks.File_IO.Address_Type)
+      return String
+   is begin
+      return DB.IO.Blocks.File_IO.Address_Type'Image(Address);
+   end To_String;
+
    function To_String (Address : DB.IO.Blocks.Direct_IO.Address_Type)
       return String
    is begin

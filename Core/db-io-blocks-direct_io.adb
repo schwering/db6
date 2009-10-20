@@ -10,14 +10,12 @@ package body DB.IO.Blocks.Direct_IO is
    is
       Last_Position : Low_Level.File_Position_Type;
    begin
-      Low_Level.Open(Path      => ID,
-                     Open_Kind => Low_Level.Create,
-                     File      => File.FD);
+      Low_Level.Open_Direct(Path      => ID,
+                            Open_Kind => Low_Level.Create,
+                            File      => File.FD);
       pragma Warnings (Off, Last_Position);
       Low_Level.Get_Size(File          => File.FD,
                          Last_Position => Last_Position);
-      --File.Max_Address_Initialized := True;
-      --File.Max_Address             := First;
    end Create;
 
 
@@ -25,14 +23,9 @@ package body DB.IO.Blocks.Direct_IO is
      (ID   : in  String;
       File : out File_Type)
    is begin
-      Low_Level.Open(Path      => ID,
-                     Open_Kind => Low_Level.Read_Write,
-                     File      => File.FD);
-      --Low_Level.Seek_End(File.FD);
-      --Low_Level.Get_Size(File          => File.FD,
-                         --Last_Position => Last_Position);
-      --File.Max_Address_Initialized := True;
-      --File.Max_Address             := To_Valid_Address(Last_Position);
+      Low_Level.Open_Direct(Path      => ID,
+                            Open_Kind => Low_Level.Read_Write,
+                            File      => File.FD);
    end Open;
 
 
@@ -121,85 +114,12 @@ package body DB.IO.Blocks.Direct_IO is
    end To_File_Position;
 
 
---   procedure Read
---     (File    : in out File_Type;
---      Address : in     Valid_Address_Type;
---      Block   :    out Block_Type)
---   is
---      procedure LL_Read is new Low_Level.Read(Buffer_Type);
---   begin
---      File.Mutex.Lock;
---
---      --if File.Max_Address_Initialized 
---      --and then File.Max_Address < Address then
---         --raise IO_Error;
---      --end if;
---      Low_Level.Seek(File.FD, To_File_Position(Address));
---      LL_Read(File.FD, Block.Buffer);
---
---      File.Mutex.Unlock;
---
---   exception
---      when others =>
---         File.Mutex.Unlock;
---         raise;
---   end Read;
-
-
---   procedure Write
---     (File    : in out File_Type;
---      Address : in     Valid_Address_Type;
---      Block   : in     Block_Type)
---   is
---      procedure LL_Write is new Low_Level.Write(Buffer_Type);
---   begin
---      File.Mutex.Lock;
---
---      Low_Level.Seek(File.FD, To_File_Position(Address));
---      LL_Write(File.FD, Block.Buffer);
---      --if not File.Max_Address_Initialized
---      --or else File.Max_Address < Address then
---         --File.Max_Address := Address;
---      --end if;
---
---      File.Mutex.Unlock;
---
---   exception
---      when others =>
---         File.Mutex.Unlock;
---         raise;
---   end Write;
-
-
---   procedure Seek_New
---     (File    : in out File_Type;
---      Address :    out Valid_Address_Type)
---   is begin
---      File.Mutex.Lock;
---
---      --if not File.Max_Address_Initialized then
---         --raise IO_Error;
---      --end if;
---      --File.Max_Address := File.Max_Address + 1;
---      --Address := File.Max_Address;
---      Low_Level.Seek_End(File.FD);
---      Address := To_Valid_Address(Low_Level.Current_File_Position(File.FD));
---
---      File.Mutex.Unlock;
---
---   exception
---      when others =>
---         File.Mutex.Unlock;
---         raise;
---   end Seek_New;
-
-
    procedure Read
      (File    : in out File_Type;
       Address : in     Valid_Address_Type;
       Block   :    out Block_Type)
    is
-      procedure LL_Read is new Low_Level.PRead(Block_Type);
+      procedure LL_Read is new Low_Level.PRead_Direct(Block_Type);
    begin
       LL_Read(File.FD, To_File_Position(Address), Block);
    end Read;
@@ -210,7 +130,7 @@ package body DB.IO.Blocks.Direct_IO is
       Address : in     Valid_Address_Type;
       Block   : in     Block_Type)
    is
-      procedure LL_Write is new Low_Level.PWrite(Block_Type);
+      procedure LL_Write is new Low_Level.PWrite_Direct(Block_Type);
    begin
       LL_Write(File.FD, To_File_Position(Address), Block);
    end Write;

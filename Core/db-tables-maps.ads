@@ -1,6 +1,6 @@
 with DB.Gen_BTrees;
 with DB.Gen_Blob_Trees;
-with DB.IO.Blocks.Direct_IO;
+with DB.IO.Blocks.File_IO;
 with DB.Types.Keys;
 with DB.Types.Values;
 
@@ -383,7 +383,7 @@ package DB.Tables.Maps is
    -- key/value-pair that should be visited next.
 
 private
-   package Block_IO renames IO.Blocks.Direct_IO.IO;
+   package Block_IO renames IO.Blocks.File_IO.IO;
 
    package BTrees is new Gen_BTrees
      (Key_Type                      => Types.Keys.Key_Type,

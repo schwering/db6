@@ -1,7 +1,7 @@
 with DB.Gen_BTrees;
 with DB.Types.Keys;
 with DB.Types.Values;
-with DB.IO.Blocks.Direct_IO;
+with DB.IO.Blocks.File_IO;
 
 package DB.BTrees is new Gen_BTrees
   (Key_Type                      => Types.Keys.Key_Type,
@@ -18,6 +18,6 @@ package DB.BTrees is new Gen_BTrees
    Skip_Value                    => Types.Values.Skip,
    Is_Context_Free_Serialization => Types.Keys.Is_Context_Free_Serialization
                                  and Types.Values.Is_Context_Free_Serialization,
-   Block_IO                      => IO.Blocks.Direct_IO.IO);
+   Block_IO                      => IO.Blocks.File_IO.IO);
 --pragma Preelaborate (DB.BTrees);
 
