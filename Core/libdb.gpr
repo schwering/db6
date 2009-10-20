@@ -10,7 +10,6 @@ project LibDB is
    LIB_NAME          := "db";
 
    LIBDB_DIR         := "lib"& LIB_NAME;
-   TEST_DIR          := "test";
 
    RELEASE_DIR       := "release";
    DEBUG_DIR         := "debug";

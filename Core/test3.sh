@@ -1,6 +1,6 @@
 BIN=bin/release/./ttree
 FILE=.tmp/btree
-C1=50k
+C1=5k
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
 # 3. Some mor insertions and check for all three

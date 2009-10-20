@@ -29,7 +29,7 @@ CURSOR_TESTS=cursor controlled blob_cursor
 THREAD_TESTS=thread thread2 thread3
 COMPRESSION_TESTS=prefix levenshtein 
 STRING_TESTS=unbounded_string
-MIXED_TESTS=locks search hash modular rtest i_bm check data mkfs bitmap
+MIXED_TESTS=locks search hash modular rtest i_bm check data mkfs bitmap deflate
 
 TESTS=$(HEAP_TESTS)\
       $(TREE_TESTS)\
@@ -74,10 +74,10 @@ CFLAGS=-c $(COMMONFLAGS)
 
 all: release debug
 
-debug: dirs cobjs
+debug: dirs libdb_debug
 	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=debug $$T.adb || exit; done
 
-release: dirs cobjs
+release: dirs libdb_release
 	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=release $$T.adb || exit; done
 
 libdb_release: dirs

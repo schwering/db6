@@ -269,10 +269,11 @@ package body DB.IO.Low_Level is
      (File : in  File_Descriptor_Type;
       Item : out Item_Type)
    is
-      Size  : constant Size_Type        := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type := Signed_Size_Type(C.read(C.int(File),
-                                                            Item'Address,
-                                                            C.size_t(Size)));
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type
+            := Signed_Size_Type(C.read(C.int(File),
+                                       Item'Address,
+                                       C.size_t(Size)));
    begin
       if Count < 0 or else Size_Type(Count) /= Size then
          raise IO_Error;
@@ -285,9 +286,12 @@ package body DB.IO.Low_Level is
       Pos  : in  File_Position_Type;
       Item : out Item_Type)
    is
-      Size  : constant Size_Type        := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type := Signed_Size_Type
-         (C.pread(C.int(File), Item'Address, C.size_t(Size), C.off_t(Pos)));
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type
+            := Signed_Size_Type(C.pread(C.int(File),
+                                        Item'Address,
+                                        C.size_t(Size),
+                                        C.off_t(Pos)));
    begin
       if Count < 0 or else Size_Type(Count) /= Size then
          raise IO_Error;
@@ -299,10 +303,11 @@ package body DB.IO.Low_Level is
      (File : in File_Descriptor_Type;
       Item : in Item_Type)
    is
-      Size  : constant Size_Type        := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type := Signed_Size_Type(C.write(C.int(File),
-                                                             Item'Address,
-                                                             C.size_t(Size)));
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type
+            := Signed_Size_Type(C.write(C.int(File),
+                                        Item'Address,
+                                        C.size_t(Size)));
    begin
       if Count < 0 or else Size_Type(Count) /= Size then
          raise IO_Error;
@@ -315,9 +320,12 @@ package body DB.IO.Low_Level is
       Pos  : in File_Position_Type;
       Item : in Item_Type)
    is
-      Size  : constant Size_Type        := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type := Signed_Size_Type
-         (C.Pwrite(C.int(File), Item'Address, C.size_t(Size), C.off_t(Pos)));
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type
+            := Signed_Size_Type(C.Pwrite(C.int(File),
+                                         Item'Address,
+                                         C.size_t(Size),
+                                         C.off_t(Pos)));
    begin
       if Count < 0 or else Size_Type(Count) /= Size then
          raise IO_Error;
