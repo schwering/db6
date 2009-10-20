@@ -1,5 +1,5 @@
 package DB.Util.Bitmaps is
-   --pragma Pure;
+   pragma Pure;
 
    subtype Size_Type is Natural;
    subtype Index_Type is Natural;
