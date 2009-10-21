@@ -18,7 +18,7 @@ with DB.Types;
 with DB.Types.Keys;
 with DB.Types.Values;
 
-with DB.Util.Traceback;
+with DB.Utils.Traceback;
 
 with System.Storage_Elements;
 
@@ -191,6 +191,6 @@ exception
    when Error : others =>
       Put_Line("Exception: "& Exception_Message(Error));
       Put_Line("Exception: "& Exception_Information(Error));
-      DB.Util.Traceback.Print_Traceback(Error);
+      DB.Utils.Traceback.Print_Traceback(Error);
 end Blob_TTree;
 

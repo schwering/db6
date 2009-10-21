@@ -11,7 +11,6 @@ package DB.IO.Blocks.Gen_System_Locking_IO is
    type File_Type is
       record
          File : P_IO.File_Type;
-         --Lock : Util.Semaphores.Lock_Type;
       end record;
 
 

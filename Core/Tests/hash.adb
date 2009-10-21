@@ -1,7 +1,7 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
 with Ada.Text_IO; use Ada.Text_IO;
-with DB.Util.Gen_HashTables;
+with DB.Utils.Gen_HashTables;
 
 procedure Hash
 is
@@ -25,7 +25,7 @@ is
       end if;
    end Rehash;
 
-   package HT is new DB.Util.Gen_Hashtables
+   package HT is new DB.Utils.Gen_Hashtables
      (Hash_Type  => Hash_Type,
       Key_Type   => Key_Type,
       Value_Type => Value_Type,

@@ -1,4 +1,4 @@
-package DB.Util.Binary_Search is
+package DB.Utils.Binary_Search is
    pragma Pure;
 
    generic
@@ -43,5 +43,5 @@ private
    pragma Inline (Find_Best);
    pragma Inline (Find_Best_In_Container);
 
-end DB.Util.Binary_Search;
+end DB.Utils.Binary_Search;
 

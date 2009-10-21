@@ -1,7 +1,7 @@
 with System.Pool_Global;
 with System.Storage_Elements;
 
-package DB.Util.Bounded_Pool is
+package DB.Utils.Bounded_Pools is
    pragma Elaborate_Body;
 
    package SSE renames System.Storage_Elements;
@@ -29,5 +29,5 @@ package DB.Util.Bounded_Pool is
      (Pool : Bounded_No_Reclaim_Pool)
       return SSE.Storage_Count;
 
-end DB.Util.Bounded_Pool;
+end DB.Utils.Bounded_Pools;
 

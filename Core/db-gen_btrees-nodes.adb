@@ -1,6 +1,6 @@
-with DB.Util.Binary_Search;
-with DB.Util.Gen_Minimum;
-with DB.Util.Gen_Maximum;
+with DB.Utils.Binary_Search;
+with DB.Utils.Gen_Minimum;
+with DB.Utils.Gen_Maximum;
 
 separate (DB.Gen_BTrees)
 package body Nodes is
@@ -1210,7 +1210,7 @@ package body Nodes is
    begin
       if Degree(Node) > 0 then
          declare
-            procedure Find is new Util.Binary_Search.Find_Best_In_Container
+            procedure Find is new Utils.Binary_Search.Find_Best_In_Container
               (Container_Type => Node_Type,
                Index_Type     => Valid_Index_Type,
                Item_Type      => Key_Type,
@@ -1308,7 +1308,7 @@ package body Nodes is
    is
       use type IO.Blocks.Long_Position_Type;
 
-      function Min is new Util.Gen_Minimum(IO.Blocks.Long_Position_Type);
+      function Min is new Utils.Gen_Minimum(IO.Blocks.Long_Position_Type);
       pragma Inline (Min);
 
       pragma Assert (Node.Ok);
@@ -1342,7 +1342,7 @@ package body Nodes is
    is
       use type IO.Blocks.Size_Type;
 
-      function Min is new Util.Gen_Minimum(IO.Blocks.Size_Type);
+      function Min is new Utils.Gen_Minimum(IO.Blocks.Size_Type);
       pragma Inline (Min);
 
       pragma Assert (Left_Node.Ok);
@@ -1830,9 +1830,9 @@ package body Nodes is
          pragma Assert (not Is_Free(Left_Node));
          pragma Assert (not Is_Free(Right_Node));
 
-         function Min is new Util.Gen_Minimum(Index_Type);
+         function Min is new Utils.Gen_Minimum(Index_Type);
          pragma Inline (Min);
-         function Max is new Util.Gen_Maximum(Index_Type);
+         function Max is new Utils.Gen_Maximum(Index_Type);
          pragma Inline (Max);
 
          function Combi_Parent

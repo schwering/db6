@@ -1,4 +1,4 @@
-package body DB.Util.Bounded_Pool is
+package body DB.Utils.Bounded_Pools is
 
    overriding procedure Allocate
      (Pool         : in out Bounded_No_Reclaim_Pool;
@@ -38,5 +38,5 @@ package body DB.Util.Bounded_Pool is
       return Pool.Max_Storage_Size;
    end Storage_Size;
 
-end DB.Util.Bounded_Pool;
+end DB.Utils.Bounded_Pools;
 

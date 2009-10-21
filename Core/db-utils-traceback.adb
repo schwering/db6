@@ -2,7 +2,7 @@ with Ada.Text_IO;
 with GNAT.Traceback;
 with GNAT.Traceback.Symbolic;
 
-package body DB.Util.Traceback is
+package body DB.Utils.Traceback is
 
    function Traceback_String return String
    is
@@ -28,5 +28,5 @@ package body DB.Util.Traceback is
       Ada.Text_IO.Put_Line(GNAT.Traceback.Symbolic.Symbolic_Traceback(E));
    end Print_Traceback;
 
-end DB.Util.Traceback;
+end DB.Utils.Traceback;
 

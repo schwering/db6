@@ -17,7 +17,7 @@ DIRS=$(LIBDB_DIR)\
      $(TEST_DIR)/$(DEBUG_DIR)\
      $(DATA_DIR)
 
-C_OBJECTS=db-compression-deflate-c db-io-low_level-c db-util-timers-c
+C_OBJECTS=db-compression-deflate-c db-io-low_level-c db-utils-timers-c
 
 
 # For each f in the list, Tests/f.adb must exist.

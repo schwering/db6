@@ -1,7 +1,7 @@
 with DB.IO.Blocks.Gen_IO;
-with DB.Util.Gen_Hashtables;
 with DB.Locks.Mutexes;
 with DB.Locks.Semaphores;
+with DB.Utils.Gen_Hashtables;
 
 generic
    with package P_IO is new Gen_IO (<>);
@@ -29,7 +29,7 @@ package DB.IO.Blocks.Gen_Climb_Caches is
    function Hash (A : Valid_Address_Type) return Hash_Type;
    function Rehash (H : Hash_Type) return Hash_Type;
 
-   package HT is new Util.Gen_Hashtables
+   package HT is new Utils.Gen_Hashtables
      (Hash_Type  => Hash_Type,
       Key_Type   => Valid_Address_Type,
       Value_Type => Index_Type,

@@ -1,4 +1,4 @@
-package DB.Util.Bitmaps is
+package DB.Utils.Bitmaps is
    pragma Pure;
 
    subtype Size_Type is Natural;
@@ -39,5 +39,5 @@ private
    pragma Inline (Set);
    pragma Inline (Get);
 
-end DB.Util.Bitmaps;
+end DB.Utils.Bitmaps;
 

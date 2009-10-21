@@ -1,19 +1,19 @@
 with Ada.Text_IO;
 with Interfaces.C;
 
-package body DB.Util.Timers is
+package body DB.Utils.Timers is
 
    function C_clock return Interfaces.C.unsigned_long;
-   pragma Import (C, C_clock, "db_util_timer_clock");
+   pragma Import (C, C_clock, "db_utils_timer_clock");
 
    function C_time return Interfaces.C.unsigned_long;
-   pragma Import (C, C_time, "db_util_timer_time");
+   pragma Import (C, C_time, "db_utils_timer_time");
 
    C_CLOCKS_PER_SEC : constant Interfaces.C.unsigned_long;
-   pragma Import (C, C_CLOCKS_PER_SEC, "db_util_timer_CLOCKS_PER_SEC");
+   pragma Import (C, C_CLOCKS_PER_SEC, "db_utils_timer_CLOCKS_PER_SEC");
 
    C_TIMES_PER_SEC : constant Interfaces.C.unsigned_long;
-   pragma Import (C, C_TIMES_PER_SEC, "db_util_timer_TIMES_PER_SEC");
+   pragma Import (C, C_TIMES_PER_SEC, "db_utils_timer_TIMES_PER_SEC");
 
    CLOCKS_PER_SEC : constant Ticks_Type := Ticks_Type(C_CLOCKS_PER_SEC);
    TIMES_PER_SEC : constant Time_Type := Time_Type(C_TIMES_PER_SEC);
@@ -142,5 +142,5 @@ package body DB.Util.Timers is
       Ada.Text_IO.New_Line;
    end Print;
 
-end DB.Util.Timers;
+end DB.Utils.Timers;
 

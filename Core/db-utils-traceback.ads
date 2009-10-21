@@ -1,6 +1,6 @@
 with Ada.Exceptions;
 
-package DB.Util.Traceback is
+package DB.Utils.Traceback is
    --pragma Preelaborate;
 
    function Traceback_String return String;
@@ -9,5 +9,5 @@ package DB.Util.Traceback is
 
    procedure Print_Traceback (E : Ada.Exceptions.Exception_Occurrence);
 
-end DB.Util.Traceback;
+end DB.Utils.Traceback;
 

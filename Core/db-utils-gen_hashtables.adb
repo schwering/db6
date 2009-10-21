@@ -1,4 +1,4 @@
-package body DB.Util.Gen_Hashtables is
+package body DB.Utils.Gen_Hashtables is
 
    function Visit_Ratio (T : Table_Type) return Float
    is
@@ -25,7 +25,7 @@ package body DB.Util.Gen_Hashtables is
             Value : Value_Type;
          end record;
       Containers : array (1 .. Table.Size) of Container_Type;
-      J : Integer := Containers'First;
+      J          : Integer := Containers'First;
    begin
       for I in Table.Arr'Range loop
          if Table.Arr(I).State = Used then
@@ -225,5 +225,5 @@ package body DB.Util.Gen_Hashtables is
       return Table.Size;
    end Size;
 
-end DB.Util.Gen_Hashtables;
+end DB.Utils.Gen_Hashtables;
 

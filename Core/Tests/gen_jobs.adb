@@ -1,8 +1,8 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 
-with DB.Util.Timers;
-with DB.Util.Traceback;
+with DB.Utils.Timers;
+with DB.Utils.Traceback;
 
 package body Gen_Jobs is
 
@@ -76,12 +76,12 @@ package body Gen_Jobs is
       Reset                     : in Boolean  := True)
    is
       use type Random.Count_Type;
-      Total_Timer : DB.Util.Timers.Timer_Type;
+      Total_Timer : DB.Utils.Timers.Timer_Type;
    begin
       if Reset then
          Random.Reset_String_Generation;
       end if;
-      DB.Util.Timers.Start(Total_Timer);
+      DB.Utils.Timers.Start(Total_Timer);
       declare
          task type Task_Type is
             entry Set_Loop_Count (Count : in Random.Count_Type);
@@ -102,7 +102,7 @@ package body Gen_Jobs is
                   when Error : others =>
                      Put_Line("Exception: "& Exception_Message(Error));
                      Put_Line("Exception: "& Exception_Information(Error));
-                     DB.Util.Traceback.Print_Traceback(Error);
+                     DB.Utils.Traceback.Print_Traceback(Error);
                      exit;
                end;
             end loop;
@@ -124,8 +124,8 @@ package body Gen_Jobs is
             end if;
          end loop;
       end;
-      DB.Util.Timers.Stop(Total_Timer);
-      DB.Util.Timers.Print(To_String(Description) &
+      DB.Utils.Timers.Stop(Total_Timer);
+      DB.Utils.Timers.Print(To_String(Description) &
                            Random.Count_Type'Image(Short_Job_Execution_Count) &
                            Positive'Image(Concurrency_Degree) & " " &
                            Boolean'Image(Reset), Total_Timer);

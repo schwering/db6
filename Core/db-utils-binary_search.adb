@@ -1,4 +1,4 @@
-package body DB.Util.Binary_Search is
+package body DB.Utils.Binary_Search is
 
    procedure Find_Exact
      (Arr   : in  Array_Type;
@@ -98,5 +98,5 @@ package body DB.Util.Binary_Search is
       Found := False;
    end Find_Best_In_Container;
 
-end DB.Util.Binary_Search;
+end DB.Utils.Binary_Search;
 

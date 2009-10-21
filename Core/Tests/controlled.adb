@@ -19,8 +19,8 @@ with DB.Types.Times;
 with DB.Types.Keys;
 with DB.Types.Values;
 
-with DB.Util.Timers;
-with DB.Util.Traceback;
+with DB.Utils.Timers;
+with DB.Utils.Traceback;
 
 
 procedure Controlled
@@ -110,12 +110,12 @@ is
       Count       : in     Count_Type;
       Reset       : in     Boolean := True)
    is
-      Total_Timer : DB.Util.Timers.Timer_Type;
+      Total_Timer : DB.Utils.Timers.Timer_Type;
    begin
       if Reset then
          Reset_String_Generation;
       end if;
-      DB.Util.Timers.Start(Total_Timer);
+      DB.Utils.Timers.Start(Total_Timer);
       for I in 1 .. Count loop
          declare
          begin
@@ -126,12 +126,12 @@ is
             when Error : others =>
                Put_Line("Exception: "& Exception_Message(Error));
                Put_Line("Exception: "& Exception_Information(Error));
-               DB.Util.Traceback.Print_Traceback;
-               DB.Util.Traceback.Print_Traceback(Error);
+               DB.Utils.Traceback.Print_Traceback;
+               DB.Utils.Traceback.Print_Traceback(Error);
          end;
       end loop;
-      DB.Util.Timers.Stop(Total_Timer);
-      DB.Util.Timers.Print(Description & Count_Type'Image(Count), Total_Timer);
+      DB.Utils.Timers.Stop(Total_Timer);
+      DB.Utils.Timers.Print(Description & Count_Type'Image(Count), Total_Timer);
    end Execute;
 
 
@@ -384,9 +384,9 @@ exception
    when Error : others =>
       Put_Line("Exception: "& Exception_Message(Error));
       Put_Line("Exception: "& Exception_Information(Error));
-      DB.Util.Traceback.Print_Traceback;
+      DB.Utils.Traceback.Print_Traceback;
       Put_Line("Traceback");
-      DB.Util.Traceback.Print_Traceback(Error);
+      DB.Utils.Traceback.Print_Traceback(Error);
       Put_Line("Traceback");
 
 end Controlled;

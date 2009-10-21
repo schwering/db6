@@ -1,6 +1,6 @@
-with DB.Util.Bitmaps;
-use DB.Util.Bitmaps;
-with DB.Util.Traceback;
+with DB.Utils.Bitmaps;
+use DB.Utils.Bitmaps;
+with DB.Utils.Traceback;
 
 procedure Bitmap
 is
@@ -40,6 +40,6 @@ begin
 
 exception
    when Error : others =>
-      DB.Util.Traceback.Print_Traceback(Error);
+      DB.Utils.Traceback.Print_Traceback(Error);
 end Bitmap;
 

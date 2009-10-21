@@ -1,4 +1,4 @@
-package DB.Util.Timers is
+package DB.Utils.Timers is
 
    type Ticks_Type is mod 2**64;
    type Time_Type is mod 2**64;
@@ -26,5 +26,5 @@ package DB.Util.Timers is
 
    Timer_Error : exception;
 
-end DB.Util.Timers;
+end DB.Utils.Timers;
 

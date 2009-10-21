@@ -3,7 +3,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with DB.Compression.Levenshtein;
-with DB.Util.Timers;
+with DB.Utils.Timers;
 
 procedure Thread
 is
@@ -42,10 +42,10 @@ is
 
    Count     : constant Natural := 10;
    Work_Size : constant Natural := 10_000;
-   T : DB.Util.Timers.Timer_Type;
+   T : DB.Utils.Timers.Timer_Type;
 begin
-   DB.Util.Timers.Reset(T);
-   DB.Util.Timers.Start(T);
+   DB.Utils.Timers.Reset(T);
+   DB.Utils.Timers.Start(T);
 
    declare
       procedure Do_Not is
@@ -61,17 +61,17 @@ begin
          for I in 1 .. Count loop
             Work(Work_Size);
             declare
-               T : DB.Util.Timers.Timer_Type;
+               T : DB.Utils.Timers.Timer_Type;
             begin
-               DB.Util.Timers.Start(T);
+               DB.Utils.Timers.Start(T);
                select
                   accept Meet (J : in Integer) do
                      Put_Line("Love is in the air!"& 
                         Integer'Image(I) &" ="& Integer'Image(J));
                   end Meet;
                end select;
-               DB.Util.Timers.Stop(T);
-               DB.Util.Timers.Print("Man waited for woman", T);
+               DB.Utils.Timers.Stop(T);
+               DB.Utils.Timers.Print("Man waited for woman", T);
             end;
          end loop;
          Put_Line("Man is done.");
@@ -82,12 +82,12 @@ begin
          for I In 1 .. Count loop
             Work(Work_Size);
             declare
-               T : DB.Util.Timers.Timer_Type;
+               T : DB.Utils.Timers.Timer_Type;
             begin
-               DB.Util.Timers.Start(T);
+               DB.Utils.Timers.Start(T);
                Man.Meet(I);
-               DB.Util.Timers.Stop(T);
-               DB.Util.Timers.Print("Woman waited for man", T);
+               DB.Utils.Timers.Stop(T);
+               DB.Utils.Timers.Print("Woman waited for man", T);
             end;
          end loop;
          Put_Line("Woman is done.");
@@ -113,7 +113,7 @@ begin
       null;
    end;
 
-   DB.Util.Timers.Stop(T);
-   DB.Util.Timers.Print("Finished", T);
+   DB.Utils.Timers.Stop(T);
+   DB.Utils.Timers.Print("Finished", T);
 end Thread;
 

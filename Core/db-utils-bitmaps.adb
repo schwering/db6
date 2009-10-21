@@ -1,4 +1,4 @@
-package body DB.Util.Bitmaps is
+package body DB.Utils.Bitmaps is
 
    function Index_To_Word
      (Index : Index_Type)
@@ -88,5 +88,5 @@ package body DB.Util.Bitmaps is
       return Invalid_Index;
    end Next;
 
-end DB.Util.Bitmaps;
+end DB.Utils.Bitmaps;
 

@@ -11,7 +11,7 @@ with This_Computer;
 with DB.Gen_Heaps;
 with DB.IO.Blocks;
 with DB.IO.Blocks.Direct_IO;
-with DB.Util.Traceback;
+with DB.Utils.Traceback;
 
 procedure Heap
 is
@@ -84,7 +84,7 @@ begin
       Put_Line("Successful");
    exception
       when Error : others =>
-         DB.Util.Traceback.Print_Traceback(Error);
+         DB.Utils.Traceback.Print_Traceback(Error);
          Put_Line("Failed");
    end;
 
@@ -257,6 +257,6 @@ begin
 exception
    when Error : others =>
       Put_Line("Traceback");
-      DB.Util.Traceback.Print_Traceback(Error);
+      DB.Utils.Traceback.Print_Traceback(Error);
 end Heap;
 

@@ -1,5 +1,3 @@
-with Ada.Unchecked_Deallocation;
-
 separate (DB.Gen_BTrees)
 package body Cursors is
 

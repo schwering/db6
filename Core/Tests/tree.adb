@@ -17,8 +17,8 @@ with DB.Types;
 with DB.Types.Keys;
 with DB.Types.Values;
 
-with DB.Util.Timers; use DB.Util.Timers;
-with DB.Util.Traceback;
+with DB.Utils.Timers; use DB.Utils.Timers;
+with DB.Utils.Traceback;
 
 
 procedure Tree
@@ -106,7 +106,7 @@ is
    end;
 
 
-   procedure Print (S : in String; Timer : in out DB.Util.Timers.Timer_Type)
+   procedure Print (S : in String; Timer : in out DB.Utils.Timers.Timer_Type)
    is
       CPU_Duration  : constant Ticks_Type := CPU_Ticks(Timer);
       Real_Duration : constant Time_Type := Real_Time(Timer);
@@ -519,9 +519,9 @@ exception
    when Error : others =>
       Put_Line("Exception: "& Exception_Message(Error));
       Put_Line("Exception: "& Exception_Information(Error));
-      DB.Util.Traceback.Print_Traceback;
+      DB.Utils.Traceback.Print_Traceback;
       Put_Line("Traceback");
-      DB.Util.Traceback.Print_Traceback(Error);
+      DB.Utils.Traceback.Print_Traceback(Error);
       Put_Line("Traceback");
 
 end Tree;

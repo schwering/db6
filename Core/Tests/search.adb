@@ -2,7 +2,7 @@
 
 with Ada.Text_IO;
 
-with DB.Util.Binary_Search;
+with DB.Utils.Binary_Search;
 
 procedure Search
 is
@@ -13,11 +13,11 @@ is
    Integers : Integer_Array_Type(FROM .. TO);
 
    procedure Search_Integer0 is
-      new DB.Util.Binary_Search.Find_Best(Integer,
+      new DB.Utils.Binary_Search.Find_Best(Integer,
                                           Integer,
                                           Integer_Array_Type);
    procedure Search_Integer1 is
-      new DB.Util.Binary_Search.Find_Exact(Integer,
+      new DB.Utils.Binary_Search.Find_Exact(Integer,
                                            Integer,
                                            Integer_Array_Type);
 

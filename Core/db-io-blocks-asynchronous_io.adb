@@ -1,6 +1,6 @@
 with Ada.Unchecked_Deallocation;
 
-with DB.Util.Gen_Hashtables;
+with DB.Utils.Gen_Hashtables;
 
 package body DB.IO.Blocks.Asynchronous_IO is
 
@@ -16,7 +16,7 @@ package body DB.IO.Blocks.Asynchronous_IO is
          end record;
       function Hash (K : Key_Type) return Hash_Type;
       function Rehash (H : Hash_Type) return Hash_Type;
-      package HT is new Util.Gen_Hashtables
+      package HT is new Utils.Gen_Hashtables
         (Hash_Type  => Hash_Type,
          Key_Type   => Key_Type,
          Value_Type => Block_Ref_Type,

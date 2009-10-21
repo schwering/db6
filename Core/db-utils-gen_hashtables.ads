@@ -7,7 +7,7 @@ generic
    with function Hash (K : Key_Type) return Hash_Type;
    with function Rehash (H : Hash_Type) return Hash_Type;
    with function "=" (K, L : Key_Type) return Boolean is <>;
-package DB.Util.Gen_Hashtables is
+package DB.Utils.Gen_Hashtables is
    pragma Pure;
 
    type Table_Type is private;
@@ -81,5 +81,5 @@ private
    pragma Inline (Contains);
    pragma Inline (Size);
 
-end DB.Util.Gen_Hashtables;
+end DB.Utils.Gen_Hashtables;
 

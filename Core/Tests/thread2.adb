@@ -12,7 +12,7 @@ with DB.Gen_BTrees.Gen_Check;
 
 with DB.Types.Values;
 
-with DB.Util.Timers;
+with DB.Utils.Timers;
 
 procedure Thread2
 is
@@ -99,7 +99,7 @@ is
                       Cnt  : BTrees.Count_Type := 0)
    is
       use type BTrees.Count_Type;
-      T : DB.Util.Timers.Timer_Type;
+      T : DB.Utils.Timers.Timer_Type;
       Current_Count : BTrees.Count_Type;
       Count         : BTrees.Count_Type := Cnt;
    begin
@@ -117,8 +117,8 @@ is
       end if;
       Reset_String_Generation;
 
-      DB.Util.Timers.Reset(T);
-      DB.Util.Timers.Start(T);
+      DB.Utils.Timers.Reset(T);
+      DB.Utils.Timers.Start(T);
       declare
          task Man;
          task body Man
@@ -147,8 +147,8 @@ is
       begin
          null;
       end;
-      DB.Util.Timers.Stop(T);
-      DB.Util.Timers.Print("Finished", T);
+      DB.Utils.Timers.Stop(T);
+      DB.Utils.Timers.Print("Finished", T);
    end Perform;
 
 begin

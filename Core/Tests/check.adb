@@ -10,7 +10,7 @@ with To_Strings; use To_Strings;
 with DB.BTrees;
 with DB.Gen_BTrees.Gen_Check;
 
-with DB.Util.Traceback;
+with DB.Utils.Traceback;
 
 
 procedure Check
@@ -39,9 +39,9 @@ exception
    when Error : others =>
       Put_Line("Exception: "& Exception_Message(Error));
       Put_Line("Exception: "& Exception_Information(Error));
-      DB.Util.Traceback.Print_Traceback;
+      DB.Utils.Traceback.Print_Traceback;
       Put_Line("Traceback");
-      DB.Util.Traceback.Print_Traceback(Error);
+      DB.Utils.Traceback.Print_Traceback(Error);
       Put_Line("Traceback");
 
 end Check;
