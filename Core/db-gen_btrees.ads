@@ -45,6 +45,8 @@ generic
 
    Is_Context_Free_Serialization : in Boolean;
 
+   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
+
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
 package DB.Gen_BTrees is
    pragma Preelaborate;
@@ -893,8 +895,8 @@ private
       Item_Type         => Nodes.Node_Type,
       To_Block          => Nodes.To_Block,
       From_Block        => Nodes.From_Block,
-      Item_Storage_Pool => Tree_Ref_Type'Storage_Pool,
-      Node_Storage_Pool => Tree_Ref_Type'Storage_Pool);
+      Item_Storage_Pool => Storage_Pool,
+      Node_Storage_Pool => Storage_Pool);
 
    type RW_Transaction_Type is new Transaction_Type with
       record

@@ -1,3 +1,9 @@
+with System.Pool_Global;
+with System.Storage_Pools;
+
+use System.Pool_Global;
+use System.Storage_Pools;
+
 with DB.Gen_BTrees;
 with DB.Gen_Blob_Trees;
 with DB.IO.Blocks.File_IO;
@@ -386,36 +392,38 @@ private
    package Block_IO renames IO.Blocks.File_IO.IO;
 
    package BTrees is new Gen_BTrees
-     (Key_Type                      => Types.Keys.Key_Type,
-      Key_Context_Type              => Types.Keys.Context_Type,
-      Read_Key                      => Types.Keys.Read,
-      Skip_Key                      => Types.Keys.Skip,
-      Write_Key                     => Types.Keys.Write,
-      "="                           => Types.Keys."=",
-      "<="                          => Types.Keys."<=",
-      Value_Type                    => Types.Values.Value_Type,
-      Value_Context_Type            => Types.Values.Context_Type,
-      Read_Value                    => Types.Values.Read,
-      Skip_Value                    => Types.Values.Skip,
-      Write_Value                   => Types.Values.Write,
+     (Key_Type               => Types.Keys.Key_Type,
+      Key_Context_Type       => Types.Keys.Context_Type,
+      Read_Key               => Types.Keys.Read,
+      Skip_Key               => Types.Keys.Skip,
+      Write_Key              => Types.Keys.Write,
+      "="                    => Types.Keys."=",
+      "<="                   => Types.Keys."<=",
+      Value_Type             => Types.Values.Value_Type,
+      Value_Context_Type     => Types.Values.Context_Type,
+      Read_Value             => Types.Values.Read,
+      Skip_Value             => Types.Values.Skip,
+      Write_Value            => Types.Values.Write,
       Is_Context_Free_Serialization => Types.Keys.Is_Context_Free_Serialization
-                                and Types.Values.Is_Context_Free_Serialization,
-      Block_IO                      => Block_IO);
+                             and Types.Values.Is_Context_Free_Serialization,
+      Storage_Pool           => Root_Storage_Pool'Class(Global_Pool_Object),
+      Block_IO               => Block_IO);
 
    package Blob_Trees is new Gen_Blob_Trees
-     (Key_Type                      => Types.Keys.Key_Type,
-      Key_Context_Type              => Types.Keys.Context_Type,
-      Read_Key                      => Types.Keys.Read,
-      Skip_Key                      => Types.Keys.Skip,
-      Write_Key                     => Types.Keys.Write,
-      "="                           => Types.Keys."=",
-      "<="                          => Types.Keys."<=",
-      Value_Type                    => Types.Values.Value_Type,
-      To_Storage_Array              => Types.Values.To_Storage_Array,
-      From_Storage_Array            => Types.Values.From_Storage_Array,
+     (Key_Type               => Types.Keys.Key_Type,
+      Key_Context_Type       => Types.Keys.Context_Type,
+      Read_Key               => Types.Keys.Read,
+      Skip_Key               => Types.Keys.Skip,
+      Write_Key              => Types.Keys.Write,
+      "="                    => Types.Keys."=",
+      "<="                   => Types.Keys."<=",
+      Value_Type             => Types.Values.Value_Type,
+      To_Storage_Array       => Types.Values.To_Storage_Array,
+      From_Storage_Array     => Types.Values.From_Storage_Array,
       Is_Context_Free_Serialization => Types.Keys.Is_Context_Free_Serialization
-                                and Types.Values.Is_Context_Free_Serialization,
-      Block_IO                      => Block_IO);
+                             and Types.Values.Is_Context_Free_Serialization,
+      Storage_Pool           => Root_Storage_Pool'Class(Global_Pool_Object),
+      Block_IO               => Block_IO);
 
 
    type Map_Type (Short : Boolean) is limited

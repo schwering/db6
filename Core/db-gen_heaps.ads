@@ -1,5 +1,5 @@
-with System.Pool_Global;
 with System.Storage_Elements;
+with System.Storage_Pools;
 
 with DB.Gen_BTrees;
 with DB.IO.Blocks;
@@ -20,6 +20,9 @@ generic
    with function Free_Index_ID
           (ID : String)
            return String;
+
+   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
+
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
 package DB.Gen_Heaps is
    --pragma Preelaborate;
@@ -222,6 +225,7 @@ private
       Read_Value                    => Info_BTree_Types.Read_Value,
       Skip_Value                    => Info_BTree_Types.Skip_Value,
       Is_Context_Free_Serialization => True,
+      Storage_Pool                  => Storage_Pool,
       Block_IO                      => Block_IO);
 
    package Free_BTree_Types is
@@ -290,6 +294,7 @@ private
       Read_Value                    => Free_BTree_Types.Read_Value,
       Skip_Value                    => Free_BTree_Types.Skip_Value,
       Is_Context_Free_Serialization => True,
+      Storage_Pool                  => Storage_Pool,
       Block_IO                      => Block_IO);
 
 
@@ -322,8 +327,8 @@ private
       Item_Type         => IO.Blocks.Block_Type,
       To_Block          => Block_Identity,
       From_Block        => Block_Identity,
-      Item_Storage_Pool => Heap_Ref_Type'Storage_Pool,
-      Node_Storage_Pool => Heap_Ref_Type'Storage_Pool);
+      Item_Storage_Pool => Storage_Pool,
+      Node_Storage_Pool => Storage_Pool);
    subtype Block_Constant_Ref is IO_Buffers.Item_Constant_Ref_Type;
 
    type Transaction_Type is abstract tagged limited

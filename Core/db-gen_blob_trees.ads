@@ -1,9 +1,10 @@
+with System.Storage_Elements;
+with System.Storage_Pools;
+
 with DB.Gen_BTrees;
 with DB.Gen_Heaps;
 with DB.IO.Blocks;
 with DB.IO.Blocks.Gen_IO;
-
-with System.Storage_Elements;
 
 generic
    type Key_Type is private;
@@ -35,6 +36,8 @@ generic
            return Value_Type;
 
    Is_Context_Free_Serialization : in Boolean;
+
+   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
 package DB.Gen_Blob_Trees is
@@ -439,6 +442,7 @@ private
       Skip_Value                    => BTree_Utils.Skip_Value,
       Write_Value                   => BTree_Utils.Write_Value,
       Is_Context_Free_Serialization => Is_Context_Free_Serialization,
+      Storage_Pool                  => Storage_Pool,
       Block_IO                      => Block_IO);
 
    package Heap_Utils is
@@ -457,6 +461,7 @@ private
       From_Storage_Array => From_Storage_Array,
       Info_Index_ID      => Heap_Utils.Info_Index_ID,
       Free_Index_ID      => Heap_Utils.Free_Index_ID,
+      Storage_Pool       => Storage_Pool,
       Block_IO           => Block_IO);
 
    type Tree_Type is limited

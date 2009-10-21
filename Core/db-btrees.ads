@@ -1,3 +1,9 @@
+with System.Pool_Global;
+with System.Storage_Pools;
+
+use System.Pool_Global;
+use System.Storage_Pools;
+
 with DB.Gen_BTrees;
 with DB.Types.Keys;
 with DB.Types.Values;
@@ -17,7 +23,8 @@ package DB.BTrees is new Gen_BTrees
    Read_Value                    => Types.Values.Read,
    Skip_Value                    => Types.Values.Skip,
    Is_Context_Free_Serialization => Types.Keys.Is_Context_Free_Serialization
-                                 and Types.Values.Is_Context_Free_Serialization,
+                                and Types.Values.Is_Context_Free_Serialization,
+   Storage_Pool                  => Root_Storage_Pool'Class(Global_Pool_Object),
    Block_IO                      => IO.Blocks.File_IO.IO);
 --pragma Preelaborate (DB.BTrees);
 

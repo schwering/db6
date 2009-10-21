@@ -2,6 +2,8 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
+with System.Pool_Global; use System.Pool_Global;
+with System.Storage_Pools; use System.Storage_Pools;
 
 with Random; use Random;
 with This_Computer;
@@ -61,19 +63,20 @@ is
    end;
 
    package BTrees is new DB.Gen_Blob_Trees
-     (Key_Type                      => Key_Type,
-      Key_Context_Type              => DB.Types.Keys.Context_Type,
-      Write_Key                     => DB.Types.Keys.Write,
-      Read_Key                      => DB.Types.Keys.Read,
-      Skip_Key                      => DB.Types.Keys.Skip,
-      "="                           => DB.Types.Keys."=",
-      "<="                          => DB.Types.Keys."<=",
-      Value_Type                    => Value_Type,
-      To_Storage_Array              => To_Storage_Array,
-      From_Storage_Array            => From_Storage_Array,
+     (Key_Type           => Key_Type,
+      Key_Context_Type   => DB.Types.Keys.Context_Type,
+      Write_Key          => DB.Types.Keys.Write,
+      Read_Key           => DB.Types.Keys.Read,
+      Skip_Key           => DB.Types.Keys.Skip,
+      "="                => DB.Types.Keys."=",
+      "<="               => DB.Types.Keys."<=",
+      Value_Type         => Value_Type,
+      To_Storage_Array   => To_Storage_Array,
+      From_Storage_Array => From_Storage_Array,
       Is_Context_Free_Serialization =>
-                     DB.Types.Keys.Is_Context_Free_Serialization,
-      Block_IO                      => DB.IO.Blocks.Direct_IO.IO);
+                            DB.Types.Keys.Is_Context_Free_Serialization,
+      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
+      Block_IO           => DB.IO.Blocks.Direct_IO.IO);
 
    INSERT_COUNT   : constant        := 10_000;
    FILE_NAME      : constant String := ".tmp/blog";--This_Computer.BTree_File;

@@ -2,7 +2,9 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 with System;
+with System.Pool_Global; use System.Pool_Global;
 with System.Storage_Elements;
+with System.Storage_Pools; use System.Storage_Pools;
 
 with This_Computer;
 
@@ -64,6 +66,7 @@ is
       From_Storage_Array => From_Storage_Array,
       Info_Index_ID      => Info_Index_ID,
       Free_Index_ID      => Free_Index_ID,
+      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
       Block_IO           => Block_IO);
 
    type Address_Array_Type is array (Size_Type range <>) of
