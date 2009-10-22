@@ -86,10 +86,10 @@ package body Gen_Args is
                exit;
             end if;
          end loop;
+         Concurrency_Degree := 10;
          if To = 0 then
             Short_Job_Execution_Count := Random.Count_Type(To_Number
                                              (S(From .. S'Last)));
-            Concurrency_Degree        := 1;
             Reset                     := True;
          else
             Short_Job_Execution_Count := Random.Count_Type(To_Number
@@ -103,7 +103,7 @@ package body Gen_Args is
                   --exit;
                --end if;
             --end loop;
-            Concurrency_Degree := 1; --Positive(To_Number(S(From .. To - 1)));
+            --Concurrency_Degree := Positive(To_Number(S(From .. To - 1)));
 
             From := To + 1;
             if S(From .. S'Last) = "Reset" then
