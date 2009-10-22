@@ -1,10 +1,10 @@
 with DB.IO.Low_Level;
 with DB.IO.Blocks.Gen_IO;
 with DB.IO.Blocks.Gen_Climb_Caches;
-with DB.Locks.Mutexes;
+with DB.IO.Blocks.Gen_System_Locking_IO;
 with DB.Locks.Semaphores;
 
-package DB.IO.Blocks.Device_IO is
+package DB.IO.Blocks.File_IO is
 
    type Address_Type is new Natural;
    subtype Valid_Address_Type is Address_Type range 1 .. Address_Type'Last;
@@ -13,11 +13,8 @@ package DB.IO.Blocks.Device_IO is
 
    type File_Type is limited
       record
-         FD                      : Low_Level.File_Descriptor_Type;
-         Mutex                   : Locks.Mutexes.Mutex_Type;
-         Semaphore               : Locks.Semaphores.Semaphore_Type;
-         Max_Address_Initialized : Boolean      := False;
-         Max_Address             : Address_Type := Invalid_Address;
+         FD        : Low_Level.File_Descriptor_Type;
+         Semaphore : Locks.Semaphores.Semaphore_Type;
       end record;
 
 
@@ -31,7 +28,8 @@ package DB.IO.Blocks.Device_IO is
 
    procedure Set_Block_Count
      (File    : in out File_Type;
-      Address : in     Address_Type);
+      Address : in     Address_Type)
+   is null;
 
    procedure Close
      (File : in out File_Type);
@@ -71,7 +69,7 @@ package DB.IO.Blocks.Device_IO is
 
    procedure Seek_New
      (File    : in out File_Type;
-      Address :    out Address_Type);
+      Address :    out Valid_Address_Type);
 
    procedure Acquire_Ticket
      (File   : in out File_Type;
@@ -97,13 +95,17 @@ package DB.IO.Blocks.Device_IO is
      (File   : in out File_Type;
       Ticket : in     Locks.Semaphores.Ticket_Type);
 
+   function FD
+     (File : File_Type)
+      return Low_Level.File_Descriptor_Type;
+
 
    package IO is new Gen_IO
      (P_File_Type                  => File_Type,
       P_Ticket_Type                => Locks.Semaphores.Ticket_Type,
       P_Address_Type               => Address_Type,
       P_Valid_Address_Type         => Valid_Address_Type,
-      P_Needs_Explicit_Block_Count => True,
+      P_Needs_Explicit_Block_Count => False,
       P_Invalid_Address            => Invalid_Address,
       P_Create                     => Create,
       P_Open                       => Open,
@@ -130,6 +132,9 @@ package DB.IO.Blocks.Device_IO is
    package Climb_Cache is new Gen_Climb_Caches(IO);
    package Climb_Cached_IO renames Climb_Cache.IO;
 
+   package System_Locking is new Gen_System_Locking_IO(IO, FD);
+   package System_Locking_IO renames System_Locking.IO;
+
 private
    pragma Inline (Succ);
    pragma Inline (Image);
@@ -147,5 +152,5 @@ private
    pragma Inline (Certify_Lock);
    pragma Inline (Unlock);
 
-end DB.IO.Blocks.Device_IO;
+end DB.IO.Blocks.File_IO;
 

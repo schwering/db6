@@ -1,65 +1,67 @@
-with System.Pool_Global;
 with System.Storage_Pools;
 
-use System.Pool_Global;
-use System.Storage_Pools;
-
+with DB.Compression.Deflate;
 with DB.IO.Blocks.Gen_IO;
 with DB.Locks.Mutexes;
-with DB.Locks.Semaphores;
-with DB.Utils;
 with DB.Utils.Gen_Hashtables;
+with DB.Utils.Bounded_Pools;
 
 generic
    with package P_IO is new Gen_IO (<>);
-package DB.IO.Blocks.Gen_Climb_Caches is
+package DB.IO.Blocks.Gen_LRU_Caches is
 
    subtype Address_Type is P_IO.Address_Type;
    subtype Valid_Address_Type is P_IO.Valid_Address_Type;
    subtype Ticket_Type is P_IO.Ticket_Type;
 
-   Mega_Bytes  : constant := 2**(10 + 10) / Block_Size;
-   Buffer_Size : constant := 1 * Mega_Bytes;
-
    Invalid_Address : constant Address_Type := P_IO.Invalid_Address;
    Needs_Explicit_Block_Count : constant Boolean
       := P_IO.Needs_Explicit_Block_Count;
 
-   type Block_Ref_Type is access Block_Type;
-   pragma Controlled (Block_Ref_Type);
+   Mega_Byte       : constant := 2**20;
+   Pool_Size       : constant := 512 * Mega_Byte;
+   Pool            : Utils.Bounded_Pools.Bounded_No_Reclaim_Pool(Pool_Size);
+   Hash_Table_Size : constant := Pool_Size / (Block_Size / 20);
 
-   subtype Length_Type is Natural range 0 .. Buffer_Size;
-   subtype Index_Type is Length_Type range 1 .. Length_Type'Last;
+   subtype Buffer_Type is Compression.Deflate.Buffer_Type;
+   subtype Buffer_Size_Type is Compression.Deflate.Size_Type;
 
-   function Hash (A : Valid_Address_Type) return Utils.Hash_Type;
-   function Rehash (H : Utils.Hash_Type) return Utils.Hash_Type;
+   subtype Hash_Type is Utils.Hash_Type;
+   function Hash (Address : Valid_Address_Type) return Hash_Type;
+   pragma Inline (Hash);
+   function Rehash (Hash : Hash_Type) return Hash_Type;
+   pragma Inline (Rehash);
 
-   package HT is new Utils.Gen_Hashtables
+   type Entry_Type;
+   type Entry_Ref_Type is access Entry_Type;
+   for Entry_Ref_Type'Storage_Pool use Pool;
+   type Entry_Type (Buffer_Size : Buffer_Size_Type) is
+      record
+         Address : Valid_Address_Type;
+         Block   : Buffer_Type(1 .. Buffer_Size);
+         Dirty   : Boolean        := False;
+         Next    : Entry_Ref_Type := null;
+         Prev    : Entry_Ref_Type := null;
+      end record;
+
+   package Hashtables is new Utils.Gen_Hashtables
      (Key_Type     => Valid_Address_Type,
-      Value_Type   => Index_Type,
+      Value_Type   => Entry_Ref_Type,
       Hash         => Hash,
       Rehash       => Rehash,
       "="          => P_IO."=",
-      Storage_Pool => Root_Storage_Pool'Class(Global_Pool_Object));
-   type Table_Ref_Type is access HT.Table_Type;
-
-   type Buffer_Element_Type is
-      record
-         Address : Valid_Address_Type;
-         Block   : Block_Ref_Type;
-         Dirty   : Boolean := False;
-      end record;
-   type Buffer_Type is array (Index_Type) of Buffer_Element_Type;
-
+      Storage_Pool => System.Storage_Pools.Root_Storage_Pool'Class(Pool));
 
    type File_Type is limited
       record
          File         : P_IO.File_Type;
          Mutex        : Locks.Mutexes.Mutex_Type;
-         Buffer       : Buffer_Type;
-         Hash_Table   : Table_Ref_Type     := null;
-         Length       : Length_Type        := 0;
-         Next_Address : Valid_Address_Type := P_IO.First;
+         Table        : Hashtables.Table_Ref_Type;
+         Head         : Entry_Ref_Type;
+         Tail         : Entry_Ref_Type;
+         Cur_Address  : Valid_Address_Type := P_IO.First;
+         Last_Address : Valid_Address_Type := P_IO.First;
+         Last_Written : Boolean            := False;
       end record;
 
    procedure Create
@@ -184,11 +186,5 @@ package DB.IO.Blocks.Gen_Climb_Caches is
       P_Certify_Lock               => Certify_Lock,
       P_Unlock                     => Unlock);
 
-private
-   pragma Inline (Hash);
-   pragma Inline (Rehash);
-   pragma Inline (Read);
-   pragma Inline (Write);
-
-end DB.IO.Blocks.Gen_Climb_Caches;
+end DB.IO.Blocks.Gen_LRU_Caches;
 

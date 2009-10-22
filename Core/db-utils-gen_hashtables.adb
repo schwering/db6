@@ -16,6 +16,14 @@ package body DB.Utils.Gen_Hashtables is
    end Size_Ratio;
 
 
+   function To_Index (T : Table_Type; H : Hash_Type) return Hash_Type
+   is
+      pragma Inline (To_Index);
+   begin
+      return (H mod (T.Arr'Last - T.Arr'First + 1)) + T.Arr'First;
+   end To_Index;
+
+
    procedure Reorganize
      (Table : in out Table_Type)
    is
@@ -42,12 +50,53 @@ package body DB.Utils.Gen_Hashtables is
    end Reorganize;
 
 
+   function To_Prime
+     (Size : Size_Type)
+      return Hash_Type
+   is
+      Primes : constant array (Positive range <>) of Hash_Type :=
+        (53,         97,         193,       389,       769,
+         1543,       3079,       6151,      12289,     24593,
+         49157,      98317,      196613,    393241,    786433,
+         1572869,    3145739,    6291469,   12582917,  25165843,
+         50331653,   100663319,  201326611, 402653189, 805306457,
+         1610612741, 3221225473, 4294967291);
+   begin
+      for I in Primes'Range loop
+         if Primes(I) >= Hash_Type(Size) then
+            return Primes(I);
+         end if;
+      end loop;
+      raise Constraint_Error;
+   end To_Prime;
+
+
+   function New_Table
+     (Size : Size_Type)
+      return Table_Type
+   is
+      Capacity : constant Hash_Type := To_Prime(Size) - 1;
+   begin
+      return Table_Type'(Capacity => Capacity, others => <>);
+   end New_Table;
+
+
+   procedure Allocate_Table
+     (Size  : in     Size_Type;
+      Table :    out Table_Ref_Type)
+   is
+      Capacity : constant Hash_Type := To_Prime(Size) - 1;
+   begin
+      Table := new Table_Type(Capacity);
+   end Allocate_Table;
+
+
    procedure Put
      (Table : in out Table_Type;
       Key   : in     Key_Type;
       Value : in     Value_Type)
    is
-      First_H     : constant Hash_Type := Hash(Key);
+      First_H     : constant Hash_Type := To_Index(Table, Hash(Key));
       H           : Hash_Type := First_H;
       Found_Match : Boolean;
       Found_Free  : Boolean;
@@ -58,7 +107,7 @@ package body DB.Utils.Gen_Hashtables is
          Found_Free  := Table.Arr(H).State = Free;
          exit when Found_Match;
          exit when Found_Free;
-         H := Rehash(H);
+         H := To_Index(Table, Rehash(H));
          exit when H = First_H;
       end loop;
       if Found_Match then
@@ -74,16 +123,16 @@ package body DB.Utils.Gen_Hashtables is
             loop
                Found_Visited := Table.Arr(H).State = Visited;
                exit when Found_Visited;
-               H := Rehash(H);
+               H := To_Index(Table, Rehash(H));
                exit when H = First_H;
             end loop;
             if Found_Visited then
                Table.Arr(H) := (Used, Key, Value);
                Table.Size   := Table.Size + 1;
                Table.Visits := Table.Visits - 1;
-               if Visit_Ratio(Table) > Visit_Threshold
-               and Visit_Ratio(Table) + Size_Ratio(Table)
-                     > Visit_Threshold + Size_Threshold then
+               if Visit_Ratio(Table) > Visit_Threshold and
+                  Visit_Ratio(Table) + Size_Ratio(Table) >
+                  Visit_Threshold + Size_Threshold then
                   Reorganize(Table);
                end if;
             else
@@ -98,7 +147,7 @@ package body DB.Utils.Gen_Hashtables is
      (Table : in out Table_Type;
       Key   : in     Key_Type)
    is
-      First_H     : constant Hash_Type := Hash(Key);
+      First_H     : constant Hash_Type := To_Index(Table, Hash(Key));
       H           : Hash_Type := First_H;
       Found_Match : Boolean;
       Found_Free  : Boolean;
@@ -109,7 +158,7 @@ package body DB.Utils.Gen_Hashtables is
          Found_Free  := Table.Arr(H).State = Free;
          exit when Found_Match;
          exit when Found_Free;
-         H := Rehash(H);
+         H := To_Index(Table, Rehash(H));
          exit when H = First_H;
       end loop;
       if Found_Match then
@@ -126,7 +175,7 @@ package body DB.Utils.Gen_Hashtables is
       Value : out Value_Type;
       Found : out Boolean)
    is
-      First_H     : constant Hash_Type := Hash(Key);
+      First_H     : constant Hash_Type := To_Index(Table, Hash(Key));
       H           : Hash_Type := First_H;
       Found_Match : Boolean;
       Found_Free  : Boolean;
@@ -137,7 +186,7 @@ package body DB.Utils.Gen_Hashtables is
          Found_Free  := Table.Arr(H).State = Free;
          exit when Found_Match;
          exit when Found_Free;
-         H := Rehash(H);
+         H := To_Index(Table, Rehash(H));
          exit when H = First_H;
       end loop;
       if Found_Match then
@@ -165,7 +214,7 @@ package body DB.Utils.Gen_Hashtables is
       Key   : Key_Type)
       return Boolean
    is
-      First_H     : constant Hash_Type := Hash(Key);
+      First_H     : constant Hash_Type := To_Index(Table, Hash(Key));
       H           : Hash_Type := First_H;
       Found_Match : Boolean;
       Found_Free  : Boolean;
@@ -176,7 +225,7 @@ package body DB.Utils.Gen_Hashtables is
          Found_Free  := Table.Arr(H).State = Free;
          exit when Found_Match;
          exit when Found_Free;
-         H := Rehash(H);
+         H := To_Index(Table, Rehash(H));
          exit when H = First_H;
       end loop;
       return Found_Match;
@@ -220,7 +269,7 @@ package body DB.Utils.Gen_Hashtables is
 
    function Size
      (Table : Table_Type)
-      return Natural
+      return Size_Type
    is begin
       return Table.Size;
    end Size;

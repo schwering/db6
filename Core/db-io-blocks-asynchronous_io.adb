@@ -1,5 +1,12 @@
 with Ada.Unchecked_Deallocation;
 
+with System.Pool_Global;
+with System.Storage_Pools;
+
+use System.Pool_Global;
+use System.Storage_Pools;
+
+with DB.Utils;
 with DB.Utils.Gen_Hashtables;
 
 package body DB.IO.Blocks.Asynchronous_IO is
@@ -8,30 +15,31 @@ package body DB.IO.Blocks.Asynchronous_IO is
    is
       Write_Buffer_Size : constant := 1;
       type Block_Ref_Type is access Block_Type;
-      type Hash_Type is mod 2 * Write_Buffer_Size;
       type Key_Type is
          record
             FD      : Low_Level.File_Descriptor_Type;
             Address : Valid_Address_Type;
          end record;
-      function Hash (K : Key_Type) return Hash_Type;
-      function Rehash (H : Hash_Type) return Hash_Type;
+      function Hash (K : Key_Type) return Utils.Hash_Type;
+      function Rehash (H : Utils.Hash_Type) return Utils.Hash_Type;
       package HT is new Utils.Gen_Hashtables
-        (Hash_Type  => Hash_Type,
-         Key_Type   => Key_Type,
-         Value_Type => Block_Ref_Type,
-         Hash       => Hash,
-         Rehash     => Rehash);
+        (Key_Type     => Key_Type,
+         Value_Type   => Block_Ref_Type,
+         Hash         => Hash,
+         Rehash       => Rehash,
+         Storage_Pool => Root_Storage_Pool'Class(Global_Pool_Object));
 
-      function Hash (K : Key_Type) return Hash_Type
+      function Hash (K : Key_Type) return Utils.Hash_Type
       is
-         I : constant Integer := Integer(K.FD) * Integer(K.Address);
+         use type Utils.Hash_Type;
       begin
-         return Hash_Type(I mod Integer(Hash_Type'Last));
+         return Utils.Hash_Type(K.FD) * Utils.Hash_Type(K.Address);
       end Hash;
 
-      function Rehash (H : Hash_Type) return Hash_Type
-      is begin
+      function Rehash (H : Utils.Hash_Type) return Utils.Hash_Type
+      is
+         use type Utils.Hash_Type;
+      begin
          return H + 1;
       end Rehash;
 
@@ -53,7 +61,7 @@ package body DB.IO.Blocks.Asynchronous_IO is
       procedure Free is new Ada.Unchecked_Deallocation
         (Block_Type, Block_Ref_Type);
 
-      Table : HT.Table_Type;
+      Table : HT.Table_Type := HT.New_Table(Write_Buffer_Size);
    begin
       loop
          select

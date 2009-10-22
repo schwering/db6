@@ -1,4 +1,4 @@
-BIN=bin/debug/./ttree
+BIN=bin/debug/./lruttree
 FILE=.tmp/btree_debug
 C1=5k
 # 1. Simple insertions and check

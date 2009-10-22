@@ -1,4 +1,4 @@
-BIN=bin/release/./ttree
+BIN=bin/release/./lruttree
 FILE=.tmp/btree
 C1=5k
 # 1. Simple insertions and check

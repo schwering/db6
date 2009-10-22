@@ -8,7 +8,7 @@ package body DB.Utils.Bounded_Pools is
    is
       use type SSE.Storage_Count;
    begin
-      if Pool.Current_Storage_Size+Storage_Size > Pool.Max_Storage_Size then
+      if Pool.Current_Storage_Size + Storage_Size > Pool.Max_Storage_Size then
          raise Storage_Error;
       end if;
       SPG.Unbounded_No_Reclaim_Pool(Pool).Allocate(Address, Storage_Size,

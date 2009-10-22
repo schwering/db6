@@ -1,40 +1,39 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
 with Ada.Text_IO; use Ada.Text_IO;
+with System.Pool_Global; use System.Pool_Global;
+with System.Storage_Pools; use System.Storage_Pools;
+
+with DB.Utils;
 with DB.Utils.Gen_HashTables;
 
 procedure Hash
 is
-   Size : constant := 100_000;
-   subtype Hash_Type is Integer range 1 .. Size*3/2;
+   use DB.Utils;
+   Size : constant := 10_000;
    subtype Key_Type is Integer;
    subtype Value_Type is Integer;
 
    function Hash (K : Key_Type) return Hash_Type
    is begin
-      -- return (Hash_Type'Last - Hash_Type'First) / 2;
-      return ((3 * K) mod (Hash_Type'Last - Hash_Type'First + 1)) + 1;
+      return Hash_Type(3 * K + 1);
    end Hash;
 
    function Rehash (H : Hash_Type) return Hash_Type
    is begin
-      if H = Hash_Type'Last then
-         return Hash_Type'First;
-      else
-         return H + 1;
-      end if;
+      return H + 1;
    end Rehash;
 
    package HT is new DB.Utils.Gen_Hashtables
-     (Hash_Type  => Hash_Type,
-      Key_Type   => Key_Type,
-      Value_Type => Value_Type,
-      Hash       => Hash,
-      Rehash     => Rehash);
+     (Key_Type     => Key_Type,
+      Value_Type   => Value_Type,
+      Hash         => Hash,
+      Rehash       => Rehash,
+      Storage_Pool => Root_Storage_Pool'Class(Global_Pool_Object));
 
    subtype Test_Range is Integer range 1 .. Size*3/2;
 
-   T : HT.Table_Type;
+   T : HT.Table_Type := HT.New_Table(Size * 3 / 2);
 begin
    for I in Test_Range loop
       if HT.Contains(T, I) then

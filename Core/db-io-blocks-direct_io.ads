@@ -5,7 +5,6 @@ with DB.IO.Blocks.Gen_System_Locking_IO;
 with DB.Locks.Semaphores;
 
 package DB.IO.Blocks.Direct_IO is
-   pragma Preelaborate;
 
    type Address_Type is new Natural;
    subtype Valid_Address_Type is Address_Type range 1 .. Address_Type'Last;

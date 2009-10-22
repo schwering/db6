@@ -1,16 +1,33 @@
+with System.Storage_Pools;
+
 generic
    Visit_Threshold : in Float := 0.15;
    Size_Threshold  : in Float := 0.65;
-   type Hash_Type is (<>);
+
    type Key_Type is private;
    type Value_Type is private;
+
    with function Hash (K : Key_Type) return Hash_Type;
    with function Rehash (H : Hash_Type) return Hash_Type;
+   -- Note: Currently, the hashtable is implemented that badly that Rehash must
+   -- simply add 1, otherwise you might end up in an infinite loop somewhere.
    with function "=" (K, L : Key_Type) return Boolean is <>;
-package DB.Utils.Gen_Hashtables is
-   pragma Pure;
 
-   type Table_Type is private;
+   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
+package DB.Utils.Gen_Hashtables is
+   pragma Preelaborate;
+
+   type Table_Type (<>) is private;
+   type Table_Ref_Type is access Table_Type;
+   for Table_Ref_Type'Storage_Pool use Storage_Pool;
+
+   function New_Table
+     (Size : Size_Type)
+      return Table_Type;
+
+   procedure Allocate_Table
+     (Size  : in     Size_Type;
+      Table :    out Table_Ref_Type);
 
    procedure Put
      (Table : in out Table_Type;
@@ -50,7 +67,7 @@ package DB.Utils.Gen_Hashtables is
 
    function Size
      (Table : Table_Type)
-      return Natural;
+      return Size_Type;
 
    Hash_Table_Error : exception;
 
@@ -66,19 +83,15 @@ private
                null;
          end case;
       end record;
-   type Array_Type is array (Hash_Type) of Element_Type;
-   type Table_Type is
+   type Array_Type is array (Hash_Type range <>) of Element_Type;
+   type Table_Type (Capacity : Hash_Type) is
       record
-         Arr    : Array_Type := (others => Element_Type'(State => Free));
-         Size   : Natural    := 0;
-         Visits : Natural    := 0;
+         Arr    : Array_Type(0 .. Capacity)
+                := (others => Element_Type'(State => Free));
+         Size   : Size_Type := 0;
+         Visits : Size_Type := 0;
       end record;
 
-   pragma Inline (Put);
-   pragma Inline (Delete);
-   pragma Inline (Get);
-   pragma Inline (Pop);
-   pragma Inline (Contains);
    pragma Inline (Size);
 
 end DB.Utils.Gen_Hashtables;

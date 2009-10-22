@@ -9,6 +9,7 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
       File : out File_Type)
    is begin
       P_IO.Create(ID, File.File);
+      File.Hash_Table := new HT.Table_Type'(HT.New_Table(Buffer_Size));
    end Create;
 
 
@@ -17,14 +18,17 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
       File : out File_Type)
    is begin
       P_IO.Open(ID, File.File);
+      File.Hash_Table := new HT.Table_Type'(HT.New_Table(Buffer_Size));
    end Open;
 
 
    procedure Close
      (File : in out File_Type)
    is
-      procedure Free is
-         new Ada.Unchecked_Deallocation(Block_Type, Block_Ref_Type);
+      procedure Free is new Ada.Unchecked_Deallocation(Block_Type,
+                                                       Block_Ref_Type);
+      procedure Free is new Ada.Unchecked_Deallocation(HT.Table_Type,
+                                                       Table_Ref_Type);
    begin
       for I in 1 .. File.Length loop
          if File.Buffer(I).Dirty then
@@ -33,6 +37,7 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
          end if;
          Free(File.Buffer(I).Block);
       end loop;
+      Free(File.Hash_Table);
       P_IO.Close(File.File);
    end Close;
 
@@ -52,12 +57,12 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
 
    procedure Check (File : in out File_Type)
    is begin
-      if File.Length /= HT.Size(File.Hash_Table) then
+      if File.Length /= HT.Size(File.Hash_Table.all) then
          --Put_Line("IO_Error IO_Error IO_Error IO_Error IO_Error ");
          raise IO_Error;
       end if;
       for I in 1 .. File.Length loop
-         if not HT.Contains(File.Hash_Table, File.Buffer(I).Address) then
+         if not HT.Contains(File.Hash_Table.all, File.Buffer(I).Address) then
             --Put_Line("IO_Error IO_Error IO_Error IO_Error IO_Error ");
             --Put_Line("A ="& Image(File.Buffer(I).Address));
             raise IO_Error;
@@ -66,7 +71,7 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
             Index : Index_Type;
             Found : Boolean;
          begin
-            HT.Get(File.Hash_Table, File.Buffer(I).Address, Index, Found);
+            HT.Get(File.Hash_Table.all, File.Buffer(I).Address, Index, Found);
             if not Found then
                --Put_Line("IO_Error IO_Error IO_Error IO_Error IO_Error ");
                raise IO_Error;
@@ -87,13 +92,14 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
 
    pragma Unreferenced (Check);
 
-   function Hash1 (A : Valid_Address_Type) return Hash_Type
+   function Hash1 (A : Valid_Address_Type) return Utils.Hash_Type
    is
+      use type Utils.Hash_Type;
       S : constant String := Image(A);
-      H : Hash_Type       := Hash_Type'First;
+      H : Utils.Hash_Type := Utils.Hash_Type'First;
    begin
       for C in S'Range loop
-         for I in 0 .. Hash_Type'Size / 8 - 1 loop
+         for I in 0 .. Utils.Hash_Type'Size / 8 - 1 loop
             H := H xor (Character'Pos(S(C)) * 2**(I * 8));
          end loop;
       end loop;
@@ -101,11 +107,13 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
    end Hash1;
 
 
-   function Hash2 (A : Valid_Address_Type) return Hash_Type
+   function Hash2 (A : Valid_Address_Type) return Utils.Hash_Type
    is
+      use type Utils.Hash_Type;
       AA : constant Valid_Address_Type := A;
       for AA'Alignment use 4;
-      type Hashs_Type is array (1 .. AA'Size / Hash_Type'Size) of Hash_Type;
+      type Hashs_Type is
+         array (1 .. AA'Size / Utils.Hash_Type'Size) of Utils.Hash_Type;
       pragma Pack (Hashs_Type);
       type Pad_Type is array (1 .. AA'Size - Hashs_Type'Size) of Boolean;
       pragma Pack (Pad_Type);
@@ -124,7 +132,7 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
                                          Target => Chunk_Type);
          pragma Warnings (On);
          Chunk : constant Chunk_Type := Convert(AA);
-         Hash  : Hash_Type           := Hash_Type'First;
+         Hash  : Utils.Hash_Type     := Utils.Hash_Type'First;
       begin
          for I in Chunk.Hashs'Range loop
             if not Chunk.Hashs(I)'Valid then
@@ -139,32 +147,26 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
    end Hash2;
 
 
-   function Hash3 (A : Valid_Address_Type) return Hash_Type
+   function Hash3 (A : Valid_Address_Type) return Utils.Hash_Type
    is
       pragma Warnings (Off);
       function Convert is
          new Ada.Unchecked_Conversion(Source => Valid_Address_Type,
-                                      Target => Integer);
-      pragma Warnings (On);
-      I : Integer := Convert(A);
+                                      Target => Utils.Hash_Type);
    begin
-      if I < 0 then
-         I := -1 * I;
-      end if;
-      if I > Integer(Hash_Type'Last) then
-         I := I mod Integer(Hash_Type'Last);
-      end if;
-      return Hash_Type(I);
+      return COnvert(A);
    end Hash3;
 
 
-   function Hash (A : Valid_Address_Type) return Hash_Type
+   function Hash (A : Valid_Address_Type) return Utils.Hash_Type
    renames Hash1;
    pragma Unreferenced (Hash2);
    pragma Unreferenced (Hash3);
 
-   function Rehash (H : Hash_Type) return Hash_Type
-   is begin
+   function Rehash (H : Utils.Hash_Type) return Utils.Hash_Type
+   is
+      use type Utils.Hash_Type;
+   begin
       return H + 1;
    end Rehash;
 
@@ -179,13 +181,13 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
          declare
             Temp : constant Buffer_Element_Type := File.Buffer(Index);
          begin
-            HT.Put(File.Hash_Table, File.Buffer(Index-1).Address, Index);
-            HT.Put(File.Hash_Table, File.Buffer(Index).Address, Index-1);
+            HT.Put(File.Hash_Table.all, File.Buffer(Index-1).Address, Index);
+            HT.Put(File.Hash_Table.all, File.Buffer(Index).Address, Index-1);
             File.Buffer(Index)   := File.Buffer(Index-1);
             File.Buffer(Index-1) := Temp;
          end;
       else
-         HT.Put(File.Hash_Table, File.Buffer(Index).Address, Index);
+         HT.Put(File.Hash_Table.all, File.Buffer(Index).Address, Index);
       end if;
    end Climb;
 
@@ -199,7 +201,7 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
       Found : Boolean;
    begin
       Locks.Mutexes.Lock(File.Mutex);
-      HT.Get(File.Hash_Table, Address, Index, Found);
+      HT.Get(File.Hash_Table.all, Address, Index, Found);
       if Found then
          if Address /= File.Buffer(Index).Address then
             raise IO_Error;
@@ -214,19 +216,19 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
          File.Buffer(Index).Block     := new Block_Type;
          File.Buffer(Index).Block.all := Block;
          File.Buffer(Index).Dirty     := False;
-         HT.Put(File.Hash_Table, Address, Index);
+         HT.Put(File.Hash_Table.all, Address, Index);
       else
          P_IO.Read(File.File, Address, Block);
          if File.Buffer(File.Length).Dirty then
             P_IO.Write(File.File, File.Buffer(File.Length).Address,
                        File.Buffer(File.Length).Block.all);
          end if;
-         HT.Delete(File.Hash_Table, File.Buffer(File.Length).Address);
+         HT.Delete(File.Hash_Table.all, File.Buffer(File.Length).Address);
          Index                        := File.Length;
          File.Buffer(Index).Address   := Address;
          File.Buffer(Index).Block.all := Block;
          File.Buffer(Index).Dirty     := False;
-         HT.Put(File.Hash_Table, Address, Index);
+         HT.Put(File.Hash_Table.all, Address, Index);
       end if;
       Locks.Mutexes.Unlock(File.Mutex);
    exception
@@ -245,7 +247,7 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
       Found : Boolean;
    begin
       Locks.Mutexes.Lock(File.Mutex);
-      HT.Get(File.Hash_Table, Address, Index, Found);
+      HT.Get(File.Hash_Table.all, Address, Index, Found);
       if Address = File.Next_Address then
          File.Next_Address := Succ(File.Next_Address);
       end if;
@@ -263,18 +265,18 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
          File.Buffer(Index).Block     := new Block_Type;
          File.Buffer(Index).Block.all := Block;
          File.Buffer(Index).Dirty     := True;
-         HT.Put(File.Hash_Table, Address, Index);
+         HT.Put(File.Hash_Table.all, Address, Index);
       else
          if File.Buffer(File.Length).Dirty then
             P_IO.Write(File.File, File.Buffer(File.Length).Address,
                        File.Buffer(File.Length).Block.all);
          end if;
-         HT.Delete(File.Hash_Table, File.Buffer(File.Length).Address);
+         HT.Delete(File.Hash_Table.all, File.Buffer(File.Length).Address);
          Index                        := File.Length;
          File.Buffer(Index).Address   := Address;
          File.Buffer(Index).Block.all := Block;
          File.Buffer(Index).Dirty     := True;
-         HT.Put(File.Hash_Table, Address, Index);
+         HT.Put(File.Hash_Table.all, Address, Index);
       end if;
       Locks.Mutexes.Unlock(File.Mutex);
    exception

@@ -24,7 +24,7 @@ C_OBJECTS=db-compression-deflate-c db-io-low_level-c db-utils-timers-c
 # A binary with its name is created in build/[release|debug]/.
 HEAP_TESTS=heap cheap
 TREE_TESTS=tree vtree dtree blob_ttree
-MULTITHREADED_TREE_TESTS=ttree vttree cttree
+MULTITHREADED_TREE_TESTS=ttree vttree cttree lruttree
 CURSOR_TESTS=cursor controlled blob_cursor
 THREAD_TESTS=thread thread2 thread3
 COMPRESSION_TESTS=prefix levenshtein 
