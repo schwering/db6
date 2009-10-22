@@ -103,11 +103,6 @@ is
          end;
       end Node_To_String;
 
-      function Message (Text : String) return String
-      is begin
-         return Text;
-      end Message;
-
       function Message (Text : String; N : Nodes.Node_Type) return String
       is begin
          Ada.Text_IO.Put_Line(Text);
@@ -122,18 +117,6 @@ is
       procedure Check_Subtree
         (Address : in Nodes.Valid_Address_Type;
          Level   : in Height_Type);
-
-      procedure Check_Subtree
-        (Address : in Nodes.Address_Type;
-         Level   : in Height_Type)
-      is begin
-         if not Nodes.Is_Valid(Address) then
-            Raise_Exception(Tree_Error'Identity,
-                            Message("Address is not valid"));
-            return;
-         end if;
-         Check_Subtree(Nodes.To_Valid_Address(Address), Level);
-      end Check_Subtree;
 
       Counter  : Positive := 1;
       Interval : constant Positive := 1024;
@@ -299,36 +282,30 @@ Ada.Text_IO.Put_Line("CONFLICTING CHILD "&
    Nodes.Degree_Type'Image(I-1) &
    Nodes.Degree_Type'Image(I));
 declare
-   function R(A : Nodes.Address_Type) return Nodes.Node_Type
-   is
-      B : DB.IO.Blocks.Block_Type;
-   begin
-      Block_IO.Read(Tree.File,
-         Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
-           (A)), B);
-      return Nodes.From_Block(B);
-   end R;
+
    function R(A : Nodes.Valid_Address_Type) return Nodes.Node_Type
    is
       B : DB.IO.Blocks.Block_Type;
    begin
-      Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(A),
-         B);
+      Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(A), B);
       return Nodes.From_Block(B);
    end R;
-   S : String := Message("PARENT PARENT PARENT",
-                         R(Nodes.Parent(N)));
-   U : String := Message("LEFT LEFT LEFT",
-                         R(Nodes.Left_Neighbor(N)));
-   T : String := Message("NODE NODE NODE",
-                         N);
-   V : String := Message("RIGHT RIGHT RIGHT",
-                         R(Nodes.Right_Neighbor(N)));
+
+   function R(A : Nodes.Address_Type) return Nodes.Node_Type
+   is begin
+      return R(Nodes.To_Valid_Address(A));
+   end R;
+   pragma Unreferenced (R);
+
+   --S : String := Message("PARENT PARENT PARENT", R(Nodes.Parent(N)));
+   --U : String := Message("LEFT LEFT LEFT", R(Nodes.Left_Neighbor(N)));
+   --T : String := Message("NODE NODE NODE", N);
+   --V : String := Message("RIGHT RIGHT RIGHT", R(Nodes.Right_Neighbor(N)));
 begin
    for I in 1 .. Nodes.Degree(N) loop
       declare
-         X : String := Message("CHILD "& Nodes.Degree_Type'Image(I),
-                               R(Nodes.Child(N, I)));
+         --X : String := Message("CHILD "& Nodes.Degree_Type'Image(I),
+                               --R(Nodes.Child(N, I)));
       begin
          null;
       end;

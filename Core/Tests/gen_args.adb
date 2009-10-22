@@ -55,9 +55,8 @@ package body Gen_Args is
             raise Parse_Error;
          end Look_Up;
 
-         Job  : Jobs.Job_Type;
-         From : Natural := S'First;
-         To   : Natural := 0;
+         From                      : Natural := S'First;
+         To                        : Natural := 0;
          Description               : Jobs.Description_Type;
          Short_Job                 : Jobs.Short_Job_Type;
          Short_Job_Execution_Count : Random.Count_Type;

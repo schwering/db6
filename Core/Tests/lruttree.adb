@@ -6,7 +6,6 @@ with System.Pool_Global; use System.Pool_Global;
 with System.Storage_Pools; use System.Storage_Pools;
 
 with Random; use Random;
-with To_Strings;
 with Gen_Args;
 with Gen_Jobs;
 
@@ -51,8 +50,6 @@ is
 
    package Jobs is new Gen_Jobs;
    package Args is new Gen_Args(Jobs);
-
-   Stop_Now : exception;
 
    subtype Key_Type is DB.Types.Keys.Key_Type;
    subtype Value_Type is DB.Types.Values.Value_Type;
@@ -162,8 +159,6 @@ begin
    BTrees.Finalize(Tree);
 
 exception
-   when Stop_Now =>
-      null;
    when Error : others =>
       Put_Line("Exception: "& Exception_Message(Error));
       Put_Line("Exception: "& Exception_Information(Error));

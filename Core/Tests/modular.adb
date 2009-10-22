@@ -14,7 +14,11 @@ is
    I : constant Uint64 := 0 - 1; --2#11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111# + 1;
    Index  : constant Uint6 := 53;
    Length : constant Uint6 := 20;
+   Great  : constant Uint64 := Uint64'Last;
+   Small  : constant Uint32 := Uint32(Great mod Uint32'Modulus);
 begin
+   Put_Line("Natural'Size ="& Natural'Size'Img);
+   Put_Line("Cast:"& Uint32'Image(Small));
    Put_Line(" "& Uint6'Image(Index));
    Put_Line(" "& Uint6'Image(Length));
    Put_Line(" "& Uint6'Image(Index+Length));

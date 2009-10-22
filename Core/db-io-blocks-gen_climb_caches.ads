@@ -6,7 +6,6 @@ use System.Storage_Pools;
 
 with DB.IO.Blocks.Gen_IO;
 with DB.Locks.Mutexes;
-with DB.Locks.Semaphores;
 with DB.Utils;
 with DB.Utils.Gen_Hashtables;
 

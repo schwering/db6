@@ -80,12 +80,16 @@ debug: dirs libdb_debug
 release: dirs libdb_release
 	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=release $$T.adb || exit; done
 
-libdb_release: dirs
+cobjects_release: dirs
 	for F in $(C_OBJECTS); do make $(LIBDB_DIR)/$(RELEASE_DIR)/$(OBJECT_DIR)/$$F.o || exit; done
+
+cobjects_debug: dirs
+	for F in $(C_OBJECTS); do make $(LIBDB_DIR)/$(DEBUG_DIR)/$(OBJECT_DIR)/$$F.o || exit; done
+
+libdb_release: dirs cobjects_release
 	$(GNATMAKE) -Plibdb -XBUILD=release
 
-libdb_debug: dirs
-	for F in $(C_OBJECTS); do make $(LIBDB_DIR)/$(DEBUG_DIR)/$(OBJECT_DIR)/$$F.o || exit; done
+libdb_debug: dirs cobjects_debug
 	$(GNATMAKE) -Plibdb -XBUILD=debug
 
 dirs:

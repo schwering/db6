@@ -36,6 +36,7 @@ package body Random is
          return 1;
       end if;
    end NI;
+   pragma Unreferenced (NI);
 
    function Make_String (I : Natural) return Str.String_Type
    is
@@ -64,6 +65,7 @@ package body Random is
         (Item_Type  => Char_Type);
       Random_Factor : in Natural := 1;
    function Make_UString (I : Natural) return Str.String_Type;
+   pragma Unreferenced (Make_UString);
 
 
    function Make_UString (I : Natural) return Str.String_Type

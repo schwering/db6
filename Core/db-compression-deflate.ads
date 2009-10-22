@@ -22,8 +22,7 @@ package DB.Compression.Deflate is
 
 private
    subtype Index_Type is System.Storage_Elements.Storage_Offset;
-   use type Index_Type;
-   use type Size_Type;
+   use type System.Storage_Elements.Storage_Offset;
 
 end DB.Compression.Deflate;
 

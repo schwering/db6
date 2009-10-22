@@ -666,6 +666,7 @@ package body Cursors is
    begin
       Lock_Mutex(Cursor);
       if not Cursor.Has_Node then
+         Position := Count_Type'First;
          State := Failure;
          Unlock_Mutex(Cursor);
          return;
@@ -715,6 +716,7 @@ package body Cursors is
    begin
       Lock_Mutex(Cursor);
       if not Cursor.Has_Node then
+         Position := Count_Type'First;
          State := Failure;
          Unlock_Mutex(Cursor);
          return;

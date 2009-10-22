@@ -37,12 +37,16 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    function Hash (Address : Valid_Address_Type) return Hash_Type
    is
-      type Long_Hash_Type is mod 2**64;
+      type Long_Hash_Type is mod 2**Natural'Size;
+      for Long_Hash_Type'Size use Natural'Size;
+      for Long_Hash_Type'Alignment use Natural'Alignment;
       function Convert is new Ada.Unchecked_Conversion
         (Valid_Address_Type, Long_Hash_Type);
-      Hash : constant Long_Hash_Type := Convert(Address);
+      Long_Hash : constant Long_Hash_Type := Convert(Address);
    begin
-      return Hash_Type(Hash);
+      pragma Assert (Address'Size = Long_Hash_Type'Size);
+      pragma Assert (Address'Alignment = Long_Hash_Type'Alignment);
+      return Hash_Type(Long_Hash);-- mod Hash_Type'Modulus);
    end Hash;
 
 
