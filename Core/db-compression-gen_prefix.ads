@@ -22,7 +22,7 @@ generic
            return String_Type;
    with function "=" (A, B : Item_Type) return Boolean;
    with function "&" (A, B : String_Type) return String_Type;
-package DB.Compression.Prefix is
+package DB.Compression.Gen_Prefix is
    pragma Pure;
 
    type Delta_Type is
@@ -41,5 +41,5 @@ package DB.Compression.Prefix is
       D : Delta_Type)
       return String_Type;
 
-end DB.Compression.Prefix;
+end DB.Compression.Gen_Prefix;
 

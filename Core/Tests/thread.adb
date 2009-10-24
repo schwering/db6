@@ -2,7 +2,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
-with DB.Compression.Levenshtein;
+with DB.Compression.Gen_Levenshtein;
 with DB.Utils.Timers;
 
 procedure Thread
@@ -14,7 +14,7 @@ is
    is
       procedure Test (S, T : in String)
       is
-         package Levenshtein is new DB.Compression.Levenshtein
+         package Levenshtein is new DB.Compression.Gen_Levenshtein
            (Item_Type             => Character,
             Item_Array_Type       => String,
             Max_Length            => 255);

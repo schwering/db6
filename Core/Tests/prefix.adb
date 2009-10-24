@@ -2,7 +2,7 @@
 
 with Ada.Text_IO;
 
-with DB.Compression.Prefix;
+with DB.Compression.Gen_Prefix;
 with DB.Types;
 with DB.Types.Gen_Bounded_Strings;
 
@@ -22,7 +22,7 @@ is
       package Str is new DB.Types.Gen_Bounded_Strings
         (Item_Type  => Item_Type,
          Max_Length => 255);
-      package Prefix is new DB.Compression.Prefix
+      package Prefix is new DB.Compression.Gen_Prefix
         (Item_Type       => Item_Type,
          String_Type     => Str.String_Type,
          Index_Type      => Str.Index_Type,

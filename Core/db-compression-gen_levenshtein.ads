@@ -3,7 +3,7 @@ generic
    with function "=" (A, B : Item_Type) return Boolean is <>;
    type Item_Array_Type is array (Positive range <>) of Item_Type;
    Max_Length : in Positive;
-package DB.Compression.Levenshtein is
+package DB.Compression.Gen_Levenshtein is
    pragma Pure;
 
    subtype Distance_Type is Natural;
@@ -55,5 +55,5 @@ private
    type Action_Array_Type is array (Positive range <>) of Action_Type;
    pragma Pack (Action_Array_Type);
 
-end DB.Compression.Levenshtein;
+end DB.Compression.Gen_Levenshtein;
 

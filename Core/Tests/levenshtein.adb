@@ -2,7 +2,7 @@
 
 with Ada.Text_IO;
 
-with DB.Compression.Levenshtein;
+with DB.Compression.Gen_Levenshtein;
 with DB.Types;
 
 procedure Levenshtein
@@ -18,7 +18,7 @@ is
 
    procedure Test (S, T : in Item_Array_Type)
    is
-      package Levenshtein is new DB.Compression.Levenshtein
+      package Levenshtein is new DB.Compression.Gen_Levenshtein
         (Item_Type             => Item_Type,
          Item_Array_Type       => Item_Array_Type,
          Max_Length            => 255);
@@ -31,8 +31,7 @@ is
       Ada.Text_IO.Put(Image(T) &" = "& Image(U));
       Ada.Text_IO.Put_Line(" = "& Boolean'Image(B));
       Ada.Text_IO.Put_Line("Sizeof(T) ="& Integer'Image(T'Size)
-                         &" Sizeof(D) ="& Integer'Image(D'Size)
-      );
+                         &" Sizeof(D) ="& Integer'Image(D'Size));
       if not B then raise Compression_Error; end if;
    end Test;
 

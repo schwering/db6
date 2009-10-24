@@ -1,4 +1,4 @@
-package body DB.Compression.Levenshtein is
+package body DB.Compression.Gen_Levenshtein is
 
    function Min
      (X, Y, Z : Integer)
@@ -318,5 +318,5 @@ package body DB.Compression.Levenshtein is
       return T;
    end Decode;
 
-end DB.Compression.Levenshtein;
+end DB.Compression.Gen_Levenshtein;
 

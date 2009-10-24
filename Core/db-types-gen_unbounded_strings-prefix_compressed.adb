@@ -1,10 +1,10 @@
 with DB.IO.Blocks;
-with DB.Compression.Prefix;
+with DB.Compression.Gen_Prefix;
 
 separate (DB.Types.Gen_Unbounded_Strings)
 package body Prefix_Compressed is
 
-   package Compression is new DB.Compression.Prefix
+   package Compression is new DB.Compression.Gen_Prefix
      (Item_Type       => Item_Type,
       String_Type     => String_Type,
       Index_Type      => Index_Type,

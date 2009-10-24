@@ -1,4 +1,4 @@
-package body DB.Compression.Prefix is
+package body DB.Compression.Gen_Prefix is
 
    function Encode
      (S, T : String_Type)
@@ -45,5 +45,5 @@ package body DB.Compression.Prefix is
       return Substring(S, 1, D.Prefix_Length) & D.Postfix;
    end Decode;
 
-end DB.Compression.Prefix;
+end DB.Compression.Gen_Prefix;
 

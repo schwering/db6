@@ -1,10 +1,10 @@
 with DB.IO.Blocks;
-with DB.Compression.Levenshtein;
+with DB.Compression.Gen_Levenshtein;
 
 separate (DB.Types.Gen_Bounded_Strings)
 package body Delta_Compressed is
 
-   package Compression is new DB.Compression.Levenshtein
+   package Compression is new DB.Compression.Gen_Levenshtein
      (Item_Type       => Item_Type,
       Item_Array_Type => Indefinite_Buffer_Type,
       Max_Length      => Max_Length);
