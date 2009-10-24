@@ -2,7 +2,6 @@ with System.Storage_Pools;
 
 generic
    Visit_Threshold : in Float := 0.15;
-   Size_Threshold  : in Float := 0.65;
 
    type Key_Type is private;
    type Value_Type is private;
@@ -15,7 +14,6 @@ generic
 
    Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.Utils.Gen_Hashtables is
-   pragma Preelaborate;
 
    type Table_Type (<>) is private;
    type Table_Ref_Type is access Table_Type;
@@ -26,8 +24,8 @@ package DB.Utils.Gen_Hashtables is
       return Table_Type;
 
    procedure Allocate_Table
-     (Size  : in     Size_Type;
-      Table :    out Table_Ref_Type);
+     (Size  : in  Size_Type;
+      Table : out Table_Ref_Type);
 
    procedure Put
      (Table : in out Table_Type;
@@ -84,9 +82,9 @@ private
          end case;
       end record;
    type Array_Type is array (Hash_Type range <>) of Element_Type;
-   type Table_Type (Capacity : Hash_Type) is
+   type Table_Type (Last_Index : Hash_Type) is
       record
-         Arr    : Array_Type(0 .. Capacity)
+         Arr    : Array_Type(0 .. Last_Index)
                 := (others => Element_Type'(State => Free));
          Size   : Size_Type := 0;
          Visits : Size_Type := 0;

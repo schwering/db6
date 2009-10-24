@@ -20,7 +20,7 @@ package body DB.Utils.Gen_Hashtables is
    is
       pragma Inline (To_Index);
    begin
-      return (H mod (T.Arr'Last - T.Arr'First + 1)) + T.Arr'First;
+      return (H mod T.Arr'Length) + T.Arr'First;
    end To_Index;
 
 
@@ -75,19 +75,19 @@ package body DB.Utils.Gen_Hashtables is
      (Size : Size_Type)
       return Table_Type
    is
-      Capacity : constant Hash_Type := To_Prime(Size) - 1;
+      Capacity : constant Hash_Type := To_Prime(Size);
    begin
-      return Table_Type'(Capacity => Capacity, others => <>);
+      return Table_Type'(Last_Index => Capacity - 1, others => <>);
    end New_Table;
 
 
    procedure Allocate_Table
-     (Size  : in     Size_Type;
-      Table :    out Table_Ref_Type)
+     (Size  : in  Size_Type;
+      Table : out Table_Ref_Type)
    is
-      Capacity : constant Hash_Type := To_Prime(Size) - 1;
+      Capacity : constant Hash_Type := To_Prime(Size);
    begin
-      Table := new Table_Type(Capacity);
+      Table := new Table_Type(Capacity - 1);
    end Allocate_Table;
 
 
@@ -96,15 +96,21 @@ package body DB.Utils.Gen_Hashtables is
       Key   : in     Key_Type;
       Value : in     Value_Type)
    is
-      First_H     : constant Hash_Type := To_Index(Table, Hash(Key));
-      H           : Hash_Type := First_H;
-      Found_Match : Boolean;
-      Found_Free  : Boolean;
+      First_H       : constant Hash_Type := To_Index(Table, Hash(Key));
+      H             : Hash_Type := First_H;
+      Visited_H     : Hash_Type := First_H;
+      Found_Match   : Boolean;
+      Found_Free    : Boolean;
+      Found_Visited : Boolean := False;
    begin
       loop
-         Found_Match := Table.Arr(H).State = Used
-                        and then Table.Arr(H).Key = Key;
-         Found_Free  := Table.Arr(H).State = Free;
+         Found_Match   := Table.Arr(H).State = Used
+                          and then Table.Arr(H).Key = Key;
+         Found_Free    := Table.Arr(H).State = Free;
+         if not Found_Visited and Table.Arr(H).State = Visited then
+            Found_Visited := True;
+            Visited_H     := H;
+         end if;
          exit when Found_Match;
          exit when Found_Free;
          H := To_Index(Table, Rehash(H));
@@ -115,30 +121,15 @@ package body DB.Utils.Gen_Hashtables is
       elsif Found_Free then
          Table.Arr(H) := (Used, Key, Value);
          Table.Size   := Table.Size + 1;
-      else -- wrapped around
-         declare
-            Found_Visited : Boolean;
-         begin
-            H := First_H;
-            loop
-               Found_Visited := Table.Arr(H).State = Visited;
-               exit when Found_Visited;
-               H := To_Index(Table, Rehash(H));
-               exit when H = First_H;
-            end loop;
-            if Found_Visited then
-               Table.Arr(H) := (Used, Key, Value);
-               Table.Size   := Table.Size + 1;
-               Table.Visits := Table.Visits - 1;
-               if Visit_Ratio(Table) > Visit_Threshold and
-                  Visit_Ratio(Table) + Size_Ratio(Table) >
-                  Visit_Threshold + Size_Threshold then
-                  Reorganize(Table);
-               end if;
-            else
-               raise Hash_Table_Error;
-            end if;
-         end;
+      elsif Found_Visited then -- wrapped around
+         Table.Arr(Visited_H) := (Used, Key, Value);
+         Table.Size           := Table.Size + 1;
+         Table.Visits         := Table.Visits - 1;
+         if Visit_Ratio(Table) > Visit_Threshold then
+            Reorganize(Table);
+         end if;
+      else
+         raise Hash_Table_Error;
       end if;
    end Put;
 
@@ -259,7 +250,7 @@ package body DB.Utils.Gen_Hashtables is
             Table.Arr(H) := (State => Visited);
             Table.Size   := Table.Size - 1;
             Table.Visits := Table.Visits + 1;
-            Success := True;
+            Success      := True;
             return;
          end if;
       end loop;

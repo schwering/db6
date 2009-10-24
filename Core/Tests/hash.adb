@@ -31,9 +31,9 @@ is
       Rehash       => Rehash,
       Storage_Pool => Root_Storage_Pool'Class(Global_Pool_Object));
 
-   subtype Test_Range is Integer range 1 .. Size*3/2;
+   subtype Test_Range is Integer range 1 .. Size;
 
-   T : HT.Table_Type := HT.New_Table(Size * 3 / 2);
+   T : HT.Table_Type := HT.New_Table(Test_Range'Last - Test_Range'First + 1);
 begin
    for I in Test_Range loop
       if HT.Contains(T, I) then
@@ -49,9 +49,21 @@ begin
    end loop;
 
    for I in Test_Range loop
+      if not HT.Contains(T, I) then
+         Put_Line("2.2 "& Integer'Image(I));
+      end if;
+   end loop;
+
+   for I in Test_Range loop
       HT.Put(T, I, I);
       if not HT.Contains(T, I) then
-         Put_Line("2.1 "& Integer'Image(I));
+         Put_Line("2.3 "& Integer'Image(I));
+      end if;
+   end loop;
+
+   for I in Test_Range loop
+      if not HT.Contains(T, I) then
+         Put_Line("2.4 "& Integer'Image(I));
       end if;
    end loop;
 
