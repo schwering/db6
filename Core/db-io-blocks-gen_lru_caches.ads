@@ -19,7 +19,7 @@ package DB.IO.Blocks.Gen_LRU_Caches is
       := P_IO.Needs_Explicit_Block_Count;
 
    Mega_Byte       : constant := 2**20;
-   Pool_Size       : constant := 512 * Mega_Byte;
+   Pool_Size       : constant := 2**10 * Mega_Byte;
    Pool            : Utils.Bounded_Pools.Bounded_No_Reclaim_Pool(Pool_Size);
    Hash_Table_Size : constant := Pool_Size / (Block_Size / 20);
 

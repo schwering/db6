@@ -25,6 +25,10 @@ package DB.Utils.Bounded_Pools is
       Storage_Size : in     SSE.Storage_Count;
       Alignment    : in     SSE.Storage_Count);
 
+   function Current_Storage_Size
+     (Pool : Bounded_No_Reclaim_Pool)
+      return SSE.Storage_Count;
+
    overriding function Storage_Size
      (Pool : Bounded_No_Reclaim_Pool)
       return SSE.Storage_Count;

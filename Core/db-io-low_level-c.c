@@ -170,20 +170,6 @@ inline ssize_t db_io_low_level_read_direct(int fd, void *buf, size_t nbytes)
 	return retval;
 }
 
-inline ssize_t db_io_low_level_pread_direct(int fd, void *buf, size_t nbytes,
-		off64_t offset)
-{
-	ssize_t retval;
-	void *abuf;
-
-	if (posix_memalign(&abuf, 512, nbytes))
-		return -1;
-	retval = pread(fd, abuf, nbytes, offset);
-	memcpy(buf, abuf, retval);
-	free(abuf);
-	return retval;
-}
-
 inline ssize_t db_io_low_level_write_direct(int fd, const void *buf,
 		size_t nbytes)
 {
@@ -194,20 +180,6 @@ inline ssize_t db_io_low_level_write_direct(int fd, const void *buf,
 		return -1;
 	memcpy(abuf, buf, nbytes);
 	retval = write(fd, abuf, nbytes);
-	free(abuf);
-	return retval;
-}
-
-inline ssize_t db_io_low_level_pwrite_direct(int fd, const void *buf,
-		size_t nbytes, off64_t offset)
-{
-	ssize_t retval;
-	void *abuf;
-
-	if (posix_memalign(&abuf, 512, nbytes))
-		return -1;
-	memcpy(abuf, buf, nbytes);
-	retval = pwrite(fd, abuf, nbytes, offset);
 	free(abuf);
 	return retval;
 }

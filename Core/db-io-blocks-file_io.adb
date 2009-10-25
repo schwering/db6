@@ -139,9 +139,11 @@ package body DB.IO.Blocks.File_IO is
    procedure Seek_New
      (File    : in out File_Type;
       Address :    out Valid_Address_Type)
-   is begin
-      Low_Level.Seek_End(File.FD);
-      Address := To_Valid_Address(Low_Level.Current_File_Position(File.FD));
+   is
+      Pos : Low_Level.File_Position_Type;
+   begin
+      Low_Level.Seek_End(File.FD, Pos);
+      Address := To_Valid_Address(Pos);
    end Seek_New;
 
 

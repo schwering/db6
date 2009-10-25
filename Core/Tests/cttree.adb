@@ -2,7 +2,6 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
---with Ada.Command_Line; use Ada.Command_Line;
 
 with Random; use Random;
 with To_Strings;
@@ -201,8 +200,9 @@ begin
    Put_Line("Size ="& BTrees.Count_Type'Image(Cnt));
 
    declare
-      I : constant Count_Type
-        := (Random.Count_Type(Cnt) - Args.Init_Offset) * 10 + 1;
+      RC : constant Random.Count_Type := Random.Count_Type(Cnt);
+      IO : constant Random.Count_Type := Args.Init_Offset;
+      I  : constant Count_Type := (RC - Random.Count_Type'Min(RC, IO)) * 10 + 1;
    begin
       Init_Key_Value_Pairs(I);
       Put_Line("Init ="& Count_Type'Image(I));

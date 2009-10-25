@@ -60,7 +60,7 @@ ifeq ($(shell uname -o), Cygwin)
 	CC=C:/Program\ Files/Gnat/Pentium/bin/gcc
 	GNATMAKE=C:/Program\ Files/Gnat/Pentium/bin/gnatmake
 else
-	CC=/usr/gnat/bin/gcc
+	CC=gcc
 	GNATMAKE=gnatmake
 endif
 

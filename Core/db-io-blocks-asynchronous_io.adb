@@ -166,9 +166,7 @@ package body DB.IO.Blocks.Asynchronous_IO is
       Low_Level.Open(Path      => ID,
                      Open_Kind => Low_Level.Read_Write,
                      File      => File.FD);
-      Low_Level.Seek_End(File.FD);
-      Low_Level.Get_Size(File          => File.FD,
-                         Last_Position => Last_Position);
+      Low_Level.Seek_End(File.FD, Last_Position);
       File.Max_Address_Initialized := True;
       File.Max_Address             := To_Valid_Address(Last_Position);
    exception

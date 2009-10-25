@@ -84,17 +84,9 @@ package body DB.IO.Low_Level is
                             NBytes : size_t) return ssize_t;
       pragma Import(C, read_direct, "db_io_low_level_read_direct");
 
-      function pread_direct (FD : int; Buf : void_ptr; NBytes : size_t;
-                             Offset : off_t) return ssize_t;
-      pragma Import(C, pread_direct, "db_io_low_level_pread_direct");
-
       function write_direct (FD : int; Buf : void_ptr;
                              NBytes : size_t) return ssize_t;
       pragma Import (C, write_direct, "db_io_low_level_write_direct");
-
-      function pwrite_direct (FD : int; Buf : void_ptr; NBytes : size_t;
-                              Offset : off_t) return ssize_t;
-      pragma Import (C, pwrite_direct, "db_io_low_level_pwrite_direct");
 
       function errno return int;
       pragma Import (C, errno, "db_io_low_level_errno");
@@ -251,9 +243,10 @@ package body DB.IO.Low_Level is
 
 
    procedure Seek_End
-     (File : File_Descriptor_Type)
+     (File    : in  File_Descriptor_Type;
+      New_Pos : out File_Position_Type)
    is begin
-      Seek(File, 0, From_End);
+      Seek(File, 0, From_End, New_Pos);
    end Seek_End;
 
 
@@ -349,24 +342,6 @@ package body DB.IO.Low_Level is
    end Read_Direct;
 
 
-   procedure PRead_Direct
-     (File : in  File_Descriptor_Type;
-      Pos  : in  File_Position_Type;
-      Item : out Item_Type)
-   is
-      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type
-            := Signed_Size_Type(C.pread_direct(C.int(File),
-                                               Item'Address,
-                                               C.size_t(Size),
-                                               C.off_t(Pos)));
-   begin
-      if Count < 0 or else Size_Type(Count) /= Size then
-         raise IO_Error;
-      end if;
-   end PRead_Direct;
-
-
    procedure Write_Direct
      (File : in File_Descriptor_Type;
       Item : in Item_Type)
@@ -381,24 +356,6 @@ package body DB.IO.Low_Level is
          raise IO_Error;
       end if;
    end Write_Direct;
-
-
-   procedure PWrite_Direct
-     (File : in File_Descriptor_Type;
-      Pos  : in File_Position_Type;
-      Item : in Item_Type)
-   is
-      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type
-            := Signed_Size_Type(C.Pwrite_direct(C.int(File),
-                                                Item'Address,
-                                                C.size_t(Size),
-                                                C.off_t(Pos)));
-   begin
-      if Count < 0 or else Size_Type(Count) /= Size then
-         raise IO_Error;
-      end if;
-   end PWrite_Direct;
 
 
    function Strerror

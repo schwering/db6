@@ -119,9 +119,16 @@ package body DB.IO.Blocks.Direct_IO is
       Address : in     Valid_Address_Type;
       Block   :    out Block_Type)
    is
-      procedure LL_Read is new Low_Level.PRead_Direct(Block_Type);
+      procedure LL_Read is new Low_Level.Read_Direct(Block_Type);
    begin
-      LL_Read(File.FD, To_File_Position(Address), Block);
+      Locks.Mutexes.Lock(File.Mutex);
+      Low_Level.Seek(File.FD, To_File_Position(Address));
+      LL_Read(File.FD, Block);
+      Locks.Mutexes.Unlock(File.Mutex);
+   exception
+      when others =>
+         Locks.Mutexes.Unlock(File.Mutex);
+         raise;
    end Read;
 
 
@@ -130,18 +137,33 @@ package body DB.IO.Blocks.Direct_IO is
       Address : in     Valid_Address_Type;
       Block   : in     Block_Type)
    is
-      procedure LL_Write is new Low_Level.PWrite_Direct(Block_Type);
+      procedure LL_Write is new Low_Level.Write_Direct(Block_Type);
    begin
-      LL_Write(File.FD, To_File_Position(Address), Block);
+      Locks.Mutexes.Lock(File.Mutex);
+      Low_Level.Seek(File.FD, To_File_Position(Address));
+      LL_Write(File.FD, Block);
+      Locks.Mutexes.Unlock(File.Mutex);
+   exception
+      when others =>
+         Locks.Mutexes.Unlock(File.Mutex);
+         raise;
    end Write;
 
 
    procedure Seek_New
      (File    : in out File_Type;
       Address :    out Valid_Address_Type)
-   is begin
-      Low_Level.Seek_End(File.FD);
-      Address := To_Valid_Address(Low_Level.Current_File_Position(File.FD));
+   is
+      Pos : Low_Level.File_Position_Type;
+   begin
+      Locks.Mutexes.Lock(File.Mutex);
+      Low_Level.Seek_End(File.FD, Pos);
+      Address := To_Valid_Address(Pos);
+      Locks.Mutexes.Unlock(File.Mutex);
+   exception
+      when others =>
+         Locks.Mutexes.Unlock(File.Mutex);
+         raise;
    end Seek_New;
 
 

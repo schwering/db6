@@ -1,35 +1,36 @@
-ITERATIONS=1
-BINARY=build/release/./ttree
-TREEFILE=.tmp/btree
-DISKFILE=/dev/sda2
-LOGFILE=OUT
-ERRFILE=ERR
-
-COUNT=2000
-OFFSET=0
-
-for i in `seq 1 $ITERATIONS`
-do
-(	(date &&\
-	iostat >/dev/null
-	${BINARY} ${TREEFILE} ${OFFSET} Insert,$COUNT &&\
-	(iostat -c -d -k -x $DISKFILE | grep -v Linux | grep [:alnum:]) &&\
-	${BINARY} ${TREEFILE} ${COUNT} Search,$COUNT &&\
-	(iostat -c -d -k -x $DISKFILE | grep -v Linux | grep [:alnum:]) &&\
-	${BINARY} ${TREEFILE} ${COUNT} Delete,$COUNT &&\
-	(iostat -c -d -k -x $DISKFILE | grep -v Linux | grep [:alnum:]) &&\
-	${BINARY} ${TREEFILE} ${OFFSET} Insert,$COUNT &&\
-	(iostat -c -d -k -x $DISKFILE | grep -v Linux | grep [:alnum:]) &&\
-	${BINARY} ${TREEFILE} ${COUNT} Search,$COUNT &&\
-	(iostat -c -d -k -x $DISKFILE | grep -v Linux | grep [:alnum:]) &&\
-	${BINARY} ${TREEFILE} ${COUNT} Check &&\
-	date &&\
-	ls -L -s --block-size=M ${TREEFILE} &&\
-	ls -L -s --block-size=G ${TREEFILE} &&\
-	echo "") ||\
-	(echo "Crashed!" &&\
-	date &&\
-	echo "")
-) >>$LOGFILE 2>>$ERRFILE
-done
+BIN=bin/release/./lruttree
+FILE=/home/chs/Disk/btree
+C1=1m
+# 1. Simple insertions and check
+# 2. Some more insertions and check for both
+# 3. Some mor insertions and check for all three
+# 4. Delete of first insertions, check for effect
+#    on all inserted elements (in fact, the first
+#    two Searches are redundant with the last two)
+# 5. Delete the last two blocks of insertions.
+# 6. Check that there are no items left in the
+#    tree (just for fun, check for four instead of
+#    three blocks of insertions)
+C="$BIN $FILE 0\
+        \
+	Insert,$C1,Cont\
+	Search,$C1,Reset\
+        \
+	Insert,$C1,Cont\
+	Search,$C1,Reset\
+	Search,$C1,Cont\
+        \
+	Insert,$C1,Cont\
+	Search,$C1,Reset\
+	Search,$C1,Cont\
+	Search,$C1,Cont\
+        \
+        Delete,$C1,Reset\
+        Search,$C1,Cont\
+	Search,$C1,Cont\
+	Antisearch,$C1,Reset\
+	Search,$C1,Cont\
+	Search,$C1,Cont"
+echo $C
+$C
 

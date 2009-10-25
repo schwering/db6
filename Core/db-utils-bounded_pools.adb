@@ -31,6 +31,14 @@ package body DB.Utils.Bounded_Pools is
    end Deallocate;
 
 
+   function Current_Storage_Size
+     (Pool : Bounded_No_Reclaim_Pool)
+      return SSE.Storage_Count
+   is begin
+      return Pool.Current_Storage_Size;
+   end Current_Storage_Size;
+
+
    overriding function Storage_Size
      (Pool : Bounded_No_Reclaim_Pool)
       return SSE.Storage_Count

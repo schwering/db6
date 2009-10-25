@@ -181,8 +181,7 @@ package body DB.IO.Blocks.CFS_IO is
       Pos : Low_Level.File_Position_Type;
    begin
       Low_Level.Open(Device, Low_Level.Read_Write, FD);
-      Low_Level.Seek_End(FD);
-      Pos := Low_Level.Current_File_Position(FD);
+      Low_Level.Seek_End(FD, Pos);
       Pos := Pos - (Chunk_Address_Type'Size+7)/8
                  - (Size_Type'Size+7)/8
                  - (File_Array_Type'Size+7)/8

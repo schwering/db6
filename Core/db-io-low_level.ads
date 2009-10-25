@@ -48,7 +48,8 @@ package DB.IO.Low_Level is
       New_Pos : out File_Position_Type);
 
    procedure Seek_End
-     (File : in File_Descriptor_Type);
+     (File    : in  File_Descriptor_Type;
+      New_Pos : out File_Position_Type);
 
    function Current_File_Position
      (File : File_Descriptor_Type)
@@ -88,22 +89,8 @@ package DB.IO.Low_Level is
 
    generic
       type Item_Type is limited private;
-   procedure PRead_Direct
-     (File : in  File_Descriptor_Type;
-      Pos  : in  File_Position_Type;
-      Item : out Item_Type);
-
-   generic
-      type Item_Type is limited private;
    procedure Write_Direct
      (File : in File_Descriptor_Type;
-      Item : in Item_Type);
-
-   generic
-      type Item_Type is limited private;
-   procedure PWrite_Direct
-     (File : in File_Descriptor_Type;
-      Pos  : in File_Position_Type;
       Item : in Item_Type);
 
    function Strerror

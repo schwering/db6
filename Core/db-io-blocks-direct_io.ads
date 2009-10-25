@@ -2,6 +2,7 @@ with DB.IO.Low_Level;
 with DB.IO.Blocks.Gen_IO;
 with DB.IO.Blocks.Gen_Climb_Caches;
 with DB.IO.Blocks.Gen_System_Locking_IO;
+with DB.Locks.Mutexes;
 with DB.Locks.Semaphores;
 
 package DB.IO.Blocks.Direct_IO is
@@ -14,6 +15,7 @@ package DB.IO.Blocks.Direct_IO is
    type File_Type is limited
       record
          FD        : Low_Level.File_Descriptor_Type;
+         Mutex     : Locks.Mutexes.Mutex_Type;
          Semaphore : Locks.Semaphores.Semaphore_Type;
       end record;
 

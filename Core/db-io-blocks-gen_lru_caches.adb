@@ -4,6 +4,37 @@ with Ada.Unchecked_Deallocation;
 
 package body DB.IO.Blocks.Gen_LRU_Caches is
 
+   subtype LLI is Long_Long_Integer range 0 .. Long_Long_Integer'Last;
+   Hashtable_Size  : LLI := 0;
+   Compressed_Size : LLI := 0;
+   Count           : LLI := 0;
+   Discard_Count   : LLI := 0;
+
+   task Superviser;
+
+   task body Superviser
+   is begin
+      loop
+         Put_Line("Hashtable Size       ="&
+                  LLI'Image(Hashtable_Size));
+         Put_Line("Compressed Size      ="&
+                  LLI'Image(Compressed_Size) &" ="&
+                  LLI'Image(Compressed_Size / 2**20) &"MB");
+         Put_Line("Uncompressed Size    ="&
+                  LLI'Image(Count * LLI(Block_Size)) &" ="&
+                  LLI'Image(Count * LLI(Block_Size) / 2**20) &"MB");
+         Put_Line("Discard Count        ="&
+                  Discard_Count'Img);
+         Put_Line("Pool Current Storage ="&
+                  LLI'Image(LLI(Pool.Current_Storage_Size) / 2**20) &"MB");
+         Put_Line("Pool Maximum Storage ="&
+                  LLI'Image(LLI(Pool.Max_Storage_Size) / 2**20) &"MB");
+         New_Line;
+         delay 30.0;
+      end loop;
+   end Superviser;
+
+
    procedure Free_Entry is
       new Ada.Unchecked_Deallocation(Entry_Type, Entry_Ref_Type);
 
@@ -78,6 +109,7 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
       pragma Assert ((File.Head = E) = (E.Prev = null));
       pragma Assert ((File.Tail = E) = (E.Next = null));
       Hashtables.Put(File.Table.all, E.Address, E);
+      Hashtable_Size := Hashtable_Size + 1;
    end Prepend_Entry;
 
 
@@ -122,6 +154,8 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
       pragma Assert ((File.Head = null) = (File.Tail = null));
       pragma Assert ((File.Head = E) = (E.Prev = null));
       pragma Assert ((File.Tail = E) = (E.Next = null));
+      Compressed_Size   := Compressed_Size   - LLI(E.Block'Length);
+      Count             := Count             - 1;
       if File.Head = E then
          File.Head := E.Next;
       end if;
@@ -136,6 +170,7 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
       end if;
       pragma Assert ((File.Head = null) = (File.Tail = null));
       Hashtables.Delete(File.Table.all, E.Address);
+      Hashtable_Size := Hashtable_Size - 1;
       declare
          Copy_Of_E : Entry_Ref_Type := E;
       begin
@@ -150,12 +185,12 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
    is begin
       if File.Tail /= null then
          if File.Tail.Dirty then
-            Put_Line("Flushing back");
             P_IO.Write(File.File, File.Tail.Address,
                        Decompress(File.Tail.Block));
          end if;
          Remove_Entry(File, File.Tail);
          Success := True;
+         Discard_Count := Discard_Count + 1;
       else
          Success := False;
       end if;
@@ -170,8 +205,11 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
    is
       Buffer : constant Buffer_Type := Compress(Block);
    begin
+      Compressed_Size   := Compressed_Size   + LLI(Buffer'Length);
+      Count             := Count             + 1;
       <<Try_Again>>
       declare
+         Allocated : Boolean := False;
       begin
          E := new Entry_Type'(Buffer_Size => Buffer'Length,
                               Block       => Buffer,
@@ -179,6 +217,7 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
                               Dirty       => False,
                               Next        => null,
                               Prev        => null);
+         Allocated := True;
          Prepend_Entry(File, E);
          pragma Assert (File.Head = E);
          pragma Assert (E.Prev = null);
@@ -188,7 +227,9 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
             declare
                Discard_Success : Boolean;
             begin
-               Put_Line("Discarding for place");
+               if Allocated then
+                  Free_Entry(E);
+               end if;
                Discard_Last_Entry(File, Discard_Success);
                if Discard_Success then
                   goto Try_Again;
@@ -283,7 +324,10 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
       declare
          use type Valid_Address_Type;
       begin
-         File.Cur_Address := Succ(File.Cur_Address);
+         File.Cur_Address := Succ(Address);
+         if File.Last_Address < File.Cur_Address then
+            File.Last_Address := File.Cur_Address;
+         end if;
       end;
       Locks.Mutexes.Unlock(File.Mutex);
    exception
@@ -298,30 +342,22 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
       Address : in     Valid_Address_Type;
       Block   : in     Block_Type)
    is
-      Buffer : constant Buffer_Type := Compress(Block);
-      E      : Entry_Ref_Type;
-      Found  : Boolean;
+      E     : Entry_Ref_Type;
+      Found : Boolean;
    begin
       Locks.Mutexes.Lock(File.Mutex);
       Hashtables.Get(File.Table.all, Address, E, Found);
       if Found then
-         if E.Block'Length = Buffer'Length then
-            E.Block := Buffer;
-            E.Dirty := True;
-            Shift_Entry(File, E);
-         else
-            Remove_Entry(File, E);
-            Create_New_Entry(File, Address, Block, E);
-            E.Dirty := True;
-         end if;
-      else
-         Create_New_Entry(File, Address, Block, E);
-         E.Dirty := True;
+         Remove_Entry(File, E);
       end if;
+      Create_New_Entry(File, Address, Block, E);
+      E.Dirty := True;
+      --P_IO.Write(File.File, E.Address, Decompress(E.Block));
+      --E.Dirty := False;
       declare
          use type Valid_Address_Type;
       begin
-         File.Cur_Address := Succ(File.Cur_Address);
+         File.Cur_Address := Succ(Address);
          if File.Last_Address < File.Cur_Address then
             File.Last_Address := File.Cur_Address;
          end if;
