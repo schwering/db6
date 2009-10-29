@@ -468,17 +468,17 @@ Then let \mbox{$e_i \in P$} with \mbox{$child(e_i) = N$} be the entry of
 $N$ in $P$.
 The main task of the synchronization is to
 \begin{itemize}
-\item set \mbox{$key(e_i) := \max N$}, and
+\item set \mbox{$key(e_i) := key(\max N)$}, and
 \item set \mbox{$count(e_i) := \sum_{e \in N} count(e)$}.
 \end{itemize}
 Let $e_i'$ be the entry $e_i$ before its modifications.
 
 The modifications might have the effect that the $P$ is {\em not valid anymore}:
 \begin{itemize}
-\item If \mbox{$size(\max N) < size(key(e_i'))$},
+\item If \mbox{$size(key(\max N)) < size(key(e_i'))$},
 	$P$ might violate req.~\ref{minsize} after the update.
 	A node decrease handling (proc.~\ref{dec}) of $P$ must be performed.
-\item If \mbox{$size(\max N) > size(key(e_i'))$},
+\item If \mbox{$size(key(\max N)) > size(key(e_i'))$},
 	$P$ might violate req.~\ref{maxsize} after the update.
 	A node increase handling (proc.~\ref{inc}) of $P$ must be performed.
 \item Otherwise, the $P$ must be written back and, if $i = deg(N)$ (and
