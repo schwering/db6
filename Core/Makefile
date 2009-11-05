@@ -41,12 +41,21 @@ TESTS=$(HEAP_TESTS)\
       $(STRING_TESTS)\
       $(MIXED_TESTS)
 
+ARCH_DARWIN=Darwin
+ARCH_CYGWIN=CYGWIN
+ARCH_DARWIN_TEST=$(findstring $(ARCH_DARWIN),$(shell uname))
+ARCH_CYGWIN_TEST=$(findstring $(ARCH_CYGWIN),$(shell uname))
+
 # Set the DEFINITIONS variable appropriate to the operating system.
 # They're used for steering the C low level routines.
-ifeq ($(shell uname), Darwin)
+ifeq ($(ARCH_DARWIN_TEST), $(ARCH_DARWIN))
 	DEFINITIONS=
 else
-	DEFINITIONS=-DHAVE_OFF64_T
+	ifeq ($(ARCH_CYGWIN_TEST), $(ARCH_CYGWIN))
+		DEFINITIONS=-DWIN32
+	else
+		DEFINITIONS=-DHAVE_OFF64_T
+	endif
 endif
 
 
@@ -56,13 +65,13 @@ endif
 # instead of the GCC available for Cygwin. (Note: for some reason, at some
 # installations the linking between Cygwin's GCC and Windows' GNAT works.
 # Nevertheless, I decided to stick with Windows' GNAT's GCC.)
-ifeq ($(shell uname -o), Cygwin)
-	CC=C:/Program\ Files/Gnat/Pentium/bin/gcc
-	GNATMAKE=C:/Program\ Files/Gnat/Pentium/bin/gnatmake
-else
+#ifeq ($(shell uname -o), Cygwin)
+	#CC=C:/Program\ Files/Gnat/Pentium/bin/gcc
+	#GNATMAKE=C:/Program\ Files/Gnat/Pentium/bin/gnatmake
+#else
 	CC=gcc
 	GNATMAKE=gnatmake
-endif
+#endif
 
 
 COMMONFLAGS=-Wall\
