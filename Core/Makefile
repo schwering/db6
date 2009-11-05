@@ -1,25 +1,3 @@
-LIBDB_DIR         =libdb
-TEST_DIR          =bin
-
-RELEASE_DIR       =release
-DEBUG_DIR         =debug
-OBJECT_DIR        =objects
-
-DATA_DIR          =.tmp
-
-DIRS=$(LIBDB_DIR)\
-     $(LIBDB_DIR)/$(DEBUG_DIR)\
-     $(LIBDB_DIR)/$(DEBUG_DIR)/$(OBJECT_DIR)\
-     $(LIBDB_DIR)/$(RELEASE_DIR)\
-     $(LIBDB_DIR)/$(RELEASE_DIR)/$(OBJECT_DIR)\
-     $(TEST_DIR)\
-     $(TEST_DIR)/$(RELEASE_DIR)\
-     $(TEST_DIR)/$(DEBUG_DIR)\
-     $(DATA_DIR)
-
-C_OBJECTS=db-compression-deflate-c db-io-low_level-c db-utils-timers-c
-
-
 # For each f in the list, Tests/f.adb must exist.
 # A binary with its name is created in build/[release|debug]/.
 HEAP_TESTS=heap cheap
@@ -41,23 +19,6 @@ TESTS=$(HEAP_TESTS)\
       $(STRING_TESTS)\
       $(MIXED_TESTS)
 
-ARCH_DARWIN=Darwin
-ARCH_CYGWIN=CYGWIN
-ARCH_DARWIN_TEST=$(findstring $(ARCH_DARWIN),$(shell uname))
-ARCH_CYGWIN_TEST=$(findstring $(ARCH_CYGWIN),$(shell uname))
-
-# Set the DEFINITIONS variable appropriate to the operating system.
-# They're used for steering the C low level routines.
-ifeq ($(ARCH_DARWIN_TEST), $(ARCH_DARWIN))
-	DEFINITIONS=
-else
-	ifeq ($(ARCH_CYGWIN_TEST), $(ARCH_CYGWIN))
-		DEFINITIONS=-DWIN32
-	else
-		DEFINITIONS=-DHAVE_OFF64_T
-	endif
-endif
-
 
 # Under Windows using Cygwin, I had problems with GNAT and GCC. As a result,
 # I'm using the GNAT for Windows, not Cygwin. Because I didn't get the linking
@@ -69,47 +30,16 @@ endif
 	#CC=C:/Program\ Files/Gnat/Pentium/bin/gcc
 	#GNATMAKE=C:/Program\ Files/Gnat/Pentium/bin/gnatmake
 #else
-	CC=gcc
-	GNATMAKE=gnatmake
 	GPRBUILD=gprbuild
 #endif
 
-
-COMMONFLAGS=-Wall\
-	    -D_FILE_OFFSET_BITS=64\
-	    -D_GNU_SOURCE\
-	    $(DEFINITIONS)\
-	    #-DDB_DIRECT_IO
-CFLAGS=-c $(COMMONFLAGS)
-
 all: release debug
 
-debug: dirs libdb_debug
-	for T in $(TESTS); do $(GPRBUILD) -Pdb -XBUILD=debug $$T.adb || exit; done
+debug:
+	for T in $(TESTS); do $(GPRBUILD) -p db.gpr -XBUILD=debug $$T.adb || exit; done
 
-release: dirs libdb_release
-	for T in $(TESTS); do $(GPRBUILD) -Pdb -XBUILD=release $$T.adb || exit; done
-
-cobjects_release: dirs
-	for F in $(C_OBJECTS); do make $(LIBDB_DIR)/$(RELEASE_DIR)/$(OBJECT_DIR)/$$F.o || exit; done
-
-cobjects_debug: dirs
-	for F in $(C_OBJECTS); do make $(LIBDB_DIR)/$(DEBUG_DIR)/$(OBJECT_DIR)/$$F.o || exit; done
-
-libdb_release: dirs cobjects_release
-	$(GNATMAKE) -Plibdb -XBUILD=release
-
-libdb_debug: dirs cobjects_debug
-	$(GNATMAKE) -Plibdb -XBUILD=debug
-
-dirs:
-	for D in $(DIRS); do if test \! -d $$D; then mkdir $$D; fi done
-
-$(LIBDB_DIR)/$(RELEASE_DIR)/$(OBJECT_DIR)/%.o: %.c
-	$(CC) $(CFLAGS) $^ -o $@
-
-$(LIBDB_DIR)/$(DEBUG_DIR)/$(OBJECT_DIR)/%.o: %.c
-	$(CC) $(CFLAGS) $^ -o $@
+release:
+	for T in $(TESTS); do $(GPRBUILD) -p db.gpr -XBUILD=release $$T.adb || exit; done
 
 tags: *.ads *.adb Makefile
 	gnat xref -v -nostdinc -nostdlib *.ad[s] | grep db- | grep \.ads >tags

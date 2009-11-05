@@ -16,7 +16,16 @@ is
    Length : constant Uint6 := 20;
    Great  : constant Uint64 := Uint64'Last;
    Small  : constant Uint32 := Uint32(Great mod Uint32'Modulus);
+
+   type Mod100 is mod 100;
+   M100 : Mod100 := 90;
 begin
+   Put_Line(Mod100'Image(Mod100(0) - 1));
+   for I in 1 .. 1000 loop
+      Put_Line("Mod100 (90 +"& I'Img &") ="& Mod100'Image(M100+Mod100(I)));
+   end loop;
+
+
    Put_Line("Natural'Size ="& Natural'Size'Img);
    Put_Line("Cast:"& Uint32'Image(Small));
    Put_Line(" "& Uint6'Image(Index));

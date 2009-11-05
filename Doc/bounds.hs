@@ -7,7 +7,7 @@
 --           = 3 * (2^{n-1} - 1)  +  2^{n-1}
 --           = 4 * 2^{n-1}  -  3
 --           = 2^{n+1} - 3
--- Let i(n) = incr n and assume n >= 3
+-- Let i(n) = incr n and assume n >= 2
 -- Then i(n) = 2 + i(n-1) + s(n-1)
 --           = 2 + (2 + i(n-2) + s(n-2)) + s(n-1)
 --           = 2 + (2 + i(n-2) + d(n-2)) + d(n-1)
