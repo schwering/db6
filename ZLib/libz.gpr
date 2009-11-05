@@ -1,0 +1,16 @@
+project Libz is
+   type OS_Type is ("GNU/Linux", "Unix", "Windows_NT");
+   OS : OS_Type    := External("OS", "GNU/Linux");
+
+   for Externally_Built use "true";
+   for Source_Files use ();
+   case OS is
+      when "Windows_NT" =>
+         for Library_Dir use "C:/cygwin/lib";
+      when others =>
+         for Library_Dir use "/usr/lib";
+   end case;
+   for Library_Name use "z";
+   for Library_Kind use "static";
+end Libz;
+

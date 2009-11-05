@@ -71,6 +71,7 @@ endif
 #else
 	CC=gcc
 	GNATMAKE=gnatmake
+	GPRBUILD=gprbuild
 #endif
 
 
@@ -84,10 +85,10 @@ CFLAGS=-c $(COMMONFLAGS)
 all: release debug
 
 debug: dirs libdb_debug
-	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=debug $$T.adb || exit; done
+	for T in $(TESTS); do $(GPRBUILD) -Pdb -XBUILD=debug $$T.adb || exit; done
 
 release: dirs libdb_release
-	for T in $(TESTS); do $(GNATMAKE) -Pdb -XBUILD=release $$T.adb || exit; done
+	for T in $(TESTS); do $(GPRBUILD) -Pdb -XBUILD=release $$T.adb || exit; done
 
 cobjects_release: dirs
 	for F in $(C_OBJECTS); do make $(LIBDB_DIR)/$(RELEASE_DIR)/$(OBJECT_DIR)/$$F.o || exit; done

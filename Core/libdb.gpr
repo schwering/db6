@@ -1,11 +1,14 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
-with "libz";
+with "../ZLib/libz";
 
 project LibDB is
 
    type Build_Type is ("release", "debug");
    Build : Build_Type := External("BUILD", "debug");
+
+   type OS_Type is ("GNU/Linux", "Unix", "Windows_NT");
+   Operating_System : OS_Type    := External("OS", "GNU/Linux");
 
    LIB_NAME          := "db";
 
@@ -26,29 +29,71 @@ project LibDB is
    for Library_Kind use "static";
    for Library_Version use Lib_Name &".a";
 
+
    package Compiler is
+      Ada_Default_Switches := ();
       case Build is
          when "release" =>
-            for Default_Switches ("Ada") use ("-O2",
-                                              "-gnatp");
+            Ada_Default_Switches := Ada_Default_Switches & "-O2" & "-gnatp";
          when "debug" =>
-            for Default_Switches ("Ada") use
-               ("-g",            -- debug info (needed for traceback)
-                "-fno-inline",   -- no inlining
-                "-gnata",        -- assertions on
-                "-gnatwa",       -- all warnings
---              "-gnatD",        -- dg-files
---              "-gnatwFa",      -- turn off unref formal
-                "-gnato",        -- overflow checking
---              "-fstack-check", -- generate stack checking code
---              "-fstack-usage", -- should make stack-usage
-                "-u0",           -- should make per-thread-stack-usage
-                "-gnatE");       -- dynamic elaboration checking (what?)
+            Ada_Default_Switches := Ada_Default_Switches  &
+                "-g" &            -- debug info (needed for traceback)
+                "-fno-inline" &   -- no inlining
+                "-gnata" &        -- assertions on
+                "-gnatwa" &       -- all warnings
+--              "-gnatD" &        -- dg-files
+--              "-gnatwFa" &      -- turn off unref formal
+                "-gnato" &        -- overflow checking
+--              "-fstack-check" & -- generate stack checking code
+--              "-fstack-usage" & -- should make stack-usage
+                "-u0" &           -- should make per-thread-stack-usage
+                "-gnatE";         -- dynamic elaboration checking (what?)
       end case;
-      for Default_Switches ("C") use ("-Wall",
-                                      "-D_FILE_OFFSET_BITS=64",
-                                      "-D_GNU_SOURCE");
+
+
+
+      C_Default_Switches := ("-Wall",
+                             "-D_FILE_OFFSET_BITS=64",
+                             "-D_GNU_SOURCE");
+
+      -- Care about HAVE_OFF64_T definition.
+      case Operating_System is
+         when "GNU/Linux" | "Windows_NT" =>
+            C_Default_Switches := C_Default_Switches & "-DHAVE_OFF64_T";
+         when "Unix" =>
+            null;
+      end case;
+
+      -- Care about HAVE_PREAD and HAVE_PWRITE definition.
+      case Operating_System is
+         when "GNU/Linux" | "Unix" =>
+            C_Default_Switches := C_Default_Switches & "-DHAVE_PREAD";
+            C_Default_Switches := C_Default_Switches & "-DHAVE_PWRITE";
+         when "Windows_NT" =>
+            null;
+      end case;
+
+      -- Care about HAVE_POSIX_MEMALIGN definition.
+      case Operating_System is
+         when "GNU/Linux" | "Unix" =>
+            C_Default_Switches := C_Default_Switches & "-DHAVE_POSIX_MEMALIGN";
+         when "Windows_NT" =>
+            null;
+      end case;
+
+      -- Care about WIN32 definition.
+      case Operating_System is
+         when "GNU/Linux" | "Unix" =>
+            null;
+         when "Windows_NT" =>
+            C_Default_Switches := C_Default_Switches & "-DWIN32";
+      end case;
+
+
+      for Default_Switches ("C") use C_Default_Switches;
+      for Default_Switches ("Ada") use Ada_Default_Switches;
    end Compiler;
+
 
    package Binder is
       case Build is

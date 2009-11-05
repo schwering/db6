@@ -15,8 +15,8 @@
 #endif
 
 #ifndef O_DIRECT
-  #error O_DIRECT not available
-  #define O_DIRECT		0
+  //#error O_DIRECT not available
+  #define O_DIRECT	0
 #endif
 
 /*
@@ -121,9 +121,9 @@ inline int db_io_low_level_unlock(int fd)
 #endif
 }
 
-inline off64_t db_io_low_level_lseek(int fd, off64_t pos, int whence)
+inline off64_t db_io_low_level_lseek(int fd, off64_t offset, int whence)
 {
-	return lseek64(fd, pos, whence);
+	return lseek64(fd, offset, whence);
 }
 
 inline off64_t db_io_low_level_size(int fd)
@@ -143,7 +143,12 @@ inline ssize_t db_io_low_level_read(int fd, void *buf, size_t nbytes)
 inline ssize_t db_io_low_level_pread(int fd, void *buf, size_t nbytes,
 		off64_t offset)
 {
+#ifndef HAVE_PREAD
+	db_io_low_level_lseek(fd, offset, SEEK_SET);
+	return read(fd, buf, nbytes);
+#else
 	return pread(fd, buf, nbytes, offset);
+#endif
 }
 
 inline ssize_t db_io_low_level_write(int fd, const void *buf, size_t nbytes)
@@ -154,11 +159,19 @@ inline ssize_t db_io_low_level_write(int fd, const void *buf, size_t nbytes)
 inline ssize_t db_io_low_level_pwrite(int fd, const void *buf, size_t nbytes,
 		off64_t offset)
 {
+#ifndef HAVE_PWRITE
+	db_io_low_level_lseek(fd, offset, SEEK_SET);
+	return write(fd, buf, nbytes);
+#else
 	return pwrite(fd, buf, nbytes, offset);
+#endif
 }
 
 inline ssize_t db_io_low_level_read_direct(int fd, void *buf, size_t nbytes)
 {
+#ifndef HAVE_POSIX_MEMALIGN
+	return -1;
+#else
 	ssize_t retval;
 	void *abuf;
 
@@ -168,11 +181,15 @@ inline ssize_t db_io_low_level_read_direct(int fd, void *buf, size_t nbytes)
 	memcpy(buf, abuf, retval);
 	free(abuf);
 	return retval;
+#endif
 }
 
 inline ssize_t db_io_low_level_write_direct(int fd, const void *buf,
 		size_t nbytes)
 {
+#ifndef HAVE_POSIX_MEMALIGN
+	return -1;
+#else
 	ssize_t retval;
 	void *abuf;
 
@@ -182,6 +199,7 @@ inline ssize_t db_io_low_level_write_direct(int fd, const void *buf,
 	retval = write(fd, abuf, nbytes);
 	free(abuf);
 	return retval;
+#endif
 }
 
 inline int db_io_low_level_errno(void)

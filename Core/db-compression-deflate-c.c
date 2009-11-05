@@ -1,4 +1,6 @@
-#include <zlib.h>
+#ifndef ZLIB_H
+#include "../ZLib/zlib.h"
+#endif
 
 #define DEFLATE_LEVEL Z_DEFAULT_COMPRESSION
 
