@@ -1,54 +1,30 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
 with "libdb";
+with "attributes";
 
 project DB is
 
-   type Build_Type is ("release", "debug");
-   type OS_Type is ("GNU/Linux", "Unix", "Windows_NT");
+   Test_Dir           := "bin/";
 
-   OS    : OS_Type    := External("OS", "GNU/Linux");
-   Build : Build_Type := External("BUILD", "debug");
+   Heap_Tests        := ("heap", "cheap");
+   Tree_Tests        := ("tree", "vtree", "dtree");
+   Ttree_Tests       := ("ttree", "vttree", "cttree", "lruttree", "blob_ttree");
+   Cursor_Tests      := ("cursor", "controlled", "blob_cursor");
+   Thread_Tests      := ("thread", "thread2", "thread3");
+   Compression_Tests := ("prefix", "levenshtein", "deflate");
+   String_Tests      := ("unbounded_string");
+   Mixed_Tests       := ("locks", "search", "hash", "modular", "rtest", "i_bm",
+                         "check", "data", "mkfs", "bitmap");
 
-   TEST_DIR           := "bin/";
-
+   for Main use Heap_Tests & Tree_Tests & Ttree_Tests & Cursor_Tests &
+                Thread_Tests & Compression_Tests & String_Tests & Mixed_Tests;
    for Source_Dirs use ("Tests");
-   for Object_Dir use TEST_DIR &"/"& Build;
-   for Exec_Dir use TEST_DIR &"/"& Build;
+   for Object_Dir use TEST_DIR &"/"& Attributes.Build;
+   for Exec_Dir use TEST_DIR &"/"& Attributes.Build;
 
-   package Compiler is
-      case Build is
-         when "release" =>
-            for Default_Switches ("Ada") use ("-O2",
-                                              "-gnatp");
-         when "debug" =>
-            for Default_Switches ("Ada") use
-               ("-g",            -- debug info (needed for traceback)
-                "-fno-inline",   -- no inlining
-                "-gnata",        -- assertions on
-                "-gnatwa",       -- all warnings
---              "-gnatD",        -- dg-files
---              "-gnatwFa",      -- turn off unref formal
-                "-gnato",        -- overflow checking
---              "-fstack-check", -- generate stack checking code
---              "-fstack-usage", -- should make stack-usage
-                "-u0",           -- should make per-thread-stack-usage
-                "-gnatE");       -- dynamic elaboration checking (what?)
-      end case;
-   end Compiler;
-
-   package Binder is
-      case Build is
-         when "release" =>
-            for Default_Switches ("Ada") use
-               ("-d8m");          -- stack size per thread
-         when "debug" =>
-            for Default_Switches ("Ada") use
-               ("-u0",            -- should make per-thread-stack-usage
-                "-d8m",           -- stack size per thread
-                "-E");            -- needed for traceback
-      end case;
-   end Binder;
+   package Compiler renames Attributes.Compiler;
+   package Binder renames Attributes.Binder;
 
 end DB;
 
