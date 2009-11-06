@@ -41,9 +41,9 @@ debug:
 release:
 	for T in $(TESTS); do $(GPRBUILD) -p db.gpr -XBUILD=release $$T.adb || exit; done
 
-tags: *.ads *.adb Makefile
-	gnat xref -v -nostdinc -nostdlib *.ad[s] | grep db- | grep \.ads >tags
-#	| sort -fu >tags
+tags: *.ads *.adb
+	gnat xref -v -nostdinc -nostdlib -aOlibdb/debug/objects/ *.ad? | grep db- | grep \.ads | sort -fu >tags
+	gnat xref -v -nostdinc -nostdlib -aOlibdb/debug/objects/ *.ads >tags
 
 apidoc: *.ads
 	for F in *.ads; do adabrowse -f $$F; done
@@ -60,5 +60,6 @@ statsbl:
 	@cat *.adb | grep -c ";"
 
 clean:
-	rm -rf $(LIBDB_DIR) $(TEST_DIR)
+	gprclean -f -q db.gpr -XBUILD=debug || true
+	gprclean -f -q db.gpr -XBUILD=release || true
 

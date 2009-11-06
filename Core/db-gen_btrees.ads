@@ -342,10 +342,8 @@ package DB.Gen_BTrees is
       Upper_Bound       : Bound_Type;
       Reverse_Direction : Boolean := False)
       return Cursor_Type;
-   -- Creates a new cursor. In contrast to the other New_Cursor constructor,
-   -- cursors created by this one do not work with an own ticket and locks;
-   -- instead, it relies on a Transaction. This Transaction must be initialized,
-   -- of course.
+   -- Creates a new cursor. The returned cursor relies on a Transaction. This
+   -- Transaction must be initialized, of course.
    -- If Thread_Safe is True, all operations on the cursor happen mutually
    -- exclusive.
    -- All key/value-pairs hit by the cursor satisfy Lower_Bound and Upper_Bound.

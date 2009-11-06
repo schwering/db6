@@ -1,8 +1,8 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
-with "../ZLib/libz";
+with "../libz/libz";
 
-project LibDB is
+library project LibDB is
 
    type Build_Type is ("release", "debug");
    Build : Build_Type := External("BUILD", "debug");
