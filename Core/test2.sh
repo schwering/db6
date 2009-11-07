@@ -1,6 +1,6 @@
-BIN=bin/release/./lruttree
-FILE=/home/chs/Disk/btree
-C1=1m
+BIN=bin/release/./mmap
+FILE=.tmp/largerbtree
+C1=10k 
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
 # 3. Some mor insertions and check for all three

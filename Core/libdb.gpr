@@ -5,25 +5,13 @@ with "attributes";
 
 library project LibDB is
 
-   Lib_Name          := "db";
-
-   Libdb_Dir         := "lib"& Lib_Name;
-
-   Release_Dir       := "release";
-   Debug_Dir         := "debug";
-   Object_Dir        := "objects";
-
-   Object_Path        := Libdb_Dir &"/"& Attributes.Build &"/"& Object_Dir;
-   Lib_Path           := Libdb_Dir &"/"& Attributes.Build;
+   for Object_Dir use  "libdb/"& Attributes.Build &"/"& Attributes.Object_Dir;
+   for Library_Dir use "libdb/"& Attributes.Build;
+   for Library_Name use "db";
+   for Library_Kind use "static";
 
    for Languages use ("Ada", "C");
    for Source_Dirs use (".");
-   for Object_Dir use Object_Path;
-   for Library_Dir use Lib_Path;
-   for Library_Name use Lib_Name;
-   for Library_Kind use "static";
-   for Library_Version use Lib_Name &".a";
-
 
    package Compiler is
       C_Sw := ();

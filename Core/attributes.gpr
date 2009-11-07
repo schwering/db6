@@ -2,6 +2,8 @@
 
 abstract project Attributes is
 
+   Object_Dir  := "objects";
+
    for Source_Files use ();
 
    type OS_Type is ("GNU/Linux", "Unix", "Windows_NT");

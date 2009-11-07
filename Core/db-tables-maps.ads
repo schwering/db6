@@ -6,6 +6,7 @@ use System.Storage_Pools;
 
 with DB.Gen_BTrees;
 with DB.Gen_Blob_Trees;
+with DB.IO.Blocks;
 with DB.IO.Blocks.File_IO;
 with DB.Types.Keys;
 with DB.Types.Values;
