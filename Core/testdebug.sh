@@ -1,5 +1,5 @@
 BIN=bin/debug/./lruttree
-FILE=.tmp/btree_debug
+FILE=`cat .temp_path`btree_debug
 C1=5k
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both

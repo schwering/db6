@@ -3,7 +3,8 @@
 with "../libz/libz";
 with "attributes";
 
-library project LibDB is
+--library
+project LibDB is
 
    for Object_Dir use  "libdb/"& Attributes.Build &"/"& Attributes.Object_Dir;
    for Library_Dir use "libdb/"& Attributes.Build;

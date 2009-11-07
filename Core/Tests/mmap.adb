@@ -31,7 +31,7 @@ is
    use type DB.IO.Blocks.Size_Type;
 
    Max_Key_Size   : constant := 2 + 1000 + 8 
-                                + 1; -- to enforce heaped map
+                                ;--+ 1; -- to enforce heaped map
    Max_Value_Size : constant := 8;
 
    Map : Maps.Map_Type := Maps.New_Map(Max_Key_Size, Max_Value_Size);

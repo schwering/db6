@@ -1,13 +1,19 @@
-GPRBUILD=gprbuild
-GPRCLEAN=gprclean
+TEST=$(shell gprbuild)
+ifneq ($(TEST),) #Gnat 2009
+	GPRBUILD=gprbuild
+	GPRCLEAN=gprclean
+else # older Gnat
+	GPRBUILD=gprmake
+	GPRCLEAN=
+endif
 
 all: release debug
 
 debug:
-	$(GPRBUILD) -p db.gpr -XBUILD=debug
+	$(GPRBUILD) -p -Pdb -XBUILD=debug
 
 release:
-	$(GPRBUILD) -p db.gpr -XBUILD=release
+	$(GPRBUILD) -p -Pdb -XBUILD=release
 
 tags: *.ads *.adb
 	gnat xref -v -nostdinc -nostdlib -aOlibdb/debug/objects/ *.ad? | grep db- | grep \.ads | sort -fu >tags

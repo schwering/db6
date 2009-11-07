@@ -1,5 +1,5 @@
 BIN=bin/release/./mmap
-FILE=.tmp/largerbtree
+FILE=`cat .temp_path`map
 C1=10k 
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both

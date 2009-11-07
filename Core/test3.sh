@@ -1,5 +1,5 @@
 BIN=bin/release/./ttree
-FILE=.tmp/btree
+FILE=`cat .temp_path`btree
 C1=10k 
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
