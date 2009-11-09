@@ -1,10 +1,15 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 
+with Random;
+
+with DB.IO.Blocks;
+with DB.Types.Keys;
+with DB.Types.Values;
 with DB.Utils.Timers;
 with DB.Utils.Traceback;
 
-package body Gen_Jobs is
+package body Jobs is
 
    function To_Description (S : String) return Description_Type
    is
@@ -131,5 +136,5 @@ package body Gen_Jobs is
                            Boolean'Image(Reset), Total_Timer);
    end Execute_Job;
 
-end Gen_Jobs;
+end Jobs;
 

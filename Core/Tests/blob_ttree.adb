@@ -6,8 +6,9 @@ with System.Pool_Global; use System.Pool_Global;
 with System.Storage_Pools; use System.Storage_Pools;
 
 with Random; use Random;
-with Gen_Args;
-with Gen_Jobs;
+with Args;
+with Jobs;
+with Gen_Simple_Jobs;
 
 with DB.IO.Blocks;
 with DB.IO.Blocks.Direct_IO;
@@ -72,9 +73,6 @@ is
       Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
       Block_IO           => DB.IO.Blocks.Direct_IO.IO);
 
-   package Jobs is new Gen_Jobs;
-   package Args is new Gen_Args(Jobs);
-
    Tree : BTrees.Tree_Type;
 
    --Max_Size : DB.IO.Blocks.Size_Type := 0;
@@ -102,66 +100,14 @@ is
       end if;
    end Insert;
 
-
-   procedure Delete
-   is
-      use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
-      use type DB.IO.Blocks.Size_Type;
-      KV     : constant Key_Value_Type := Random_Entry;
-      Val    : Value_Type;
-      Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
-   begin
-      BTrees.Delete(Tree, KV.Key, Val, Pos, State);
-      if State /= BTrees.Success or else KV.Value /= Val then
-         Put_Line("Deletion failed");
-      end if;
-   end Delete;
-
-
-   procedure Search
-   is
-      use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
-      use type DB.IO.Blocks.Size_Type;
-      KV     : constant Key_Value_Type := Random_Entry;
-      Val    : Value_Type;
-      Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
-   begin
-      BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
-      if State /= BTrees.Success or else KV.Value /= Val then
-         Put_Line("Look up failed "& BTrees.Result_Type'Image(State));
-      end if;
-   end Search;
-
-
-   procedure Antisearch
-   is
-      use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
-      use type DB.IO.Blocks.Size_Type;
-      KV     : constant Key_Value_Type := Random_Entry;
-      Val    : Value_Type;
-      Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
-   begin
-      BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
-      if State /= BTrees.Failure then
-         Put_Line("Look up failed");
-      end if;
-   end Antisearch;
-
+   package Simple_Jobs is new Gen_Simple_Jobs
+     (BTrees.Tree_Type, BTrees.Count_Type, BTrees.Result_Type,
+      Tree, BTrees.Success, BTrees.Failure,
+      BTrees.Insert, BTrees.Delete, BTrees.Look_Up);
 
    use type BTrees.Result_Type;
-   Map      : constant Jobs.Map_Type
-            := ((Jobs.To_Description("Insert"),     Insert'Access),
-                (Jobs.To_Description("Delete"),     Delete'Access),
-                (Jobs.To_Description("Search"),     Search'Access),
-                (Jobs.To_Description("Antisearch"), Antisearch'Access));
    Long_Job : constant Jobs.Long_Job_Type
-            := Args.Create_Jobs_From_Command_Line(Map);
+            := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
    Cnt      : BTrees.Count_Type := 0;
 begin
    declare

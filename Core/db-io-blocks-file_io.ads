@@ -9,6 +9,12 @@ package DB.IO.Blocks.File_IO is
    type Address_Type is new Natural;
    subtype Valid_Address_Type is Address_Type range 1 .. Address_Type'Last;
 
+   type Block_Accesses_Type is array (Valid_Address_Type range
+      1 .. 9 * 2**20) of Boolean;
+   pragma Pack(Block_Accesses_Type);
+   type Block_Accesses_Access is access Block_Accesses_Type;
+   Blocks : Block_Accesses_Access := new Block_Accesses_Type;
+
    Invalid_Address : constant Address_Type := 0;
 
    type File_Type is limited

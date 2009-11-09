@@ -1,9 +1,7 @@
-with Gen_Jobs;
+with Jobs;
 with Random;
 
-generic
-   with package Jobs is new Gen_Jobs(<>);
-package Gen_Args is
+package Args is
 
    Parse_Error : exception;
 
@@ -17,5 +15,5 @@ package Gen_Args is
      (Map : Jobs.Map_Type)
       return Jobs.Long_Job_Type;
 
-end Gen_Args;
+end Args;
 

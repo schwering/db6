@@ -1,7 +1,9 @@
 with Ada.Command_Line;
 with Ada.Text_IO; use Ada.Text_IO;
 
-package body Gen_Args is
+with Jobs;
+
+package body Args is
 
    function To_Number (S : String) return Long_Long_Integer
    is
@@ -127,5 +129,5 @@ package body Gen_Args is
       return Long_Job;
    end Create_Jobs_From_Command_Line;
 
-end Gen_Args;
+end Args;
 

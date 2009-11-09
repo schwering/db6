@@ -1,7 +1,6 @@
 with Random;
 
-generic
-package Gen_Jobs is
+package Jobs is
 
    type Job_Type is private;
    type Long_Job_Type is array (Positive range <>) of Job_Type;
@@ -63,5 +62,5 @@ private
          Reset                     : Boolean;
       end record;
 
-end Gen_Jobs;
+end Jobs;
 

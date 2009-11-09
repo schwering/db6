@@ -6,8 +6,9 @@ with Ada.Exceptions; use Ada.Exceptions;
 
 with Random; use Random;
 with To_Strings;
-with Gen_Args;
-with Gen_Jobs;
+with Args;
+with Jobs;
+with Gen_Simple_Jobs;
 
 with DB.IO.Blocks;
 
@@ -25,8 +26,6 @@ with DB.Utils.Traceback;
 procedure TTree
 is
    package BTrees renames DB.BTrees;
-   package Jobs is new Gen_Jobs;
-   package Args is new Gen_Args(Jobs);
 
    Stop_Now : exception;
 
@@ -100,93 +99,13 @@ is
    end;
 
 
-   --Max_Size : DB.IO.Blocks.Size_Type := 0;
-   procedure Insert
-   is
-      use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
-      use type DB.IO.Blocks.Size_Type;
-      KV     : constant Key_Value_Type := Random_Entry;
-      Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
-      --Size   : DB.IO.Blocks.Size_Type;
-      --Context : DB.Types.Keys.Context_Type;
-   begin
-      --DB.Types.Keys.Get_Size_Of(Context, KV.Key, Size);
-      --Put_Line("This key size ="& DB.IO.Blocks.Size_Type'Image(Size));
-      --if Max_Size < Size then Max_Size := Size; end if;
-      --Put_Line("Max inserted key size ="&
-               --DB.IO.Blocks.Size_Type'Image(Max_Size));
-      --Put_Line("Max possible key size ="&
-               --DB.IO.Blocks.Size_Type'Image(BTrees.Max_Key_Size));
-      BTrees.Insert(Tree, KV.Key, KV.Value, Pos, State);
-      if State /= BTrees.Success then
-         Put_Line("Insertion failed");
-      end if;
-   end Insert;
+   package Simple_Jobs is new Gen_Simple_Jobs
+     (BTrees.Tree_Type, BTrees.Count_Type, BTrees.Result_Type,
+      Tree, BTrees.Success, BTrees.Failure,
+      BTrees.Insert, BTrees.Delete, BTrees.Look_Up);
 
-
-   procedure Delete
-   is
-      use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
-      use type DB.IO.Blocks.Size_Type;
-      KV     : constant Key_Value_Type := Random_Entry;
-      Val    : Value_Type;
-      Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
-   begin
-      BTrees.Delete(Tree, KV.Key, Val, Pos, State);
-      if State /= BTrees.Success or else KV.Value /= Val then
-         Put_Line("Deletion failed");
-      end if;
-   end Delete;
-
-
-   procedure Search
-   is
-      use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
-      use type DB.IO.Blocks.Size_Type;
-      KV     : constant Key_Value_Type := Random_Entry;
-      Val    : Value_Type;
-      Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
-   begin
-      BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
-      if State /= BTrees.Success or else KV.Value /= Val then
-         Put_Line("Look up failed "& BTrees.Result_Type'Image(State));
-      end if;
-   end Search;
-
-
-   procedure Antisearch
-   is
-      use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
-      use type DB.IO.Blocks.Size_Type;
-      KV     : constant Key_Value_Type := Random_Entry;
-      Val    : Value_Type;
-      Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
-   begin
-      BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
-      if State /= BTrees.Failure then
-         Put_Line("Look up failed");
-      end if;
-   end Antisearch;
-
-
-   use type BTrees.Result_Type;
-   Map      : constant Jobs.Map_Type
-            := ((Jobs.To_Description("Stats"),      Stats'Access),
-                (Jobs.To_Description("Check"),      Check'Access),
-                (Jobs.To_Description("Insert"),     Insert'Access),
-                (Jobs.To_Description("Delete"),     Delete'Access),
-                (Jobs.To_Description("Search"),     Search'Access),
-                (Jobs.To_Description("Antisearch"), Antisearch'Access));
    Long_Job : constant Jobs.Long_Job_Type
-            := Args.Create_Jobs_From_Command_Line(Map);
+            := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
    Cnt      : BTrees.Count_Type := 0;
 begin
    declare

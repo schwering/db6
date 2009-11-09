@@ -12,90 +12,55 @@ with Ada.Unchecked_Deallocation;
 
 package body Random is
 
-   Mutex           : DB.Locks.Mutexes.Mutex_Type;
-   Max_Size        : constant := 2048;
+   Mutex             : DB.Locks.Mutexes.Mutex_Type;
+   Max_Size          : constant := 2048;
    --Max_Length      : constant := 1530 - 8 - 4 - 1;
-   Max_Length      : constant := 1012 - 8 - 4;-- + 10;
+   Max_String_Length : constant := 1012 - 8 - 4;-- + 10;
+
 
    generic
-      with package Str is new DB.Types.Gen_Bounded_Strings
-        (Item_Type  => Char_Type,
-         Max_Length => Max_Size);
-      Random_Factor : in Natural := 1;
-   function Make_String (I : Natural) return Str.String_Type;
+      with package Strings is
+         new DB.Types.Gen_Bounded_Strings(Char_Type, Max_Size);
+         --new DB.Types.Gen_Unbounded_Strings(Char_Type);
+      Random_Weight : in Natural := 1;
+   function Make_String (Index : Natural) return Strings.String_Type;
 
-   X : Natural := 0;
-   function NI return Natural
+   function Make_String (Index : Natural) return Strings.String_Type
    is
-      N : constant := 5;
+      Alphabet_Length : constant
+                      := Char_Type'Pos('z') - Char_Type'Pos('a') + 1;
+      Total_KV_Count  : constant Positive
+                      := Key_Value_Pairs'Length;
+      Random_Factor   : constant Strings.Length_Type
+                      := Random_Weight * Total_KV_Count / Index + 10 + Index;
+      String_Length   : constant Strings.Length_Type
+                      := ((Random_Factor mod Max_String_Length) + 1);
+      String_Buffer   : Strings.Indefinite_Buffer_Type(1 .. String_Length);
    begin
-      X := (X + 1) mod N;
-      if X = N-1 then
-         return 0;
-      else
-         return 1;
-      end if;
-   end NI;
-   pragma Unreferenced (NI);
-
-   function Make_String (I : Natural) return Str.String_Type
-   is
-      AZ : constant := Character'Pos('z') - Character'Pos('a') + 1;
-      R  : constant Natural
-         := Random_Factor * (Key_Value_Pairs'Length - I + 10) / I + 10 + I;
-      L  : constant Str.Length_Type
-         := Str.Length_Type((R mod Max_Length) + 1);
-         --:= Str.Length_Type((NI * Max_Length) + 1);
-         --:= Str.Length_Type(Max_Length);
-      B  : Str.Indefinite_Buffer_Type(1 .. L);
-   begin
-      for J in 1 .. L loop
-         if J mod 2 = 0 then
-            B(J) := Char_Type'Val(Char_Type'Pos('a') + ((R*J) mod AZ));
-         else
-            B(J) := Char_Type'Val(Char_Type'Pos('A') + ((R*J) mod AZ));
-         end if;
+      for J in 1 .. String_Length loop
+         declare
+            Char_Pos : Natural;
+            Offset   : constant Natural
+                     := (Random_Factor * J) mod Alphabet_Length;
+         begin
+            if (String_Length + J) mod 2 = 0 then
+               Char_Pos := Char_Type'Pos('a') + Offset;
+            else
+               Char_Pos := Char_Type'Pos('A') + Offset;
+            end if;
+            String_Buffer(J) := Char_Type'Val(Char_Pos);
+         end;
       end loop;
-      return Str.New_String(B);
+      return Strings.New_String(String_Buffer);
    end Make_String;
 
 
-   generic
-      with package Str is new DB.Types.Gen_Unbounded_Strings
-        (Item_Type  => Char_Type);
-      Random_Factor : in Natural := 1;
-   function Make_UString (I : Natural) return Str.String_Type;
-   pragma Unreferenced (Make_UString);
-
-
-   function Make_UString (I : Natural) return Str.String_Type
-   is
-      AZ : constant := Character'Pos('z') - Character'Pos('a') + 1;
-      R  : constant Natural
-         := Random_Factor * (Key_Value_Pairs'Length - I + 10) / I + 10 + I;
-      L  : constant Str.Length_Type
-         := Str.Length_Type((R mod Max_Length) + 1);
-      B  : Str.Buffer_Type(1 .. L);
-   begin
-      for J in 1 .. L loop
-         if J mod 2 = 0 then
-            B(J) := Char_Type'Val(Char_Type'Pos('a') + ((R*J) mod AZ));
-         else
-            B(J) := Char_Type'Val(Char_Type'Pos('A') + ((R*J) mod AZ));
-         end if;
-      end loop;
-      return Str.New_String(B);
-   end Make_UString;
-
-
    function Make_Row is new Make_String
-     (Str => DB.Types.Rows,
-      Random_Factor => 1);
+     (Strings => DB.Types.Rows, Random_Weight => 1);
 
 
    function Make_Column is new Make_String
-     (Str => DB.Types.Columns,
-      Random_Factor => 3);
+     (Strings => DB.Types.Columns, Random_Weight => 3);
 
 
    procedure Init_Key_Value_Pairs (Init : in Count_Type)
@@ -138,7 +103,7 @@ package body Random is
    begin
       DB.Locks.Mutexes.Lock(Mutex);
       declare
-         I  : constant Positive
+         I : constant Positive
          := Positive((Current_KV mod Count_Type(Key_Value_Pairs'Length)) + 1);
       begin
          Key_Value_Pairs(I).Key.Time := DB.Types.Times.Number_Type(Current_KV);
