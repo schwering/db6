@@ -1,6 +1,6 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
-with "../libz/libz";
+with "../lib/zlib";
 with "attributes";
 
 --library

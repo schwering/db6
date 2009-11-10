@@ -1,5 +1,5 @@
 --library
-project Libz is
+project ZLib is
    type OS_Type is ("GNU/Linux", "Unix", "Windows_NT");
    Operating_System : OS_Type := External("OS", "GNU/Linux");
 
@@ -12,6 +12,6 @@ project Libz is
          for Library_Dir use "C:/cygwin/lib";
    end case;
    for Library_Name use "z";
-   for Library_Kind use "dynamic";
-end Libz;
+   for Library_Kind use "static";
+end ZLib;
 
