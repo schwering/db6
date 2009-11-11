@@ -121,24 +121,24 @@ is
       DB.Utils.Timers.Start(T);
       declare
          task Man;
-         task body Man
-         is begin
+         task body Man is
+         begin
             Put_Line("Man starts.");
             Proc("Man", Count);
             Put_Line("Man is done.");
          end Man; -- begin null; end; declare -- sequential or parallel
 
          task Woman;
-         task body Woman
-         is begin
+         task body Woman is
+         begin
             Put_Line("Woman starts.");
             Proc("Woman", Count);
             Put_Line("Woman is done.");
          end Woman; -- begin null; end; declare -- sequential or parallel
 
          task Lukas;
-         task body Lukas
-         is begin
+         task body Lukas is
+         begin
             Put_Line("Lukas starts.");
             Searches("Lukas", Count);
             Searches("Lukas", Count);

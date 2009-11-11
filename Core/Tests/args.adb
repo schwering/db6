@@ -24,16 +24,14 @@ package body Args is
    end To_Number;
 
 
-   function File_Name
-      return String
-   is begin
+   function File_Name return String is
+   begin
       return Ada.Command_Line.Argument(1);
    end File_Name;
 
 
-   function Init_Offset
-      return Random.Count_Type
-   is begin
+   function Init_Offset return Random.Count_Type is
+   begin
       return Random.Count_Type(To_Number(Ada.Command_Line.Argument(2)));
    end Init_Offset;
 

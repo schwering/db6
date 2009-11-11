@@ -43,18 +43,18 @@ is
       return Arr;
    end;
 
-   function From_Storage_Array (Arr : Base_Block_Type) return Item_Type
-   is begin
+   function From_Storage_Array (Arr : Base_Block_Type) return Item_Type is
+   begin
       return (I => Arr'Length);
    end;
 
-   function Info_Index_ID (ID : String) return String
-   is begin
+   function Info_Index_ID (ID : String) return String is
+   begin
       return ID &"_info";
    end;
 
-   function Free_Index_ID (ID : String) return String
-   is begin
+   function Free_Index_ID (ID : String) return String is
+   begin
       return ID &"_free";
    end;
 

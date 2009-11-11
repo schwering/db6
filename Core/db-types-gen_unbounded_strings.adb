@@ -4,16 +4,16 @@ with Ada.Unchecked_Deallocation;
 package body DB.Types.Gen_Unbounded_Strings is
 
    overriding
-   procedure Initialize (String : in out String_Type)
-   is begin
+   procedure Initialize (String : in out String_Type) is
+   begin
       String.Buffer   := null;
       String.Refcount := new Refcount_Type'(1);
    end;
 
 
    overriding
-   procedure Adjust (String : in out String_Type)
-   is begin
+   procedure Adjust (String : in out String_Type) is
+   begin
       String.Refcount.all := String.Refcount.all + 1;
    end;
 
@@ -39,20 +39,20 @@ package body DB.Types.Gen_Unbounded_Strings is
    end;
 
 
-   function "<" (Left, Right : String_Type) return Boolean
-   is begin
+   function "<" (Left, Right : String_Type) return Boolean is
+   begin
       return Left.Buffer.all < Right.Buffer.all;
    end "<";
 
 
-   function "=" (Left, Right : String_Type) return Boolean
-   is begin
+   function "=" (Left, Right : String_Type) return Boolean is
+   begin
       return Left.Buffer.all = Right.Buffer.all;
    end "=";
 
 
-   function "&" (Left, Right : String_Type) return String_Type
-   is begin
+   function "&" (Left, Right : String_Type) return String_Type is
+   begin
       return New_String(Left.Buffer.all & Right.Buffer.all);
    end "&";
 
@@ -60,8 +60,8 @@ package body DB.Types.Gen_Unbounded_Strings is
    function "&"
      (Left  : String_Type;
       Right : Buffer_Type)
-      return String_Type
-   is begin
+      return String_Type is
+   begin
       return New_String(Left.Buffer.all & Right);
    end "&";
 
@@ -69,16 +69,16 @@ package body DB.Types.Gen_Unbounded_Strings is
    function "&"
      (Left  : Buffer_Type;
       Right : String_Type)
-      return String_Type
-   is begin
+      return String_Type is
+   begin
       return New_String(Left & Right.Buffer.all);
    end "&";
 
 
    function To_Index
      (L : Length_Type)
-      return Index_Type
-   is begin
+      return Index_Type is
+   begin
       return Index_Type(L);
    end To_Index;
 
@@ -106,8 +106,8 @@ package body DB.Types.Gen_Unbounded_Strings is
 
    function Length
      (S : String_Type)
-      return Length_Type
-   is begin
+      return Length_Type is
+   begin
       return S.Buffer'Length;
    end Length;
 
@@ -115,8 +115,8 @@ package body DB.Types.Gen_Unbounded_Strings is
    function Element
      (S : String_Type;
       I : Index_Type)
-      return Item_Type
-   is begin
+      return Item_Type is
+   begin
       return S.Buffer(I);
    end Element;
 
@@ -125,16 +125,16 @@ package body DB.Types.Gen_Unbounded_Strings is
      (S      : String_Type;
       From   : Index_Type;
       Length : Length_Type)
-      return String_Type
-   is begin
+      return String_Type is
+   begin
       return New_String(S.Buffer.all(From .. From + Length - 1));
    end Substring;
 
 
    function To_String
      (S : String_Type)
-      return Buffer_Type
-   is begin
+      return Buffer_Type is
+   begin
       return S.Buffer.all(1 .. S.Length);
    end To_String;
 

@@ -6,8 +6,8 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
 
    procedure Create
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       P_IO.Create(ID, File.File);
       File.Hash_Table := new HT.Table_Type'(HT.New_Table(Buffer_Size));
    end Create;
@@ -15,8 +15,8 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
 
    procedure Open
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       P_IO.Open(ID, File.File);
       File.Hash_Table := new HT.Table_Type'(HT.New_Table(Buffer_Size));
    end Open;
@@ -44,8 +44,8 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
 
    procedure Set_Block_Count
      (File    : in out File_Type;
-      Address : in     Address_Type)
-   is begin
+      Address : in     Address_Type) is
+   begin
       P_IO.Set_Block_Count(File.File, Address);
       if Is_Valid_Address(Address) then
          File.Next_Address := Succ(To_Valid_Address(Address));
@@ -55,8 +55,8 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
    end Set_Block_Count;
 
 
-   procedure Check (File : in out File_Type)
-   is begin
+   procedure Check (File : in out File_Type) is
+   begin
       if File.Length /= HT.Size(File.Hash_Table.all) then
          --Put_Line("IO_Error IO_Error IO_Error IO_Error IO_Error ");
          raise IO_Error;
@@ -288,8 +288,8 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
 
    procedure Seek_New
      (File    : in out File_Type;
-      Address :    out Valid_Address_Type)
-   is begin
+      Address :    out Valid_Address_Type) is
+   begin
       Address           := File.Next_Address;
       File.Next_Address := Succ(File.Next_Address);
    end Seek_New;
@@ -297,48 +297,48 @@ package body DB.IO.Blocks.Gen_Climb_Caches is
 
    procedure Acquire_Ticket
      (File   : in out File_Type;
-      Ticket :    out Ticket_Type)
-   is begin
+      Ticket :    out Ticket_Type) is
+   begin
       P_IO.Acquire_Ticket(File.File, Ticket);
    end Acquire_Ticket;
 
 
    procedure Release_Ticket
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Release_Ticket(File.File, Ticket);
    end Release_Ticket;
 
 
    procedure Read_Lock
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Read_Lock(File.File, Ticket);
    end Read_Lock;
 
 
    procedure Write_Lock
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Write_Lock(File.File, Ticket);
    end Write_Lock;
 
 
    procedure Certify_Lock
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Certify_Lock(File.File, Ticket);
    end Certify_Lock;
 
 
    procedure Unlock
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Unlock(File.File, Ticket);
    end Unlock;
 

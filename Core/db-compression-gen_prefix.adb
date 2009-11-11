@@ -4,8 +4,8 @@ package body DB.Compression.Gen_Prefix is
      (S, T : String_Type)
       return Delta_Type
    is
-      function Min (X, Y : Length_Type) return Length_Type
-      is begin
+      function Min (X, Y : Length_Type) return Length_Type is
+      begin
          if X < Y then
             return X;
          else
@@ -40,8 +40,8 @@ package body DB.Compression.Gen_Prefix is
    function Decode
      (S : String_Type;
       D : Delta_Type)
-      return String_Type
-   is begin
+      return String_Type is
+   begin
       return Substring(S, 1, D.Prefix_Length) & D.Postfix;
    end Decode;
 

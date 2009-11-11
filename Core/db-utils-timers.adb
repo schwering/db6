@@ -19,8 +19,8 @@ package body DB.Utils.Timers is
    TIMES_PER_SEC : constant Time_Type := Time_Type(C_TIMES_PER_SEC);
 
 
-   procedure Start (Timer : in out Timer_Type)
-   is begin
+   procedure Start (Timer : in out Timer_Type) is
+   begin
       if Timer.Running then
          raise Timer_Error;
       end if;
@@ -31,8 +31,8 @@ package body DB.Utils.Timers is
    end Start;
 
 
-   procedure Stop (Timer : in out Timer_Type)
-   is begin
+   procedure Stop (Timer : in out Timer_Type) is
+   begin
       if not Timer.Running then
          raise Timer_Error;
       end if;
@@ -59,8 +59,8 @@ package body DB.Utils.Timers is
    end Stop;
 
 
-   procedure Reset (Timer : out Timer_Type)
-   is begin
+   procedure Reset (Timer : out Timer_Type) is
+   begin
       Timer.Running         := False;
 
       Timer.CPU_Start_Time  := 0;
@@ -71,8 +71,8 @@ package body DB.Utils.Timers is
    end Reset;
 
 
-   function CPU_Ticks (Timer : Timer_Type) return Ticks_Type
-   is begin
+   function CPU_Ticks (Timer : Timer_Type) return Ticks_Type is
+   begin
       if Timer.Running then
          raise Timer_Error;
       end if;
@@ -84,8 +84,8 @@ package body DB.Utils.Timers is
    end CPU_Ticks;
 
 
-   function Real_Time (Timer : Timer_Type) return Time_Type
-   is begin
+   function Real_Time (Timer : Timer_Type) return Time_Type is
+   begin
       if Timer.Running then
          raise Timer_Error;
       end if;
@@ -119,8 +119,8 @@ package body DB.Utils.Timers is
 
    procedure Print (S : in String; Timer : in out Timer_Type)
    is
-      function Trim (S : String) return String
-      is begin
+      function Trim (S : String) return String is
+      begin
          if S(S'First) = ' ' then
             return S(S'First+1 .. S'Last);
          else

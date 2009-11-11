@@ -1,7 +1,7 @@
 package body DB.Types.Gen_Bounded_Strings is
 
-   function "<" (Left, Right : String_Type) return Boolean
-   is begin
+   function "<" (Left, Right : String_Type) return Boolean is
+   begin
       if Left.Length < Right.Length then
          return Left.Buffer(1..Left.Length) <= Right.Buffer(1..Left.Length);
       else
@@ -10,8 +10,8 @@ package body DB.Types.Gen_Bounded_Strings is
    end "<";
 
 
-   function "=" (Left, Right : String_Type) return Boolean
-   is begin
+   function "=" (Left, Right : String_Type) return Boolean is
+   begin
       return Left.Length = Right.Length and then
              Left.Buffer(1..Left.Length) = Right.Buffer(1..Right.Length);
    end "=";
@@ -56,8 +56,8 @@ package body DB.Types.Gen_Bounded_Strings is
 
    function To_Index
      (L : Length_Type)
-      return Index_Type
-   is begin
+      return Index_Type is
+   begin
       return Index_Type(L);
    end To_Index;
 
@@ -86,8 +86,8 @@ package body DB.Types.Gen_Bounded_Strings is
 
    function Length
      (S : String_Type)
-      return Length_Type
-   is begin
+      return Length_Type is
+   begin
       return S.Length;
    end Length;
 
@@ -95,8 +95,8 @@ package body DB.Types.Gen_Bounded_Strings is
    function Element
      (S : String_Type;
       I : Index_Type)
-      return Item_Type
-   is begin
+      return Item_Type is
+   begin
       return S.Buffer(I);
    end Element;
 
@@ -117,8 +117,8 @@ package body DB.Types.Gen_Bounded_Strings is
 
    function To_String
      (S : String_Type)
-      return Indefinite_Buffer_Type
-   is begin
+      return Indefinite_Buffer_Type is
+   begin
       return S.Buffer(1 .. S.Length);
    end To_String;
 

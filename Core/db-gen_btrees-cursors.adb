@@ -2,8 +2,8 @@ separate (DB.Gen_BTrees)
 package body Cursors is
 
    procedure Lock_Mutex
-     (Cursor : in out Cursor_Type)
-   is begin
+     (Cursor : in out Cursor_Type) is
+   begin
       if Cursor.Thread_Safe then
          Locks.Mutexes.Lock(Cursor.Mutex);
       end if;
@@ -11,8 +11,8 @@ package body Cursors is
 
 
    procedure Unlock_Mutex
-     (Cursor : in out Cursor_Type)
-   is begin
+     (Cursor : in out Cursor_Type) is
+   begin
       if Cursor.Thread_Safe then
          Locks.Mutexes.Unlock(Cursor.Mutex);
       end if;
@@ -20,15 +20,15 @@ package body Cursors is
 
 
    function Positive_Infinity_Bound
-      return Bound_Type
-   is begin
+      return Bound_Type is
+   begin
       return Bound_Type'(Kind => Abstract_Bound, Location => Positive_Infinity);
    end Positive_Infinity_Bound;
 
 
    function Negative_Infinity_Bound
-      return Bound_Type
-   is begin
+      return Bound_Type is
+   begin
       return Bound_Type'(Kind => Abstract_Bound, Location => Negative_Infinity);
    end Negative_Infinity_Bound;
 
@@ -36,8 +36,8 @@ package body Cursors is
    function New_Bound
      (Comparison : Comparison_Type;
       Key        : Key_Type)
-      return Bound_Type
-   is begin
+      return Bound_Type is
+   begin
       return Bound_Type'(Kind       => Concrete_Bound,
                          Comparison => Comparison,
                          Key        => Key);
@@ -467,8 +467,8 @@ package body Cursors is
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
-         State       :    out Result_Type)
-      is begin
+         State       :    out Result_Type) is
+      begin
          if Cursor.Final or not Cursor.Has_Node then
             State := Success;
             return;

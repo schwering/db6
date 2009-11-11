@@ -15,8 +15,8 @@ package body DB.IO.Blocks.Memory_IO is
 
    procedure Create
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       for I in Files'Range loop
          if Files(I) /= null and then Files(I).Name = ID then
             raise IO_Error;
@@ -34,8 +34,8 @@ package body DB.IO.Blocks.Memory_IO is
 
    procedure Open
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       for I in Files'Range loop
          if Files(I) /= null and then Files(I).Name = ID then
             File := Files(I).File;
@@ -47,55 +47,55 @@ package body DB.IO.Blocks.Memory_IO is
 
 
    function First
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return 1;
    end First;
 
 
    function Succ
      (Address : Valid_Address_Type)
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return Address + 1;
    end Succ;
 
 
    function Image
      (A : in Valid_Address_Type)
-      return String
-   is begin
+      return String is
+   begin
       return Valid_Address_Type'Image(A);
    end Image;
 
 
    function To_Address
      (Address : Valid_Address_Type)
-      return Address_Type
-   is begin
+      return Address_Type is
+   begin
       return Address;
    end To_Address;
 
 
    function To_Valid_Address
      (Address : Address_Type)
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return Address;
    end To_Valid_Address;
 
 
    function Is_Valid_Address
      (Address : Address_Type)
-      return Boolean
-   is begin
+      return Boolean is
+   begin
       return Address /= Invalid_Address;
    end Is_Valid_Address;
 
 
    procedure Resize_Buffer
-     (File : in File_Type)
-   is begin
+     (File : in File_Type) is
+   begin
       if File.Current >= File.Capacity then
          declare
             Capacity : constant Address_Type
@@ -117,8 +117,8 @@ package body DB.IO.Blocks.Memory_IO is
 
 
    procedure Next_Block
-     (File : in File_Type)
-   is begin
+     (File : in File_Type) is
+   begin
       File.Current := File.Current + 1;
       Resize_Buffer(File);
    end Next_Block;
@@ -127,8 +127,8 @@ package body DB.IO.Blocks.Memory_IO is
    procedure Read
      (File    : in out File_Type;
       Address : in     Valid_Address_Type;
-      Block   :    out Block_Type)
-   is begin
+      Block   :    out Block_Type) is
+   begin
       Locks.Mutexes.Lock(File.Mutex);
 
       File.Current := Address;
@@ -151,8 +151,8 @@ package body DB.IO.Blocks.Memory_IO is
    procedure Write
      (File    : in out File_Type;
       Address : in     Valid_Address_Type;
-      Block   : in     Block_Type)
-   is begin
+      Block   : in     Block_Type) is
+   begin
       Locks.Mutexes.Lock(File.Mutex);
 
       File.Current := Address;
@@ -174,8 +174,8 @@ package body DB.IO.Blocks.Memory_IO is
 
    procedure Seek_New
      (File    : in out File_Type;
-      Address :    out Address_Type)
-   is begin
+      Address :    out Address_Type) is
+   begin
       Locks.Mutexes.Lock(File.Mutex);
 
       File.Current := File.Maximum + 1;
@@ -191,48 +191,48 @@ package body DB.IO.Blocks.Memory_IO is
 
    procedure Acquire_Ticket
      (File   : in out File_Type;
-      Ticket :    out Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket :    out Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Acquire_Ticket(File.Semaphore, Ticket);
    end Acquire_Ticket;
 
 
    procedure Release_Ticket
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Release_Ticket(File.Semaphore, Ticket);
    end Release_Ticket;
 
 
    procedure Read_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Read_Lock(File.Semaphore, Ticket);
    end Read_Lock;
 
 
    procedure Write_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Write_Lock(File.Semaphore, Ticket);
    end Write_Lock;
 
 
    procedure Certify_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Certify_Lock(File.Semaphore, Ticket);
    end Certify_Lock;
 
 
    procedure Unlock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Unlock(File.Semaphore, Ticket);
    end Unlock;
 

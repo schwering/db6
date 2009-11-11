@@ -218,8 +218,10 @@ package body Nodes is
       -- 5. Left    (Size_Of_Address)
       -- 6. Right   (Size_Of_Address)
       -- 7. Indexes ((|Degree| + 1) * Size_Of_Position)
-      -- 8. Entries (Size_Of(Key_1) + Size_Of_Child .. + Size_Of_Child)
-      --         or (Size_Of(Key_1) + Size_Of(Value_1) .. + Size_Of(Value_N))
+      -- 8. Entries (Size_Of(Key_1) + Size_Of_Child ..
+      --             Size_Of(Key_N) + Size_Of_Child)
+      --         or (Size_Of(Key_1) + Size_Of(Value_1) ..
+      --             Size_Of(Key_N) + Size_Of(Value_N))
 
 
       function "*"
@@ -319,8 +321,8 @@ package body Nodes is
       function Entry_Size
         (Block : IO.Blocks.Long_Block_Type;
          Index : Valid_Index_Type)
-         return IO.Blocks.Long_Position_Type
-      is begin
+         return IO.Blocks.Long_Position_Type is
+      begin
          return Entry_To_Pos(Block, Index) - Entry_From_Pos(Block, Index) + 1 +
                 Size_Of_Position;
       end Entry_Size;
@@ -328,8 +330,8 @@ package body Nodes is
 
       function Entries_Size
         (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Position_Type
-      is begin
+         return IO.Blocks.Long_Position_Type is
+      begin
          if Degree(Block) = 0 then
             return 0;
          else
@@ -341,8 +343,8 @@ package body Nodes is
 
       function Total_Size
         (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Position_Type
-      is begin
+         return IO.Blocks.Long_Position_Type is
+      begin
          if Is_Free(Block) then
             return Size_Of_Meta_Data;
          else
@@ -352,8 +354,8 @@ package body Nodes is
 
 
       function Effective_Block_Space
-        return IO.Blocks.Long_Position_Type
-      is begin
+        return IO.Blocks.Long_Position_Type is
+      begin
          return IO.Blocks.Index_Type'Last - Size_Of_Meta_Data;
       end Effective_Block_Space;
 
@@ -361,8 +363,8 @@ package body Nodes is
       function Max_Key_Size
         (Max_Entry_Size : IO.Blocks.Long_Position_Type;
          Max_Value_Size : IO.Blocks.Long_Position_Type)
-         return IO.Blocks.Long_Position_Type
-      is begin
+         return IO.Blocks.Long_Position_Type is
+      begin
          if Size_Of_Child > Max_Value_Size then
             return Max_Entry_Size - Size_Of_Child - Size_Of_Position;
          else
@@ -373,8 +375,8 @@ package body Nodes is
 
       function Last_Used_Index
         (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Index_Type
-      is begin
+         return IO.Blocks.Long_Index_Type is
+      begin
          if Degree(Block) = 0 then
             return IO.Blocks.Long_Index_Type(Size_Of_Meta_Data);
          else
@@ -824,8 +826,8 @@ package body Nodes is
 
    function Root_Node
      (Is_Leaf : Boolean)
-      return Node_Type
-   is begin
+      return Node_Type is
+   begin
       return Node_Type'(Ok    => True,
                         Block => Phys.New_Block(Is_Free => False,
                                                 Degree  => 0,
@@ -1031,24 +1033,24 @@ package body Nodes is
 
    function Is_Valid
      (Address : Address_Type)
-      return Boolean
-   is begin
+      return Boolean is
+   begin
       return Block_IO.Is_Valid_Address(Block_IO.Address_Type(Address));
    end Is_Valid;
 
 
    function Is_Valid
      (Address : Valid_Address_Type)
-      return Boolean
-   is begin
+      return Boolean is
+   begin
       return Is_Valid(To_Address(Address));
    end Is_Valid;
 
 
    function To_Valid_Address
      (Address : Address_Type)
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return Valid_Address_Type(
          Block_IO.To_Valid_Address(Block_IO.Address_Type(Address)));
    end To_Valid_Address;
@@ -1056,8 +1058,8 @@ package body Nodes is
 
    function To_Address
      (Address : Valid_Address_Type)
-      return Address_Type
-   is begin
+      return Address_Type is
+   begin
       return Address_Type(
          Block_IO.To_Address(Block_IO.Valid_Address_Type(Address)));
    end To_Address;
@@ -1386,8 +1388,8 @@ package body Nodes is
 
    function Is_Valid
      (Index : Index_Type)
-      return Boolean
-   is begin
+      return Boolean is
+   begin
       return Index /= Invalid_Index;
    end Is_Valid;
 
@@ -1753,8 +1755,8 @@ package body Nodes is
      (Node : Node_Type;
       From : Valid_Index_Type;
       To   : Index_Type)
-      return Node_Type
-   is begin
+      return Node_Type is
+   begin
       if not Node.Ok then
          declare
             Not_Ok_Node : Node_Type;
@@ -1815,8 +1817,8 @@ package body Nodes is
       Right_Node : Node_Type;
       From       : Valid_Index_Type;
       To         : Index_Type)
-      return Node_Type
-   is begin
+      return Node_Type is
+   begin
       if not Left_Node.Ok or not Right_Node.Ok then
          declare
             Not_Ok_Node : Node_Type;
@@ -1839,8 +1841,8 @@ package body Nodes is
            (Left_Node  : Node_Type;
             Right_Node : Node_Type;
             To         : Index_Type)
-            return Address_Type
-         is begin
+            return Address_Type is
+         begin
             if To <= Degree(Left_Node) then
                return Parent(Left_Node);
             else
@@ -1852,8 +1854,8 @@ package body Nodes is
            (Left_Node  : Node_Type;
             Right_Node : Node_Type;
             From       : Index_Type)
-            return Address_Type
-         is begin
+            return Address_Type is
+         begin
             if From <= Degree(Left_Node) then
                return Left_Neighbor(Left_Node);
             else
@@ -1865,8 +1867,8 @@ package body Nodes is
            (Left_Node  : Node_Type;
             Right_Node : Node_Type;
             To         : Index_Type)
-            return Address_Type
-         is begin
+            return Address_Type is
+         begin
             if To <= Degree(Left_Node) then
                return Right_Neighbor(Left_Node);
             else
@@ -1943,8 +1945,8 @@ package body Nodes is
    function Combination
      (Left_Node  : Node_Type;
       Right_Node : Node_Type)
-      return Node_Type
-   is begin
+      return Node_Type is
+   begin
       if not Left_Node.Ok or not Right_Node.Ok then
          declare
             Not_Ok_Node : Node_Type;
@@ -2038,8 +2040,8 @@ package body Nodes is
    function Is_Valid
      (Node           : Node_Type;
       Force_Non_Root : Boolean := False)
-      return Boolean
-   is begin
+      return Boolean is
+   begin
       return Validation(Node, Force_Non_Root) = Valid;
    end Is_Valid;
 

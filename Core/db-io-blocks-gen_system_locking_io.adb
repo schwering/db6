@@ -2,31 +2,31 @@ package body DB.IO.Blocks.Gen_System_Locking_IO is
 
    procedure Create
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       P_IO.Create(ID, File.File);
    end Create;
 
 
    procedure Open
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       P_IO.Open(ID, File.File);
    end Open;
 
 
    procedure Close
-     (File : in out File_Type)
-   is begin
+     (File : in out File_Type) is
+   begin
       P_IO.Close(File.File);
    end Close;
 
 
    procedure Set_Block_Count
      (File    : in out File_Type;
-      Address : in     P_IO.Address_Type)
-   is begin
+      Address : in     P_IO.Address_Type) is
+   begin
       P_IO.Set_Block_Count(File.File, Address);
    end Set_Block_Count;
 
@@ -34,8 +34,8 @@ package body DB.IO.Blocks.Gen_System_Locking_IO is
    procedure Read
      (File    : in out File_Type;
       Address : in     P_IO.Valid_Address_Type;
-      Block   :    out Block_Type)
-   is begin
+      Block   :    out Block_Type) is
+   begin
       P_IO.Read(File.File, Address, Block);
    end Read;
 
@@ -43,32 +43,32 @@ package body DB.IO.Blocks.Gen_System_Locking_IO is
    procedure Write
      (File    : in out File_Type;
       Address : in     P_IO.Valid_Address_Type;
-      Block   : in     Block_Type)
-   is begin
+      Block   : in     Block_Type) is
+   begin
       P_IO.Write(File.File, Address, Block);
    end Write;
 
 
    procedure Seek_New
      (File    : in out File_Type;
-      Address :    out P_IO.Valid_Address_Type)
-   is begin
+      Address :    out P_IO.Valid_Address_Type) is
+   begin
       P_IO.Seek_New(File.File, Address);
    end Seek_New;
 
 
    procedure Acquire_Ticket
      (File   : in out File_Type;
-      Ticket :    out P_IO.Ticket_Type)
-   is begin
+      Ticket :    out P_IO.Ticket_Type) is
+   begin
       P_IO.Acquire_Ticket(File.File, Ticket);
    end Acquire_Ticket;
 
 
    procedure Release_Ticket
      (File   : in out File_Type;
-      Ticket : in     P_IO.Ticket_Type)
-   is begin
+      Ticket : in     P_IO.Ticket_Type) is
+   begin
       P_IO.Release_Ticket(File.File, Ticket);
    end Release_Ticket;
 

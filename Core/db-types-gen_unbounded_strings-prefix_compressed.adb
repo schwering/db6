@@ -22,8 +22,8 @@ package body Prefix_Compressed is
    procedure Size_Of
      (Context : in out Context_Type;
       S       : in     String_Type;
-      Size    :    out IO.Blocks.Size_Type)
-   is begin
+      Size    :    out IO.Blocks.Size_Type) is
+   begin
       if not Context.Initialized then
          Context.Initialized := True;
          Context.Previous    := S;
@@ -51,8 +51,8 @@ package body Prefix_Compressed is
      (Context : in out Context_Type;
       Block   : in out IO.Blocks.Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type;
-      S       : in     String_Type)
-   is begin
+      S       : in     String_Type) is
+   begin
       if not Context.Initialized then
          Context.Initialized := True;
          Context.Previous    := S;
@@ -80,8 +80,8 @@ package body Prefix_Compressed is
      (Context : in out Context_Type;
       Block   : in     IO.Blocks.Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type;
-      S       :    out String_Type)
-   is begin
+      S       :    out String_Type) is
+   begin
       if not Context.Initialized then
          Uncompressed.Read(Block, Cursor, S);
          Context.Initialized := True;

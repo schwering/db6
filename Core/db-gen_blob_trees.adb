@@ -44,16 +44,16 @@ package body DB.Gen_Blob_Trees is
    package body Heap_Utils is
       function Info_Index_ID
         (ID : String)
-         return String
-      is begin
+         return String is
+      begin
          return ID &".info.ix";
       end Info_Index_ID;
 
 
       function Free_Index_ID
         (ID : String)
-         return String
-      is begin
+         return String is
+      begin
          return ID &".free.ix";
       end Free_Index_ID;
    end Heap_Utils;
@@ -61,8 +61,8 @@ package body DB.Gen_Blob_Trees is
 
    function New_RO_Transaction
      (Tree : Tree_Type)
-      return RO_Transaction_Type
-   is begin
+      return RO_Transaction_Type is
+   begin
       return (BTree_Transaction => BTrees.New_RO_Transaction(Tree.BTree),
               Heap_Transaction  => Heaps.New_RO_Transaction(Tree.Heap));
    end New_RO_Transaction;
@@ -70,8 +70,8 @@ package body DB.Gen_Blob_Trees is
 
    procedure Start_Transaction
      (Tree        : in out Tree_Type;
-      Transaction : in out RO_Transaction_Type)
-   is begin
+      Transaction : in out RO_Transaction_Type) is
+   begin
       BTrees.Start_Transaction(Tree.BTree, Transaction.BTree_Transaction);
       Heaps.Start_Transaction(Tree.Heap, Transaction.Heap_Transaction);
    end Start_Transaction;
@@ -79,8 +79,8 @@ package body DB.Gen_Blob_Trees is
 
    procedure Finish_Transaction
      (Tree        : in out Tree_Type;
-      Transaction : in out RO_Transaction_Type)
-   is begin
+      Transaction : in out RO_Transaction_Type) is
+   begin
       Heaps.Finish_Transaction(Tree.Heap, Transaction.Heap_Transaction);
       BTrees.Finish_Transaction(Tree.BTree, Transaction.BTree_Transaction);
    end Finish_Transaction;
@@ -88,8 +88,8 @@ package body DB.Gen_Blob_Trees is
 
    function New_RW_Transaction
      (Tree : Tree_Type)
-      return RW_Transaction_Type
-   is begin
+      return RW_Transaction_Type is
+   begin
       return (BTree_Transaction => BTrees.New_RW_Transaction(Tree.BTree),
               Heap_Transaction  => Heaps.New_RW_Transaction(Tree.Heap));
    end New_RW_Transaction;
@@ -97,8 +97,8 @@ package body DB.Gen_Blob_Trees is
 
    procedure Start_Transaction
      (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type)
-   is begin
+      Transaction : in out RW_Transaction_Type) is
+   begin
       BTrees.Start_Transaction(Tree.BTree, Transaction.BTree_Transaction);
       Heaps.Start_Transaction(Tree.Heap, Transaction.Heap_Transaction);
    end Start_Transaction;
@@ -106,8 +106,8 @@ package body DB.Gen_Blob_Trees is
 
    procedure Abort_Transaction
      (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type)
-   is begin
+      Transaction : in out RW_Transaction_Type) is
+   begin
       Heaps.Abort_Transaction(Tree.Heap, Transaction.Heap_Transaction);
       BTrees.Abort_Transaction(Tree.BTree, Transaction.BTree_Transaction);
    end Abort_Transaction;
@@ -115,8 +115,8 @@ package body DB.Gen_Blob_Trees is
 
    procedure Commit_Transaction
      (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type)
-   is begin
+      Transaction : in out RW_Transaction_Type) is
+   begin
       Heaps.Commit_Transaction(Tree.Heap, Transaction.Heap_Transaction);
       BTrees.Commit_Transaction(Tree.BTree, Transaction.BTree_Transaction);
    end Commit_Transaction;
@@ -127,8 +127,8 @@ package body DB.Gen_Blob_Trees is
 
 
    procedure Create
-     (ID : in String)
-   is begin
+     (ID : in String) is
+   begin
       BTrees.Create(ID & BTree_Suffix);
       Heaps.Create(ID & Heap_Suffix);
    end Create;
@@ -136,24 +136,24 @@ package body DB.Gen_Blob_Trees is
 
    procedure Initialize
      (Tree : out Tree_Type;
-      ID   : in  String)
-   is begin
+      ID   : in  String) is
+   begin
       BTrees.Initialize(Tree.BTree, ID & BTree_Suffix);
       Heaps.Initialize(Tree.Heap, ID & Heap_Suffix);
    end Initialize;
 
 
    procedure Finalize
-     (Tree : in out Tree_Type)
-   is begin
+     (Tree : in out Tree_Type) is
+   begin
       BTrees.Finalize(Tree.BTree);
       Heaps.Finalize(Tree.Heap);
    end Finalize;
 
 
    function Max_Key_Size
-      return IO.Blocks.Size_Type
-   is begin
+      return IO.Blocks.Size_Type is
+   begin
       return BTrees.Max_Key_Size(IO.Blocks.Bits_To_Units
                                        (BTree_Utils.Value_Type'Size));
    end Max_Key_Size;
@@ -631,8 +631,8 @@ package body DB.Gen_Blob_Trees is
       Lower_Bound       : Bound_Type;
       Upper_Bound       : Bound_Type;
       Reverse_Direction : Boolean := False)
-      return Cursor_Type
-   is begin
+      return Cursor_Type is
+   begin
       if Transaction in RO_Transaction_Type'Class then
          return (Cursor => BTrees.New_Cursor(Tree.BTree,
                              RO_Transaction_Type(Transaction).BTree_Transaction,
@@ -653,24 +653,24 @@ package body DB.Gen_Blob_Trees is
 
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
-      Enabled : in     Boolean)
-   is begin
+      Enabled : in     Boolean) is
+   begin
       BTrees.Set_Thread_Safety(Cursor.Cursor, Enabled);
    end Set_Thread_Safety;
 
 
    procedure Finalize
      (Tree   : in out Tree_Type;
-      Cursor : in out Cursor_Type)
-   is begin
+      Cursor : in out Cursor_Type) is
+   begin
       BTrees.Finalize(Tree.BTree, Cursor.Cursor);
    end Finalize;
 
 
    procedure Pause
      (Tree   : in out Tree_Type;
-      Cursor : in out Cursor_Type)
-   is begin
+      Cursor : in out Cursor_Type) is
+   begin
       BTrees.Pause(Tree.BTree, Cursor.Cursor);
    end Pause;
 
@@ -678,8 +678,8 @@ package body DB.Gen_Blob_Trees is
    procedure Unpause
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Cursor      : in out Cursor_Type)
-   is begin
+      Cursor      : in out Cursor_Type) is
+   begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Unpause(Tree.BTree,
                         RO_Transaction_Type(Transaction).BTree_Transaction,
@@ -760,8 +760,8 @@ package body DB.Gen_Blob_Trees is
 
    procedure Count
      (Tree  : in out Tree_Type;
-      Count :    out Count_Type)
-   is begin
+      Count :    out Count_Type) is
+   begin
       BTrees.Count(Tree.BTree, BTrees.Count_Type(Count));
    end Count;
 
@@ -769,8 +769,8 @@ package body DB.Gen_Blob_Trees is
    procedure Count
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Count       :    out Count_Type)
-   is begin
+      Count       :    out Count_Type) is
+   begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Count(Tree.BTree,
                       RO_Transaction_Type(Transaction).BTree_Transaction,
@@ -785,8 +785,8 @@ package body DB.Gen_Blob_Trees is
 
    procedure Get_Height
      (Tree   : in out Tree_Type;
-      Height :    out Height_Type)
-   is begin
+      Height :    out Height_Type) is
+   begin
       BTrees.Get_Height(Tree.BTree, BTrees.Height_Type(Height));
    end Get_Height;
 
@@ -794,8 +794,8 @@ package body DB.Gen_Blob_Trees is
    procedure Get_Height
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type)
-   is begin
+      Height      :    out Height_Type) is
+   begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Get_Height(Tree.BTree,
                            RO_Transaction_Type(Transaction).BTree_Transaction,

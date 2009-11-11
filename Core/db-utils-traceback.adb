@@ -15,15 +15,15 @@ package body DB.Utils.Traceback is
    end Traceback_String;
 
 
-   procedure Print_Traceback
-   is begin
+   procedure Print_Traceback is
+   begin
       Ada.Text_IO.Put_Line("Symbolic Traceback:");
       Ada.Text_IO.Put(Traceback_String);
    end Print_Traceback;
 
 
-   procedure Print_Traceback (E : Ada.Exceptions.Exception_Occurrence)
-   is begin
+   procedure Print_Traceback (E : Ada.Exceptions.Exception_Occurrence) is
+   begin
       Ada.Text_IO.Put_Line("Symbolic Traceback of Exception:");
       Ada.Text_IO.Put_Line(GNAT.Traceback.Symbolic.Symbolic_Traceback(E));
    end Print_Traceback;

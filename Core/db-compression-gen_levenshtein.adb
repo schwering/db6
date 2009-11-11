@@ -2,8 +2,8 @@ package body DB.Compression.Gen_Levenshtein is
 
    function Min
      (X, Y, Z : Integer)
-      return Integer
-   is begin
+      return Integer is
+   begin
       if X <= Y and X <= Z then
          return X;
       elsif Y <= Z then
@@ -46,8 +46,8 @@ package body DB.Compression.Gen_Levenshtein is
 
 
    --procedure Print
-     --(D : Distance_Matrix_Type)
-   --is begin
+     --(D : Distance_Matrix_Type) is
+   --begin
       --for X in D'Range(1) loop
          --for Y in D'Range(2) loop
             --Put(Distance_Type'Image(D(X, Y)));
@@ -79,8 +79,8 @@ package body DB.Compression.Gen_Levenshtein is
          function DD
            (I, J : Invalid_Matrix_Index_Type;
             D    : Distance_Matrix_Type)
-            return Distance_Type
-         is begin
+            return Distance_Type is
+         begin
             if I in D'Range(1) and J in D'Range(2) then
                return D(I, J);
             else
@@ -92,8 +92,8 @@ package body DB.Compression.Gen_Levenshtein is
            (I, J : Invalid_Matrix_Index_Type;
             D    : Distance_Matrix_Type;
             S, T : Item_Array_Type)
-            return Distance_Type
-         is begin
+            return Distance_Type is
+         begin
             if I in D'Range(1) and J in D'Range(2) then
                if (S'First + I in S'Range and T'First + J in T'Range)
                and then not (S(S'First + I) = T(T'First + J)) then
@@ -276,14 +276,14 @@ package body DB.Compression.Gen_Levenshtein is
       J           : Invalid_Index_Type := T'Last;
       Chars_Index : Invalid_Index_Type := D.Chars'Last;
 
-      procedure Add_From_S (From, To : Invalid_Index_Type)
-      is begin
+      procedure Add_From_S (From, To : Invalid_Index_Type) is
+      begin
          T(J - (To - From) .. J) := S(From .. To);
          J := J - (To - From) - 1;
       end Add_From_S;
 
-      procedure Add_From_Chars (From, To : Invalid_Index_Type)
-      is begin
+      procedure Add_From_Chars (From, To : Invalid_Index_Type) is
+      begin
          T(J - (To - From) .. J) := D.Chars(From .. To);
          J := J - (To - From) - 1;
       end Add_From_Chars;

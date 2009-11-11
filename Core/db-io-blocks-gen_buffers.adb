@@ -52,8 +52,8 @@ package body DB.IO.Blocks.Gen_Buffers is
    procedure Seek_New
      (File    : in out Block_IO.File_Type;
       Buffer  : in out Buffer_Type;
-      Address :    out Block_IO.Valid_Address_Type)
-   is begin
+      Address :    out Block_IO.Valid_Address_Type) is
+   begin
       if not Buffer.New_Address_Initialized then
          Buffer.New_Address_Initialized := True;
          Block_IO.Seek_New(File, Buffer.New_Address);

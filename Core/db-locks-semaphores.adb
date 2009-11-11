@@ -2,16 +2,16 @@ package body DB.Locks.Semaphores is
 
    procedure Acquire_Ticket
       (S : in out Semaphore_Type;
-       T :    out Ticket_Type)
-   is begin
+       T :    out Ticket_Type) is
+   begin
       S.Acquire_Ticket(T);
    end Acquire_Ticket;
 
 
    procedure Release_Ticket
       (S : in out Semaphore_Type;
-       T : in      Ticket_Type)
-   is begin
+       T : in      Ticket_Type) is
+   begin
       S.Release_Ticket(T);
    end Release_Ticket;
 
@@ -48,8 +48,8 @@ package body DB.Locks.Semaphores is
 
    procedure Unlock
       (S : in out Semaphore_Type;
-       T : in     Ticket_Type)
-   is begin
+       T : in     Ticket_Type) is
+   begin
       S.Unlock(T);
    end Unlock;
 
@@ -57,8 +57,8 @@ package body DB.Locks.Semaphores is
    protected body Semaphore_Type is
 
       function All_Tickets_Are_Used
-         return Boolean
-      is begin
+         return Boolean is
+      begin
         return Ticket_Used = Bitset_Type'Last;
      end All_Tickets_Are_Used;
 
@@ -90,8 +90,8 @@ package body DB.Locks.Semaphores is
 
 
       entry Acquire_Ticket (T : out Ticket_Type)
-         when not All_Tickets_Are_Used
-      is begin
+         when not All_Tickets_Are_Used is
+         begin
          for I in Ticket_Type'Range loop
             if not Ticket_Is_Used(I) then
                Set_Ticket_Used(I, True);
@@ -104,8 +104,8 @@ package body DB.Locks.Semaphores is
       end Acquire_Ticket;
 
 
-      procedure Release_Ticket (T : in Ticket_Type)
-      is begin
+      procedure Release_Ticket (T : in Ticket_Type) is
+      begin
          if Ticket_Is_Used(T) and then Ticket_Sizes(T) /= 0 then
             raise Lock_Error;
          end if;
@@ -139,22 +139,22 @@ package body DB.Locks.Semaphores is
 
 
       entry Read_Lock (for T in Ticket_Type)
-         when Count >= Size(Shared) - Ticket_Sizes(T)
-      is begin
+         when Count >= Size(Shared) - Ticket_Sizes(T) is
+         begin
          Lock(T, Shared);
       end Read_Lock;
 
 
       entry Write_Lock (for T in Ticket_Type)
-         when Count >= Size(Majority) - Ticket_Sizes(T)
-      is begin
+         when Count >= Size(Majority) - Ticket_Sizes(T) is
+         begin
          Lock(T, Majority);
       end Write_Lock;
 
 
       entry Certify_Lock (for T in Ticket_Type)
-         when Count >= Size(Exclusive) - Ticket_Sizes(T)
-      is begin
+         when Count >= Size(Exclusive) - Ticket_Sizes(T) is
+         begin
          Lock(T, Exclusive);
       end Certify_Lock;
 

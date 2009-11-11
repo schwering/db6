@@ -39,8 +39,8 @@ package body Initialization is
          declare
             procedure Increment
               (Count : in out Block_IO.Valid_Address_Type;
-               Init  : in out Boolean)
-            is begin
+               Init  : in out Boolean) is
+            begin
                if not Init then
                   Count := Block_IO.First;
                   Init  := True;
@@ -114,8 +114,8 @@ package body Initialization is
 
 
    procedure Finalize
-     (Tree : in out Tree_Type)
-   is begin
+     (Tree : in out Tree_Type) is
+   begin
       if Tree.Initialized then
          Block_IO.Close(Tree.File);
          Tree.Initialized := False;

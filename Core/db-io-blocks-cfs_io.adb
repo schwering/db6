@@ -2,27 +2,27 @@ with Ada.Unchecked_Deallocation;
 
 package body DB.IO.Blocks.CFS_IO is
 
-   function "=" (N, M : Name_Type) return Boolean
-   is begin
+   function "=" (N, M : Name_Type) return Boolean is
+   begin
       return N.Len = M.Len and then
              N.Str(1 .. Natural(N.Len)) = M.str(1 .. Natural(M.Len));
    end "=";
 
 
-   function "=" (N : Name_Type; S : String) return Boolean
-   is begin
+   function "=" (N : Name_Type; S : String) return Boolean is
+   begin
       return N.Len = S'Length and then N.Str(1 .. Natural(N.Len)) = S;
    end "=";
 
 
-   function To_String (N : Name_Type) return String
-   is begin
+   function To_String (N : Name_Type) return String is
+   begin
       return N.Str(1 .. Natural(N.Len));
    end To_String;
 
 
-   function Disk_Name (ID : String) return Disk_Name_Type
-   is begin
+   function Disk_Name (ID : String) return Disk_Name_Type is
+   begin
       for I in reverse ID'Range loop
          if ID(I) = '/' then
             declare
@@ -37,8 +37,8 @@ package body DB.IO.Blocks.CFS_IO is
    end Disk_Name;
 
 
-   function File_Name (ID : String) return File_Name_Type
-   is begin
+   function File_Name (ID : String) return File_Name_Type is
+   begin
       for I in reverse ID'Range loop
          if ID(I) = '/' then
             declare
@@ -117,8 +117,8 @@ package body DB.IO.Blocks.CFS_IO is
 
    procedure Get_Disk_Handle
      (Disk_Name : in  Disk_Name_Type;
-      Disk      : out Disk_Handle_Ref_Type)
-   is begin
+      Disk      : out Disk_Handle_Ref_Type) is
+   begin
       for I in Disks'Range loop
          declare
          begin
@@ -320,63 +320,63 @@ package body DB.IO.Blocks.CFS_IO is
 
    procedure Set_Block_Count
      (File    : in out File_Type;
-      Address : in     Address_Type)
-   is begin
+      Address : in     Address_Type) is
+   begin
       File.Max_Address_Initialized := True;
       File.Max_Address             := Address;
    end Set_Block_Count;
 
 
    procedure Close
-     (File : in out File_Type)
-   is begin
+     (File : in out File_Type) is
+   begin
       null;
    end Close;
 
 
    function First
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return 1;
    end First;
 
 
    function Succ
      (Address : Valid_Address_Type)
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return Address + 1;
    end Succ;
 
 
    function Image
      (A : in Valid_Address_Type)
-      return String
-   is begin
+      return String is
+   begin
       return Valid_Address_Type'Image(A);
    end Image;
 
 
    function To_Address
      (Address : Valid_Address_Type)
-      return Address_Type
-   is begin
+      return Address_Type is
+   begin
       return Address;
    end To_Address;
 
 
    function To_Valid_Address
      (Address : Address_Type)
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return Address;
    end To_Valid_Address;
 
 
    function Is_Valid_Address
      (Address : Address_Type)
-      return Boolean
-   is begin
+      return Boolean is
+   begin
       return Address /= Invalid_Address;
    end Is_Valid_Address;
 
@@ -483,8 +483,8 @@ package body DB.IO.Blocks.CFS_IO is
 
    procedure Seek_New
      (File    : in out File_Type;
-      Address :    out Address_Type)
-   is begin
+      Address :    out Address_Type) is
+   begin
       Locks.Mutexes.Lock(File.Mutex);
 
       if not File.Max_Address_Initialized then
@@ -504,48 +504,48 @@ package body DB.IO.Blocks.CFS_IO is
 
    procedure Acquire_Ticket
      (File   : in out File_Type;
-      Ticket :    out Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket :    out Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Acquire_Ticket(File.Semaphore, Ticket);
    end Acquire_Ticket;
 
 
    procedure Release_Ticket
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Release_Ticket(File.Semaphore, Ticket);
    end Release_Ticket;
 
 
    procedure Read_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Read_Lock(File.Semaphore, Ticket);
    end Read_Lock;
 
 
    procedure Write_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Write_Lock(File.Semaphore, Ticket);
    end Write_Lock;
 
 
    procedure Certify_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Certify_Lock(File.Semaphore, Ticket);
    end Certify_Lock;
 
 
    procedure Unlock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Unlock(File.Semaphore, Ticket);
    end Unlock;
 

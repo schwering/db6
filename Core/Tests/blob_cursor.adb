@@ -278,8 +278,8 @@ is
          BTrees.Commit_Transaction(Tree, Trans);
    end Iterate;
 
-   function S(Str : String) return Key_Type
-   is begin
+   function S(Str : String) return Key_Type is
+   begin
       return (Row    => DB.Types.Rows.New_String
                         (DB.Types.Rows.Indefinite_Buffer_Type(Str)),
               Column => DB.Types.Columns.New_String
@@ -329,14 +329,14 @@ begin
 
    declare
       task Iteration_Task_A;
-      task body Iteration_Task_A
-      is begin
+      task body Iteration_Task_A is
+      begin
          Iterate(Tree, 10, 0);
          Put_Line("Task 1 finished");
       end Iteration_Task_A;
       task Iteration_Task_B;
-      task body Iteration_Task_B
-      is begin
+      task body Iteration_Task_B is
+      begin
          Iterate(Tree, 0, 0);
          Put_Line("Task 2 finished");
       end Iteration_Task_B;

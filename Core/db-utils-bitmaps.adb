@@ -22,8 +22,8 @@ package body DB.Utils.Bitmaps is
 
    function New_Bitmap
      (Size : Size_Type)
-      return Bitmap_Type
-   is begin
+      return Bitmap_Type is
+   begin
       return Bitmap_Type'(Last_Index => (Size+Word_Length-1) / Word_Length - 1,
                           Size       => Size,
                           Words      => (others => 0));
@@ -68,8 +68,8 @@ package body DB.Utils.Bitmaps is
    function Next
      (Bitmap : Bitmap_Type;
       Value  : Boolean)
-      return Index_Type
-   is begin
+      return Index_Type is
+   begin
       for W in Bitmap.Words'Range loop
          if (Value and then Bitmap.Words(W) /= 0) or
             (not Value and then Bitmap.Words(W) /= (not 0)) then

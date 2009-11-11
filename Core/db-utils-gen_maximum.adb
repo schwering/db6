@@ -1,8 +1,8 @@
 function DB.Utils.Gen_Maximum
   (M : Number_Type;
    N : Number_Type)
-   return Number_Type
-is begin
+   return Number_Type is
+begin
    if M > N then
       return M;
    else

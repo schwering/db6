@@ -118,8 +118,8 @@ package body Misc is
          end Find_Outermost_Left_In_Level;
 
          procedure Increment
-           (N_A : in out Nodes.Valid_Address_Type)
-         is begin
+           (N_A : in out Nodes.Valid_Address_Type) is
+         begin
             N_A := Nodes.Valid_Address_Type(Block_IO.Succ
                        (Block_IO.Valid_Address_Type(N_A)));
          end Increment;

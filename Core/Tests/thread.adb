@@ -56,8 +56,8 @@ begin
       end Man;
       task Woman;
 
-      task body Man
-      is begin
+      task body Man is
+      begin
          for I in 1 .. Count loop
             Work(Work_Size);
             declare
@@ -77,8 +77,8 @@ begin
          Put_Line("Man is done.");
       end Man;
 
-      task body Woman
-      is begin
+      task body Woman is
+      begin
          for I In 1 .. Count loop
             Work(Work_Size);
             declare
@@ -98,8 +98,8 @@ begin
 
       task type Worker;
 
-      task body Worker
-      is begin
+      task body Worker is
+      begin
          Put_Line("Worker starts working");
          for I in 1 .. Count loop
             Work(Work_Size);

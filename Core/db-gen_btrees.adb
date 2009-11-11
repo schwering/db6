@@ -249,8 +249,8 @@ package body DB.Gen_BTrees is
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type;
       N_A         : in     Nodes.Valid_Address_Type;
-      N           :    out Nodes.Node_Type)
-   is begin
+      N           :    out Nodes.Node_Type) is
+   begin
       raise Tree_Error;
    end Read_Node;
 
@@ -538,8 +538,8 @@ package body DB.Gen_BTrees is
 
    function New_RW_Transaction
      (Tree : Tree_Type)
-      return Sub_RW_Transaction_Type
-   is begin
+      return Sub_RW_Transaction_Type is
+   begin
       raise Tree_Error;
       pragma Warnings (Off);
       return (RW_Transaction_Type with others => <>);
@@ -705,8 +705,8 @@ package body DB.Gen_BTrees is
       T     : in out RW_Transaction_Type'Class;
       N_A   : in     Nodes.Valid_Address_Type;
       N     : in     Nodes.Node_Type;
-      State : in out Result_Type)
-   is begin
+      State : in out Result_Type) is
+   begin
       if Nodes.Is_Valid(Nodes.Parent(N)) then
          declare
             use type Nodes.Degree_Type;

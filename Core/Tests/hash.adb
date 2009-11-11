@@ -14,13 +14,13 @@ is
    subtype Key_Type is Integer;
    subtype Value_Type is Integer;
 
-   function Hash (K : Key_Type) return Hash_Type
-   is begin
+   function Hash (K : Key_Type) return Hash_Type is
+   begin
       return Hash_Type(3 * K + 1);
    end Hash;
 
-   function Rehash (H : Hash_Type) return Hash_Type
-   is begin
+   function Rehash (H : Hash_Type) return Hash_Type is
+   begin
       return H + 1;
    end Rehash;
 

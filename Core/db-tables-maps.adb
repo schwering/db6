@@ -2,8 +2,8 @@ package body DB.Tables.Maps is
 
    function New_RO_Transaction
      (Map : Map_Type)
-      return RO_Transaction_Type
-   is begin
+      return RO_Transaction_Type is
+   begin
       if Map.Short then
          return (Short             => True,
                  Short_Transaction =>
@@ -50,8 +50,8 @@ package body DB.Tables.Maps is
 
    function New_RW_Transaction
      (Map : Map_Type)
-      return RW_Transaction_Type
-   is begin
+      return RW_Transaction_Type is
+   begin
       if Map.Short then
          return (Short             => True,
                  Short_Transaction =>
@@ -144,8 +144,8 @@ package body DB.Tables.Maps is
 
    procedure Initialize
      (Map : out Map_Type;
-      ID  : in  String)
-   is begin
+      ID  : in  String) is
+   begin
       if Map.Short then
          BTrees.Initialize(Map.Short_Tree, ID);
       else
@@ -155,8 +155,8 @@ package body DB.Tables.Maps is
 
 
    procedure Finalize
-     (Map : in out Map_Type)
-   is begin
+     (Map : in out Map_Type) is
+   begin
       if Map.Short then
          BTrees.Finalize(Map.Short_Tree);
       else
@@ -168,8 +168,8 @@ package body DB.Tables.Maps is
    function Max_Key_Size
      (Map            : Map_Type;
       Max_Value_Size : IO.Blocks.Size_Type)
-      return IO.Blocks.Size_Type
-   is begin
+      return IO.Blocks.Size_Type is
+   begin
       if Map.Short then
          return BTrees.Max_Key_Size(Max_Value_Size);
       else
@@ -211,8 +211,8 @@ package body DB.Tables.Maps is
       Key      : in     Types.Keys.Key_Type;
       Value    :    out Types.Values.Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
-   is begin
+      State    :    out Result_Type) is
+   begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
@@ -285,8 +285,8 @@ package body DB.Tables.Maps is
       Position : in     Count_Type;
       Value    :    out Types.Values.Value_Type;
       Key      :    out Types.Keys.Key_Type;
-      State    :    out Result_Type)
-   is begin
+      State    :    out Result_Type) is
+   begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
@@ -359,8 +359,8 @@ package body DB.Tables.Maps is
       Key      :    out Types.Keys.Key_Type;
       Value    :    out Types.Values.Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
-   is begin
+      State    :    out Result_Type) is
+   begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
@@ -433,8 +433,8 @@ package body DB.Tables.Maps is
       Key      :    out Types.Keys.Key_Type;
       Value    :    out Types.Values.Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
-   is begin
+      State    :    out Result_Type) is
+   begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
@@ -507,8 +507,8 @@ package body DB.Tables.Maps is
       Key      : in     Types.Keys.Key_Type;
       Value    : in     Types.Values.Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
-   is begin
+      State    :    out Result_Type) is
+   begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
@@ -564,8 +564,8 @@ package body DB.Tables.Maps is
       Key      : in     Types.Keys.Key_Type;
       Value    :    out Types.Values.Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
-   is begin
+      State    :    out Result_Type) is
+   begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
@@ -621,8 +621,8 @@ package body DB.Tables.Maps is
       Position : in     Count_Type;
       Value    :    out Types.Values.Value_Type;
       Key      :    out Types.Keys.Key_Type;
-      State    :    out Result_Type)
-   is begin
+      State    :    out Result_Type) is
+   begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
@@ -675,8 +675,8 @@ package body DB.Tables.Maps is
 
    function Positive_Infinity_Bound
      (Map : Map_Type)
-      return Bound_Type
-   is begin
+      return Bound_Type is
+   begin
       if Map.Short then
          return Bound_Type'(Short       => True,
                             Short_Bound => BTrees.Positive_Infinity_Bound);
@@ -689,8 +689,8 @@ package body DB.Tables.Maps is
 
    function Negative_Infinity_Bound
      (Map : Map_Type)
-      return Bound_Type
-   is begin
+      return Bound_Type is
+   begin
       if Map.Short then
          return Bound_Type'(Short       => True,
                             Short_Bound => BTrees.Negative_Infinity_Bound);
@@ -705,8 +705,8 @@ package body DB.Tables.Maps is
      (Map        : Map_Type;
       Comparison : Comparison_Type;
       Key        : Types.Keys.Key_Type)
-      return Bound_Type
-   is begin
+      return Bound_Type is
+   begin
       if Map.Short then
          declare
             C : BTrees.Comparison_Type;
@@ -805,8 +805,8 @@ package body DB.Tables.Maps is
 
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
-      Enabled : in     Boolean)
-   is begin
+      Enabled : in     Boolean) is
+   begin
       if Cursor.Short then
          BTrees.Set_Thread_Safety(Cursor.Short_Cursor, Enabled);
       else
@@ -962,8 +962,8 @@ package body DB.Tables.Maps is
 
    procedure Count
      (Map   : in out Map_Type;
-      Count :    out Count_Type)
-   is begin
+      Count :    out Count_Type) is
+   begin
       if Map.Short then
          BTrees.Count(Map.Short_Tree, BTrees.Count_Type(Count));
       else
@@ -1008,8 +1008,8 @@ package body DB.Tables.Maps is
 
    procedure Get_Height
      (Map    : in out Map_Type;
-      Height :    out Height_Type)
-   is begin
+      Height :    out Height_Type) is
+   begin
       if Map.Short then
          BTrees.Get_Height(Map.Short_Tree, BTrees.Height_Type(Height));
       else
@@ -1054,8 +1054,8 @@ package body DB.Tables.Maps is
 
    procedure Clusterize
      (Map   : in out Map_Type;
-      State :    out Result_Type)
-   is begin
+      State :    out Result_Type) is
+   begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;

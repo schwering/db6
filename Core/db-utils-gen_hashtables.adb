@@ -241,8 +241,8 @@ package body DB.Utils.Gen_Hashtables is
      (Table   : in out Table_Type;
       Key     :    out Key_Type;
       Value   :    out Value_Type;
-      Success :    out Boolean)
-   is begin
+      Success :    out Boolean) is
+   begin
       for H in Table.Arr'Range loop
          if Table.Arr(H).State = Used then
             Key          := Table.Arr(H).Key;
@@ -260,8 +260,8 @@ package body DB.Utils.Gen_Hashtables is
 
    function Size
      (Table : Table_Type)
-      return Size_Type
-   is begin
+      return Size_Type is
+   begin
       return Table.Size;
    end Size;
 

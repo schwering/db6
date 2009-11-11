@@ -6,13 +6,13 @@ with DB.IO.Blocks;
 procedure DB.Gen_BTrees.Gen_Check
   (Tree : in out Tree_Type)
 is
-   function Image (N_A : Nodes.Valid_Address_Type) return String
-   is begin
+   function Image (N_A : Nodes.Valid_Address_Type) return String is
+   begin
       return Block_IO.Image(Block_IO.Valid_Address_Type(N_A));
    end Image;
 
-   function Image (N_A : Nodes.Address_Type) return String
-   is begin
+   function Image (N_A : Nodes.Address_Type) return String is
+   begin
       if Nodes.Is_Valid(N_A) then
          return Image(Nodes.To_Valid_Address(N_A));
       else
@@ -30,14 +30,14 @@ is
 
       function Node_To_String (N : Nodes.Node_Type) return String
       is
-         procedure App (L : in out Natural; S : in String)
-         is begin
+         procedure App (L : in out Natural; S : in String) is
+         begin
             L := L + S'Length + 1;
          end App;
 
          Offset : Natural := 1;
-         procedure App (S : in out String; T : in String)
-         is begin
+         procedure App (S : in out String; T : in String) is
+         begin
             S(Offset .. Offset + T'Length - 1) := T;
             Offset := Offset + T'Length;
             S(Offset .. Offset) := "\n";
@@ -45,13 +45,13 @@ is
             Ada.Text_IO.Put_Line(T);
          end App;
 
-         function To_String (A : Nodes.Address_Type) return String
-         is begin
+         function To_String (A : Nodes.Address_Type) return String is
+         begin
             return Address_To_String(Block_IO.Address_Type(A));
          end To_String;
 
-         function To_String (A : Nodes.Valid_Address_Type) return String
-         is begin
+         function To_String (A : Nodes.Valid_Address_Type) return String is
+         begin
             return Address_To_String(Block_IO.Address_Type
                      (Nodes.To_Address(A)));
          end To_String;
@@ -103,14 +103,14 @@ is
          end;
       end Node_To_String;
 
-      function Message (Text : String; N : Nodes.Node_Type) return String
-      is begin
+      function Message (Text : String; N : Nodes.Node_Type) return String is
+      begin
          Ada.Text_IO.Put_Line(Text);
          return Text & " "& Node_To_String(N);
       end Message;
 
-      function Message (Text : String; M, N : Nodes.Node_Type) return String
-      is begin
+      function Message (Text : String; M, N : Nodes.Node_Type) return String is
+      begin
          return Text & " "& Node_To_String(M) & Node_To_String(N);
       end Message;
 
@@ -291,8 +291,8 @@ declare
       return Nodes.From_Block(B);
    end R;
 
-   function R(A : Nodes.Address_Type) return Nodes.Node_Type
-   is begin
+   function R(A : Nodes.Address_Type) return Nodes.Node_Type is
+   begin
       return R(Nodes.To_Valid_Address(A));
    end R;
    pragma Unreferenced (R);

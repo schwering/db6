@@ -63,8 +63,8 @@ package body Random is
      (Strings => DB.Types.Columns, Random_Weight => 3);
 
 
-   procedure Init_Key_Value_Pairs (Init : in Count_Type)
-   is begin
+   procedure Init_Key_Value_Pairs (Init : in Count_Type) is
+   begin
       DB.Locks.Mutexes.Lock(Mutex);
       Initial_KV := Init;
       Current_KV := Initial_KV;
@@ -78,16 +78,15 @@ package body Random is
    end Init_Key_Value_Pairs;
 
 
-   procedure Reset_String_Generation
-   is begin
+   procedure Reset_String_Generation is
+   begin
       DB.Locks.Mutexes.Lock(Mutex);
       Current_KV := Initial_KV;
       DB.Locks.Mutexes.Unlock(Mutex);
    end Reset_String_Generation;
 
 
-   function To_Value (Count : Count_Type) return DB.Types.Values.Value_Type
-   is
+   function To_Value (Count : Count_Type) return DB.Types.Values.Value_Type is
       Last : constant Count_Type
            := Count_Type(DB.Types.Values.Value_Type'Last);
       Off  : constant Count_Type

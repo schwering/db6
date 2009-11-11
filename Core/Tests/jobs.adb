@@ -21,14 +21,14 @@ package body Jobs is
    end To_Description;
 
 
-   function To_String (D : Description_Type) return String
-   is begin
+   function To_String (D : Description_Type) return String is
+   begin
       return D.Str(1 .. D.Len);
    end To_String;
 
 
-   function "=" (D, E : Description_Type) return Boolean
-   is begin
+   function "=" (D, E : Description_Type) return Boolean is
+   begin
       return D.Len = E.Len and then D.Str(1 .. D.Len) = E.Str(1 .. E.Len);
    end "=";
 
@@ -37,8 +37,8 @@ package body Jobs is
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
       Reset                     : in Boolean := True)
-      return Job_Type
-   is begin
+      return Job_Type is
+   begin
       return New_Job(Description, Short_Job, 1, 1, Reset);
    end New_Job;
 
@@ -49,16 +49,16 @@ package body Jobs is
       Short_Job_Execution_Count : in Random.Count_Type;
       Concurrency_Degree        : in Positive := 10;
       Reset                     : in Boolean  := True)
-      return Job_Type
-   is begin
+      return Job_Type is
+   begin
       return (Description, Short_Job, Short_Job_Execution_Count,
               Concurrency_Degree, Reset);
    end New_Job;
 
 
    procedure Execute_Jobs
-     (Jobs : in Long_Job_Type)
-   is begin
+     (Jobs : in Long_Job_Type) is
+   begin
       for I in Jobs'Range loop
          Execute_Job(Jobs(I));
       end loop;
@@ -66,8 +66,8 @@ package body Jobs is
 
 
    procedure Execute_Job
-     (Job : in Job_Type)
-   is begin
+     (Job : in Job_Type) is
+   begin
       Execute_Job(Job.Description, Job.Short_Job, Job.Short_Job_Execution_Count,
                   Job.Concurrency_Degree, Job.Reset);
    end Execute_Job;

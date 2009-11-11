@@ -47,8 +47,8 @@ package body DB.Types.Keys is
      (Context : in out Context_Type;
       Block   : in out IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type;
-      Key     : in     Key_Type)
-   is begin
+      Key     : in     Key_Type) is
+   begin
       Row_Serialization.Write(Context.Row_Context, Block, Cursor, Key.Row);
       --Column_Serialization.Write(Context.Column_Context, Block, Cursor,
                                   --Key.Column);
@@ -60,8 +60,8 @@ package body DB.Types.Keys is
      (Context : in out Context_Type;
       Block   : in     IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type;
-      Key     :    out Key_Type)
-   is begin
+      Key     :    out Key_Type) is
+   begin
       Row_Serialization.Read(Context.Row_Context, Block, Cursor, Key.Row);
       Key.Column := Types.Columns.Empty_String;
       --Column_Serialization.Read(Context.Column_Context, Block, Cursor,

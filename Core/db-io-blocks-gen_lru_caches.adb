@@ -12,8 +12,8 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    task Superviser;
 
-   task body Superviser
-   is begin
+   task body Superviser is
+   begin
       loop
          Put_Line("Hashtable Size       ="&
                   LLI'Image(Hashtable_Size));
@@ -91,8 +91,8 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    procedure Prepend_Entry
      (File : in out File_Type;
-      E    : in out Entry_Ref_Type)
-   is begin
+      E    : in out Entry_Ref_Type) is
+   begin
       pragma Assert ((File.Head = null) = (File.Tail = null));
       if File.Head /= null then
          E.Prev         := null;
@@ -149,8 +149,8 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    procedure Remove_Entry
      (File : in out File_Type;
-      E    : in Entry_Ref_Type)
-   is begin
+      E    : in Entry_Ref_Type) is
+   begin
       pragma Assert ((File.Head = null) = (File.Tail = null));
       pragma Assert ((File.Head = E) = (E.Prev = null));
       pragma Assert ((File.Tail = E) = (E.Next = null));
@@ -181,8 +181,8 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    procedure Discard_Last_Entry
      (File    : in out File_Type;
-      Success :    out Boolean)
-   is begin
+      Success :    out Boolean) is
+   begin
       if File.Tail /= null then
          if File.Tail.Dirty then
             P_IO.Write(File.File, File.Tail.Address,
@@ -243,8 +243,8 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    procedure Create
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       Locks.Mutexes.Lock(File.Mutex);
       P_IO.Create(ID, File.File);
       Hashtables.Allocate_Table(Hash_Table_Size, File.Table);
@@ -258,8 +258,8 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    procedure Open
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       Locks.Mutexes.Lock(File.Mutex);
       P_IO.Open(ID, File.File);
       Hashtables.Allocate_Table(Hash_Table_Size, File.Table);
@@ -298,8 +298,8 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    procedure Set_Block_Count
      (File    : in out File_Type;
-      Address : in     Address_Type)
-   is begin
+      Address : in     Address_Type) is
+   begin
       P_IO.Set_Block_Count(File.File, Address);
    end Set_Block_Count;
 
@@ -389,48 +389,48 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
 
    procedure Acquire_Ticket
      (File   : in out File_Type;
-      Ticket :    out Ticket_Type)
-   is begin
+      Ticket :    out Ticket_Type) is
+   begin
       P_IO.Acquire_Ticket(File.File, Ticket);
    end Acquire_Ticket;
 
 
    procedure Release_Ticket
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Release_Ticket(File.File, Ticket);
    end Release_Ticket;
 
 
    procedure Read_Lock
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Read_Lock(File.File, Ticket);
    end Read_Lock;
 
 
    procedure Write_Lock
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Write_Lock(File.File, Ticket);
    end Write_Lock;
 
 
    procedure Certify_Lock
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Certify_Lock(File.File, Ticket);
    end Certify_Lock;
 
 
    procedure Unlock
      (File   : in out File_Type;
-      Ticket : in     Ticket_Type)
-   is begin
+      Ticket : in     Ticket_Type) is
+   begin
       P_IO.Unlock(File.File, Ticket);
    end Unlock;
 

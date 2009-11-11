@@ -5,8 +5,8 @@ package body DB.IO.Blocks is
 
    function To_Block
      (Block : Long_Block_Type)
-      return Block_Type
-   is begin
+      return Block_Type is
+   begin
       return Block(Index_Type);
    end To_Block;
 
@@ -24,8 +24,8 @@ package body DB.IO.Blocks is
 
    function New_Cursor
      (Start : Base_Index_Type)
-      return Cursor_Type
-   is begin
+      return Cursor_Type is
+   begin
       return Cursor_Type'(Pos => Start);
    end New_Cursor;
 
@@ -33,31 +33,31 @@ package body DB.IO.Blocks is
    function Is_Valid
      (Block  : Base_Block_Type;
       Cursor : Cursor_Type)
-      return Boolean
-   is begin
+      return Boolean is
+   begin
       return Cursor.Pos in Block'Range;
    end Is_Valid;
 
 
    function Position
      (Cursor : Cursor_Type)
-      return Base_Position_Type
-   is begin
+      return Base_Position_Type is
+   begin
       return Cursor.Pos;
    end Position;
 
 
    function Bits_To_Units
      (Bits : Size_Type)
-      return Size_Type
-   is begin
+      return Size_Type is
+   begin
       return (Bits + System.Storage_Unit - 1) / System.Storage_Unit;
    end Bits_To_Units;
 
 
    procedure Reset
-     (Block : in out Base_Block_Type)
-   is begin
+     (Block : in out Base_Block_Type) is
+   begin
       for I in Block'Range loop
          Block(I) := Storage_Element_Type'First;
       end loop;
@@ -66,8 +66,8 @@ package body DB.IO.Blocks is
 
    function Size_Of
      (Item  : Item_Type)
-      return Size_Type
-   is begin
+      return Size_Type is
+   begin
       return Bits_To_Units(Item'Size);
    end Size_Of;
 

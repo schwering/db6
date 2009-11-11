@@ -54,8 +54,8 @@ is
 
    procedure S_Test_Both (S, T : in String)
    is
-      function Image (S : String) return String
-      is begin
+      function Image (S : String) return String is
+      begin
          return S;
       end Image;
 

@@ -76,14 +76,14 @@ package body DB.Gen_Heaps is
       end Write_Value;
 
 
-      function "=" (A, B : Key_Type) return Boolean
-      is begin
+      function "=" (A, B : Key_Type) return Boolean is
+      begin
          return Block_IO."="(A, B);
       end "=";
 
 
-      function "<=" (A, B : Key_Type) return Boolean
-      is begin
+      function "<=" (A, B : Key_Type) return Boolean is
+      begin
          pragma Warnings (Off); -- the reversed order is intended
          return not Block_IO."<"(B, A);
          pragma Warnings (On);
@@ -190,8 +190,8 @@ package body DB.Gen_Heaps is
 
    function Block_Identity
      (Block : IO.Blocks.Block_Type)
-      return IO.Blocks.Block_Type
-   is begin
+      return IO.Blocks.Block_Type is
+   begin
       return Block;
    end Block_Identity;
 
@@ -227,8 +227,8 @@ package body DB.Gen_Heaps is
 
    function Chunk_Length
      (Size : IO.Blocks.Size_Type)
-      return Length_Type
-   is begin
+      return Length_Type is
+   begin
       return Chunk_Length(Length_Type(Size));
    end Chunk_Length;
 
@@ -282,8 +282,8 @@ package body DB.Gen_Heaps is
 
 
    procedure Finalize
-     (Heap : in out Heap_Type)
-   is begin
+     (Heap : in out Heap_Type) is
+   begin
       if Heap.Initialized then
          Block_IO.Close(Heap.File);
          Info_BTrees.Finalize(Heap.Info_Tree);
@@ -475,8 +475,8 @@ package body DB.Gen_Heaps is
 
    function Result
      (State : Info_BTrees.Result_Type)
-      return Result_Type
-   is begin
+      return Result_Type is
+   begin
       case State is
          when Info_BTrees.Success =>
             return Success;
@@ -490,8 +490,8 @@ package body DB.Gen_Heaps is
 
    function Result
      (State : Free_BTrees.Result_Type)
-      return Result_Type
-   is begin
+      return Result_Type is
+   begin
       case State is
          when Free_BTrees.Success =>
             return Success;
@@ -782,8 +782,8 @@ package body DB.Gen_Heaps is
       function Lower_Bound
         (Address           : Block_IO.Valid_Address_Type;
          Reverse_Direction : Boolean)
-         return Info_BTrees.Bound_Type
-      is begin
+         return Info_BTrees.Bound_Type is
+      begin
          if not Reverse_Direction then
             return Info_BTrees.New_Bound(Info_BTrees.Greater, Address);
          else
@@ -794,8 +794,8 @@ package body DB.Gen_Heaps is
       function Upper_Bound
         (Address           : Block_IO.Valid_Address_Type;
          Reverse_Direction : Boolean)
-         return Info_BTrees.Bound_Type
-      is begin
+         return Info_BTrees.Bound_Type is
+      begin
          if not Reverse_Direction then
             return Info_BTrees.Positive_Infinity_Bound;
          else

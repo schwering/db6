@@ -244,16 +244,16 @@ package body DB.IO.Low_Level is
 
    procedure Seek_End
      (File    : in  File_Descriptor_Type;
-      New_Pos : out File_Position_Type)
-   is begin
+      New_Pos : out File_Position_Type) is
+   begin
       Seek(File, 0, From_End, New_Pos);
    end Seek_End;
 
 
    function Current_File_Position
      (File : File_Descriptor_Type)
-      return File_Position_Type
-   is begin
+      return File_Position_Type is
+   begin
       return File_Position_Type(C.lseek(C.int(File), C.off_t(0), C.SEEK_CUR));
    end Current_File_Position;
 

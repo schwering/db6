@@ -8,8 +8,8 @@ package body DB.IO.Blocks.Device_IO is
 
    procedure Open
      (ID   : in  String;
-      File : out File_Type)
-   is begin
+      File : out File_Type) is
+   begin
       File.Max_Address_Initialized := False;
       File.Max_Address             := Invalid_Address;
       Low_Level.Open(Path      => ID,
@@ -20,63 +20,63 @@ package body DB.IO.Blocks.Device_IO is
 
    procedure Set_Block_Count
      (File    : in out File_Type;
-      Address : in     Address_Type)
-   is begin
+      Address : in     Address_Type) is
+   begin
       File.Max_Address_Initialized := True;
       File.Max_Address             := Address;
    end Set_Block_Count;
 
 
    procedure Close
-     (File : in out File_Type)
-   is begin
+     (File : in out File_Type) is
+   begin
       Low_Level.Close(File.FD);
    end Close;
 
 
    function First
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return 1;
    end First;
 
 
    function Succ
      (Address : Valid_Address_Type)
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return Address + 1;
    end Succ;
 
 
    function Image
      (A : in Valid_Address_Type)
-      return String
-   is begin
+      return String is
+   begin
       return Valid_Address_Type'Image(A);
    end Image;
 
 
    function To_Address
      (Address : Valid_Address_Type)
-      return Address_Type
-   is begin
+      return Address_Type is
+   begin
       return Address;
    end To_Address;
 
 
    function To_Valid_Address
      (Address : Address_Type)
-      return Valid_Address_Type
-   is begin
+      return Valid_Address_Type is
+   begin
       return Address;
    end To_Valid_Address;
 
 
    function Is_Valid_Address
      (Address : Address_Type)
-      return Boolean
-   is begin
+      return Boolean is
+   begin
       return Address /= Invalid_Address;
    end Is_Valid_Address;
 
@@ -147,8 +147,8 @@ package body DB.IO.Blocks.Device_IO is
 
    procedure Seek_New
      (File    : in out File_Type;
-      Address :    out Address_Type)
-   is begin
+      Address :    out Address_Type) is
+   begin
       Locks.Mutexes.Lock(File.Mutex);
 
       if not File.Max_Address_Initialized then
@@ -168,48 +168,48 @@ package body DB.IO.Blocks.Device_IO is
 
    procedure Acquire_Ticket
      (File   : in out File_Type;
-      Ticket :    out Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket :    out Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Acquire_Ticket(File.Semaphore, Ticket);
    end Acquire_Ticket;
 
 
    procedure Release_Ticket
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Release_Ticket(File.Semaphore, Ticket);
    end Release_Ticket;
 
 
    procedure Read_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Read_Lock(File.Semaphore, Ticket);
    end Read_Lock;
 
 
    procedure Write_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Write_Lock(File.Semaphore, Ticket);
    end Write_Lock;
 
 
    procedure Certify_Lock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Certify_Lock(File.Semaphore, Ticket);
    end Certify_Lock;
 
 
    procedure Unlock
      (File   : in out File_Type;
-      Ticket : in     Locks.Semaphores.Ticket_Type)
-   is begin
+      Ticket : in     Locks.Semaphores.Ticket_Type) is
+   begin
       Locks.Semaphores.Unlock(File.Semaphore, Ticket);
    end Unlock;
 
