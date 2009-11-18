@@ -1,3 +1,18 @@
+-- Abstract:
+--
+-- Chunk File System (CFS) IO. CFS is a simple file system.
+-- Files grow by chunks which are pretty large in size (e.g. 128 MB).
+-- The file system is flat and files have no meta data except for their name.
+--
+-- Design Notes:
+--
+-- Each partition starts with a super block. The super block stores the chunk
+-- size of this partition, the total count of chunks and the current files.
+-- A file is defined only by its name and the sequence of chunks that belongs to
+-- it.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Low_Level;
 with DB.IO.Blocks.Gen_IO;
 with DB.Locks.Mutexes;

@@ -1,3 +1,14 @@
+-- Abstract:
+--
+-- Asynchronous file IO prefers read operations over write operations which
+-- are buffered.
+--
+-- Design Notes:
+--
+-- Currently broken when it comes to seeked addresses, I think.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Low_Level;
 with DB.IO.Blocks.Gen_IO;
 with DB.IO.Blocks.Gen_Climb_Caches;

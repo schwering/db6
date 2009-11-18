@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- BTree instance that writes to UNIX device files.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Pool_Global;
 with System.Storage_Pools;
 

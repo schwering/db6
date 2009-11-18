@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- BTree instance using the operating system's file IO.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Pool_Global;
 with System.Storage_Pools;
 

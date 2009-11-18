@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Traceback using GNAT libraries.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with Ada.Exceptions;
 
 package DB.Utils.Traceback is

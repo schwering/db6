@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with Ada.Text_IO;
 with GNAT.Traceback;
 with GNAT.Traceback.Symbolic;

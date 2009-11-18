@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Simple minimum.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 generic
    type Number_Type is (<>);
 function DB.Utils.Gen_Minimum

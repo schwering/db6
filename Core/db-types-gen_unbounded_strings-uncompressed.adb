@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Blocks;
 
 separate (DB.Types.Gen_Unbounded_Strings)

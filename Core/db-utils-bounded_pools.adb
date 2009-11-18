@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package body DB.Utils.Bounded_Pools is
 
    overriding procedure Allocate

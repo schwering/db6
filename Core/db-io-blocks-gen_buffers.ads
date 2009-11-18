@@ -1,3 +1,18 @@
+-- Abstract:
+--
+-- A non-persistent layer for IO operations that can be materialized.
+-- This is used by writing transactions: they work on a buffer which is
+-- materialized on a commit and simply forgotten on an abort.
+--
+-- Design Notes:
+--
+-- Currently, Item_Type objects are stored. Possibly, it is a good idea to store
+-- Block_Type objects directly (TODO investigate).
+--
+-- Uses the dynamic memory allocation, of course.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Storage_Pools;
 
 with DB.IO.Blocks.Gen_IO;

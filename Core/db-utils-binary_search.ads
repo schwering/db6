@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Binary search implementations.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package DB.Utils.Binary_Search is
    pragma Pure;
 

@@ -1,3 +1,16 @@
+-- Abstract:
+--
+-- An implementation of the LRU cache strategy.
+--
+-- Design Notes:
+--
+-- A linked list of blocks is used to order the blocks in cache and a hashtable
+-- is used for fast access to them.
+-- The cache uses a storage pool with a certain size. When no new memory from
+-- this pool can be allocated, an cached block is discarded.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Storage_Pools;
 
 with DB.Compression.Deflate;

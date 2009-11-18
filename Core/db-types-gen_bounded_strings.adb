@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package body DB.Types.Gen_Bounded_Strings is
 
    function "<" (Left, Right : String_Type) return Boolean is

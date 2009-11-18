@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Root package for data types.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package DB.Types is
    pragma Pure;
 

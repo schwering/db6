@@ -1,3 +1,10 @@
+-- Abstract:
+--
+-- Generic IO package interface.
+-- All generic parameters are exported again without the P_ prefix.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 generic
    type P_File_Type is limited private;
    type P_Ticket_Type is private;

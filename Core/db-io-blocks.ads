@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Disk block container.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Storage_Elements;
 
 package DB.IO.Blocks is

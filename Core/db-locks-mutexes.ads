@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Simple lock type.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package DB.Locks.Mutexes is
    pragma Pure;
 
@@ -8,7 +14,6 @@ package DB.Locks.Mutexes is
 
    procedure Unlock
      (M : in out Mutex_Type);
-
 
 private
    protected type Mutex_Type is

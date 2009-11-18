@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with Ada.Unchecked_Conversion;
 with Ada.Unchecked_Deallocation;
 --with Ada.Text_IO; use Ada.Text_IO;

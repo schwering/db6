@@ -1,5 +1,0 @@
-RATIONALE DB.Locks.Mutexes
-
-Mutexes provide a simple lock.
-They are realized with a protected type.
-

@@ -1,3 +1,23 @@
+-- Abstract:
+--
+-- A closed non-growing hashtable implementation.
+--
+-- This hashtable uses handles collisions by rehashing.
+-- The table has a fixed size and does not grow.
+--
+-- References:
+--
+-- [Ney] H. Ney -- Datenstrukturen und Algorithmen, Vorlesungsskript
+-- http://www-i6.informatik.rwth-aachen.de/web/Teaching/Lectures/SS04/ \
+-- Datenstrukturen/index.html#skript
+--
+-- Design Notes:
+--
+-- The current implementation is not very good, see the comment at the formal
+-- generic parameter Rehash.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Storage_Pools;
 
 generic

@@ -38,7 +38,8 @@
 --
 -- References:
 --
--- [BTree] http://schwering.ath.cx/~chs/db6/btree.pdf
+-- [BTree] C. Schwering -- Dingsbums B+-Tree
+-- http://schwering.ath.cx/~chs/db6/btree.pdf
 --
 -- Design Notes:
 --

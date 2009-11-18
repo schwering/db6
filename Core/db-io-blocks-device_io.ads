@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- IO operations for UNIX device files.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Low_Level;
 with DB.IO.Blocks.Gen_IO;
 with DB.IO.Blocks.Gen_Climb_Caches;

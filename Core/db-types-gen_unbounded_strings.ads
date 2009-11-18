@@ -1,3 +1,10 @@
+-- Abstract:
+--
+-- Unbounded string type.
+-- Pretty similar to Ada.Strings.Unbounded.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with Ada.Finalization;
 
 with DB.IO.Blocks;

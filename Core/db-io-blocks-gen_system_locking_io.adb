@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package body DB.IO.Blocks.Gen_System_Locking_IO is
 
    procedure Create

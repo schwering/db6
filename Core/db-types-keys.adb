@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package body DB.Types.Keys is
 
    function "<=" (Left, Right : Key_Type) return Boolean

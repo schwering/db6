@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- String prefix compression.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 generic
    type Item_Type is private;
    type String_Type is private;

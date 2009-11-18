@@ -1,3 +1,14 @@
+-- Abstract:
+--
+-- Levenshtein string metric compression.
+--
+-- Design Notes:
+--
+-- This implements a simple O(n^2) algorithm and therefore, the performance is
+-- pretty bad. A O(n) algorithm for Levenshtein exists.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 generic
    type Item_Type is private;
    with function "=" (A, B : Item_Type) return Boolean is <>;

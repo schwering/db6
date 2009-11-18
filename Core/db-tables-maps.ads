@@ -1,3 +1,10 @@
+-- Abstract:
+--
+-- Wrapper for BTree and Blob_Tree. Decides which to use depending on the
+-- maximum value size.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Pool_Global;
 with System.Storage_Pools;
 

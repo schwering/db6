@@ -1,3 +1,15 @@
+-- Abstract:
+--
+-- Deflate compression.
+--
+-- Makes use of the Deflate C implementation zlib.
+--
+-- Design Notes:
+--
+-- The Ada Web Server (AWS) contains a nicer zlib binding.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Storage_Elements;
 
 package DB.Compression.Deflate is

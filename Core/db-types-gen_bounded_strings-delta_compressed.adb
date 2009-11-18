@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Blocks;
 with DB.Compression.Gen_Levenshtein;
 

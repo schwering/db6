@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package body DB.IO.Blocks.Device_IO is
 
    procedure Create

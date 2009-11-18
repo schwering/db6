@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with Ada.Unchecked_Conversion;
 
 package body DB.Types.Gen_Numbers is

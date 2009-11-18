@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with Ada.Unchecked_Deallocation;
 
 package body DB.IO.Blocks.Gen_Buffers is

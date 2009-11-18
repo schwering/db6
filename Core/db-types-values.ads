@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Value type.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Blocks;
 
 with System.Storage_Elements;

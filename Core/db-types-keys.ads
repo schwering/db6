@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Key type. A key consists of a row, a column and a timestamp.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Blocks;
 with DB.Types.Rows;
 with DB.Types.Columns;

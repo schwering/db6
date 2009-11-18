@@ -1,5 +1,10 @@
-with Ada.Unchecked_Deallocation;
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
 
+with Ada.Unchecked_Deallocation;
 
 package body DB.Types.Gen_Unbounded_Strings is
 

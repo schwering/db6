@@ -1,3 +1,10 @@
+-- Abstract:
+--
+-- Bounded string type.
+-- Pretty similar to Ada.Strings.Bounded.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Blocks;
 
 generic

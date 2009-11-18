@@ -1,3 +1,13 @@
+-- Abstract:
+--
+-- Timer for CPU and real time.
+--
+-- Design Notes:
+--
+-- See db-utils-timers-c.c for C functions.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package DB.Utils.Timers is
 
    type Ticks_Type is mod 2**64;

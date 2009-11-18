@@ -1,3 +1,16 @@
+-- Abstract:
+--
+-- A heap is capable of storing large data values.
+--
+-- The insertion process returns an address. This address can be used to read
+-- the value later.
+--
+-- Design Notes:
+--
+-- (TODO document)
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Storage_Elements;
 with System.Storage_Pools;
 

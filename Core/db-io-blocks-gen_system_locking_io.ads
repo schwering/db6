@@ -1,3 +1,10 @@
+-- Abstract:
+--
+-- Wrapper for a normal IO implementation that works with system file
+-- descriptors that adds file locking on operating system level.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.IO.Blocks.Gen_IO;
 with DB.IO.Low_Level;
 

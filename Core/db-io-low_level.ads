@@ -1,3 +1,14 @@
+-- Abstract:
+--
+-- Thin binding of UNIX IO system calls.
+--
+-- Design Notes:
+--
+-- See db-io-low_level-c.c for C wrapper functions. Most calls are directly
+-- system calls.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 package DB.IO.Low_Level is
    pragma Preelaborate;
 
