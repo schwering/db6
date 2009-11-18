@@ -108,7 +108,7 @@ package DB.Gen_BTrees is
    -- nodes.
 
    ----------
-   -- Initialization
+   -- Tree initialization procedures.
 
    type Tree_Type is limited private;
 
@@ -134,7 +134,7 @@ package DB.Gen_BTrees is
    -- values is Max_Value_Size.
 
    ----------
-   -- Transactions.
+   -- Transactions and their operations.
 
    type Transaction_Type is abstract tagged limited private;
    type RO_Transaction_Type is new Transaction_Type with private;
@@ -170,7 +170,7 @@ package DB.Gen_BTrees is
 
 
    ----------
-   -- Core operations: Look_Up, Insertion, Deletion
+   -- Core operations: Look_Up, Insertion, Deletion.
 
    type Result_Type is (Success, Failure, Error);
    type Count_Type is new Natural;
@@ -323,7 +323,7 @@ package DB.Gen_BTrees is
    -- such key exists.
 
    ----------
-   -- Information procedures
+   -- Miscellaneous information procedures.
 
    subtype Height_Type is Positive;
 
@@ -508,7 +508,7 @@ private
                       := Address_Type(Block_IO.Invalid_Address);
 
       ----------
-      -- General and accessor subprograms
+      -- General and accessor subprograms.
 
       function Root_Node
         (Is_Leaf : Boolean)
@@ -670,7 +670,7 @@ private
       -- Returns the Index-th value. This function is determined for leaves.
 
       ----------
-      -- Node operations
+      -- Node operations.
 
       function Key_Position
         (Node : Node_Type;
@@ -806,7 +806,7 @@ private
       -- inner nodes.
 
       ----------
-      -- Block-related subprograms
+      -- Block-related subprograms.
 
       function Size_Of
         (Node : Node_Type)
@@ -900,7 +900,7 @@ private
       end record;
 
    ----------
-   -- Transaction types and private operations.
+   -- Transaction types and their private operations.
 
    type Transaction_Ref_Type is not null access all Transaction_Type'Class;
    pragma Controlled (Transaction_Ref_Type);
