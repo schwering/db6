@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with DB.Utils.Binary_Search;
 with DB.Utils.Gen_Minimum;
 with DB.Utils.Gen_Maximum;

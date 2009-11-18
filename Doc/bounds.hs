@@ -7,11 +7,11 @@
 --           = 3 * (2^{n-1} - 1)  +  2^{n-1}
 --           = 4 * 2^{n-1}  -  3
 --           = 2^{n+1} - 3
--- Let i(n) = incr n and assume n >= 2
+-- Let i(n) = incr n and assume n >= 3
 -- Then i(n) = 2 + i(n-1) + s(n-1)
 --           = 2 + (2 + i(n-2) + s(n-2)) + s(n-1)
 --           = 2 + (2 + i(n-2) + d(n-2)) + d(n-1)
---           = 3 + 2 * (n-1)  +  \sum_{i=1}^{n-1} d(i)  +  1
+--           = 3 + 2 * (n-1)  +  \sum_{i=1}^{n-1} d(i)
 --           = 3 + 2 * (n-1)  +  \sum_{i=1}^{n-1} (2^{i+1} - 3) - 1
 --           = 3 + 2 * (n-1)  +  \sum_{i=1}^{n-1} 2^{i+1}  -  3 * (n-1) - 1
 --           = 3 - (n-1)  +  \sum_{i=1}^{n-1} 2^{i+1}  -  1
@@ -30,7 +30,7 @@ incr 1 = 3
 incr n = 2 + incr (n-1) + sync (n-1)
 
 decr :: Integer -> Integer
-decr 1 = 1
+decr 1 = 2
 decr n = 3 + 2 * sync (n-1)
 
 sync :: Integer -> Integer
@@ -44,7 +44,6 @@ maxl (x : xs) = maxh x xs
                 maxh i (x : xs) | otherwise = maxh i xs
 
 mklist :: (Integer -> Integer) -> Integer -> Integer -> [ Integer ]
-mklist _ _ 0 = []
 mklist _ m n | m > n = []
 mklist f m n = (f m) : mklist f (m+1) n
 
@@ -83,12 +82,12 @@ test n = 3 + 2*(n-1) + (sum (decrs (n-1))) + 1
 
 test1 n = 2 + (2 + incr (n-2) + sync (n-2)) + sync (n-1)
 test2 n = 2 + (2 + incr (n-2) + decr (n-2)) + decr (n-1)
-test3 n = 3 + 2 * (n-1)  +  (sumf (1) (n-1) (\i -> decr(i)))  +  1
-test4 n = 3 + 2 * (n-1)  +  (sumf (1) (n-1) (\i -> 2 `power` (i+1) - 3)) - 1
+test3 n = 3 + 2 * (n-1)  +  (sumf (1) (n-1) (\i -> decr(i)))
+test4 n = 3 + 2 * (n-1)  +  (sumf (1) (n-1) (\i -> (2 `power` (i+1)) - 3)) - 1
 test5 n = 3 + 2 * (n-1)  +  (sumf (1) (n-1) (\i -> 2 `power` (i+1)))  -  3 * (n-1) - 1
 test6 n = 3 - (n-1)  +  (sumf 1 (n-1) (\i -> 2 `power` (i+1)))  -  1
 test7 n = 3 - (n-1)  +  (sumf 0 n (\i -> 2 `power` i))  -  (2 `power` 0 + 2 `power` 1) - 1
 test8 n = - n + 1  +    (sumf 0 n (\i -> 2 `power` i))  -  1
-test9 n = - n - 1  +  2 `power` (n+1)
+test9 n = - n - 1  +  (2 `power` (n+1))
 
 

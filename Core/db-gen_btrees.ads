@@ -1,3 +1,53 @@
+-- Abstract:
+--
+-- A generic implementation of [BTree] which basically is a B+ Tree.
+-- It stores ordered bounded length key/value pairs.
+-- Values can be either searched by specifying a key or a position.
+-- The same applies for deletion.
+-- This package also implements sophisticated cursors which can be used to
+-- scan certain key intervals.
+--
+-- All operations are thread-safe due to the use of transactions. There are
+-- read-only and read-write transactions. Transactions acquire locks.
+-- The implementation of the locks is in the generic Block_IO parameter.
+--
+-- The Key_Context_Type and Value_Context_Type can be used for compression, for
+-- example. This package guarantees that if the entries E_1 .. E_N are the
+-- entries of a node, E_I is written before E_{I+1} for all I in 1 .. E_N.
+-- Howevever, entries are read randomly!
+-- This must be taken in account by the formal Read/Write_Key and
+-- Read/Write_Value operations.
+--
+-- The Is_Context_Free_Serialization must be False if the count of bytes
+-- occupied by an entry depends on the other entries in a node.
+-- This is typically the case when entries are compressed.
+-- The effect of Is_Context_Free_Serialization being False is that the minimum
+-- node occupation is 0 instead of 3/8 (see below). The tree can still not
+-- degenerate to a list, because the minimum degree of each node is still 2.
+-- 
+-- Trivial choices for the Skip_Key and Skip_Value operations are mappings to
+-- Read_Key and Write_Key, respectively, just without returning the key or
+-- value.
+--
+-- In contrast to normal B+ Trees, entries have not a fixed length. As a 
+-- consequence, the node filling degree is not measured in used entry slots
+-- but in bytes. In each node except the root, at least (S_N - S_H) * floor(3/8)
+-- bytes must be used, where S_N is the size of a node and S_H is the fixed size
+-- of each node's header.
+-- A detailed description of this B+ Tree variant can be found in [BTree].
+--
+-- References:
+--
+-- [BTree] http://schwering.ath.cx/~chs/db6/btree.pdf
+--
+-- Design Notes:
+--
+-- Exceptions should only be raised under really serious circumstances or in
+-- debugging mode.
+-- In productive use, the Result_Type should be used.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with System.Storage_Pools;
 
 with DB.IO.Blocks;
@@ -52,27 +102,15 @@ package DB.Gen_BTrees is
    pragma Preelaborate;
    pragma Unreferenced (Skip_Value);
 
-   type Tree_Type is limited private;
-   type Result_Type is (Success, Failure, Error);
-   type Count_Type is new Natural;
-   subtype Height_Type is Positive;
-   type Transaction_Type is abstract tagged limited private;
-   type RO_Transaction_Type is new Transaction_Type with private;
-   type RW_Transaction_Type is new Transaction_Type with private;
-
-   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
-      Greater);
-   type Bound_Type is private;
-   type Cursor_Type is limited private;
-
-
    Tree_Error : exception;
    -- This exception is only raised when there are extremely serious
    -- errors in the tree such as dangling references to child or neighbor
    -- nodes.
 
+   ----------
+   -- Initialization
 
-   -- Tree initialization procedures: Create, Initialize, Finalize.
+   type Tree_Type is limited private;
 
    procedure Create
      (ID : in String);
@@ -95,9 +133,12 @@ package DB.Gen_BTrees is
    -- Returns the maximum allowed size of keys if the maximum size of
    -- values is Max_Value_Size.
 
+   ----------
+   -- Transactions.
 
-   -- Transaction: New_Transaction, Start_Transaction, Abort_Transaction,
-   -- Commit_Transaction.
+   type Transaction_Type is abstract tagged limited private;
+   type RO_Transaction_Type is new Transaction_Type with private;
+   type RW_Transaction_Type is new Transaction_Type with private;
 
    function New_RO_Transaction
      (Tree : Tree_Type)
@@ -128,7 +169,11 @@ package DB.Gen_BTrees is
       Transaction : in out RW_Transaction_Type);
 
 
-   -- Search operations: Look_Up, Minimum, Maximum.
+   ----------
+   -- Core operations: Look_Up, Insertion, Deletion
+
+   type Result_Type is (Success, Failure, Error);
+   type Count_Type is new Natural;
 
    procedure Look_Up
      (Tree     : in out Tree_Type;
@@ -213,9 +258,6 @@ package DB.Gen_BTrees is
       State       :    out Result_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
-
-
-   -- Modification procedures: Insert, Delete.
 
    procedure Insert
      (Tree     : in out Tree_Type;
@@ -280,8 +322,10 @@ package DB.Gen_BTrees is
    -- Deletes the Position-th Key / Value pair or sets State = Failure if no
    -- such key exists.
 
+   ----------
+   -- Information procedures
 
-   -- Information procedures and other utilities: Count, Get_Height, Clusterize.
+   subtype Height_Type is Positive;
 
    procedure Count
      (Tree  : in out Tree_Type;
@@ -315,8 +359,13 @@ package DB.Gen_BTrees is
    -- Reorganizes the nodes in the file.
    -- Not implemented yet.
 
+   ----------
+   -- Cursor operations.
 
-   -- Cursor.
+   type Cursor_Type is limited private;
+   type Bound_Type is private;
+   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
+      Greater);
 
    function Positive_Infinity_Bound
       return Bound_Type;
@@ -458,7 +507,7 @@ private
       Invalid_Address : constant Address_Type
                       := Address_Type(Block_IO.Invalid_Address);
 
-
+      ----------
       -- General and accessor subprograms
 
       function Root_Node
@@ -620,7 +669,7 @@ private
          return Value_Type;
       -- Returns the Index-th value. This function is determined for leaves.
 
-
+      ----------
       -- Node operations
 
       function Key_Position
@@ -756,7 +805,7 @@ private
       -- The nodes must not be free. They must be either both leaves or both
       -- inner nodes.
 
-
+      ----------
       -- Block-related subprograms
 
       function Size_Of
@@ -830,6 +879,8 @@ private
       pragma Inline (From_Block);
    end Nodes;
 
+   ----------
+   -- Tree type.
 
    Root_Address : constant Nodes.Valid_Address_Type
                 := Nodes.Valid_Address_Type(Block_IO.First);
@@ -848,6 +899,8 @@ private
          Finalized   : Boolean       := False;
       end record;
 
+   ----------
+   -- Transaction types and private operations.
 
    type Transaction_Ref_Type is not null access all Transaction_Type'Class;
    pragma Controlled (Transaction_Ref_Type);
@@ -872,7 +925,6 @@ private
    -- Would be abstract if this wouldn't force Write_Node being visible.
    -- Therefore, it simply raises an exception.
 
-
    type RO_Transaction_Type is new Transaction_Type with null record;
 
    overriding
@@ -881,7 +933,6 @@ private
       Transaction : in out RO_Transaction_Type;
       N_A         : in     Nodes.Valid_Address_Type;
       N           :    out Nodes.Node_Type);
-
 
    type RW_Transaction_Ref_Type is
       not null access all RW_Transaction_Type'Class;
@@ -951,6 +1002,8 @@ private
      (Tree        : in out Tree_Type;
       Transaction : in out Sub_RW_Transaction_Type);
 
+   ----------
+   -- Cursor types.
 
    type Bound_Kind_Type is (Concrete_Bound, Abstract_Bound);
    type Direction_Type is (From_Upper_To_Lower, From_Lower_To_Upper);
@@ -986,7 +1039,6 @@ private
          Mutex              : Locks.Mutexes.Mutex_Type;
          Owning_Transaction : Nullable_Transaction_Ref_Type := null;
       end record;
-
 
 end DB.Gen_BTrees;
 

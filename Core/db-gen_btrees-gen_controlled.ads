@@ -1,3 +1,25 @@
+-- Abstract:
+--
+-- A wrapper package for Gen_BTrees which simply finalizes all data structures.
+-- This includes Tree_Type, Transaction_Type and Cursor_Type objects.
+--
+-- Tree_Type objects are Finalized which means that the file is closed (which
+-- again might release locks or free memory, this depends on the Block_IO
+-- implementation).
+--
+-- RO_Transaction_Type objects are Finished, RW_Transaction_Type objects are
+-- Aborted. In both cases, locks are released and, in the RW_Transaction_Type,
+-- the memory for the transaction buffer is freed.
+--
+-- Cursor_Type objects are Finalized. Since cursors hold no own ressources at
+-- the moment, this does nothing.
+--
+-- Note that the summaries of the finalization effects might not be correct
+-- due to changes in the meantime. For exact information, have a look at the
+-- respective procedures in Gen_BTrees.
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 with Ada.Finalization;
 
 with DB.IO.Blocks;

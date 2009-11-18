@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009 Christoph Schwering
+
 separate (DB.Gen_BTrees)
 package body Search is
 

@@ -1,3 +1,46 @@
+Fahrplan:
+
+* Wert-Datentyp
+  * ein generischer Obertyp fuer alle moeglichen Werte
+  * wird wohl ein Byte-Array sein, dessen Laenge auch gespeichert werden muss
+  * vielleicht koennte man die Laenge, wenn sie fix ist, einmal pro Knoten
+    speichern?
+
+* Map-Reduce
+  * erstmal nur auf einzelnen Column-Families, also B-Trees, ausfuehrbar
+  * spaeter: Column-Families joinen (sehr wichtig, z. B. wegen Blob-Trees)
+  * Garantie: die Attribute einer ID werden direkt nacheinander reduced
+
+* Management-Schicht
+  * Column-Families mit Attribut-Pattern-Matching (= vert. Part.)
+  * hier auch direkt Intervalle festlegen?        (= horiz. Part.)
+
+* Schnittstelle
+  * REST
+  * http://server.de/datenbank/datenbank/[-infty,infty]/attribut1,attribut5/HEAD
+    alle Datensaetze, nur Attribute attribut1 und attribut5, letzte Revision
+  * http://server.de/datenbank/datenbank/[com.bbc,com.cnn]/*name*/<=2009-09-10
+    Datensaetze von com.bbc bis com.cnn, jeweils inklusive, alle Attribute, die
+    auf das Muster *name* passen, die letzte Revision vor 2009-09-10
+  * http://server.de/datenbank/datenbank/(com.bbc,com.cnn]/vorname/HEAD^3
+    Datenseatze von com.bbc, exklusiv, bis com.cnn, inklusiv, Attribut vorname,
+    dritt-aktuellste Revision
+  * erst Einfach-Rechner-Loesung, spaeter Cluster (siehe Verteilung)
+
+* Verteilung
+  * moeglichst gut bei horiz./vert. Partitionierung voraus-beruecksichtigen
+  * moeglichst gut bei Map-Reduce voraus-beruecksichtigen (-> Jobs?)
+  * auch ueber REST?
+  * Vorschlag/Idee:
+    * logisch in eine neue oberste Ebene ansiedeln
+    * Anfragen ueber REST wie bei einem einzelnen Computer
+    * zusaetzlich: Anfrage "auf welchen Computern liegen welche Teile einer
+      Datenbank?"
+  
+
+
+
+
 
 * Shadowing:
   Einfaches Shadowing aus Folien nicht uebertragbar, da offensives Splitten
