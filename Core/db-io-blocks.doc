@@ -1,7 +1,0 @@
-RATIONALE DB.IO.Blocks
-
-The Blocks package contains functionality to copy objects to a block and
-rebuild the objects from a block.
-A block consists of 4096 bytes, which is the size of a disk block and should
-be the best choice. However, other block sizes should be tested.
-
