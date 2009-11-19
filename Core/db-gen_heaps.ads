@@ -40,6 +40,7 @@ generic
 package DB.Gen_Heaps is
    --pragma Preelaborate;
 
+   subtype Address_Type is Block_IO.Valid_Address_Type;
    type Heap_Type is limited private;
    type Transaction_Type is abstract tagged limited private;
    type RO_Transaction_Type is new Transaction_Type with private;
@@ -105,7 +106,7 @@ package DB.Gen_Heaps is
 
    procedure Get
      (Heap    : in out Heap_Type;
-      Address : in     Block_IO.Valid_Address_Type;
+      Address : in     Address_Type;
       Item    :    out Item_Type;
       State   :    out Result_Type);
    -- Get the Item stored under Address or set State = Failure if no such
@@ -116,7 +117,7 @@ package DB.Gen_Heaps is
    procedure Get
      (Heap        : in out Heap_Type;
       Transaction : in out Transaction_Type'Class;
-      Address     : in     Block_IO.Valid_Address_Type;
+      Address     : in     Address_Type;
       Item        :    out Item_Type;
       State       :    out Result_Type);
    -- Get the Item stored under Address or set State = Failure if no such
@@ -125,7 +126,7 @@ package DB.Gen_Heaps is
    procedure Put
      (Heap    : in out Heap_Type;
       Item    : in     Item_Type;
-      Address :    out Block_IO.Valid_Address_Type;
+      Address :    out Address_Type;
       State   :    out Result_Type);
    -- Inserts Item and sets Address to the address of Item.
    -- Generally, State = Failure should never occur because there is nothing
@@ -137,7 +138,7 @@ package DB.Gen_Heaps is
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Item        : in     Item_Type;
-      Address     :    out Block_IO.Valid_Address_Type;
+      Address     :    out Address_Type;
       State       :    out Result_Type);
    -- Inserts Item and sets Address to the address of Item.
    -- Generally, State = Failure should never occur because there is nothing
@@ -145,7 +146,7 @@ package DB.Gen_Heaps is
 
    procedure Delete
      (Heap    : in out Heap_Type;
-      Address : in     Block_IO.Valid_Address_Type;
+      Address : in     Address_Type;
       State   :    out Result_Type);
    -- Deletes Item at Address and set Item to the deleted one or set
    -- State = Failure if no item exists on Address.
@@ -155,7 +156,7 @@ package DB.Gen_Heaps is
    procedure Delete
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Address     : in     Block_IO.Valid_Address_Type;
+      Address     : in     Address_Type;
       State       :    out Result_Type);
    -- Deletes Item at Address and set Item to the deleted one or set
    -- State = Failure if no item exists on Address.
@@ -178,7 +179,7 @@ private
 
 
    package Info_BTree_Types is
-      subtype Key_Type is Block_IO.Valid_Address_Type;
+      subtype Key_Type is Address_Type;
       type Key_Context_Type is null record;
 
       subtype Value_Type is Chunk_Info_Type;
@@ -245,7 +246,7 @@ private
       type Key_Type is
          record
             Length  : Length_Type;
-            Address : Block_IO.Valid_Address_Type;
+            Address : Address_Type;
          end record;
       pragma Pack (Key_Type);
       type Key_Context_Type is null record;

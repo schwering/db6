@@ -240,11 +240,11 @@ package body DB.Gen_Heaps is
 
 
    function Succ
-     (Address : Block_IO.Valid_Address_Type;
+     (Address : Address_Type;
       Count   : Length_Type)
-      return Block_IO.Valid_Address_Type
+      return Address_Type
    is
-      Succ_Address : Block_IO.Valid_Address_Type := Address;
+      Succ_Address : Address_Type := Address;
    begin
       for I in 1 .. Count loop
          Succ_Address := Block_IO.Succ(Succ_Address);
@@ -267,7 +267,7 @@ package body DB.Gen_Heaps is
          declare
             use type IO.Blocks.Size_Type;
             use type Info_BTrees.Result_Type;
-            Address : Block_IO.Valid_Address_Type;
+            Address : Address_Type;
             Info    : Chunk_Info_Type;
             Pos     : Info_BTrees.Count_Type;
             St      : Info_BTrees.Result_Type;
@@ -511,7 +511,7 @@ package body DB.Gen_Heaps is
 
    procedure Get
      (Heap    : in out Heap_Type;
-      Address : in     Block_IO.Valid_Address_Type;
+      Address : in     Address_Type;
       Item    :    out Item_Type;
       State   :    out Result_Type)
    is
@@ -530,7 +530,7 @@ package body DB.Gen_Heaps is
    procedure Get
      (Heap        : in out Heap_Type;
       Transaction : in out Transaction_Type'Class;
-      Address     : in     Block_IO.Valid_Address_Type;
+      Address     : in     Address_Type;
       Item        :    out Item_Type;
       State       :    out Result_Type)
    is
@@ -562,7 +562,7 @@ package body DB.Gen_Heaps is
 
       declare
          use type IO.Blocks.Size_Type;
-         Addr : Block_IO.Valid_Address_Type := Address;
+         Addr : Address_Type := Address;
          Arr  : System.Storage_Elements.Storage_Array(1 .. Length);
       begin
          while Length > 0 loop
@@ -606,7 +606,7 @@ package body DB.Gen_Heaps is
    procedure Put
      (Heap    : in out Heap_Type;
       Item    : in     Item_Type;
-      Address :    out Block_IO.Valid_Address_Type;
+      Address :    out Address_Type;
       State   :    out Result_Type)
    is
       Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
@@ -628,7 +628,7 @@ package body DB.Gen_Heaps is
    procedure Set_Used
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Address     : in     Block_IO.Valid_Address_Type;
+      Address     : in     Address_Type;
       Length      : in     IO.Blocks.Size_Type;
       State       :    out Result_Type)
    is
@@ -656,7 +656,7 @@ package body DB.Gen_Heaps is
    procedure Unset_Used
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Address     : in     Block_IO.Valid_Address_Type;
+      Address     : in     Address_Type;
       Length      :    out Length_Type;
       State       :    out Result_Type)
    is
@@ -686,7 +686,7 @@ package body DB.Gen_Heaps is
    procedure Set_Free
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Address     : in     Block_IO.Valid_Address_Type;
+      Address     : in     Address_Type;
       Length      : in     Length_Type;
       State       :    out Result_Type)
    is
@@ -732,7 +732,7 @@ package body DB.Gen_Heaps is
    procedure Unset_Free
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Address     : in     Block_IO.Valid_Address_Type;
+      Address     : in     Address_Type;
       Length      : in     Length_Type;
       State       :    out Result_Type)
    is
@@ -779,14 +779,14 @@ package body DB.Gen_Heaps is
    procedure Unset_Free_Following
      (Heap              : in out Heap_Type;
       Transaction       : in out RW_Transaction_Type'Class;
-      Address           : in out Block_IO.Valid_Address_Type;
+      Address           : in out Address_Type;
       Reverse_Direction : in     Boolean;
       Length            : in out Length_Type;
       State             :    out Result_Type)
    is
 
       function Lower_Bound
-        (Address           : Block_IO.Valid_Address_Type;
+        (Address           : Address_Type;
          Reverse_Direction : Boolean)
          return Info_BTrees.Bound_Type is
       begin
@@ -798,7 +798,7 @@ package body DB.Gen_Heaps is
       end Lower_Bound;
 
       function Upper_Bound
-        (Address           : Block_IO.Valid_Address_Type;
+        (Address           : Address_Type;
          Reverse_Direction : Boolean)
          return Info_BTrees.Bound_Type is
       begin
@@ -826,7 +826,7 @@ package body DB.Gen_Heaps is
    begin
       loop
          declare
-            Addr : Block_IO.Valid_Address_Type;
+            Addr : Address_Type;
             Info : Chunk_Info_Type;
             St   : Info_BTrees.Result_Type;
          begin
@@ -843,7 +843,7 @@ package body DB.Gen_Heaps is
             Length := Length + Info.Length;
 
             declare
-               Key : Block_IO.Valid_Address_Type;
+               Key : Address_Type;
                Val : Chunk_Info_Type;
                Pos : Info_BTrees.Count_Type;
             begin
@@ -885,7 +885,7 @@ package body DB.Gen_Heaps is
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Item        : in     Item_Type;
-      Address     :    out Block_IO.Valid_Address_Type;
+      Address     :    out Address_Type;
       State       :    out Result_Type)
    is
 
@@ -893,7 +893,7 @@ package body DB.Gen_Heaps is
         (Heap        : in out Heap_Type;
          Transaction : in out RW_Transaction_Type'Class;
          Min_Length  : in     Length_Type;
-         Address     :    out Block_IO.Valid_Address_Type;
+         Address     :    out Address_Type;
          Length      :    out Length_Type;
          State       :    out Result_Type)
       is
@@ -959,7 +959,7 @@ package body DB.Gen_Heaps is
                                          Length_Type(IO.Blocks.Block_Size);
                   Free_Chunk_Length   : Length_Type
                                       := Chunk_Length - Needed_Chunk_Length;
-                  Free_Address        : Block_IO.Valid_Address_Type
+                  Free_Address        : Address_Type
                                       := Succ(Address, Block_Count);
                begin
                   Unset_Free_Following(Heap              => Heap,
@@ -995,7 +995,7 @@ package body DB.Gen_Heaps is
       end if;
       declare
          use type IO.Blocks.Size_Type;
-         Block_Address    : Block_IO.Valid_Address_Type := Address;
+         Block_Address    : Address_Type := Address;
          Remaining_Length : IO.Blocks.Size_Type         := Arr'Length;
       begin
          while Remaining_Length > 0 loop
@@ -1024,7 +1024,7 @@ package body DB.Gen_Heaps is
 
    procedure Delete
      (Heap    : in out Heap_Type;
-      Address : in     Block_IO.Valid_Address_Type;
+      Address : in     Address_Type;
       State   :    out Result_Type)
    is
       pragma Assert (Heap.Initialized);
@@ -1047,12 +1047,12 @@ package body DB.Gen_Heaps is
    procedure Delete
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Address     : in     Block_IO.Valid_Address_Type;
+      Address     : in     Address_Type;
       State       :    out Result_Type)
    is
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
-      Chunk_Address : Block_IO.Valid_Address_Type := Address;
+      Chunk_Address : Address_Type := Address;
       Length        : Length_Type;
    begin
       -- Remove from free index
@@ -1109,7 +1109,7 @@ package body DB.Gen_Heaps is
                                        Lower_Bound       => LB,
                                        Upper_Bound       => UB,
                                        Reverse_Direction => False);
-      Address : Block_IO.Valid_Address_Type;
+      Address : Address_Type;
       Info    : Chunk_Info_Type;
       State   : Info_BTrees.Result_Type;
       use type Info_BTrees.Result_Type;
@@ -1156,7 +1156,7 @@ package body DB.Gen_Heaps is
                                        Upper_Bound       => UB,
                                        Reverse_Direction => False);
       Length  : Length_Type;
-      Address : Block_IO.Valid_Address_Type;
+      Address : Address_Type;
       Key     : Free_BTree_Types.Key_Type;
       Value   : Free_BTree_Types.Value_Type;
       State   : Free_BTrees.Result_Type;

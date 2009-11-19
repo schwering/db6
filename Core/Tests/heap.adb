@@ -69,8 +69,7 @@ is
       Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
       Block_IO           => Block_IO);
 
-   type Address_Array_Type is array (Size_Type range <>) of
-      Block_IO.Valid_Address_Type;
+   type Address_Array_Type is array (Size_Type range <>) of Heaps.Address_Type;
 
    use type DB.IO.Blocks.Size_Type;
    use type Heaps.Result_Type;

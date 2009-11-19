@@ -416,8 +416,27 @@ package DB.Gen_Blob_Trees is
    -- key/value-pair that should be visited next.
 
 private
+   package Heap_Utils is
+      function Info_Index_ID
+        (ID : String)
+         return String;
+
+      function Free_Index_ID
+        (ID : String)
+         return String;
+   end Heap_Utils;
+
+   package Heaps is new Gen_Heaps
+     (Item_Type          => Value_Type,
+      To_Storage_Array   => To_Storage_Array,
+      From_Storage_Array => From_Storage_Array,
+      Info_Index_ID      => Heap_Utils.Info_Index_ID,
+      Free_Index_ID      => Heap_Utils.Free_Index_ID,
+      Storage_Pool       => Storage_Pool,
+      Block_IO           => Block_IO);
+
    package BTree_Utils is
-      subtype Value_Type is Block_IO.Valid_Address_Type;
+      subtype Value_Type is Heaps.Address_Type;
       type Value_Context_Type is null record;
 
       procedure Read_Value
@@ -454,25 +473,6 @@ private
       Is_Context_Free_Serialization => Is_Context_Free_Serialization,
       Storage_Pool                  => Storage_Pool,
       Block_IO                      => Block_IO);
-
-   package Heap_Utils is
-      function Info_Index_ID
-        (ID : String)
-         return String;
-
-      function Free_Index_ID
-        (ID : String)
-         return String;
-   end Heap_Utils;
-
-   package Heaps is new Gen_Heaps
-     (Item_Type          => Value_Type,
-      To_Storage_Array   => To_Storage_Array,
-      From_Storage_Array => From_Storage_Array,
-      Info_Index_ID      => Heap_Utils.Info_Index_ID,
-      Free_Index_ID      => Heap_Utils.Free_Index_ID,
-      Storage_Pool       => Storage_Pool,
-      Block_IO           => Block_IO);
 
    type Tree_Type is limited
       record
