@@ -55,7 +55,7 @@ package body Prefix_Compressed is
 
    procedure Write
      (Context : in out Context_Type;
-      Block   : in out IO.Blocks.Block_Type;
+      Block   : in out IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type;
       S       : in     String_Type) is
    begin
@@ -84,7 +84,7 @@ package body Prefix_Compressed is
 
    procedure Read
      (Context : in out Context_Type;
-      Block   : in     IO.Blocks.Block_Type;
+      Block   : in     IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type;
       S       :    out String_Type) is
    begin

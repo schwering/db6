@@ -19,6 +19,9 @@ package DB.Types.Gen_Unbounded_Strings is
 
    type Buffer_Type is array (Positive range <>) of Item_Type;
 
+   subtype Indefinite_Buffer_Type is Buffer_Type;
+   -- for compatibility with Gen_Bounded_Strings
+
    type String_Type is new Ada.Finalization.Controlled with private;
 
    overriding procedure Initialize (String : in out String_Type);
@@ -77,30 +80,30 @@ package DB.Types.Gen_Unbounded_Strings is
          Size    :    out IO.Blocks.Size_Type);
 
       procedure Write
-        (Block   : in out IO.Blocks.Block_Type;
+        (Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       : in     String_Type);
 
       procedure Write
         (Context : in out Context_Type;
-         Block   : in out IO.Blocks.Block_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       : in     String_Type);
 
       procedure Read
-        (Block   : in     IO.Blocks.Block_Type;
+        (Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       :    out String_Type);
 
       procedure Read
         (Context : in out Context_Type;
-         Block   : in     IO.Blocks.Block_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       :    out String_Type);
 
       procedure Skip
         (Context : in out Context_Type;
-         Block   : in     IO.Blocks.Block_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type);
 
    private
@@ -127,13 +130,13 @@ package DB.Types.Gen_Unbounded_Strings is
 
       procedure Write
         (Context : in out Context_Type;
-         Block   : in out IO.Blocks.Block_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       : in     String_Type);
 
       procedure Read
         (Context : in out Context_Type;
-         Block   : in     IO.Blocks.Block_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       :    out String_Type);
 
