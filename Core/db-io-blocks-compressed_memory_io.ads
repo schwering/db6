@@ -1,14 +1,16 @@
 -- Abstract:
 --
--- Main memory IO implementation.
+-- Volatile IO implementation that compresses the blocks with DEFLATE and stores
+-- the buffers in main memory.
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
+with DB.Compression.Deflate;
 with DB.IO.Blocks.Gen_IO;
 with DB.Locks.Mutexes;
 with DB.Locks.Semaphores;
 
-package DB.IO.Blocks.Memory_IO is
+package DB.IO.Blocks.Compressed_Memory_IO is
    pragma Preelaborate;
 
    type Address_Type is new Natural;
@@ -128,19 +130,27 @@ package DB.IO.Blocks.Memory_IO is
       Unlock                     => Unlock);
 
 
+   subtype Count_Type is Long_Long_Integer range 0 .. Long_Long_Integer'Last;
+   function Byte_Count return Count_Type;
+   function Block_Count return Count_Type;
+
+
 private
-   type Block_Ref_Type is access Block_Type;
-   pragma Controlled (Block_Ref_Type);
+   subtype Buffer_Size_Type is Compression.Deflate.Size_Type;
+   subtype Buffer_Type is Compression.Deflate.Buffer_Type;
 
-   type Block_Ref_Array_Type is
-      array (Valid_Address_Type range <>) of Block_Ref_Type;
+   type Buffer_Ref_Type is access Buffer_Type;
+   pragma Controlled (Buffer_Ref_Type);
 
-   type Block_Ref_Array_Ref_Type is access Block_Ref_Array_Type;
-   pragma Controlled (Block_Ref_Array_Ref_Type);
+   type Buffer_Ref_Array_Type is
+      array (Valid_Address_Type range <>) of Buffer_Ref_Type;
+
+   type Buffer_Ref_Array_Ref_Type is access Buffer_Ref_Array_Type;
+   pragma Controlled (Buffer_Ref_Array_Ref_Type);
 
    type File_Object_Type is limited
       record
-         Buffer    : Block_Ref_Array_Ref_Type := null;
+         Buffer    : Buffer_Ref_Array_Ref_Type := null;
          Capacity  : Address_Type := 0;
          Current   : Address_Type := 0;
          Maximum   : Address_Type := 0;
@@ -164,5 +174,5 @@ private
    pragma Inline (Certify_Lock);
    pragma Inline (Unlock);
 
-end DB.IO.Blocks.Memory_IO;
+end DB.IO.Blocks.Compressed_Memory_IO;
 
