@@ -95,5 +95,16 @@ begin
          end if;
       end if;
    end loop;
+
+   declare
+      subtype Index_Type is Natural range 1 .. 3;
+      type String_Type is new String(Index_Type);
+      S : String_Type := (others => 'a');
+      N : Natural := 4;
+   begin
+      S(N .. S'Last) := (others => '0');
+      Put_Line(String(S));
+      Put_Line("OK");
+   end;
 end;
 

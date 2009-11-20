@@ -791,18 +791,18 @@ package body Nodes is
             Set_Entry_Size(Block, Index, Size);
          end;
 
-         declare
-            Key_Context : Key_Context_Type;
-            Value_Context : Value_Context_Type;
-            K : Key_Type;
-            V : Value_Type;
-            S : Boolean;
-         begin
-            Read_Entry(Key_Context, Value_Context, Block, Index, K, V, S);
-            pragma Assert (S);
-            pragma Assert (K = Key);
-            pragma Assert (V = Value);
-         end;
+         --declare
+         --   Key_Context : Key_Context_Type;
+         --   Value_Context : Value_Context_Type;
+         --   K : Key_Type;
+         --   V : Value_Type;
+         --   S : Boolean;
+         --begin
+         --   Read_Entry(Key_Context, Value_Context, Block, Index, K, V, S);
+         --   pragma Assert (S);
+         --   pragma Assert (K = Key);
+         --   pragma Assert (V = Value);
+         --end;
       end Write_Entry;
 
 
@@ -2123,7 +2123,7 @@ package body Nodes is
    begin
       pragma Assert (Phys.Total_Size(Node.Block) <= IO.Blocks.Block_Size);
       pragma Assert (Validation(Node) = Valid);
-      return IO.Blocks.To_Block(Node.Block);
+      return IO.Blocks.To_Block(Node.Block, Phys.Total_Size(Node.Block));
    end To_Block;
 
 

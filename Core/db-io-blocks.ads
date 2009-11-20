@@ -33,8 +33,12 @@ package DB.IO.Blocks is
 
 
    function To_Block
-     (Block : Long_Block_Type)
+     (Block     : Long_Block_Type;
+      Last_Used : Long_Position_Type)
       return Block_Type;
+   -- Truncates the long block to a short one and sets the remaining free
+   -- storage elements to zero. The latter is done because the block will
+   -- probably be written to disk.
 
    function To_Long_Block
      (Block : Block_Type)

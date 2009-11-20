@@ -86,19 +86,26 @@ begin
    Jobs.Execute_Jobs(Long_Job);
 
    declare
-      Blocks : constant Memory_IO.Count_Type
-             := Memory_IO.Block_Count;
-      CBytes : constant Memory_IO.Count_Type
-             := Memory_IO.Byte_Count;
-      UBytes : constant Memory_IO.Count_Type
-             := Blocks * DB.IO.Blocks.Block_Size;
-      Ratio  : constant Natural
-             := Natural(Float(CBytes) / Float(UBytes) * 100.0);
+      procedure Cancel (A, B : in out Memory_IO.Count_Type) is
+      begin
+         for I in reverse 2 .. Memory_IO.Count_Type'Min(A, B) loop
+            if A mod I = 0 and B mod I = 0 then
+               A := A / I;
+               B := B / I;
+            end if;
+         end loop;
+      end Cancel;
+
+      Blocks : constant Memory_IO.Count_Type := Memory_IO.Block_Count;
+      CBytes : Memory_IO.Count_Type := Memory_IO.Byte_Count;
+      UBytes : Memory_IO.Count_Type := Blocks * DB.IO.Blocks.Block_Size;
    begin
       Put_Line("Blocks count:"& Blocks'Img);
       Put_Line("CBytes count:"& CBytes'Img);
       Put_Line("UBytes count:"& UBytes'Img);
-      Put_Line("Compression ratio:"& Ratio'Img);
+      Cancel(CBytes, UBytes);
+      Put_Line("Compression ratio:"& CBytes'Img &" :"& UBytes'Img &
+               Natural'Image(Integer(Float(CBytes)/Float(UBytes)*100.0)) &"%");
    end;
 
    BTrees.Finalize(Tree);

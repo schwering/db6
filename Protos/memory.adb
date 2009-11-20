@@ -147,7 +147,6 @@ is
    begin
       return Block_Type'(Capacity => Hash_Type(Size) - 1, others => <>);
    end New_Block;
-
 begin
    Put_Line("Component_Size ="& Array_Type'Component_Size'Img);
    for I in Positive loop

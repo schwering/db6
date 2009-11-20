@@ -10,10 +10,14 @@ with System;
 package body DB.IO.Blocks is
 
    function To_Block
-     (Block : Long_Block_Type)
-      return Block_Type is
+     (Block     : Long_Block_Type;
+      Last_Used : Long_Position_Type)
+      return Block_Type
+   is
+      B : Block_Type := Block(Index_Type);
    begin
-      return Block(Index_Type);
+      B(Last_Used + 1 .. B'Last) := (others => 0);
+      return B;
    end To_Block;
 
 

@@ -31,7 +31,7 @@ package body Random is
                       := Char_Type'Pos('z') - Char_Type'Pos('a') + 1;
       Total_KV_Count  : constant Positive
                       := Key_Value_Pairs'Length;
-      Random_Factor   : constant Strings.Length_Type
+      Random_Factor   : constant Strings.Length_Type'Base
                       := Random_Weight * Total_KV_Count / Index + 10 + Index;
       String_Length   : constant Strings.Length_Type
                       := ((Random_Factor mod Max_String_Length) + 1);
