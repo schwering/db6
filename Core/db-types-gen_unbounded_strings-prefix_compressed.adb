@@ -24,7 +24,6 @@ package body Prefix_Compressed is
       "&"             => "&");
 
 
-
    procedure Size_Of
      (Context : in out Context_Type;
       S       : in     String_Type;

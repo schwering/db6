@@ -10,7 +10,7 @@ with DB.Types.Columns;
 with DB.Types.Times;
 
 package DB.Types.Keys is
-   pragma Preelaborate;
+   pragma Elaborate_Body;
 
    type Key_Type is
       record

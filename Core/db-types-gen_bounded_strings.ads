@@ -20,6 +20,7 @@ package DB.Types.Gen_Bounded_Strings is
 
    type String_Type is private;
 
+   Empty_String : constant String_Type;
 
    function "<" (Left, Right : String_Type) return Boolean;
    function "=" (Left, Right : String_Type) return Boolean;
@@ -36,9 +37,6 @@ package DB.Types.Gen_Bounded_Strings is
    function To_Index
      (L : Length_Type)
       return Index_Type;
-
-   function Empty_String
-     return String_Type;
 
    function New_String
      (Arr : Indefinite_Buffer_Type)
@@ -192,10 +190,12 @@ private
          Length : Length_Type;
       end record;
 
+   Empty_String : constant String_Type
+                := String_Type'(Length => 0, others => <>);
+
    pragma Inline ("<");
    pragma Inline ("=");
    pragma Inline ("&");
-   pragma Inline (Empty_String);
    pragma Inline (New_String);
    pragma Inline (To_Index);
    pragma Inline (Length);

@@ -1,4 +1,4 @@
-BIN=bin/release/./ttree
+BIN=bin/release/./vttree
 FILE=`cat .temp_path`btree
 C1=10k 
 # 1. Simple insertions and check

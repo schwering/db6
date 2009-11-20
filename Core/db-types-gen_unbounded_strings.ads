@@ -12,17 +12,16 @@ with DB.IO.Blocks;
 generic
    type Item_Type is (<>);
 package DB.Types.Gen_Unbounded_Strings is
-   pragma Preelaborate;
+   pragma Elaborate_Body;
 
    subtype Length_Type is Natural;
    subtype Index_Type is Length_Type range 1 .. Length_Type'Last;
 
-   type Buffer_Type is array (Positive range <>) of Item_Type;
-
-   subtype Indefinite_Buffer_Type is Buffer_Type;
-   -- for compatibility with Gen_Bounded_Strings
+   type Indefinite_Buffer_Type is array (Positive range <>) of Item_Type;
 
    type String_Type is new Ada.Finalization.Controlled with private;
+
+   Empty_String : constant String_Type;
 
    overriding procedure Initialize (String : in out String_Type);
    overriding procedure Adjust (String : in out String_Type);
@@ -31,18 +30,21 @@ package DB.Types.Gen_Unbounded_Strings is
    function "<" (Left, Right : String_Type) return Boolean;
    function "=" (Left, Right : String_Type) return Boolean;
    function "&" (Left, Right : String_Type) return String_Type;
-   function "&" (Left : String_Type; Right : Buffer_Type) return String_Type;
-   function "&" (Left : Buffer_Type; Right : String_Type) return String_Type;
+   function "&"
+     (Left  : String_Type;
+      Right : Indefinite_Buffer_Type)
+      return String_Type;
+   function "&"
+     (Left  : Indefinite_Buffer_Type;
+      Right : String_Type)
+      return String_Type;
 
    function To_Index
      (L : Length_Type)
       return Index_Type;
 
-   function Empty_String
-     return String_Type;
-
    function New_String
-     (Arr : Buffer_Type)
+     (Arr : Indefinite_Buffer_Type)
       return String_Type;
 
    function Length
@@ -62,7 +64,7 @@ package DB.Types.Gen_Unbounded_Strings is
 
    function To_String
      (S : String_Type)
-      return Buffer_Type;
+      return Indefinite_Buffer_Type;
 
 
    package Uncompressed is
@@ -147,16 +149,25 @@ package DB.Types.Gen_Unbounded_Strings is
    end Prefix_Compressed;
 
 private
-   type Buffer_Ref_Type is access Buffer_Type;
-   pragma Controlled (Buffer_Ref_Type);
    type Refcount_Type is new Positive;
-   type Refcount_Ref_Type is access Refcount_Type;
-   pragma Controlled (Refcount_Ref_Type);
+
+   type Bounded_String_Type (Length : Natural) is
+      record
+         Refcount : Refcount_Type;
+         Buffer   : Indefinite_Buffer_Type(1 .. Length);
+      end record;
+
+   type Bounded_String_Ref_Type is access Bounded_String_Type;
+   pragma Controlled (Bounded_String_Ref_Type);
+
    type String_Type is new Ada.Finalization.Controlled with
       record
-         Buffer   : Buffer_Ref_Type;
-         Refcount : Refcount_Ref_Type;
+         S : Bounded_String_Ref_Type;
       end record;
+
+   Empty_String : constant String_Type
+                := String_Type'(Ada.Finalization.Controlled with
+                                S => null);
 
    pragma Inline (Initialize);
    pragma Inline (Adjust);
@@ -164,7 +175,6 @@ private
    pragma Inline ("<");
    pragma Inline ("=");
    pragma Inline ("&");
-   pragma Inline (Empty_String);
    pragma Inline (New_String);
    pragma Inline (To_Index);
    pragma Inline (Length);

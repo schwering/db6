@@ -11,72 +11,99 @@ package body DB.Types.Gen_Unbounded_Strings is
    overriding
    procedure Initialize (String : in out String_Type) is
    begin
-      String.Buffer   := null;
-      String.Refcount := new Refcount_Type'(1);
+      String.S := null;
    end;
 
 
    overriding
    procedure Adjust (String : in out String_Type) is
    begin
-      String.Refcount.all := String.Refcount.all + 1;
+      if String.S /= null then
+         String.S.Refcount := String.S.Refcount + 1;
+      end if;
    end;
 
 
    overriding
    procedure Finalize (String : in out String_Type)
    is
-      procedure Free_Buffer is new Ada.Unchecked_Deallocation
-        (Buffer_Type, Buffer_Ref_Type);
-      procedure Free_Refcount is new Ada.Unchecked_Deallocation
-        (Refcount_Type, Refcount_Ref_Type);
    begin
-      if String.Refcount /= null and then String.Refcount.all > 1 then
-         String.Refcount.all := String.Refcount.all - 1;
+      if String.S /= null and then String.S.Refcount > 1 then
+         String.S.Refcount := String.S.Refcount - 1;
       else
-         if String.Buffer /= null then
-            Free_Buffer(String.Buffer);
-         end if;
-         if String.Refcount /= null then
-            Free_Refcount(String.Refcount);
-         end if;
+         declare
+            procedure Free_Bounded_String is new Ada.Unchecked_Deallocation
+              (Bounded_String_Type, Bounded_String_Ref_Type);
+         begin
+            Free_Bounded_String(String.S);
+         end;
       end if;
    end;
 
 
    function "<" (Left, Right : String_Type) return Boolean is
    begin
-      return Left.Buffer.all < Right.Buffer.all;
+      if Left.S = null and Right.S = null then
+         return False;
+      elsif Left.S = null then
+         return True;
+      elsif Right.S = null then
+         return False;
+      else
+         return Left.S.Buffer < Right.S.Buffer;
+      end if;
    end "<";
 
 
    function "=" (Left, Right : String_Type) return Boolean is
    begin
-      return Left.Buffer.all = Right.Buffer.all;
+      if Left.S = Right.S then
+         return True;
+      elsif Left.S /= null and Right.S /= null then
+         return Left.S.Buffer = Right.S.Buffer;
+      else
+         return False;
+      end if;
    end "=";
 
 
    function "&" (Left, Right : String_Type) return String_Type is
    begin
-      return New_String(Left.Buffer.all & Right.Buffer.all);
+      if Left.S = null and Right.S = null then
+         return Empty_String;
+      elsif Left.S = null then
+         return Right;
+      elsif Right.S = null then
+         return Left;
+      else
+         return New_String(Left.S.Buffer & Right.S.Buffer);
+      end if;
    end "&";
 
 
    function "&"
      (Left  : String_Type;
-      Right : Buffer_Type)
+      Right : Indefinite_Buffer_Type)
       return String_Type is
    begin
-      return New_String(Left.Buffer.all & Right);
+      if Left.S = null then
+         return New_String(Right);
+      else
+         return New_String(Left.S.Buffer & Right);
+      end if;
    end "&";
 
 
    function "&"
-     (Left  : Buffer_Type;
+     (Left  : Indefinite_Buffer_Type;
       Right : String_Type)
       return String_Type is
    begin
-      return New_String(Left & Right.Buffer.all);
+      if Right.S = null then
+         return New_String(Left);
+      else
+         return New_String(Left & Right.S.Buffer);
+      end if;
    end "&";
 
 
@@ -88,24 +115,20 @@ package body DB.Types.Gen_Unbounded_Strings is
    end To_Index;
 
 
-   function Empty_String
-     return String_Type
-   is
-      S : String_Type;
-   begin
-      S.Buffer := new Buffer_Type(1 .. 0);
-      return S;
-   end Empty_String;
-
-
    function New_String
-     (Arr : Buffer_Type)
+     (Arr : Indefinite_Buffer_Type)
       return String_Type
    is
       S : String_Type;
    begin
-      S.Buffer := new Buffer_Type'(Arr);
-      return S;
+      if Arr'Length = 0 then
+         return Empty_String;
+      else
+         return String_Type'(Ada.Finalization.Controlled with
+                             new Bounded_String_Type'(Length   => Arr'Length,
+                                                      Refcount => 1,
+                                                      Buffer   => Arr));
+      end if;
    end New_String;
 
 
@@ -113,7 +136,11 @@ package body DB.Types.Gen_Unbounded_Strings is
      (S : String_Type)
       return Length_Type is
    begin
-      return S.Buffer'Length;
+      if S.S = null then
+         return 0;
+      else
+         return S.S.Buffer'Length;
+      end if;
    end Length;
 
 
@@ -122,7 +149,7 @@ package body DB.Types.Gen_Unbounded_Strings is
       I : Index_Type)
       return Item_Type is
    begin
-      return S.Buffer(I);
+      return S.S.Buffer(I);
    end Element;
 
 
@@ -132,15 +159,24 @@ package body DB.Types.Gen_Unbounded_Strings is
       Length : Length_Type)
       return String_Type is
    begin
-      return New_String(S.Buffer.all(From .. From + Length - 1));
+      return New_String(S.S.Buffer(From .. From + Length - 1));
    end Substring;
 
 
    function To_String
      (S : String_Type)
-      return Buffer_Type is
+      return Indefinite_Buffer_Type is
    begin
-      return S.Buffer.all(1 .. S.Length);
+      if S.S = null then
+         declare
+            Empty_Buffer : constant Indefinite_Buffer_Type(1 .. 0)
+                         := (others => Item_Type'First);
+         begin
+            return Empty_Buffer;
+         end;
+      else
+         return S.S.Buffer(1 .. S.Length);
+      end if;
    end To_String;
 
 

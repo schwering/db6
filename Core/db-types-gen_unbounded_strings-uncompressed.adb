@@ -14,13 +14,13 @@ package body Uncompressed is
       return IO.Blocks.Size_Type
    is
       type Definite_Buffer_Type is
-         array (Index_Type range S.Buffer'Range) of Item_Type;
+         array (Index_Type range S.S.Buffer'Range) of Item_Type;
       function Size_Of_Length is new IO.Blocks.Size_Of(Length_Type);
       function Size_Of_Buffer is new IO.Blocks.Size_Of(Definite_Buffer_Type);
       use type IO.Blocks.Size_Type;
    begin
-      return Size_Of_Length(S.Buffer'Length)
-           + Size_Of_Buffer(Definite_Buffer_Type(S.Buffer.all));
+      return Size_Of_Length(S.S.Buffer'Length)
+           + Size_Of_Buffer(Definite_Buffer_Type(S.S.Buffer));
    end Size_Of;
 
 
@@ -41,12 +41,12 @@ package body Uncompressed is
       S       : in     String_Type)
    is
       type Definite_Buffer_Type is
-         array (Index_Type range S.Buffer'Range) of Item_Type;
+         array (Index_Type range S.S.Buffer'Range) of Item_Type;
       procedure Write_Length is new IO.Blocks.Write(Length_Type);
       procedure Write_Buffer is new IO.Blocks.Write(Definite_Buffer_Type);
    begin
-      Write_Length(Block, Cursor, S.Buffer'Length);
-      Write_Buffer(Block, Cursor, Definite_Buffer_Type(S.Buffer.all));
+      Write_Length(Block, Cursor, S.S.Buffer'Length);
+      Write_Buffer(Block, Cursor, Definite_Buffer_Type(S.S.Buffer));
    end Write;
 
 
@@ -79,7 +79,7 @@ package body Uncompressed is
          Definite_Buffer : Definite_Buffer_Type;
       begin
          Read_Buffer(Block, Cursor, Definite_Buffer);
-         S := New_String(Buffer_Type(Definite_Buffer));
+         S := New_String(Indefinite_Buffer_Type(Definite_Buffer));
       end;
    end Read;
 

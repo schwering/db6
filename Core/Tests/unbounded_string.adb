@@ -20,7 +20,7 @@ begin
       Put_Line("Declaration with initialization");
       declare
          T : constant String_Type
-           := New_String(Buffer_Type'("http://www.cnn.com"));
+           := New_String(Indefinite_Buffer_Type'("http://www.cnn.com"));
       begin
          Put_Line(String(To_String(T)));
          Put_Line("Declaration with initialization done");

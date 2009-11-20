@@ -68,16 +68,6 @@ package body DB.Types.Gen_Bounded_Strings is
    end To_Index;
 
 
-   function Empty_String
-     return String_Type
-   is
-      S : String_Type;
-   begin
-      S.Length := 0;
-      return S;
-   end Empty_String;
-
-
    function New_String
      (Arr : Indefinite_Buffer_Type)
       return String_Type

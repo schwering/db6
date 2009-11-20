@@ -9,8 +9,7 @@ generic
    type String_Type is private;
    type Index_Type is range <>;
    type Length_Type is range <>;
-   with function Empty_String
-           return String_Type;
+   Empty_String : in String_Type;
    with function To_Index
           (L : Length_Type)
            return Index_Type;
