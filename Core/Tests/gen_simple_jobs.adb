@@ -11,11 +11,11 @@ package body Gen_Simple_Jobs is
    is
       KV    : constant Random.Key_Value_Type := Random.Random_Entry;
       Pos   : Count_Type;
-      State : Result_Type;
+      State : Result_Type := Success;
    begin
       P_Insert(Object, KV.Key, KV.Value, Pos, State);
       if State /= Success then
-         Put_Line("Insertion failed");
+         Put_Line("Insertion failed "& State'Img);
          raise Stop_Now;
       end if;
    end Insert;
@@ -28,11 +28,11 @@ package body Gen_Simple_Jobs is
       KV    : constant Random.Key_Value_Type := Random.Random_Entry;
       Val   : DB.Types.Values.Value_Type;
       Pos   : Count_Type;
-      State : Result_Type;
+      State : Result_Type := Success;
    begin
       P_Delete(Object, KV.Key, Val, Pos, State);
       if State /= Success or else KV.Value /= Val then
-         Put_Line("Deletion failed");
+         Put_Line("Deletion failed "& State'Img);
          raise Stop_Now;
       end if;
    end Delete;
@@ -45,11 +45,11 @@ package body Gen_Simple_Jobs is
       KV     : constant Random.Key_Value_Type := Random.Random_Entry;
       Val    : DB.Types.Values.Value_Type;
       Pos    : Count_Type;
-      State  : Result_Type;
+      State  : Result_Type := Success;
    begin
       P_Look_Up(Object, KV.Key, Val, Pos, State);
       if State /= Success or else KV.Value /= Val then
-         Put_Line("Look up failed "& Result_Type'Image(State));
+         Put_Line("Look up failed  "& State'Img);
          raise Stop_Now;
       end if;
    end Search;
@@ -61,15 +61,14 @@ package body Gen_Simple_Jobs is
       KV    : constant Random.Key_Value_Type := Random.Random_Entry;
       Val   : DB.Types.Values.Value_Type;
       Pos   : Count_Type;
-      State : Result_Type;
+      State : Result_Type := Failure;
    begin
       P_Look_Up(Object, KV.Key, Val, Pos, State);
       if State /= Failure then
-         Put_Line("Look up failed");
+         Put_Line("Look up failed "& State'Img);
          raise Stop_Now;
       end if;
    end Antisearch;
 
 end Gen_Simple_Jobs;
-
 
