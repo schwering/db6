@@ -146,21 +146,21 @@ package body DB.Locks.Semaphores is
 
       entry Read_Lock (for T in Ticket_Type)
          when Count >= Size(Shared) - Ticket_Sizes(T) is
-         begin
+      begin
          Lock(T, Shared);
       end Read_Lock;
 
 
       entry Write_Lock (for T in Ticket_Type)
          when Count >= Size(Majority) - Ticket_Sizes(T) is
-         begin
+      begin
          Lock(T, Majority);
       end Write_Lock;
 
 
       entry Certify_Lock (for T in Ticket_Type)
          when Count >= Size(Exclusive) - Ticket_Sizes(T) is
-         begin
+      begin
          Lock(T, Exclusive);
       end Certify_Lock;
 
