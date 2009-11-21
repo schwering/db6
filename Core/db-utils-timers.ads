@@ -34,7 +34,5 @@ package DB.Utils.Timers is
    function Real_String (Timer : Timer_Type) return String;
    procedure Print (S : in String; Timer : in out Timer_Type);
 
-   Timer_Error : exception;
-
 end DB.Utils.Timers;
 

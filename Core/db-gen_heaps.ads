@@ -40,20 +40,10 @@ generic
 package DB.Gen_Heaps is
    --pragma Preelaborate;
 
-   subtype Address_Type is Block_IO.Valid_Address_Type;
+   ----------
+   -- Heap initialization operations.
+
    type Heap_Type is limited private;
-   type Transaction_Type is abstract tagged limited private;
-   type RO_Transaction_Type is new Transaction_Type with private;
-   type RW_Transaction_Type is new Transaction_Type with private;
-   type Result_Type is (Success, Failure, Error);
-
-   Heap_Error : exception;
-   -- This exception is only raised when there are extremely serious
-   -- errors in the heap such as dangling references to child or neighbor
-   -- nodes.
-
-
-   -- Heap initialization procedures: Create, Initialize, Finalize.
 
    procedure Create
      (ID : in String);
@@ -69,9 +59,12 @@ package DB.Gen_Heaps is
      (Heap : in out Heap_Type);
    -- Finalizes Heap, i.e. closes opened files.
 
+   ----------
+   -- Transactions and their operations.
 
-   -- Transaction: New_R[O|W]Transaction, Start_Transaction, Abort_Transaction,
-   -- Commit_Transaction.
+   type Transaction_Type is abstract tagged limited private;
+   type RO_Transaction_Type is new Transaction_Type with private;
+   type RW_Transaction_Type is new Transaction_Type with private;
 
    function New_RO_Transaction
      (Heap : Heap_Type)
@@ -101,8 +94,11 @@ package DB.Gen_Heaps is
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type);
 
+   ----------
+   -- Core operations: Get, Put and Delete.
 
-   -- Operations: Get, Put and Delete.
+   subtype Address_Type is Block_IO.Valid_Address_Type;
+   type Result_Type is (Success, Failure, Error);
 
    procedure Get
      (Heap    : in out Heap_Type;
@@ -161,8 +157,12 @@ package DB.Gen_Heaps is
    -- Deletes Item at Address and set Item to the deleted one or set
    -- State = Failure if no item exists on Address.
 
+   ----------
+   -- Some debug procedures.
+
    procedure Print_Info_Index
      (Heap : in out Heap_Type);
+
    procedure Print_Free_Index
      (Heap : in out Heap_Type);
 

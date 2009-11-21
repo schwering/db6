@@ -229,7 +229,7 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
          pragma Assert (E.Prev = null);
          pragma Assert ((File.Tail = E) = (E.Next = null));
       exception
-         when Storage_Error | Hashtables.Hash_Table_Error =>
+         when Storage_Error | Hash_Table_Error =>
             declare
                Discard_Success : Boolean;
             begin

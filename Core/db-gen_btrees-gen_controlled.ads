@@ -43,9 +43,6 @@ package DB.Gen_BTrees.Gen_Controlled is
    type Cursor_Type is tagged limited private;
 
 
-   Tree_Error : exception renames Gen_BTrees.Tree_Error;
-
-
    procedure Create
      (ID : in String);
 

@@ -9,6 +9,7 @@ with Random; use Random;
 with This_Computer;
 with To_Strings;
 
+with DB;
 with DB.IO.Blocks;
 with DB.IO.Blocks.Direct_IO;
 
@@ -315,7 +316,7 @@ begin
       BTrees.Create(FILE_NAME);
       Put_Line("Newly created BTree "& FILE_NAME);
    exception
-      when DB.IO.IO_Error => Put_Line("Using existing BTree "& FILE_NAME);
+      when DB.IO_Error => Put_Line("Using existing BTree "& FILE_NAME);
    end;
    BTrees.Initialize(Tree, FILE_NAME);
    BTrees.Count(Tree, Cnt);

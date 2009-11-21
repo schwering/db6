@@ -9,6 +9,7 @@ with Args;
 with Jobs;
 with Gen_Simple_Jobs;
 
+with DB;
 with DB.IO.Blocks;
 with DB.IO.Blocks.File_IO;
 
@@ -45,7 +46,7 @@ begin
       Maps.Create(Args.File_Name, Max_Key_Size, Max_Value_Size);
       Put_Line("Newly created Map "& Args.File_Name);
    exception
-      when DB.IO.IO_Error => Put_Line("Using existing Map "& Args.File_Name);
+      when DB.IO_Error => Put_Line("Using existing Map "& Args.File_Name);
    end;
    Maps.Initialize(Map, Args.File_Name);
    Maps.Count(Map, Cnt);

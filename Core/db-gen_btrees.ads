@@ -103,11 +103,6 @@ package DB.Gen_BTrees is
    pragma Preelaborate;
    pragma Unreferenced (Skip_Value);
 
-   Tree_Error : exception;
-   -- This exception is only raised when there are extremely serious
-   -- errors in the tree such as dangling references to child or neighbor
-   -- nodes.
-
    ----------
    -- Tree initialization procedures.
 
@@ -841,8 +836,6 @@ private
         (Block : IO.Blocks.Block_Type)
          return Node_Type;
       -- Converts a block to a node.
-
-      Node_Error : exception renames Tree_Error;
 
    private
       type Node_Type is

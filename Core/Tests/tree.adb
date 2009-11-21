@@ -7,6 +7,7 @@ with Random; use Random;
 with This_Computer;
 with To_Strings;
 
+with DB;
 with DB.IO.Blocks;
 
 with DB.BTrees;
@@ -132,7 +133,7 @@ begin
    begin
       BTrees.Create(FILE_NAME);
    exception
-      when DB.IO.IO_Error => null;
+      when DB.IO_Error => null;
    end;
    BTrees.Initialize(Tree, FILE_NAME);
    BTrees.Count(Tree, Cnt);

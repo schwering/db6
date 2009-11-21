@@ -21,27 +21,10 @@ with DB.Types.Values;
 package DB.Tables.Maps is
    --pragma Preelaborate;
 
+   ----------
+   -- Map initialization operations.
+
    type Map_Type (<>) is limited private;
-   type Result_Type is (Success, Failure, Error);
-   type Count_Type is new Natural;
-   subtype Height_Type is Positive;
-   type Transaction_Type is abstract tagged limited private;
-   type RO_Transaction_Type (<>) is new Transaction_Type with private;
-   type RW_Transaction_Type (<>) is new Transaction_Type with private;
-
-   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
-      Greater);
-   type Bound_Type (<>) is private;
-   type Cursor_Type (<>) is limited private;
-
-
-   Map_Error : exception;
-   -- This exception is only raised when there are extremely serious
-   -- errors in the map such as dangling references to child or neighbor
-   -- nodes.
-
-
-   -- Map initialization procedures: Create, Initialize, Finalize.
 
    function New_Map
      (Max_Key_Size   : in IO.Blocks.Size_Type;
@@ -71,9 +54,12 @@ package DB.Tables.Maps is
       return IO.Blocks.Size_Type;
    -- Returns the maximum allowed size of keys.
 
+   ----------
+   -- Transactions and their operations.
 
-   -- Transaction: New_Transaction, Start_Transaction, Abort_Transaction,
-   -- Commit_Transaction.
+   type Transaction_Type is abstract tagged limited private;
+   type RO_Transaction_Type (<>) is new Transaction_Type with private;
+   type RW_Transaction_Type (<>) is new Transaction_Type with private;
 
    function New_RO_Transaction
      (Map  : Map_Type)
@@ -103,8 +89,11 @@ package DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type);
 
+   ----------
+   -- Core operations: Look_Up, Insertion, Deletion.
 
-   -- Search operations: Look_Up, Minimum, Maximum.
+   type Result_Type is (Success, Failure, Error);
+   type Count_Type is new Natural;
 
    procedure Look_Up
      (Map      : in out Map_Type;
@@ -189,9 +178,6 @@ package DB.Tables.Maps is
       State       :    out Result_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
-
-
-   -- Modification procedures: Insert, Delete.
 
    procedure Insert
      (Map      : in out Map_Type;
@@ -256,8 +242,11 @@ package DB.Tables.Maps is
    -- Deletes the Position-th Key / Value pair or sets State = Failure if no
    -- such key exists.
 
+   ----------
+   -- Miscellaneous information procedures.
 
-   -- Information procedures and other utilities: Count, Get_Height, Clusterize.
+   subtype Height_Type is Positive;
+
 
    procedure Count
      (Map   : in out Map_Type;
@@ -291,8 +280,14 @@ package DB.Tables.Maps is
    -- Reorganizes the nodes in the file.
    -- Not implemented yet.
 
+   ----------
+   -- Cursor operations.
 
-   -- Cursor.
+   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
+      Greater);
+   type Bound_Type (<>) is private;
+   type Cursor_Type (<>) is limited private;
+
 
    function Positive_Infinity_Bound
      (Map : Map_Type)
@@ -431,6 +426,8 @@ private
       Storage_Pool           => Root_Storage_Pool'Class(Global_Pool_Object),
       Block_IO               => Block_IO);
 
+   ----------
+   -- Type wrappers. Always Short (=> BTrees) and not Short (=> Blob_Trees).
 
    type Map_Type (Short : Boolean) is limited
       record

@@ -87,8 +87,6 @@ package DB.Utils.Gen_Hashtables is
      (Table : Table_Type)
       return Size_Type;
 
-   Hash_Table_Error : exception;
-
 private
    type State_Type is (Used, Visited, Free);
    type Element_Type (State : State_Type := Used) is

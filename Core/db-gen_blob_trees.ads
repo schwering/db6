@@ -55,27 +55,10 @@ generic
 package DB.Gen_Blob_Trees is
    --pragma Preelaborate;
 
+   ----------
+   -- Tree initialization procedures.
+
    type Tree_Type is limited private;
-   type Result_Type is (Success, Failure, Error);
-   type Count_Type is new Natural;
-   subtype Height_Type is Positive;
-   type Transaction_Type is abstract tagged limited private;
-   type RO_Transaction_Type is new Transaction_Type with private;
-   type RW_Transaction_Type is new Transaction_Type with private;
-
-   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
-      Greater);
-   type Bound_Type is private;
-   type Cursor_Type is limited private;
-
-
-   Tree_Error : exception;
-   -- This exception is only raised when there are extremely serious
-   -- errors in the tree such as dangling references to child or neighbor
-   -- nodes.
-
-
-   -- Tree initialization procedures: Create, Initialize, Finalize.
 
    procedure Create
      (ID : in String);
@@ -95,9 +78,12 @@ package DB.Gen_Blob_Trees is
       return IO.Blocks.Size_Type;
    -- Returns the maximum allowed size of keys.
 
+   ----------
+   -- Transactions and their operations.
 
-   -- Transaction: New_Transaction, Start_Transaction, Abort_Transaction,
-   -- Commit_Transaction.
+   type Transaction_Type is abstract tagged limited private;
+   type RO_Transaction_Type is new Transaction_Type with private;
+   type RW_Transaction_Type is new Transaction_Type with private;
 
    function New_RO_Transaction
      (Tree : Tree_Type)
@@ -127,8 +113,11 @@ package DB.Gen_Blob_Trees is
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type);
 
+   ----------
+   -- Core operations: Look_Up, Insertion, Deletion.
 
-   -- Search operations: Look_Up, Minimum, Maximum.
+   type Result_Type is (Success, Failure, Error);
+   type Count_Type is new Natural;
 
    procedure Look_Up
      (Tree     : in out Tree_Type;
@@ -213,9 +202,6 @@ package DB.Gen_Blob_Trees is
       State       :    out Result_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
-
-
-   -- Modification procedures: Insert, Delete.
 
    procedure Insert
      (Tree     : in out Tree_Type;
@@ -280,8 +266,10 @@ package DB.Gen_Blob_Trees is
    -- Deletes the Position-th Key / Value pair or sets State = Failure if no
    -- such key exists.
 
+   ----------
+   -- Miscellaneous information procedures.
 
-   -- Information procedures and other utilities: Count, Get_Height, Clusterize.
+   subtype Height_Type is Positive;
 
    procedure Count
      (Tree  : in out Tree_Type;
@@ -315,8 +303,13 @@ package DB.Gen_Blob_Trees is
    -- Reorganizes the nodes in the file.
    -- Not implemented yet.
 
+   ----------
+   -- Cursor operations.
 
-   -- Cursor.
+   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
+      Greater);
+   type Bound_Type is private;
+   type Cursor_Type is limited private;
 
    function Positive_Infinity_Bound
       return Bound_Type;

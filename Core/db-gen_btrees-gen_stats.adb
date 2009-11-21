@@ -62,7 +62,7 @@ begin -- Gen_Traverse
             end if;
          end;
       exception
-         when IO.IO_Error =>
+         when IO_Error =>
             exit;
       end;
    end loop;

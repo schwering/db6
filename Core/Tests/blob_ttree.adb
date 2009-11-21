@@ -10,6 +10,7 @@ with Args;
 with Jobs;
 with Gen_Simple_Jobs;
 
+with DB;
 with DB.IO.Blocks;
 with DB.IO.Blocks.Direct_IO;
 
@@ -115,7 +116,7 @@ begin
       BTrees.Create(Args.File_Name);
       Put_Line("Newly created BTree "& Args.File_Name);
    exception
-      when DB.IO.IO_Error => Put_Line("Using existing BTree "& Args.File_Name);
+      when DB.IO_Error => Put_Line("Using existing BTree "& Args.File_Name);
    end;
    BTrees.Initialize(Tree, Args.File_Name);
    BTrees.Count(Tree, Cnt);
