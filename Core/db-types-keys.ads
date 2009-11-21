@@ -5,18 +5,20 @@
 -- Copyright 2008, 2009 Christoph Schwering
 
 with DB.IO.Blocks;
-with DB.Types.Rows;
-with DB.Types.Columns;
+with DB.Types.Strings.Bounded;
 with DB.Types.Times;
 
 package DB.Types.Keys is
    pragma Elaborate_Body;
 
+   package Rows    renames Strings.Bounded;
+   package Columns renames Strings.Bounded;
+
    type Key_Type is
       record
-         Row    : Types.Rows.String_Type;
-         Column : Types.Columns.String_Type;
-         Time   : Types.Times.Number_Type;
+         Row    : Rows.String_Type;
+         Column : Columns.String_Type;
+         Time   : Times.Number_Type;
       end record;
 
    type Context_Type is private;

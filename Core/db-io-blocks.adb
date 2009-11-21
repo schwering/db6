@@ -85,7 +85,7 @@ package body DB.IO.Blocks is
    procedure Write_At
      (Block      : in out Base_Block_Type;
       From_Index : in     Base_Index_Type;
-      To_Index   : in     Base_Index_Type;
+      To_Index   : in     Base_Position_Type;
       Item       : in     Item_Type)
    is
       subtype Raw_Type is Base_Block_Type(From_Index .. To_Index);
@@ -98,7 +98,7 @@ package body DB.IO.Blocks is
    procedure Read_At
      (Block      : in  Base_Block_Type;
       From_Index : in  Base_Index_Type;
-      To_Index   : in  Base_Index_Type;
+      To_Index   : in  Base_Position_Type;
       Item       : out Item_Type)
    is
       subtype Raw_Type is Base_Block_Type(From_Index .. To_Index);
@@ -164,10 +164,10 @@ package body DB.IO.Blocks is
 
    function Size_Of_Array
      (Arr : Array_Type;
-      To  : Index_Type := Array_Type'Last)
+      To  : Index_Type'Base := Array_Type'Last)
       return Size_Type
    is
-      function Size_Of_Index is new Size_Of(Index_Type);
+      function Size_Of_Index is new Size_Of(Index_Type'Base);
       type Array_Sub_Type is array (Arr'First .. To) of Item_Type;
       function Size_Of_Data is new Size_Of(Array_Sub_Type);
    begin
@@ -180,9 +180,9 @@ package body DB.IO.Blocks is
      (Block  : in out Base_Block_Type;
       Cursor : in out Cursor_Type;
       Arr    : in     Array_Type;
-      To     : in     Index_Type := Array_Type'Last)
+      To     : in     Index_Type'Base := Array_Type'Last)
    is
-      procedure Write_Index is new Write(Index_Type);
+      procedure Write_Index is new Write(Index_Type'Base);
       type Array_Sub_Type is array (Arr'First .. To) of Item_Type;
       procedure Write_Data is new Write(Array_Sub_Type);
    begin
@@ -197,9 +197,9 @@ package body DB.IO.Blocks is
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type;
       Arr    :    out Array_Type;
-      To     :    out Index_Type)
+      To     :    out Index_Type'Base)
    is
-      procedure Read_Index is new Read(Index_Type);
+      procedure Read_Index is new Read(Index_Type'Base);
    begin
       Read_Index(Block, Cursor, To);
       if Is_Valid(Block, Cursor) then

@@ -12,12 +12,10 @@ separate (DB.Gen_BTrees)
 package body Nodes is
 
    -- The layout of a Block, i.e. a byte sequence is the following:
-   -- 1. Packed_Meta_Data (Node.Meta_Data packed)
+   -- 1. Meta_Data
    -- If Degree(N) > 0:
-   -- 2. If Is_Leaf(N): Degree(N) times Index_Type (Key)
-   --                   Index_Type (end of last Key)
-   --    Else:          Degree(N) times Index_Type (Key) + Index_Type (Value)
-   --                   Index_Type (end of last Value)
+   -- 2. If Is_Leaf(N): Degree(N) times Index_Type (end position of entry)
+   --                   where an entry is either (Key, Child) or (Key, Value)
    -- 3. If Is_Leaf(N): Key1, Value1, ..., KeyDegree(N), ValueDegree(N)
    --    Else:          Key1, Child_Type, ..., KeyDegree(N), Child_Type
    package Phys is
@@ -223,7 +221,7 @@ package body Nodes is
       -- 4. Parent  (Size_Of_Address)
       -- 5. Left    (Size_Of_Address)
       -- 6. Right   (Size_Of_Address)
-      -- 7. Indexes ((|Degree| + 1) * Size_Of_Position)
+      -- 7. Indexes (|Degree| * Size_Of_Position)
       -- 8. Entries (Size_Of(Key_1) + Size_Of_Child ..
       --             Size_Of(Key_N) + Size_Of_Child)
       --         or (Size_Of(Key_1) + Size_Of(Value_1) ..

@@ -1,11 +1,5 @@
 Fahrplan:
 
-* Wert-Datentyp
-  * ein generischer Obertyp fuer alle moeglichen Werte
-  * wird wohl ein Byte-Array sein, dessen Laenge auch gespeichert werden muss
-  * vielleicht koennte man die Laenge, wenn sie fix ist, einmal pro Knoten
-    speichern?
-
 * Map-Reduce
   * erstmal nur auf einzelnen Column-Families, also B-Trees, ausfuehrbar
   * spaeter: Column-Families joinen (sehr wichtig, z. B. wegen Blob-Trees)

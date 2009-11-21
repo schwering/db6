@@ -6,7 +6,7 @@
 
 with Ada.Unchecked_Deallocation;
 
-package body DB.Types.Gen_Unbounded_Strings is
+package body DB.Types.Gen_Strings.Gen_Unbounded is
 
    overriding
    procedure Initialize (String : in out String_Type) is
@@ -117,9 +117,7 @@ package body DB.Types.Gen_Unbounded_Strings is
 
    function New_String
      (Arr : Indefinite_Buffer_Type)
-      return String_Type
-   is
-      S : String_Type;
+      return String_Type is
    begin
       if Arr'Length = 0 then
          return Empty_String;
@@ -163,7 +161,7 @@ package body DB.Types.Gen_Unbounded_Strings is
    end Substring;
 
 
-   function To_String
+   function To_Buffer
      (S : String_Type)
       return Indefinite_Buffer_Type is
    begin
@@ -177,11 +175,11 @@ package body DB.Types.Gen_Unbounded_Strings is
       else
          return S.S.Buffer(1 .. S.Length);
       end if;
-   end To_String;
+   end To_Buffer;
 
 
    package body Uncompressed is separate;
    package body Prefix_Compressed is separate;
 
-end DB.Types.Gen_Unbounded_Strings;
+end DB.Types.Gen_Strings.Gen_Unbounded;
 

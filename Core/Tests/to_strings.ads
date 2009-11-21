@@ -1,11 +1,14 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
 with DB.Types;
-with DB.Types.Columns;
-with DB.Types.Rows;
 with DB.Types.Times;
 with DB.Types.Keys;
+with DB.Types.Strings;
+with DB.Types.Strings.Bounded;
+with DB.Types.Strings.Unbounded;
 with DB.Types.Values;
+with DB.Types.Values.Bounded;
+with DB.Types.Values.Unbounded;
 with DB.IO.Blocks.File_IO;
 with DB.IO.Blocks.Direct_IO;
 with DB.IO.Blocks.Device_IO;
@@ -14,15 +17,23 @@ with DB.IO.Blocks.Memory_IO;
 
 package To_Strings is
 
-   function To_String (Column : DB.Types.Columns.String_Type) return String;
+   function To_String (S : DB.Types.Strings.Bounded.String_Type)
+      return String;
 
-   function To_String (Row : DB.Types.Rows.String_Type) return String;
+   function To_String (S : DB.Types.Strings.Unbounded.String_Type)
+      return String;
 
-   function To_String (Time : DB.Types.Times.Number_Type) return String;
+   function To_String (Time : DB.Types.Times.Number_Type)
+      return String;
 
-   function To_String (Key : DB.Types.Keys.Key_Type) return String;
+   function To_String (Key : DB.Types.Keys.Key_Type)
+      return String;
 
-   function To_String (Value : DB.Types.Values.Value_Type) return String;
+   function To_String (Value : DB.Types.Values.Bounded.String_Type)
+      return String;
+
+   function To_String (Value : DB.Types.Values.Unbounded.String_Type)
+      return String;
 
    function To_String (Address : DB.IO.Blocks.File_IO.Address_Type)
       return String;

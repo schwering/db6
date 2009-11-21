@@ -5,6 +5,9 @@
 -- Copyright 2008, 2009 Christoph Schwering
 
 generic
+
+   pragma Warnings (Off); -- Disable `unreferenced' warnings
+
    type File_Type is limited private;
    -- File handle.
 
@@ -174,6 +177,9 @@ generic
    -- If the Ticket does not hold any lock, the procedure has no effect.
    -- The Ticket must be valid, i.e. it must be acquired but not yet released,
    -- otherwise a Lock_Error is raised.
+
+   pragma Warnings (On);
+
 package DB.IO.Blocks.Gen_IO is
    pragma Pure;
 end DB.IO.Blocks.Gen_IO;

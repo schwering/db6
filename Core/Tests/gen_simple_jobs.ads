@@ -2,32 +2,44 @@ with Ada.Unchecked_Conversion;
 
 with Jobs;
 
-with DB.Types.Keys;
-with DB.Types.Values;
-
 generic
    type Object_Type (<>) is limited private;
+   type Key_Type is private;
+   type Value_Type (<>) is private;
+
+   type Key_Value_Type is private;
+   with function Random_Entry return Key_Value_Type;
+   with function Get_Key (KV : Key_Value_Type) return Key_Type;
+   with function Get_Value (KV : Key_Value_Type) return Value_Type;
+
+   with function To_String (V : Value_Type) return String;
+
+   with procedure Check (KV : Key_Value_Type);
+
    type Count_Type is range <>;
    type Result_Type is (<>);
-   Object : in out Object_Type;
-   Success : in Result_Type;
-   Failure : in Result_Type;
+
+   Object     : in out Object_Type;
+   Null_value : in Value_Type;
+   Success    : in Result_Type;
+   Failure    : in Result_Type;
+
    with procedure P_Insert
           (Object   : in out Object_Type; 
-           Key      : in     DB.Types.Keys.Key_Type;
-           Value    : in     DB.Types.Values.Value_Type;
+           Key      : in     Key_Type;
+           Value    : in     Value_Type;
            Position :    out Count_Type;
            State    :    out Result_Type);
    with procedure P_Delete
           (Object   : in out Object_Type; 
-           Key      : in     DB.Types.Keys.Key_Type;
-           Value    :    out DB.Types.Values.Value_Type;
+           Key      : in     Key_Type;
+           Value    :    out Value_Type;
            Position :    out Count_Type;
            State    :    out Result_Type);
    with procedure P_Look_Up
           (Object   : in out Object_Type; 
-           Key      : in     DB.Types.Keys.Key_Type;
-           Value    :    out DB.Types.Values.Value_Type;
+           Key      : in     Key_Type;
+           Value    :    out Value_Type;
            Position :    out Count_Type;
            State    :    out Result_Type);
 package Gen_Simple_Jobs is

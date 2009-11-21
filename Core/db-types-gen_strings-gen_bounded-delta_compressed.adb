@@ -7,7 +7,7 @@
 with DB.IO.Blocks;
 with DB.Compression.Gen_Levenshtein;
 
-separate (DB.Types.Gen_Bounded_Strings)
+separate (DB.Types.Gen_Strings.Gen_Bounded)
 package body Delta_Compressed is
 
    package Compression is new DB.Compression.Gen_Levenshtein

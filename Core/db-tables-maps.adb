@@ -214,26 +214,30 @@ package body DB.Tables.Maps is
 
    procedure Look_Up
      (Map      : in out Map_Type;
-      Key      : in     Types.Keys.Key_Type;
-      Value    :    out Types.Values.Value_Type;
+      Key      : in     Key_Type;
+      Value    :    out Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type) is
    begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
-            BTrees.Look_Up(Map.Short_Tree, Key, Value,
+            BTrees.Look_Up(Map.Short_Tree, Key, V,
                            BTrees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
-            Blob_Trees.Look_Up(Map.Long_Tree, Key, Value,
+            Blob_Trees.Look_Up(Map.Long_Tree, Key, V,
                                Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Look_Up;
@@ -242,8 +246,8 @@ package body DB.Tables.Maps is
    procedure Look_Up
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
-      Key         : in     Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         : in     Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is
@@ -255,32 +259,36 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                BTrees.Look_Up(Map.Short_Tree,
                              RO_Transaction_Type(Transaction).Short_Transaction,
-                             Key, Value, BTrees.Count_Type(Position), S);
+                             Key, V, BTrees.Count_Type(Position), S);
             else
                BTrees.Look_Up(Map.Short_Tree,
                              RW_Transaction_Type(Transaction).Short_Transaction,
-                             Key, Value, BTrees.Count_Type(Position), S);
+                             Key, V, BTrees.Count_Type(Position), S);
             end if;
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                Blob_Trees.Look_Up(Map.Long_Tree,
                              RO_Transaction_Type(Transaction).Long_Transaction,
-                             Key, Value, Blob_Trees.Count_Type(Position), S);
+                             Key, V, Blob_Trees.Count_Type(Position), S);
             else
                Blob_Trees.Look_Up(Map.Long_Tree,
                              RW_Transaction_Type(Transaction).Long_Transaction,
-                             Key, Value, Blob_Trees.Count_Type(Position), S);
+                             Key, V, Blob_Trees.Count_Type(Position), S);
             end if;
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Look_Up;
@@ -289,25 +297,29 @@ package body DB.Tables.Maps is
    procedure Look_Up
      (Map      : in out Map_Type;
       Position : in     Count_Type;
-      Value    :    out Types.Values.Value_Type;
-      Key      :    out Types.Keys.Key_Type;
+      Value    :    out Value_Type'Class;
+      Key      :    out Key_Type;
       State    :    out Result_Type) is
    begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
-            BTrees.Look_Up(Map.Short_Tree, BTrees.Count_Type(Position), Value,
+            BTrees.Look_Up(Map.Short_Tree, BTrees.Count_Type(Position), V,
                            Key, S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Look_Up(Map.Long_Tree, Blob_Trees.Count_Type(Position),
-                               Value, Key, S);
+                               V, Key, S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Look_Up;
@@ -317,8 +329,8 @@ package body DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
       Position    : in     Count_Type;
-      Value       :    out Types.Values.Value_Type;
-      Key         :    out Types.Keys.Key_Type;
+      Value       :    out Value_Type'Class;
+      Key         :    out Key_Type;
       State       :    out Result_Type)
    is
       pragma Assert ((Transaction not in RO_Transaction_Type'Class or else
@@ -329,32 +341,37 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                BTrees.Look_Up(Map.Short_Tree,
                              RO_Transaction_Type(Transaction).Short_Transaction,
-                             BTrees.Count_Type(Position), Value, Key, S);
+                             BTrees.Count_Type(Position), V, Key, S);
             else
                BTrees.Look_Up(Map.Short_Tree,
                              RW_Transaction_Type(Transaction).Short_Transaction,
-                             BTrees.Count_Type(Position), Value, Key, S);
+                             BTrees.Count_Type(Position), V, Key, S);
             end if;
             State := To_State(S);
+            pragma Assert (Types.Values.Bounded.Length(V) = 0);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                Blob_Trees.Look_Up(Map.Long_Tree,
                              RO_Transaction_Type(Transaction).Long_Transaction,
-                             Blob_Trees.Count_Type(Position), Value, Key, S);
+                             Blob_Trees.Count_Type(Position), V, Key, S);
             else
                Blob_Trees.Look_Up(Map.Long_Tree,
                              RW_Transaction_Type(Transaction).Long_Transaction,
-                             Blob_Trees.Count_Type(Position), Value, Key, S);
+                             Blob_Trees.Count_Type(Position), V, Key, S);
             end if;
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Look_Up;
@@ -362,26 +379,30 @@ package body DB.Tables.Maps is
 
    procedure Minimum
      (Map      : in out Map_Type;
-      Key      :    out Types.Keys.Key_Type;
-      Value    :    out Types.Values.Value_Type;
+      Key      :    out Key_Type;
+      Value    :    out Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type) is
    begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
-            BTrees.Minimum(Map.Short_Tree, Key, Value,
+            BTrees.Minimum(Map.Short_Tree, Key, V,
                            BTrees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
-            Blob_Trees.Minimum(Map.Long_Tree, Key, Value,
+            Blob_Trees.Minimum(Map.Long_Tree, Key, V,
                                Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Minimum;
@@ -390,8 +411,8 @@ package body DB.Tables.Maps is
    procedure Minimum
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
-      Key         :    out Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is
@@ -403,32 +424,36 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                BTrees.Minimum(Map.Short_Tree,
                              RO_Transaction_Type(Transaction).Short_Transaction,
-                             Key, Value, BTrees.Count_Type(Position), S);
+                             Key, V, BTrees.Count_Type(Position), S);
             else
                BTrees.Minimum(Map.Short_Tree,
                              RW_Transaction_Type(Transaction).Short_Transaction,
-                             Key, Value, BTrees.Count_Type(Position), S);
+                             Key, V, BTrees.Count_Type(Position), S);
             end if;
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                Blob_Trees.Minimum(Map.Long_Tree,
                              RO_Transaction_Type(Transaction).Long_Transaction,
-                             Key, Value, Blob_Trees.Count_Type(Position), S);
+                             Key, V, Blob_Trees.Count_Type(Position), S);
             else
                Blob_Trees.Minimum(Map.Long_Tree,
                              RW_Transaction_Type(Transaction).Long_Transaction,
-                             Key, Value, Blob_Trees.Count_Type(Position), S);
+                             Key, V, Blob_Trees.Count_Type(Position), S);
             end if;
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Minimum;
@@ -436,26 +461,30 @@ package body DB.Tables.Maps is
 
    procedure Maximum
      (Map      : in out Map_Type;
-      Key      :    out Types.Keys.Key_Type;
-      Value    :    out Types.Values.Value_Type;
+      Key      :    out Key_Type;
+      Value    :    out Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type) is
    begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
-            BTrees.Maximum(Map.Short_Tree, Key, Value,
+            BTrees.Maximum(Map.Short_Tree, Key, V,
                            BTrees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
-            Blob_Trees.Maximum(Map.Long_Tree, Key, Value,
+            Blob_Trees.Maximum(Map.Long_Tree, Key, V,
                                Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Maximum;
@@ -464,8 +493,8 @@ package body DB.Tables.Maps is
    procedure Maximum
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
-      Key         :    out Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is
@@ -477,32 +506,36 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                BTrees.Maximum(Map.Short_Tree,
                              RO_Transaction_Type(Transaction).Short_Transaction,
-                             Key, Value, BTrees.Count_Type(Position), S);
+                             Key, V, BTrees.Count_Type(Position), S);
             else
                BTrees.Maximum(Map.Short_Tree,
                              RW_Transaction_Type(Transaction).Short_Transaction,
-                             Key, Value, BTrees.Count_Type(Position), S);
+                             Key, V, BTrees.Count_Type(Position), S);
             end if;
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                Blob_Trees.Maximum(Map.Long_Tree,
                              RO_Transaction_Type(Transaction).Long_Transaction,
-                             Key, Value, Blob_Trees.Count_Type(Position), S);
+                             Key, V, Blob_Trees.Count_Type(Position), S);
             else
                Blob_Trees.Maximum(Map.Long_Tree,
                              RW_Transaction_Type(Transaction).Long_Transaction,
-                             Key, Value, Blob_Trees.Count_Type(Position), S);
+                             Key, V, Blob_Trees.Count_Type(Position), S);
             end if;
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Maximum;
@@ -510,24 +543,28 @@ package body DB.Tables.Maps is
 
    procedure Insert
      (Map      : in out Map_Type;
-      Key      : in     Types.Keys.Key_Type;
-      Value    : in     Types.Values.Value_Type;
+      Key      : in     Key_Type;
+      Value    : in     Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type) is
    begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
-            BTrees.Insert(Map.Short_Tree, Key, Value,
+            V := Value.To_Bounded;
+            BTrees.Insert(Map.Short_Tree, Key, V,
                           BTrees.Count_Type(Position), S);
             State := To_State(S);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
-            Blob_Trees.Insert(Map.Long_Tree, Key, Value,
+            V := Value.To_Unbounded;
+            Blob_Trees.Insert(Map.Long_Tree, Key, V,
                               Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
          end;
@@ -538,8 +575,8 @@ package body DB.Tables.Maps is
    procedure Insert
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Key         : in     Types.Keys.Key_Type;
-      Value       : in     Types.Values.Value_Type;
+      Key         : in     Key_Type;
+      Value       : in     Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is
@@ -548,17 +585,21 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
+            V := Value.To_Bounded;
             BTrees.Insert(Map.Short_Tree, Transaction.Short_Transaction,
-                          Key, Value, BTrees.Count_Type(Position), S);
+                          Key, V, BTrees.Count_Type(Position), S);
             State := To_State(S);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
+            V := Value.To_Unbounded;
             Blob_Trees.Insert(Map.Long_Tree, Transaction.Long_Transaction,
-                              Key, Value, Blob_Trees.Count_Type(Position), S);
+                              Key, V, Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
          end;
       end if;
@@ -567,26 +608,30 @@ package body DB.Tables.Maps is
 
    procedure Delete
      (Map      : in out Map_Type;
-      Key      : in     Types.Keys.Key_Type;
-      Value    :    out Types.Values.Value_Type;
+      Key      : in     Key_Type;
+      Value    :    out Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type) is
    begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
-            BTrees.Delete(Map.Short_Tree, Key, Value,
+            BTrees.Delete(Map.Short_Tree, Key, V,
                           BTrees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
-            Blob_Trees.Delete(Map.Long_Tree, Key, Value,
+            Blob_Trees.Delete(Map.Long_Tree, Key, V,
                               Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Delete;
@@ -595,8 +640,8 @@ package body DB.Tables.Maps is
    procedure Delete
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Key         : in     Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         : in     Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is
@@ -605,18 +650,22 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, Transaction.Short_Transaction,
-                          Key, Value, BTrees.Count_Type(Position), S);
+                          Key, V, BTrees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Transaction.Long_Transaction,
-                              Key, Value, Blob_Trees.Count_Type(Position), S);
+                              Key, V, Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Delete;
@@ -625,25 +674,29 @@ package body DB.Tables.Maps is
    procedure Delete
      (Map      : in out Map_Type;
       Position : in     Count_Type;
-      Value    :    out Types.Values.Value_Type;
-      Key      :    out Types.Keys.Key_Type;
+      Value    :    out Value_Type'Class;
+      Key      :    out Key_Type;
       State    :    out Result_Type) is
    begin
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, BTrees.Count_Type(Position),
-                          Value, Key, S);
+                          V, Key, S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Blob_Trees.Count_Type(Position),
-                              Value, Key, S);
+                              V, Key, S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Delete;
@@ -653,8 +706,8 @@ package body DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Position    : in     Count_Type;
-      Value       :    out Types.Values.Value_Type;
-      Key         :    out Types.Keys.Key_Type;
+      Value       :    out Value_Type'Class;
+      Key         :    out Key_Type;
       State       :    out Result_Type)
    is
       pragma Assert (Map.Short = Transaction.Short);
@@ -662,18 +715,22 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, Transaction.Short_Transaction,
-                          BTrees.Count_Type(Position), Value, Key, S);
+                          BTrees.Count_Type(Position), V, Key, S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Transaction.Long_Transaction,
-                              Blob_Trees.Count_Type(Position), Value, Key, S);
+                              Blob_Trees.Count_Type(Position), V, Key, S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Delete;
@@ -710,7 +767,7 @@ package body DB.Tables.Maps is
    function New_Bound
      (Map        : Map_Type;
       Comparison : Comparison_Type;
-      Key        : Types.Keys.Key_Type)
+      Key        : Key_Type)
       return Bound_Type is
    begin
       if Map.Short then
@@ -888,8 +945,8 @@ package body DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
-      Key         :    out Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type'Class;
       State       :    out Result_Type)
    is
       pragma Assert (Map.Short = Cursor.Short);
@@ -901,32 +958,36 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                BTrees.Next(Map.Short_Tree,
                            RO_Transaction_Type(Transaction).Short_Transaction,
-                           Cursor.Short_Cursor, Key, Value, S);
+                           Cursor.Short_Cursor, Key, V, S);
             else
                BTrees.Next(Map.Short_Tree,
                            RW_Transaction_Type(Transaction).Short_Transaction,
-                           Cursor.Short_Cursor, Key, Value, S);
+                           Cursor.Short_Cursor, Key, V, S);
             end if;
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                Blob_Trees.Next(Map.Long_Tree,
                               RO_Transaction_Type(Transaction).Long_Transaction,
-                              Cursor.Long_Cursor, Key, Value, S);
+                              Cursor.Long_Cursor, Key, V, S);
             else
                Blob_Trees.Next(Map.Long_Tree,
                               RW_Transaction_Type(Transaction).Long_Transaction,
-                              Cursor.Long_Cursor, Key, Value, S);
+                              Cursor.Long_Cursor, Key, V, S);
             end if;
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Next;
@@ -936,8 +997,8 @@ package body DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
-      Key         :    out Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is
@@ -947,20 +1008,24 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
+            V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, Transaction.Short_Transaction,
-                          Cursor.Short_Cursor, Key, Value,
+                          Cursor.Short_Cursor, Key, V,
                           BTrees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Bounded(V);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
+            V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Transaction.Long_Transaction,
-                              Cursor.Long_Cursor, Key, Value,
+                              Cursor.Long_Cursor, Key, V,
                               Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
+            Value := From_Unbounded(V);
          end;
       end if;
    end Delete;

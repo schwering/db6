@@ -5,18 +5,19 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
+with System.Storage_Elements;
+
 with DB.IO.Blocks;
 
 generic
-   type Item_Type is (<>);
-   Max_Length : in Positive := 255;
-package DB.Types.Gen_Bounded_Strings is
+   Max_Length : in Positive := 1024;
+package DB.Types.Gen_Strings.Gen_Bounded is
    pragma Preelaborate;
 
-   subtype Length_Type is Natural range 0 .. Max_Length;
-   subtype Index_Type is Length_Type range 1 .. Length_Type'Last;
+   package SSE renames System.Storage_Elements;
 
-   type Indefinite_Buffer_Type is array (Positive range <>) of Item_Type;
+   subtype Length_Type is Gen_Strings.Length_Type range 0 .. Max_Length;
+   subtype Index_Type is Gen_Strings.Index_Type range 1 .. Length_Type'Last;
 
    type String_Type is private;
 
@@ -57,7 +58,7 @@ package DB.Types.Gen_Bounded_Strings is
       Length : Length_Type)
       return String_Type;
 
-   function To_String
+   function To_Buffer
      (S : String_Type)
       return Indefinite_Buffer_Type;
 
@@ -102,6 +103,14 @@ package DB.Types.Gen_Bounded_Strings is
         (Context : in out Context_Type;
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type);
+
+      function To_Storage_Array
+        (String : String_Type)
+         return SSE.Storage_Array;
+
+      function From_Storage_Array
+        (Arr : SSE.Storage_Array)
+         return String_Type;
 
    private
       type Indefinite_Packed_Buffer_Type is
@@ -202,5 +211,5 @@ private
    pragma Inline (Element);
    pragma Inline (Substring);
 
-end DB.Types.Gen_Bounded_Strings;
+end DB.Types.Gen_Strings.Gen_Bounded;
 

@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
-package body DB.Types.Gen_Bounded_Strings is
+package body DB.Types.Gen_Strings.Gen_Bounded is
 
    function "<" (Left, Right : String_Type) return Boolean is
    begin
@@ -111,17 +111,17 @@ package body DB.Types.Gen_Bounded_Strings is
    end Substring;
 
 
-   function To_String
+   function To_Buffer
      (S : String_Type)
       return Indefinite_Buffer_Type is
    begin
       return S.Buffer(1 .. S.Length);
-   end To_String;
+   end To_Buffer;
 
 
    package body Uncompressed is separate;
    package body Prefix_Compressed is separate;
    package body Delta_Compressed is separate;
 
-end DB.Types.Gen_Bounded_Strings;
+end DB.Types.Gen_Strings.Gen_Bounded;
 

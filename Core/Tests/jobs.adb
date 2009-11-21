@@ -1,11 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 
-with Random;
-
-with DB.IO.Blocks;
-with DB.Types.Keys;
-with DB.Types.Values;
 with DB.Utils.Timers;
 with DB.Utils.Traceback;
 
@@ -47,8 +42,8 @@ package body Jobs is
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
       Short_Job_Execution_Count : in Random.Count_Type;
-      Concurrency_Degree        : in Positive := 10;
-      Reset                     : in Boolean  := True)
+      Concurrency_Degree        : in Positive;
+      Reset                     : in Boolean)
       return Job_Type is
    begin
       return (Description, Short_Job, Short_Job_Execution_Count,
@@ -111,6 +106,11 @@ package body Jobs is
                      exit;
                end;
             end loop;
+         exception
+            when Error : others =>
+               Put_Line("Exception: "& Exception_Message(Error));
+               Put_Line("Exception: "& Exception_Information(Error));
+               DB.Utils.Traceback.Print_Traceback(Error);
          end Task_Type;
 
          Tasks : array (1 .. Concurrency_Degree) of Task_Type;

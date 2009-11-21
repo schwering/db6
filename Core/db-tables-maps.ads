@@ -14,9 +14,7 @@ use System.Storage_Pools;
 with DB.Gen_BTrees;
 with DB.Gen_Blob_Trees;
 with DB.IO.Blocks;
-with DB.IO.Blocks.File_IO;
-with DB.Types.Keys;
-with DB.Types.Values;
+with DB.IO.Blocks.Memory_IO;
 
 package DB.Tables.Maps is
    --pragma Preelaborate;
@@ -97,8 +95,8 @@ package DB.Tables.Maps is
 
    procedure Look_Up
      (Map      : in out Map_Type;
-      Key      : in     Types.Keys.Key_Type;
-      Value    :    out Types.Values.Value_Type;
+      Key      : in     Key_Type;
+      Value    :    out Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type);
    -- Searches the Value associated with Key or sets State = Failure if
@@ -109,8 +107,8 @@ package DB.Tables.Maps is
    procedure Look_Up
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
-      Key         : in     Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         : in     Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type);
    -- Searches the Value associated with Key or sets State = Failure if
@@ -119,8 +117,8 @@ package DB.Tables.Maps is
    procedure Look_Up
      (Map      : in out Map_Type;
       Position : in     Count_Type;
-      Value    :    out Types.Values.Value_Type;
-      Key      :    out Types.Keys.Key_Type;
+      Value    :    out Value_Type'Class;
+      Key      :    out Key_Type;
       State    :    out Result_Type);
    -- Searches the Position-th Key / Value pair or sets State = Failure if
    -- no such key exists.
@@ -131,16 +129,16 @@ package DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
       Position    : in     Count_Type;
-      Value       :    out Types.Values.Value_Type;
-      Key         :    out Types.Keys.Key_Type;
+      Value       :    out Value_Type'Class;
+      Key         :    out Key_Type;
       State       :    out Result_Type);
    -- Searches the Position-th Key / Value pair or sets State = Failure if
    -- no such key exists.
 
    procedure Minimum
      (Map      : in out Map_Type;
-      Key      :    out Types.Keys.Key_Type;
-      Value    :    out Types.Values.Value_Type;
+      Key      :    out Key_Type;
+      Value    :    out Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
@@ -151,8 +149,8 @@ package DB.Tables.Maps is
    procedure Minimum
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
-      Key         :    out Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
@@ -160,8 +158,8 @@ package DB.Tables.Maps is
 
    procedure Maximum
      (Map      : in out Map_Type;
-      Key      :    out Types.Keys.Key_Type;
-      Value    :    out Types.Values.Value_Type;
+      Key      :    out Key_Type;
+      Value    :    out Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
@@ -172,8 +170,8 @@ package DB.Tables.Maps is
    procedure Maximum
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
-      Key         :    out Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
@@ -181,8 +179,8 @@ package DB.Tables.Maps is
 
    procedure Insert
      (Map      : in out Map_Type;
-      Key      : in     Types.Keys.Key_Type;
-      Value    : in     Types.Values.Value_Type;
+      Key      : in     Key_Type;
+      Value    : in     Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
@@ -193,8 +191,8 @@ package DB.Tables.Maps is
    procedure Insert
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Key         : in     Types.Keys.Key_Type;
-      Value       : in     Types.Values.Value_Type;
+      Key         : in     Key_Type;
+      Value       : in     Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
@@ -202,8 +200,8 @@ package DB.Tables.Maps is
 
    procedure Delete
      (Map      : in out Map_Type;
-      Key      : in     Types.Keys.Key_Type;
-      Value    :    out Types.Values.Value_Type;
+      Key      : in     Key_Type;
+      Value    :    out Value_Type'Class;
       Position :    out Count_Type;
       State    :    out Result_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
@@ -214,8 +212,8 @@ package DB.Tables.Maps is
    procedure Delete
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type'Class;
-      Key         : in     Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         : in     Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
@@ -224,8 +222,8 @@ package DB.Tables.Maps is
    procedure Delete
      (Map      : in out Map_Type;
       Position : in     Count_Type;
-      Value    :    out Types.Values.Value_Type;
-      Key      :    out Types.Keys.Key_Type;
+      Value    :    out Value_Type'Class;
+      Key      :    out Key_Type;
       State    :    out Result_Type);
    -- Deletes the Position-th Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -236,8 +234,8 @@ package DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Position    : in     Count_Type;
-      Value       :    out Types.Values.Value_Type;
-      Key         :    out Types.Keys.Key_Type;
+      Value       :    out Value_Type'Class;
+      Key         :    out Key_Type;
       State       :    out Result_Type);
    -- Deletes the Position-th Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -302,7 +300,7 @@ package DB.Tables.Maps is
    function New_Bound
      (Map        : Map_Type;
       Comparison : Comparison_Type;
-      Key        : Types.Keys.Key_Type)
+      Key        : Key_Type)
       return Bound_Type;
    -- Creates a concrete bound. The bound New_Bound(Greater, Min) is a
    -- lower bound, because this means that all keys Key hit by the cursor
@@ -365,8 +363,8 @@ package DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
-      Key         :    out Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type'Class;
       State       :    out Result_Type);
    -- Steps forward to the next Key/Value-pair and sets State to Success.
    -- If no such pair exists (with regard to the set bounds), State is set to
@@ -378,8 +376,8 @@ package DB.Tables.Maps is
      (Map         : in out Map_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Cursor      : in out Cursor_Type;
-      Key         :    out Types.Keys.Key_Type;
-      Value       :    out Types.Values.Value_Type;
+      Key         :    out Key_Type;
+      Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
       State       :    out Result_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
@@ -390,41 +388,45 @@ package DB.Tables.Maps is
    -- key/value-pair that should be visited next.
 
 private
-   package Block_IO renames IO.Blocks.File_IO.IO;
+   package Bounded_Values_IO   renames Types.Values.Bounded.Uncompressed;
+   package Unbounded_Values_IO renames Types.Values.Unbounded.Uncompressed;
+   package Block_IO renames IO.Blocks.Memory_IO.IO;
 
    package BTrees is new Gen_BTrees
-     (Key_Type               => Types.Keys.Key_Type,
-      Key_Context_Type       => Types.Keys.Context_Type,
-      Read_Key               => Types.Keys.Read,
-      Skip_Key               => Types.Keys.Skip,
-      Write_Key              => Types.Keys.Write,
-      "="                    => Types.Keys."=",
-      "<="                   => Types.Keys."<=",
-      Value_Type             => Types.Values.Value_Type,
-      Value_Context_Type     => Types.Values.Context_Type,
-      Read_Value             => Types.Values.Read,
-      Skip_Value             => Types.Values.Skip,
-      Write_Value            => Types.Values.Write,
-      Is_Context_Free_Serialization => Types.Keys.Is_Context_Free_Serialization
-                             and Types.Values.Is_Context_Free_Serialization,
-      Storage_Pool           => Root_Storage_Pool'Class(Global_Pool_Object),
-      Block_IO               => Block_IO);
+     (Key_Type           => Types.Keys.Key_Type,
+      Key_Context_Type   => Types.Keys.Context_Type,
+      Read_Key           => Types.Keys.Read,
+      Skip_Key           => Types.Keys.Skip,
+      Write_Key          => Types.Keys.Write,
+      "="                => Types.Keys."=",
+      "<="               => Types.Keys."<=",
+      Value_Type         => Types.Values.Bounded.String_Type,
+      Value_Context_Type => Bounded_Values_IO.Context_Type,
+      Read_Value         => Bounded_Values_IO.Read,
+      Skip_Value         => Bounded_Values_IO.Skip,
+      Write_Value        => Bounded_Values_IO.Write,
+      Is_Context_Free_Serialization =>
+              Types.Keys.Is_Context_Free_Serialization and
+              Types.Values.Bounded.Uncompressed.Is_Context_Free_Serialization,
+      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
+      Block_IO           => Block_IO);
 
    package Blob_Trees is new Gen_Blob_Trees
-     (Key_Type               => Types.Keys.Key_Type,
-      Key_Context_Type       => Types.Keys.Context_Type,
-      Read_Key               => Types.Keys.Read,
-      Skip_Key               => Types.Keys.Skip,
-      Write_Key              => Types.Keys.Write,
-      "="                    => Types.Keys."=",
-      "<="                   => Types.Keys."<=",
-      Value_Type             => Types.Values.Value_Type,
-      To_Storage_Array       => Types.Values.To_Storage_Array,
-      From_Storage_Array     => Types.Values.From_Storage_Array,
-      Is_Context_Free_Serialization => Types.Keys.Is_Context_Free_Serialization
-                             and Types.Values.Is_Context_Free_Serialization,
-      Storage_Pool           => Root_Storage_Pool'Class(Global_Pool_Object),
-      Block_IO               => Block_IO);
+     (Key_Type           => Types.Keys.Key_Type,
+      Key_Context_Type   => Types.Keys.Context_Type,
+      Read_Key           => Types.Keys.Read,
+      Skip_Key           => Types.Keys.Skip,
+      Write_Key          => Types.Keys.Write,
+      "="                => Types.Keys."=",
+      "<="               => Types.Keys."<=",
+      Value_Type         => Types.Values.Unbounded.String_Type,
+      To_Storage_Array   => Unbounded_Values_IO.To_Storage_Array,
+      From_Storage_Array => Unbounded_Values_IO.From_Storage_Array,
+      Is_Context_Free_Serialization =>
+              Types.Keys.Is_Context_Free_Serialization and
+              Types.Values.Unbounded.Uncompressed.Is_Context_Free_Serialization,
+      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
+      Block_IO           => Block_IO);
 
    ----------
    -- Type wrappers. Always Short (=> BTrees) and not Short (=> Blob_Trees).

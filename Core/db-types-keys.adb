@@ -6,11 +6,16 @@
 
 package body DB.Types.Keys is
 
-   function "<=" (Left, Right : Key_Type) return Boolean
-   is
-      use type Types.Rows.String_Type;
-      use type Types.Columns.String_Type;
-      use type Types.Times.Number_Type;
+   function "<" (Left, Right : Rows.String_Type) return Boolean
+   renames Rows."<";
+   function "=" (Left, Right : Rows.String_Type) return Boolean
+   renames Rows."=";
+   function "<" (Left, Right : Times.Number_Type) return Boolean
+   renames Times."<";
+   function "=" (Left, Right : Times.Number_Type) return Boolean
+   renames Times."=";
+
+   function "<=" (Left, Right : Key_Type) return Boolean is
    begin
       if Left.Row < Right.Row then
          return True;
@@ -27,9 +32,9 @@ package body DB.Types.Keys is
 
    function "=" (Left, Right : Key_Type) return Boolean
    is
-      use type Types.Rows.String_Type;
-      use type Types.Columns.String_Type;
-      use type Types.Times.Number_Type;
+      use type Rows.String_Type;
+      use type Columns.String_Type;
+      use type Times.Number_Type;
    begin
       return Left.Row = Right.Row
          --and Left.Column = Right.Column
@@ -69,7 +74,7 @@ package body DB.Types.Keys is
       Key     :    out Key_Type) is
    begin
       Row_Serialization.Read(Context.Row_Context, Block, Cursor, Key.Row);
-      Key.Column := Types.Columns.Empty_String;
+      Key.Column := Columns.Empty_String;
       --Column_Serialization.Read(Context.Column_Context, Block, Cursor,
                                    --Key.Column);
       Times.Read(Context.Time_Context, Block, Cursor, Key.Time);

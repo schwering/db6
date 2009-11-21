@@ -17,6 +17,7 @@ package DB.IO.Blocks is
    Long_Block_Size : constant := Block_Size * 5 / 4;
 
    type    Base_Position_Type is range 0 .. Long_Block_Size;
+   for Base_Position_Type'Size use 16;
    subtype Position_Type      is Base_Position_Type range 0 .. Block_Size;
    subtype Long_Position_Type is Base_Position_Type;
 
@@ -75,7 +76,7 @@ package DB.IO.Blocks is
    procedure Write_At
      (Block      : in out Base_Block_Type;
       From_Index : in     Base_Index_Type;
-      To_Index   : in     Base_Index_Type;
+      To_Index   : in     Base_Position_Type;
       Item       : in     Item_Type);
 
    generic
@@ -83,7 +84,7 @@ package DB.IO.Blocks is
    procedure Read_At
      (Block      : in  Base_Block_Type;
       From_Index : in  Base_Index_Type;
-      To_Index   : in  Base_Index_Type;
+      To_Index   : in  Base_Position_Type;
       Item       : out Item_Type);
 
    generic
@@ -106,7 +107,7 @@ package DB.IO.Blocks is
       type Array_Type is array (Index_Type) of Item_Type;
    function Size_Of_Array
      (Arr : Array_Type;
-      To  : Index_Type := Array_Type'Last)
+      To  : Index_Type'Base := Array_Type'Last)
       return Size_Type;
 
    generic
@@ -117,7 +118,7 @@ package DB.IO.Blocks is
      (Block  : in out Base_Block_Type;
       Cursor : in out Cursor_Type;
       Arr    : in     Array_Type;
-      To     : in     Index_Type := Array_Type'Last);
+      To     : in     Index_Type'Base := Array_Type'Last);
 
    generic
       type Index_Type is (<>);
@@ -127,7 +128,7 @@ package DB.IO.Blocks is
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type;
       Arr    :    out Array_Type;
-      To     :    out Index_Type);
+      To     :    out Index_Type'Base);
 
 
 private

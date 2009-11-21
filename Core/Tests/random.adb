@@ -1,31 +1,45 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
 with DB.Types;
-with DB.Types.Rows;
-with DB.Types.Columns;
 with DB.Types.Times;
-with DB.Types.Gen_Bounded_Strings;
-with DB.Types.Gen_Unbounded_Strings;
+
+with DB.Types.Gen_Strings;
+with DB.Types.Strings;
+with DB.Types.Values;
+
+pragma Warnings (Off);
+with DB.Types.Gen_Strings.Gen_Bounded;
+with DB.Types.Strings.Bounded;
+with DB.Types.Values.Bounded;
+pragma Warnings (On);
+
+pragma Warnings (Off);
+with DB.Types.Gen_Strings.Gen_Unbounded;
+with DB.Types.Strings.Unbounded;
+with DB.Types.Values.Unbounded;
+pragma Warnings (On);
+
 with DB.Locks.Mutexes;
 
 with Ada.Unchecked_Deallocation;
+with Ada.Unchecked_Conversion;
 
 package body Random is
 
    Mutex             : DB.Locks.Mutexes.Mutex_Type;
-   Max_Size          : constant := 2048;
+   Max_Size          : constant := 1024;
    --Max_Length      : constant := 1530 - 8 - 4 - 1;
    Max_String_Length : constant := 1012 - 8 - 4;-- + 10;
 
 
    generic
-      with package Strings is
-         new DB.Types.Gen_Bounded_Strings(Char_Type, Max_Size);
-         --new DB.Types.Gen_Unbounded_Strings(Char_Type);
+      with package Strings is new DB.Types.Gen_Strings(Char_Type);
+      with package Strings_Impl is new Strings.Gen_Bounded(<>);
+      --with package Strings_Impl is new Strings.Gen_Unbounded;
       Random_Weight : in Natural := 1;
-   function Make_String (Index : Natural) return Strings.String_Type;
+   function Make_String (Index : Natural) return Strings_Impl.String_Type;
 
-   function Make_String (Index : Natural) return Strings.String_Type
+   function Make_String (Index : Natural) return Strings_Impl.String_Type
    is
       Alphabet_Length : constant
                       := Char_Type'Pos('z') - Char_Type'Pos('a') + 1;
@@ -51,16 +65,63 @@ package body Random is
             String_Buffer(J) := Char_Type'Val(Char_Pos);
          end;
       end loop;
-      return Strings.New_String(String_Buffer);
+      return Strings_Impl.New_String(String_Buffer);
    end Make_String;
 
 
    function Make_Row is new Make_String
-     (Strings => DB.Types.Rows, Random_Weight => 1);
+     (Strings       => DB.Types.Strings,
+      Strings_Impl  => DB.Types.Strings.Bounded,
+      Random_Weight => 1);
 
 
    function Make_Column is new Make_String
-     (Strings => DB.Types.Columns, Random_Weight => 3);
+     (Strings       => DB.Types.Strings,
+      Strings_Impl  => DB.Types.Strings.Bounded,
+      Random_Weight => 3);
+
+
+   package Values renames DB.Types.Values;
+   package Values_Impl renames DB.Types.Values.Bounded;
+
+   function Make_Value1 (Count : Count_Type) return Values_Impl.String_Type
+   is
+      Max_Len : constant := 4;
+      type Uint32 is mod 2**32;
+      type Definite_Buffer_Type is new Values.Indefinite_Buffer_Type(1 .. 4);
+      function Convert is new Ada.Unchecked_Conversion
+        (Uint32, Definite_Buffer_Type);
+
+      I   : constant Uint32 
+          := Uint32(Count mod Uint32'Modulus);
+      Buf : constant Values.Indefinite_Buffer_Type
+          := Values.Indefinite_Buffer_Type(Convert(I));
+   begin
+      return Values_Impl.New_String(Buf);
+   end Make_Value1;
+
+   function Make_Value2 (Count : Count_Type) return Values_Impl.String_Type
+   is
+      Max_Len : constant := 4;
+      Img  : constant String   := Count_Type'Image(Count);
+      From : constant Positive := Integer'Max(Img'Last - Max_Len+1, Img'First);
+      Sub  : constant String   := Img(From .. Img'Last);
+
+      subtype R is Positive range From .. Img'Last;
+      type Definite_String_Type is new String(R);
+      type Definite_Buffer_Type is new Values.Indefinite_Buffer_Type(R);
+      function Convert is new Ada.Unchecked_Conversion
+        (Definite_string_Type, Definite_Buffer_Type);
+
+      Buf : constant Values.Indefinite_Buffer_Type
+          := Values.Indefinite_Buffer_Type(Convert(Definite_String_Type(Sub)));
+   begin
+      return Values_Impl.New_String(Buf);
+   end Make_Value2;
+
+
+   function Make_Value (Count : Count_Type) return Values_Impl.String_Type
+   renames Make_Value2;
 
 
    procedure Init_Key_Value_Pairs (Init : in Count_Type) is
@@ -72,7 +133,7 @@ package body Random is
          Key_Value_Pairs(I).Key.Row    := Make_Row(I);
          Key_Value_Pairs(I).Key.Column := Make_Column(I);
          Key_Value_Pairs(I).Key.Time   := 0;
-         Key_Value_Pairs(I).Value      := 1;
+         Key_Value_Pairs(I).Value      := Make_Value(Count_Type(I));
       end loop;
       DB.Locks.Mutexes.Unlock(Mutex);
    end Init_Key_Value_Pairs;
@@ -86,16 +147,6 @@ package body Random is
    end Reset_String_Generation;
 
 
-   function To_Value (Count : Count_Type) return DB.Types.Values.Value_Type is
-      Last : constant Count_Type
-           := Count_Type(DB.Types.Values.Value_Type'Last);
-      Off  : constant Count_Type
-           := Count_Type(DB.Types.Values.Value_Type'First);
-   begin
-      return DB.Types.Values.Value_Type((Count mod (Last)) + Off);
-   end To_Value;
-
-
    function Random_Entry return Key_Value_Type
    is
       KV : Key_Value_Type;
@@ -106,7 +157,7 @@ package body Random is
          := Positive((Current_KV mod Count_Type(Key_Value_Pairs'Length)) + 1);
       begin
          Key_Value_Pairs(I).Key.Time := DB.Types.Times.Number_Type(Current_KV);
-         Key_Value_Pairs(I).Value := To_Value(Current_KV);
+         Key_Value_Pairs(I).Value := Make_Value(Current_KV);
          Current_KV := Current_KV + 1;
          KV := Key_Value_Pairs(I);
       end;
@@ -125,7 +176,7 @@ package body Random is
          := Positive((Current_KV mod Count_Type(Key_Value_Pairs'Length)) + 1);
       begin
          Key_Value_Pairs(I).Key.Time := DB.Types.Times.Number_Type(Current_KV);
-         Key_Value_Pairs(I).Value := To_Value(Current_KV);
+         Key_Value_Pairs(I).Value := Make_Value(Current_KV);
          KV := Key_Value_Pairs(I);
       end;
       DB.Locks.Mutexes.Unlock(Mutex);
@@ -140,6 +191,18 @@ package body Random is
    begin
       Free(Key_Value_Pairs);
    end Finalize_Key_Value_Pairs;
+
+   function Key (KV : Key_Value_Type) return DB.Types.Keys.Key_Type is
+   begin
+      return KV.Key;
+   end Key;
+
+
+   function Value (KV : Key_Value_Type)
+      return DB.Types.Values.Bounded.String_Type is
+   begin
+      return KV.Value;
+   end Value;
 
 end Random;
 

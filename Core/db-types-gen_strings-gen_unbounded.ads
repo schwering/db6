@@ -6,18 +6,15 @@
 -- Copyright 2008, 2009 Christoph Schwering
 
 with Ada.Finalization;
+with System.Storage_Elements;
 
 with DB.IO.Blocks;
 
 generic
-   type Item_Type is (<>);
-package DB.Types.Gen_Unbounded_Strings is
+package DB.Types.Gen_Strings.Gen_Unbounded is
    pragma Elaborate_Body;
 
-   subtype Length_Type is Natural;
-   subtype Index_Type is Length_Type range 1 .. Length_Type'Last;
-
-   type Indefinite_Buffer_Type is array (Positive range <>) of Item_Type;
+   package SSE renames System.Storage_Elements;
 
    type String_Type is new Ada.Finalization.Controlled with private;
 
@@ -62,7 +59,7 @@ package DB.Types.Gen_Unbounded_Strings is
       Length : Length_Type)
       return String_Type;
 
-   function To_String
+   function To_Buffer
      (S : String_Type)
       return Indefinite_Buffer_Type;
 
@@ -107,6 +104,14 @@ package DB.Types.Gen_Unbounded_Strings is
         (Context : in out Context_Type;
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type);
+
+      function To_Storage_Array
+        (String : String_Type)
+         return SSE.Storage_Array;
+
+      function From_Storage_Array
+        (Arr : SSE.Storage_Array)
+         return String_Type;
 
    private
       pragma Inline (Uncompressed.Size_Of);
@@ -181,5 +186,5 @@ private
    pragma Inline (Element);
    pragma Inline (Substring);
 
-end DB.Types.Gen_Unbounded_Strings;
+end DB.Types.Gen_Strings.Gen_Unbounded;
 

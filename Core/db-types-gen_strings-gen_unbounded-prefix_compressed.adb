@@ -7,7 +7,7 @@
 with DB.IO.Blocks;
 with DB.Compression.Gen_Prefix;
 
-separate (DB.Types.Gen_Unbounded_Strings)
+separate (DB.Types.Gen_Strings.Gen_Unbounded)
 package body Prefix_Compressed is
 
    package Compression is new DB.Compression.Gen_Prefix
