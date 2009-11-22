@@ -38,6 +38,11 @@ package DB.Tables is
 
    function "=" (Left, Right : Value_Type) return Boolean
    is abstract;
+   -- In fact, this one is needed nowhere. It seems to me that if for a derived
+   -- type X "=" is not overridden, then all comparisons of objects of type X
+   -- yield `unequal' even when this is not expected without any compiler
+   -- warning. Declaring "=" as abstract here avoids in advance errors that
+   -- are annyoing to find.
 
    function To_Bounded
      (Value : Value_Type)

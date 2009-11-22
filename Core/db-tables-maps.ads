@@ -17,7 +17,7 @@ with DB.IO.Blocks;
 with DB.IO.Blocks.Memory_IO;
 
 package DB.Tables.Maps is
-   --pragma Preelaborate;
+   pragma Elaborate_Body;
 
    ----------
    -- Map initialization operations.
@@ -390,7 +390,7 @@ package DB.Tables.Maps is
 private
    package Bounded_Values_IO   renames Types.Values.Bounded.Uncompressed;
    package Unbounded_Values_IO renames Types.Values.Unbounded.Uncompressed;
-   package Block_IO renames IO.Blocks.Memory_IO.IO;
+   package Block_IO            renames IO.Blocks.Memory_IO.IO;
 
    package BTrees is new Gen_BTrees
      (Key_Type           => Types.Keys.Key_Type,
@@ -434,10 +434,8 @@ private
    type Map_Type (Short : Boolean) is limited
       record
          case Short is
-            when True =>
-               Short_Tree : BTrees.Tree_Type;
-            when False =>
-               Long_Tree  : Blob_Trees.Tree_Type;
+            when True =>  Short_Tree : BTrees.Tree_Type;
+            when False => Long_Tree  : Blob_Trees.Tree_Type;
          end case;
       end record;
 
@@ -446,40 +444,32 @@ private
    type RO_Transaction_Type (Short : Boolean) is new Transaction_Type with
       record
          case Short is
-            when True =>
-               Short_Transaction : BTrees.RO_Transaction_Type;
-            when False =>
-               Long_Transaction  : Blob_Trees.RO_Transaction_Type;
+            when True =>  Short_Transaction : BTrees.RO_Transaction_Type;
+            when False => Long_Transaction  : Blob_Trees.RO_Transaction_Type;
          end case;
       end record;
 
    type RW_Transaction_Type (Short : Boolean) is new Transaction_Type with
       record
          case Short is
-            when True =>
-               Short_Transaction : BTrees.RW_Transaction_Type;
-            when False =>
-               Long_Transaction  : Blob_Trees.RW_Transaction_Type;
+            when True =>  Short_Transaction : BTrees.RW_Transaction_Type;
+            when False => Long_Transaction  : Blob_Trees.RW_Transaction_Type;
          end case;
       end record;
 
    type Bound_Type (Short : Boolean) is
       record
          case Short is
-            when True =>
-               Short_Bound : BTrees.Bound_Type;
-            when False =>
-               Long_Bound : Blob_Trees.Bound_Type;
+            when True =>  Short_Bound : BTrees.Bound_Type;
+            when False => Long_Bound : Blob_Trees.Bound_Type;
          end case;
       end record;
 
    type Cursor_Type (Short : Boolean) is limited
       record
          case Short is
-            when True =>
-               Short_Cursor : BTrees.Cursor_Type;
-            when False =>
-               Long_Cursor  : Blob_Trees.Cursor_Type;
+            when True =>  Short_Cursor : BTrees.Cursor_Type;
+            when False => Long_Cursor  : Blob_Trees.Cursor_Type;
          end case;
       end record;
 

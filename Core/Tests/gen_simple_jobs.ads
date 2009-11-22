@@ -12,9 +12,12 @@ generic
    with function Get_Key (KV : Key_Value_Type) return Key_Type;
    with function Get_Value (KV : Key_Value_Type) return Value_Type;
 
-   with function To_String (V : Value_Type) return String;
+   with function Key_To_String (K : Key_Type) return String;
+   with function Value_To_String (V : Value_Type) return String;
 
-   with procedure Check (KV : Key_Value_Type);
+   with function "=" (Left, Right : Value_Type) return Boolean;
+
+   with procedure Check_Key_Value (KV : Key_Value_Type);
 
    type Count_Type is range <>;
    type Result_Type is (<>);
@@ -42,6 +45,21 @@ generic
            Value    :    out Value_Type;
            Position :    out Count_Type;
            State    :    out Result_Type);
+   with procedure P_Count
+          (Object : in out Object_Type;
+           Count  :    out Count_Type);
+   with procedure P_Make_Stats
+          (Object                 : in out Object_Type;
+           Height                 :    out Natural;
+           Blocks                 :    out Natural;
+           Free_Blocks            :    out Natural;
+           Max_Degree             :    out Natural;
+           Avg_Degree             :    out Natural;
+           Min_Degree             :    out Natural;
+           Bytes_Wasted_In_Blocks :    out Long_Integer;
+           Bytes_In_Blocks        :    out Long_Integer);
+   with procedure P_Check
+          (Object : in out Object_Type);
 package Gen_Simple_Jobs is
 
    Stop_Now : exception;
@@ -50,6 +68,8 @@ package Gen_Simple_Jobs is
    procedure Delete;
    procedure Search;
    procedure Antisearch;
+   procedure Make_Stats;
+   procedure Check;
 
    Job_Map : constant Jobs.Map_Type;
 
@@ -61,6 +81,8 @@ private
    Delete_Access     : Short_Job_Type := Delete'Access;
    Search_Access     : Short_Job_Type := Search'Access;
    Antisearch_Access : Short_Job_Type := Antisearch'Access;
+   Make_Stats_Access : Short_Job_Type := Make_Stats'Access;
+   Check_Access      : Short_Job_Type := Check'Access;
 
    function Convert is new Ada.Unchecked_Conversion
      (Short_Job_Type, Jobs.Short_Job_Type);
@@ -69,7 +91,9 @@ private
            := ((Jobs.To_Description("Insert"),     Convert(Insert_Access)),
                (Jobs.To_Description("Delete"),     Convert(Delete_Access)),
                (Jobs.To_Description("Search"),     Convert(Search_Access)),
-               (Jobs.To_Description("Antisearch"), Convert(Antisearch_Access)));
+               (Jobs.To_Description("Antisearch"), Convert(Antisearch_Access)),
+               (Jobs.To_Description("Make_Stats"), Convert(Make_Stats_Access)),
+               (Jobs.To_Description("Check"),      Convert(Check_Access)));
 
 end Gen_Simple_Jobs;
 

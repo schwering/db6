@@ -10,7 +10,7 @@ package body Gen_Simple_Jobs is
       Pos   : Count_Type;
       State : Result_Type := Success;
    begin
-      Check(KV);
+      Check_Key_Value(KV);
       P_Insert(Object, Get_Key(KV), Get_Value(KV), Pos, State);
       if State /= Success then
          Put_Line("Insertion failed "& State'Img);
@@ -65,6 +65,58 @@ package body Gen_Simple_Jobs is
          raise Stop_Now;
       end if;
    end Antisearch;
+
+
+   procedure Make_Stats
+   is
+      Count                                    : Count_Type;
+      Height, Blocks, Free_Blocks, Used_Blocks : Natural;
+      Max_Degree, Min_Degree, Avg_Degree       : Natural;
+      Waste, Waste_Per_Block, Bytes            : Long_Integer;
+      Relative_Waste_Per_Block                 : Float;
+   begin
+      P_Make_Stats(Object                 => Object,
+                   Height                 => Height,
+                   Blocks                 => Blocks,
+                   Free_Blocks            => Free_Blocks,
+                   Max_Degree             => Max_Degree,
+                   Min_Degree             => Min_Degree,
+                   Avg_Degree             => Avg_Degree,
+                   Bytes_Wasted_In_Blocks => Waste,
+                   Bytes_In_Blocks        => Bytes);
+      P_Count(Object, Count);
+      Used_Blocks              := Blocks - Free_Blocks;
+      if Used_Blocks > 0 then
+         Waste_Per_Block       := Waste / Long_Integer(Used_Blocks);
+      else
+         Waste_Per_Block       := 0;
+      end if;
+      Relative_Waste_Per_Block := Float(Waste_Per_Block)
+                                / Float(DB.IO.Blocks.Block_Size);
+      -- The lines contain the following
+      -- "OK" Count Height Blocks Used_Blocks Free_Blocks Max_Deg Avg_Dev\
+      -- Min_Deg Total_Waste Total_Sizes Waste_per_Block Rel_Waste_per_Block
+      Put("OK");
+      Put(Count_Type'Image(Count));
+      Put(Natural'Image(Height));
+      Put(Natural'Image(Blocks));
+      Put(Natural'Image(Used_Blocks));
+      Put(Natural'Image(Free_Blocks));
+      Put(Natural'Image(Max_Degree));
+      Put(Natural'Image(Avg_Degree));
+      Put(Natural'Image(Min_Degree));
+      Put(Long_Integer'Image(Waste));
+      Put(Long_Integer'Image(Bytes));
+      Put(Long_Integer'Image(Waste_Per_Block));
+      Put(Float'Image(Relative_Waste_Per_Block));
+      New_Line;
+   end Make_Stats;
+
+
+   procedure Check is
+   begin
+      P_Check(Object);
+   end Check;
 
 end Gen_Simple_Jobs;
 

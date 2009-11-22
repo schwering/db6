@@ -7,7 +7,7 @@
 generic
    type Item_Type is (<>);
 package DB.Types.Gen_Strings is
-   pragma Preelaborate;
+   pragma Pure;
 
    subtype Length_Type is Natural range 0 .. Natural'Last;
    subtype Index_Type is Length_Type range 1 .. Length_Type'Last;

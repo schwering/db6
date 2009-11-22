@@ -12,7 +12,7 @@ with DB.IO.Blocks;
 
 generic
 package DB.Types.Gen_Strings.Gen_Unbounded is
-   pragma Elaborate_Body;
+   pragma Preelaborate;
 
    package SSE renames System.Storage_Elements;
 

@@ -1,5 +1,3 @@
--- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
-
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 
@@ -11,7 +9,6 @@ with To_Strings; use To_Strings;
 
 with DB;
 with DB.IO.Blocks;
-with DB.IO.Blocks.File_IO;
 
 with DB.Tables.Maps;
 
@@ -24,9 +21,7 @@ with DB.Types.Times;
 
 with DB.Utils.Traceback;
 
-
 procedure MMap is
-
    Max_Key_Size   : constant := 2 + 1000 + 8 
                                 ;--+ 1; -- to enforce heaped map
    Max_Value_Size : constant := 8;
@@ -117,7 +112,7 @@ procedure MMap is
               := From_Bounded(DB.Types.Values.Bounded.Empty_String);
 
 
-   procedure Check (KV : Key_Value_Type)
+   procedure Check_Key_Value (KV : Key_Value_Type)
    is
       use DB.IO.Blocks;
       use DB.Types.Strings.Bounded;
@@ -137,7 +132,7 @@ procedure MMap is
    begin
       pragma Assert (KS <= DB.Tables.Maps.Max_Key_Size(Map, VS));
       null;
-   end Check;
+   end Check_Key_Value;
 
 
    function To_String (V : DB.Tables.Value_Type'Class) return String is
@@ -147,8 +142,6 @@ procedure MMap is
             Len : constant DB.Types.Values.Bounded.Length_Type
                 := DB.Types.Values.Bounded.Length(Value_Type(V).S);
          begin
-            Put_Line("Checking");
-            Put_Line("Checked: "& Boolean'Image(Value_Type(V) = Null_Value));
             return "'"& To_String(Value_Type(V).S) &"' ["& Len'Img &"]";
          end;
       else
@@ -157,25 +150,51 @@ procedure MMap is
    end To_String;
 
 
+   procedure Make_Stats
+     (Tree                   : in out DB.Tables.Maps.Map_Type;
+      Height                 :    out Natural;
+      Blocks                 :    out Natural;
+      Free_Blocks            :    out Natural;
+      Max_Degree             :    out Natural;
+      Avg_Degree             :    out Natural;
+      Min_Degree             :    out Natural;
+      Bytes_Wasted_In_Blocks :    out Long_Integer;
+      Bytes_In_Blocks        :    out Long_Integer) is null;
+   procedure Check (Tree : in out DB.Tables.Maps.Map_Type) is null;
+
+
+
    package Simple_Jobs is new Gen_Simple_Jobs
-     (Object_Type    => DB.Tables.Maps.Map_Type,
-      Key_Type       => DB.Types.Keys.Key_Type,
-      Value_Type     => DB.Tables.Value_Type'Class,
-      Check          => Check,
-      To_String      => To_String,
-      Key_Value_Type => Random.Key_Value_Type,
-      Random_Entry   => Random.Random_Entry,
-      Get_Key        => Random.Key,
-      Get_Value      => Get_Value,
-      Count_Type     => DB.Tables.Maps.Count_Type,
-      Result_Type    => DB.Tables.Maps.Result_Type,
-      Object         => Map,
-      Null_Value     => Null_Value,
-      Success        => DB.Tables.Maps.Success,
-      Failure        => DB.Tables.Maps.Failure,
-      P_Insert       => DB.Tables.Maps.Insert,
-      P_Delete       => DB.Tables.Maps.Delete,
-      P_Look_Up      => DB.Tables.Maps.Look_Up);
+     (Object_Type     => DB.Tables.Maps.Map_Type,
+      Key_Type        => DB.Types.Keys.Key_Type,
+      Value_Type      => DB.Tables.Value_Type'Class,
+ 
+      Key_To_String   => To_String,
+      Value_To_String => To_String,
+
+      "="             => DB.Tables."=",
+
+      Check_Key_Value => Check_Key_Value,
+
+      Key_Value_Type  => Random.Key_Value_Type,
+      Random_Entry    => Random.Random_Entry,
+      Get_Key         => Random.Key,
+      Get_Value       => Get_Value,
+
+      Count_Type      => DB.Tables.Maps.Count_Type,
+      Result_Type     => DB.Tables.Maps.Result_Type,
+
+      Object          => Map,
+      Null_Value      => Null_Value,
+      Success         => DB.Tables.Maps.Success,
+      Failure         => DB.Tables.Maps.Failure,
+
+      P_Insert        => DB.Tables.Maps.Insert,
+      P_Delete        => DB.Tables.Maps.Delete,
+      P_Look_Up       => DB.Tables.Maps.Look_Up,
+      P_Count         => DB.Tables.Maps.Count,
+      P_Make_Stats    => Make_Stats,
+      P_Check         => Check);
 
 
    use type DB.Tables.Maps.Result_Type;
@@ -206,20 +225,6 @@ begin
    Jobs.Execute_Jobs(Long_Job);
 
    DB.Tables.Maps.Finalize(Map);
-
-   if False then
-      declare
-         use DB.IO.Blocks.File_IO;
-         File : Ada.Text_IO.File_Type;
-      begin
-         Ada.Text_IO.Create(File, Ada.Text_IO.Out_File, "block_access");
-         for I in Blocks'Range loop
-            Ada.Text_IO.Put_Line(File, I'Img &" = "& Blocks(I)'Img);
-         end loop;
-         Ada.Text_IO.Close(File);
-      end;
-   end if;
-
 exception
    when Error : others =>
       Put_Line("Exception: "& Exception_Message(Error));
