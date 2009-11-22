@@ -1,6 +1,7 @@
-with Random;
+with IO_Dispatcher.Random;
 
-package Jobs is
+private
+package IO_Dispatcher.Jobs is
 
    type Job_Type is private;
    type Long_Job_Type is array (Positive range <>) of Job_Type;
@@ -62,5 +63,5 @@ private
          Reset                     : Boolean;
       end record;
 
-end Jobs;
+end IO_Dispatcher.Jobs;
 

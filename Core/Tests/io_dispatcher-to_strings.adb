@@ -1,8 +1,6 @@
--- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
-
 with Ada.Unchecked_Conversion;
 
-package body To_Strings is
+package body IO_Dispatcher.To_Strings is
 
    function To_String (S : DB.Types.Strings.Bounded.String_Type)
       return String is
@@ -96,6 +94,5 @@ package body To_Strings is
       return DB.IO.Blocks.Memory_IO.Address_Type'Image(Address);
    end To_String;
 
-end To_Strings;
-
+end IO_Dispatcher.To_Strings;
 

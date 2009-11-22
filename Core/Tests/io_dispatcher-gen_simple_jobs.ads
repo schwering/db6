@@ -1,7 +1,8 @@
 with Ada.Unchecked_Conversion;
 
-with Jobs;
+with IO_Dispatcher.Jobs;
 
+private
 generic
    type Object_Type (<>) is limited private;
    type Key_Type is private;
@@ -60,7 +61,7 @@ generic
            Bytes_In_Blocks        :    out Long_Integer);
    with procedure P_Check
           (Object : in out Object_Type);
-package Gen_Simple_Jobs is
+package IO_Dispatcher.Gen_Simple_Jobs is
 
    Stop_Now : exception;
 
@@ -95,5 +96,5 @@ private
                (Jobs.To_Description("Make_Stats"), Convert(Make_Stats_Access)),
                (Jobs.To_Description("Check"),      Convert(Check_Access)));
 
-end Gen_Simple_Jobs;
+end IO_Dispatcher.Gen_Simple_Jobs;
 

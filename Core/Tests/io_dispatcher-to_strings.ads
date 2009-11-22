@@ -1,5 +1,3 @@
--- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
-
 with DB.Types;
 with DB.Types.Times;
 with DB.Types.Keys;
@@ -15,7 +13,8 @@ with DB.IO.Blocks.Device_IO;
 with DB.IO.Blocks.CFS_IO;
 with DB.IO.Blocks.Memory_IO;
 
-package To_Strings is
+private
+package IO_Dispatcher.To_Strings is
 
    function To_String (S : DB.Types.Strings.Bounded.String_Type)
       return String;
@@ -50,5 +49,5 @@ package To_Strings is
    function To_String (Address : DB.IO.Blocks.Memory_IO.Address_Type)
       return String;
 
-end To_Strings;
+end IO_Dispatcher.To_Strings;
 

@@ -4,7 +4,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with DB.Utils.Timers;
 with DB.Utils.Traceback;
 
-package body Jobs is
+package body IO_Dispatcher.Jobs is
 
    function To_Description (S : String) return Description_Type
    is
@@ -136,5 +136,5 @@ package body Jobs is
                            Boolean'Image(Reset), Total_Timer);
    end Execute_Job;
 
-end Jobs;
+end IO_Dispatcher.Jobs;
 

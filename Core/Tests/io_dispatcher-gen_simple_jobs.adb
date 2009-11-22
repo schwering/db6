@@ -2,7 +2,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with DB.IO.Blocks;
 
-package body Gen_Simple_Jobs is
+package body IO_Dispatcher.Gen_Simple_Jobs is
 
    procedure Insert
    is
@@ -118,5 +118,5 @@ package body Gen_Simple_Jobs is
       P_Check(Object);
    end Check;
 
-end Gen_Simple_Jobs;
+end IO_Dispatcher.Gen_Simple_Jobs;
 

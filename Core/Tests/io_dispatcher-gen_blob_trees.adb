@@ -3,15 +3,15 @@ with Ada.Exceptions; use Ada.Exceptions;
 with System.Pool_Global; use System.Pool_Global;
 with System.Storage_Pools; use System.Storage_Pools;
 
-with Random; use Random;
-with Args;
-with Jobs;
-with Gen_Simple_Jobs;
-with To_Strings; use To_Strings;
+with IO_Dispatcher.Random; use IO_Dispatcher.Random;
+with IO_Dispatcher.Args;
+with IO_Dispatcher.Jobs;
+with IO_Dispatcher.Gen_Simple_Jobs;
+with IO_Dispatcher.To_Strings; use IO_Dispatcher.To_Strings;
 
 with DB;
 with DB.IO.Blocks;
-with DB.Gen_BTrees;
+with DB.Gen_Blob_Trees;
 
 with DB.Types.Keys;
 with DB.Types.Strings;
@@ -21,11 +21,11 @@ with DB.Types.Times;
 
 with DB.Utils.Traceback;
 
-procedure Gen_TTree is
+procedure IO_Dispatcher.Gen_Blob_Trees is
    package Keys     renames DB.Types.Keys;
    package Values   renames DB.Types.Values.Bounded;
    package Value_IO renames DB.Types.Values.Bounded.Uncompressed;
-   package BTrees is new DB.Gen_BTrees
+   package Blob_Trees is new DB.Gen_Blob_Trees
      (Key_Type           => Keys.Key_Type,
       Key_Context_Type   => Keys.Context_Type,
       Read_Key           => Keys.Read,
@@ -34,10 +34,8 @@ procedure Gen_TTree is
       "="                => Keys."=",
       "<="               => Keys."<=",
       Value_Type         => Values.String_Type,
-      Value_Context_Type => Value_IO.Context_Type,
-      Read_Value         => Value_IO.Read,
-      Skip_Value         => Value_IO.Skip,
-      Write_Value        => Value_IO.Write,
+      To_Storage_Array   => Value_IO.To_Storage_Array,
+      From_Storage_Array => Value_IO.From_Storage_Array,
       Is_Context_Free_Serialization => 
                             Keys.Is_Context_Free_Serialization and
                             Value_IO.Is_Context_Free_Serialization,
@@ -58,17 +56,15 @@ procedure Gen_TTree is
          := 2 + Size_Type(Length(KV.Key.Row)) +
           --2 + Size_Type(Length(KV.Key.Column)) +
             Bits_To_Units(DB.Types.Times.Number_Type'Size);
-      VS : constant DB.IO.Blocks.Size_Type
-         := Size_Type(Length(KV.Value));
    begin
-      if KS > BTrees.Max_Key_Size(VS) then
+      if KS > Blob_Trees.Max_Key_Size then
          raise Key_Value_Error;
       end if;
    end Check_Key_Value;
 
 
    procedure Make_Stats
-     (Tree                   : in out BTrees.Tree_Type;
+     (Tree                   : in out Blob_Trees.Tree_Type;
       Height                 :    out Natural;
       Blocks                 :    out Natural;
       Free_Blocks            :    out Natural;
@@ -77,13 +73,13 @@ procedure Gen_TTree is
       Min_Degree             :    out Natural;
       Bytes_Wasted_In_Blocks :    out Long_Integer;
       Bytes_In_Blocks        :    out Long_Integer) is null;
-   procedure Check (Tree : in out BTrees.Tree_Type) is null;
+   procedure Check (Tree : in out Blob_Trees.Tree_Type) is null;
 
 
-   Tree : BTrees.Tree_Type;
+   Tree : Blob_Trees.Tree_Type;
 
    package Simple_Jobs is new Gen_Simple_Jobs
-     (Object_Type     => BTrees.Tree_Type,
+     (Object_Type     => Blob_Trees.Tree_Type,
       Key_Type        => Keys.Key_Type,
       Value_Type      => Values.String_Type,
 
@@ -99,37 +95,37 @@ procedure Gen_TTree is
       Get_Key         => Random.Key,
       Get_Value       => Random.Value,
 
-      Count_Type      => BTrees.Count_Type,
-      Result_Type     => BTrees.Result_Type,
+      Count_Type      => Blob_Trees.Count_Type,
+      Result_Type     => Blob_Trees.Result_Type,
 
       Object          => Tree,
       Null_Value      => Values.Empty_String,
-      Success         => BTrees.Success,
-      Failure         => BTrees.Failure,
+      Success         => Blob_Trees.Success,
+      Failure         => Blob_Trees.Failure,
 
-      P_Insert        => BTrees.Insert,
-      P_Delete        => BTrees.Delete,
-      P_Look_Up       => BTrees.Look_Up,
-      P_Count         => BTrees.Count,
+      P_Insert        => Blob_Trees.Insert,
+      P_Delete        => Blob_Trees.Delete,
+      P_Look_Up       => Blob_Trees.Look_Up,
+      P_Count         => Blob_Trees.Count,
       P_Make_Stats    => Make_Stats,
       P_Check         => Check);
 
 
-   use type BTrees.Result_Type;
+   use type Blob_Trees.Result_Type;
    Long_Job : constant Jobs.Long_Job_Type
             := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
-   Cnt      : BTrees.Count_Type := 0;
+   Cnt      : Blob_Trees.Count_Type := 0;
 begin
    declare
    begin
-      BTrees.Create(Args.File_Name);
+      Blob_Trees.Create(Args.File_Name);
       Put_Line("Newly created Tree "& Args.File_Name);
    exception
       when DB.IO_Error => Put_Line("Using existing Tree "& Args.File_Name);
    end;
-   BTrees.Initialize(Tree, Args.File_Name);
-   BTrees.Count(Tree, Cnt);
-   Put_Line("Size ="& BTrees.Count_Type'Image(Cnt));
+   Blob_Trees.Initialize(Tree, Args.File_Name);
+   Blob_Trees.Count(Tree, Cnt);
+   Put_Line("Size ="& Blob_Trees.Count_Type'Image(Cnt));
 
    declare
       RC : constant Random.Count_Type := Random.Count_Type(Cnt);
@@ -142,11 +138,11 @@ begin
 
    Jobs.Execute_Jobs(Long_Job);
 
-   BTrees.Finalize(Tree);
+   Blob_Trees.Finalize(Tree);
 exception
    when Error : others =>
       Put_Line("Exception: "& Exception_Message(Error));
       Put_Line("Exception: "& Exception_Information(Error));
       DB.Utils.Traceback.Print_Traceback(Error);
-end Gen_TTree;
+end IO_Dispatcher.Gen_Blob_Trees;
 

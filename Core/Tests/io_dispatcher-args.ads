@@ -1,7 +1,8 @@
-with Jobs;
-with Random;
+with IO_Dispatcher.Jobs;
+with IO_Dispatcher.Random;
 
-package Args is
+private
+package IO_Dispatcher.Args is
 
    Parse_Error : exception;
 
@@ -15,5 +16,8 @@ package Args is
      (Map : Jobs.Map_Type)
       return Jobs.Long_Job_Type;
 
-end Args;
+   function Pop_Argument (I : Positive) return String;
+   procedure Undo_Pop;
+
+end IO_Dispatcher.Args;
 

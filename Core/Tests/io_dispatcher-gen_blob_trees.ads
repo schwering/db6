@@ -1,6 +1,7 @@
 with DB.IO.Blocks.Gen_IO;
 
+private
 generic
    with package Block_IO is new DB.IO.Blocks.Gen_IO (<>);
-procedure Gen_TTree;
+procedure IO_Dispatcher.Gen_Blob_Trees;
 

@@ -1,9 +1,7 @@
 with Ada.Command_Line;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Jobs;
-
-package body Args is
+package body IO_Dispatcher.Args is
 
    function To_Number (S : String) return Long_Long_Integer
    is
@@ -24,15 +22,34 @@ package body Args is
    end To_Number;
 
 
+   Offset : Natural := 0;
+   -- Parameters can be processed in which case they `disappear'.
+   -- To realize this, an offset is always added.
+
+
+   function Pop_Argument (I : Positive) return String is
+      Arg : constant String := Ada.Command_Line.Argument(Offset + I);
+   begin
+      Offset := Offset + 1;
+      return Arg;
+   end Pop_Argument;
+
+
    function File_Name return String is
    begin
-      return Ada.Command_Line.Argument(1);
+      return Ada.Command_Line.Argument(Offset + 1);
    end File_Name;
+
+
+   procedure Undo_Pop is
+   begin
+      Offset := Offset - 1;
+   end Undo_Pop;
 
 
    function Init_Offset return Random.Count_Type is
    begin
-      return Random.Count_Type(To_Number(Ada.Command_Line.Argument(2)));
+      return Random.Count_Type(To_Number(Ada.Command_Line.Argument(Offset+2)));
    end Init_Offset;
 
 
@@ -119,7 +136,7 @@ package body Args is
                              Concurrency_Degree, Reset);
       end New_Job;
 
-      Long_Job : Jobs.Long_Job_Type(3 .. Ada.Command_Line.Argument_Count);
+      Long_Job : Jobs.Long_Job_Type(Offset+3..Ada.Command_Line.Argument_Count);
    begin
       for I in Long_Job'Range loop
          Long_Job(I) := New_Job(Ada.Command_Line.Argument(I));
@@ -127,5 +144,5 @@ package body Args is
       return Long_Job;
    end Create_Jobs_From_Command_Line;
 
-end Args;
+end IO_Dispatcher.Args;
 

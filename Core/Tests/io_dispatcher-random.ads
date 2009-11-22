@@ -1,9 +1,8 @@
--- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
-
 with DB.Types.Keys;
 with DB.Types.Values.Bounded;
 
-package Random is
+private
+package IO_Dispatcher.Random is
 
    type Count_Type is mod 2**64;
    type Key_Value_Type is
@@ -32,5 +31,5 @@ private
    Key_Value_Pairs : Key_Value_Array_Access_Type
                    := new Key_Value_Array_Type(1 .. 10_000);
 
-end Random;
+end IO_Dispatcher.Random;
 

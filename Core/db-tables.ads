@@ -16,15 +16,11 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
-with System.Storage_Elements;
-
 with DB.Types.Keys;
 with DB.Types.Values.Bounded;
 with DB.Types.Values.Unbounded;
 
 package DB.Tables is
-
-   package SSE renames System.Storage_Elements;
 
    ----------
    -- Key type is predefined.

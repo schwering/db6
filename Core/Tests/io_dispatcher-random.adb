@@ -1,5 +1,3 @@
--- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
-
 with DB.Types;
 with DB.Types.Times;
 
@@ -24,7 +22,7 @@ with DB.Locks.Mutexes;
 with Ada.Unchecked_Deallocation;
 with Ada.Unchecked_Conversion;
 
-package body Random is
+package body IO_Dispatcher.Random is
 
    Mutex             : DB.Locks.Mutexes.Mutex_Type;
    Max_Size          : constant := 1024;
@@ -204,5 +202,5 @@ package body Random is
       return KV.Value;
    end Value;
 
-end Random;
+end IO_Dispatcher.Random;
 
