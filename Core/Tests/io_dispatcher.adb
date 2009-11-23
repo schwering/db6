@@ -71,6 +71,7 @@ package body IO_Dispatcher is
       procedure Device_BTree   is new Gen_BTrees(Device_IO.IO);
       procedure Direct_BTree   is new Gen_BTrees(Direct_IO.IO);
       procedure File_BTree     is new Gen_BTrees(File_IO.IO);
+      procedure File_Sys_BTree is new Gen_BTrees(File_IO.System_Locking_IO);
       procedure Memory_BTree   is new Gen_BTrees(Memory_IO.IO);
 
       procedure Async_Blob    is new Gen_Blob_Trees(Asynchronous_IO.IO);
@@ -79,6 +80,7 @@ package body IO_Dispatcher is
       procedure Device_Blob   is new Gen_Blob_Trees(Device_IO.IO);
       procedure Direct_Blob   is new Gen_Blob_Trees(Direct_IO.IO);
       procedure File_Blob     is new Gen_Blob_Trees(File_IO.IO);
+      procedure File_Sys_Blob is new Gen_Blob_Trees(File_IO.System_Locking_IO);
       procedure Memory_Blob   is new Gen_Blob_Trees(Memory_IO.IO);
 
       Procs : constant Entries_Type
@@ -88,6 +90,7 @@ package body IO_Dispatcher is
                 (New_String("device"),       Device_BTree'Access),
                 (New_String("direct"),       Direct_BTree'Access),
                 (New_String("file"),         File_BTree'Access),
+                (New_String("filesys"),      File_Sys_BTree'Access),
                 (New_String("memory"),       Memory_BTree'Access),
 
                 (New_String("blob_async"),   Async_Blob'Access),
@@ -96,6 +99,7 @@ package body IO_Dispatcher is
                 (New_String("blob_device"),  Device_Blob'Access),
                 (New_String("blob_direct"),  Direct_Blob'Access),
                 (New_String("blob_file"),    File_Blob'Access),
+                (New_String("blobsys"),      File_Sys_Blob'Access),
                 (New_String("blob_memory"),  Memory_Blob'Access),
 
                 (New_string("mmap"),    MMap'Access));

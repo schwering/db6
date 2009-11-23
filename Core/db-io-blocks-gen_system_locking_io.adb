@@ -116,11 +116,11 @@ package body DB.IO.Blocks.Gen_System_Locking_IO is
    is
       Successful : Boolean;
    begin
+      P_IO.Certify_Lock(File.File, Ticket);
       Low_Level.Lock(FD(File.File), Low_Level.Exclusive, True, Successful);
       if not Successful then
          raise IO_Error;
       end if;
-      P_IO.Certify_Lock(File.File, Ticket);
    end Certify_Lock;
 
 
@@ -130,11 +130,11 @@ package body DB.IO.Blocks.Gen_System_Locking_IO is
    is
       Successful : Boolean;
    begin
-      P_IO.Unlock(File.File, Ticket);
       Low_Level.Unlock(FD(File.File), Successful);
       if not Successful then
          raise IO_Error;
       end if;
+      P_IO.Unlock(File.File, Ticket);
    end Unlock;
 
 end DB.IO.Blocks.Gen_System_Locking_IO;
