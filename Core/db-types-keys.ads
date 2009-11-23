@@ -5,7 +5,10 @@
 -- Copyright 2008, 2009 Christoph Schwering
 
 with DB.IO.Blocks;
+pragma Warnings (Off);
 with DB.Types.Strings.Bounded;
+with DB.Types.Strings.Unbounded;
+pragma Warnings (On);
 with DB.Types.Times;
 
 package DB.Types.Keys is

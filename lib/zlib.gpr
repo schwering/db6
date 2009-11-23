@@ -12,6 +12,6 @@ project ZLib is
          for Library_Dir use "C:/cygwin/lib";
    end case;
    for Library_Name use "z";
-   for Library_Kind use "static";
+   for Library_Kind use "dynamic";
 end ZLib;
 

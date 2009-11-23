@@ -4,15 +4,9 @@ with Ada.Exceptions; use Ada.Exceptions;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Gen_BTrees;
 with IO_Dispatcher.Gen_Blob_Trees;
-with IO_Dispatcher.MMap;
 
-with DB.IO.Blocks.Asynchronous_IO;
-with DB.IO.Blocks.CFS_IO;
-with DB.IO.Blocks.Compressed_Memory_IO;
-with DB.IO.Blocks.Device_IO;
-with DB.IO.Blocks.Direct_IO;
-with DB.IO.Blocks.File_IO;
-with DB.IO.Blocks.Memory_IO;
+with DB.BTrees;
+with DB.Blob_Trees;
 
 with DB.Utils.Traceback;
 
@@ -63,46 +57,46 @@ package body IO_Dispatcher is
       ----------
       -- Available procedures and their map.
 
-      use DB.IO.Blocks;
+      use DB.BTrees;
+      use DB.Blob_Trees;
 
-      procedure Async_BTree    is new Gen_BTrees(Asynchronous_IO.IO);
-      procedure CFS_BTree      is new Gen_BTrees(CFS_IO.IO);
-      procedure Comp_Mem_BTree is new Gen_BTrees(Compressed_Memory_IO.IO);
-      procedure Device_BTree   is new Gen_BTrees(Device_IO.IO);
-      procedure Direct_BTree   is new Gen_BTrees(Direct_IO.IO);
-      procedure File_BTree     is new Gen_BTrees(File_IO.IO);
-      procedure File_Sys_BTree is new Gen_BTrees(File_IO.System_Locking_IO);
-      procedure Memory_BTree   is new Gen_BTrees(Memory_IO.IO);
+      procedure Async_BTree    is new Gen_BTrees(Async_BTrees, Check, Stats);
+      procedure CFS_BTree      is new Gen_BTrees(CFS_BTrees, Check, Stats);
+      procedure Cmp_Mem_BTree  is new Gen_BTrees(Cmp_Mem_BTrees, Check, Stats);
+      procedure Device_BTree   is new Gen_BTrees(Device_BTrees, Check, Stats);
+      procedure Direct_BTree   is new Gen_BTrees(Direct_BTrees, Check, Stats);
+      procedure File_BTree     is new Gen_BTrees(File_BTrees, Check, Stats);
+      procedure File_SL_BTree  is new Gen_BTrees(File_SL_BTrees, Check, Stats);
+      procedure Memory_BTree   is new Gen_BTrees(Memory_BTrees, Check, Stats);
 
-      procedure Async_Blob    is new Gen_Blob_Trees(Asynchronous_IO.IO);
-      procedure CFS_Blob      is new Gen_Blob_Trees(CFS_IO.IO);
-      procedure Comp_Mem_Blob is new Gen_Blob_Trees(Compressed_Memory_IO.IO);
-      procedure Device_Blob   is new Gen_Blob_Trees(Device_IO.IO);
-      procedure Direct_Blob   is new Gen_Blob_Trees(Direct_IO.IO);
-      procedure File_Blob     is new Gen_Blob_Trees(File_IO.IO);
-      procedure File_Sys_Blob is new Gen_Blob_Trees(File_IO.System_Locking_IO);
-      procedure Memory_Blob   is new Gen_Blob_Trees(Memory_IO.IO);
+      procedure Async_Blob    is new Gen_Blob_Trees(Async_Blob_Trees);
+      procedure CFS_Blob      is new Gen_Blob_Trees(CFS_Blob_Trees);
+      procedure Cmp_Mem_Blob  is new Gen_Blob_Trees(Cmp_Mem_Blob_Trees);
+      procedure Device_Blob   is new Gen_Blob_Trees(Device_Blob_Trees);
+      procedure Direct_Blob   is new Gen_Blob_Trees(Direct_Blob_Trees);
+      procedure File_Blob     is new Gen_Blob_Trees(File_Blob_Trees);
+      procedure File_SL_Blob  is new Gen_Blob_Trees(File_SL_Blob_Trees);
+      procedure Memory_Blob   is new Gen_Blob_Trees(Memory_Blob_Trees);
 
       Procs : constant Entries_Type
             := ((New_String("async"),        Async_BTree'Access),
                 (New_String("cfs"),          CFS_BTree'Access),
-                (New_String("compmem"),      Comp_Mem_BTree'Access),
+                (New_String("compmem"),      Cmp_Mem_BTree'Access),
                 (New_String("device"),       Device_BTree'Access),
                 (New_String("direct"),       Direct_BTree'Access),
                 (New_String("file"),         File_BTree'Access),
-                (New_String("filesys"),      File_Sys_BTree'Access),
+                (New_String("filesl"),       File_SL_BTree'Access),
                 (New_String("memory"),       Memory_BTree'Access),
 
                 (New_String("blob_async"),   Async_Blob'Access),
                 (New_String("blob_cfs"),     CFS_Blob'Access),
-                (New_String("blob_compmem"), Comp_Mem_Blob'Access),
+                (New_String("blob_compmem"), Cmp_Mem_Blob'Access),
                 (New_String("blob_device"),  Device_Blob'Access),
                 (New_String("blob_direct"),  Direct_Blob'Access),
                 (New_String("blob_file"),    File_Blob'Access),
-                (New_String("blobsys"),      File_Sys_Blob'Access),
-                (New_String("blob_memory"),  Memory_Blob'Access),
-
-                (New_string("mmap"),    MMap'Access));
+                (New_String("blob_filesl"),  File_SL_Blob'Access),
+                (New_String("blob_memory"),  Memory_Blob'Access)
+                );
 
       IO_Name : constant String := Args.Pop_Argument(1);
    begin

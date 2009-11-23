@@ -7,14 +7,10 @@ with DB.Types.Values;
 
 pragma Warnings (Off);
 with DB.Types.Gen_Strings.Gen_Bounded;
-with DB.Types.Strings.Bounded;
-with DB.Types.Values.Bounded;
 pragma Warnings (On);
 
 pragma Warnings (Off);
 with DB.Types.Gen_Strings.Gen_Unbounded;
-with DB.Types.Strings.Unbounded;
-with DB.Types.Values.Unbounded;
 pragma Warnings (On);
 
 with DB.Locks.Mutexes;
@@ -32,12 +28,13 @@ package body IO_Dispatcher.Random is
 
    generic
       with package Strings is new DB.Types.Gen_Strings(Char_Type);
-      with package Strings_Impl is new Strings.Gen_Bounded(<>);
-      --with package Strings_Impl is new Strings.Gen_Unbounded;
+      type String_Type is private;
+      with function New_String (Buf : Strings.Indefinite_Buffer_Type)
+         return String_Type;
       Random_Weight : in Natural := 1;
-   function Make_String (Index : Natural) return Strings_Impl.String_Type;
+   function Make_String (Index : Natural) return String_Type;
 
-   function Make_String (Index : Natural) return Strings_Impl.String_Type
+   function Make_String (Index : Natural) return String_Type
    is
       Alphabet_Length : constant
                       := Char_Type'Pos('z') - Char_Type'Pos('a') + 1;
@@ -63,42 +60,42 @@ package body IO_Dispatcher.Random is
             String_Buffer(J) := Char_Type'Val(Char_Pos);
          end;
       end loop;
-      return Strings_Impl.New_String(String_Buffer);
+      return New_String(String_Buffer);
    end Make_String;
 
 
    function Make_Row is new Make_String
      (Strings       => DB.Types.Strings,
-      Strings_Impl  => DB.Types.Strings.Bounded,
+      String_Type   => DB.Types.Keys.Rows.String_Type,
+      New_String    => DB.Types.Keys.Rows.New_String,
       Random_Weight => 1);
 
 
    function Make_Column is new Make_String
      (Strings       => DB.Types.Strings,
-      Strings_Impl  => DB.Types.Strings.Bounded,
+      String_Type   => DB.Types.Keys.Columns.String_Type,
+      New_String    => DB.Types.Keys.Columns.New_String,
       Random_Weight => 3);
 
 
-   package Values renames DB.Types.Values;
-   package Values_Impl renames DB.Types.Values.Bounded;
-
-   function Make_Value1 (Count : Count_Type) return Values_Impl.String_Type
+   function Make_Value1 (Count : Count_Type) return Values.String_Type
    is
       Max_Len : constant := 4;
       type Uint32 is mod 2**32;
-      type Definite_Buffer_Type is new Values.Indefinite_Buffer_Type(1 .. 4);
+      type Definite_Buffer_Type is
+         new DB.Types.Values.Indefinite_Buffer_Type(1 .. 4);
       function Convert is new Ada.Unchecked_Conversion
         (Uint32, Definite_Buffer_Type);
 
       I   : constant Uint32 
           := Uint32(Count mod Uint32'Modulus);
-      Buf : constant Values.Indefinite_Buffer_Type
-          := Values.Indefinite_Buffer_Type(Convert(I));
+      Buf : constant DB.Types.Values.Indefinite_Buffer_Type
+          := DB.Types.Values.Indefinite_Buffer_Type(Convert(I));
    begin
-      return Values_Impl.New_String(Buf);
+      return Values.New_String(Buf);
    end Make_Value1;
 
-   function Make_Value2 (Count : Count_Type) return Values_Impl.String_Type
+   function Make_Value2 (Count : Count_Type) return Values.String_Type
    is
       Max_Len : constant := 4;
       Img  : constant String   := Count_Type'Image(Count);
@@ -107,18 +104,20 @@ package body IO_Dispatcher.Random is
 
       subtype R is Positive range From .. Img'Last;
       type Definite_String_Type is new String(R);
-      type Definite_Buffer_Type is new Values.Indefinite_Buffer_Type(R);
+      type Definite_Buffer_Type is
+         new DB.Types.Values.Indefinite_Buffer_Type(R);
       function Convert is new Ada.Unchecked_Conversion
         (Definite_string_Type, Definite_Buffer_Type);
 
-      Buf : constant Values.Indefinite_Buffer_Type
-          := Values.Indefinite_Buffer_Type(Convert(Definite_String_Type(Sub)));
+      Buf : constant DB.Types.Values.Indefinite_Buffer_Type
+          := DB.Types.Values.Indefinite_Buffer_Type
+                (Convert(Definite_String_Type(Sub)));
    begin
-      return Values_Impl.New_String(Buf);
+      return Values.New_String(Buf);
    end Make_Value2;
 
 
-   function Make_Value (Count : Count_Type) return Values_Impl.String_Type
+   function Make_Value (Count : Count_Type) return Values.String_Type
    renames Make_Value2;
 
 
@@ -197,7 +196,7 @@ package body IO_Dispatcher.Random is
 
 
    function Value (KV : Key_Value_Type)
-      return DB.Types.Values.Bounded.String_Type is
+      return Values.String_Type is
    begin
       return KV.Value;
    end Value;

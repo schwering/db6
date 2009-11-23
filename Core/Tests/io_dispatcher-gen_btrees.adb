@@ -1,7 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
-with System.Pool_Global; use System.Pool_Global;
-with System.Storage_Pools; use System.Storage_Pools;
+with Ada.Unchecked_Conversion;
 
 with IO_Dispatcher.Random; use IO_Dispatcher.Random;
 with IO_Dispatcher.Args;
@@ -11,55 +10,31 @@ with IO_Dispatcher.To_Strings; use IO_Dispatcher.To_Strings;
 
 with DB;
 with DB.IO.Blocks;
-with DB.Gen_BTrees;
 
 with DB.Types.Keys;
-with DB.Types.Strings;
-with DB.Types.Strings.Bounded;
-with DB.Types.Values.Bounded;
 with DB.Types.Times;
 
 with DB.Utils.Traceback;
 
 procedure IO_Dispatcher.Gen_BTrees is
    package Keys     renames DB.Types.Keys;
-   package Values   renames DB.Types.Values.Bounded;
-   package Value_IO renames DB.Types.Values.Bounded.Uncompressed;
-   package BTrees is new DB.Gen_BTrees
-     (Key_Type           => Keys.Key_Type,
-      Key_Context_Type   => Keys.Context_Type,
-      Read_Key           => Keys.Read,
-      Skip_Key           => Keys.Skip,
-      Write_Key          => Keys.Write,
-      "="                => Keys."=",
-      "<="               => Keys."<=",
-      Value_Type         => Values.String_Type,
-      Value_Context_Type => Value_IO.Context_Type,
-      Read_Value         => Value_IO.Read,
-      Skip_Value         => Value_IO.Skip,
-      Write_Value        => Value_IO.Write,
-      Is_Context_Free_Serialization => 
-                            Keys.Is_Context_Free_Serialization and
-                            Value_IO.Is_Context_Free_Serialization,
-      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
-      Block_IO           => Block_IO);
-
+   package Rows     renames Random.Rows;
+   package Columns  renames Random.Columns;
+   package Value    renames Random.Values;
 
    procedure Check_Key_Value (KV : Key_Value_Type)
    is
       use DB.IO.Blocks;
-      use DB.Types.Strings.Bounded;
-      use DB.Types.Values.Bounded;
       use type Size_Type;
 
       Key_Value_Error : exception;
 
       KS : constant DB.IO.Blocks.Size_Type
-         := 2 + Size_Type(Length(KV.Key.Row)) +
-          --2 + Size_Type(Length(KV.Key.Column)) +
+         := 2 + Size_Type(Rows.Length(KV.Key.Row)) +
+          --2 + Size_Type(Columns.Length(KV.Key.Column)) +
             Bits_To_Units(DB.Types.Times.Number_Type'Size);
       VS : constant DB.IO.Blocks.Size_Type
-         := Size_Type(Length(KV.Value));
+         := Size_Type(Values.Length(KV.Value));
    begin
       if KS > BTrees.Max_Key_Size(VS) then
          raise Key_Value_Error;
@@ -67,43 +42,96 @@ procedure IO_Dispatcher.Gen_BTrees is
    end Check_Key_Value;
 
 
-   procedure Make_Stats
-     (Tree                   : in out BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer) is null;
-   procedure Check (Tree : in out BTrees.Tree_Type) is null;
+   function To_Key (K : Keys.Key_Type) return BTrees.Key_Type
+   is
+      function Convert is new Ada.Unchecked_Conversion
+         (Keys.Key_Type, BTrees.Key_Type);
+      --KK : aliased BTrees.Key_Type;
+      --for KK'Address use K'Address;
+      --pragma Import (Ada, KK);
+   begin
+      return Convert(K);
+      --return KK;
+   end To_Key;
 
+   function To_Key (K : BTrees.Key_Type) return Keys.Key_Type
+   is
+      function Convert is new Ada.Unchecked_Conversion
+         (BTrees.Key_Type, Keys.Key_Type);
+   begin
+      return Convert(K);
+   end To_Key;
+
+   function To_Value (V : Values.String_Type) return BTrees.Value_Type
+   is
+      function Convert is new Ada.Unchecked_Conversion
+         (Values.String_Type, BTrees.Value_Type);
+      --VV : aliased BTrees.Value_Type;
+      --for VV'Address use V'Address;
+      --pragma Import (Ada, VV);
+   begin
+      return Convert(V);
+      --return VV;
+   end To_Value;
+
+   function To_Value (V : BTrees.Value_Type) return Values.String_Type
+   is
+      function Convert is new Ada.Unchecked_Conversion
+         (BTrees.Value_Type, Values.String_Type);
+   begin
+      return Convert(V);
+   end To_Value;
+
+   function Get_Key (KV : Key_Value_Type) return BTrees.Key_Type is
+   begin
+      return To_Key(KV.Key);
+   end Get_Key;
+
+   function Get_Value (KV : Key_Value_Type) return BTrees.Value_Type is
+   begin
+      return To_Value(KV.Value);
+   end Get_Value;
+
+   function Key_To_String (K : BTrees.Key_Type) return String is
+   begin
+      return To_String(To_Key(K));
+   end Key_To_String;
+
+   function Value_To_String (V : BTrees.Value_Type) return String is
+   begin
+      return To_String(To_Value(V));
+   end Value_To_String;
+
+   function "=" (Left, Right : BTrees.Value_Type) return Boolean
+   is
+      use Values;
+   begin
+      return To_Value(Left) = To_Value(Right);
+   end "=";
+
+   Null_Value : constant BTrees.Value_Type := To_Value(Values.Empty_String);
 
    Tree : BTrees.Tree_Type;
 
    package Simple_Jobs is new Gen_Simple_Jobs
      (Object_Type     => BTrees.Tree_Type,
-      Key_Type        => Keys.Key_Type,
-      Value_Type      => Values.String_Type,
+      Key_Type        => BTrees.Key_Type,
+      Value_Type      => BTrees.Value_Type,
+      "="             => "=",
+      Key_To_String   => Key_To_String,
+      Value_To_String => Value_To_String,
 
-      Key_To_String   => To_String,
-      Value_To_String => To_String,
-
-      "="             => Values."=",
-
+      Key_Value_Type  => Key_Value_Type,
+      Random_Entry    => Random_Entry,
+      Get_Key         => Get_Key,
+      Get_Value       => Get_Value,
       Check_Key_Value => Check_Key_Value,
-
-      Key_Value_Type  => Random.Key_Value_Type,
-      Random_Entry    => Random.Random_Entry,
-      Get_Key         => Random.Key,
-      Get_Value       => Random.Value,
 
       Count_Type      => BTrees.Count_Type,
       Result_Type     => BTrees.Result_Type,
 
       Object          => Tree,
-      Null_Value      => Values.Empty_String,
+      Null_Value      => Null_Value,
       Success         => BTrees.Success,
       Failure         => BTrees.Failure,
 
@@ -111,7 +139,7 @@ procedure IO_Dispatcher.Gen_BTrees is
       P_Delete        => BTrees.Delete,
       P_Look_Up       => BTrees.Look_Up,
       P_Count         => BTrees.Count,
-      P_Make_Stats    => Make_Stats,
+      P_Make_Stats    => Stats,
       P_Check         => Check);
 
 

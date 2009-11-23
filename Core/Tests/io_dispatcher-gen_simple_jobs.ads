@@ -8,16 +8,14 @@ generic
    type Key_Type is private;
    type Value_Type (<>) is private;
 
+   with function "=" (Left, Right : Value_Type) return Boolean is <>;
+   with function Key_To_String (K : Key_Type) return String;
+   with function Value_To_String (V : Value_Type) return String;
+
    type Key_Value_Type is private;
    with function Random_Entry return Key_Value_Type;
    with function Get_Key (KV : Key_Value_Type) return Key_Type;
    with function Get_Value (KV : Key_Value_Type) return Value_Type;
-
-   with function Key_To_String (K : Key_Type) return String;
-   with function Value_To_String (V : Value_Type) return String;
-
-   with function "=" (Left, Right : Value_Type) return Boolean;
-
    with procedure Check_Key_Value (KV : Key_Value_Type);
 
    type Count_Type is range <>;

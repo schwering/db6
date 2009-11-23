@@ -46,6 +46,10 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       P_Look_Up(Object, Get_Key(KV), Val, Pos, State);
       if State /= Success or else Get_Value(KV) /= Val then
          Put_Line("Look up failed "& State'Img);
+         Put_Line("Key   = "& Key_To_String(Get_Key(KV)));
+         Put_Line("Value = "& Value_To_String(Get_Value(KV)));
+         Put_Line("Value = "& Value_To_String(Val));
+         Put_Line("Equal = "& Boolean'Image(Get_Value(KV) = Val));
          raise Stop_Now;
       end if;
    end Search;
