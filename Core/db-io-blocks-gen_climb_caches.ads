@@ -4,20 +4,16 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
-with System.Pool_Global;
-with System.Storage_Pools;
-
-use System.Pool_Global;
-use System.Storage_Pools;
-
 with DB.IO.Blocks.Gen_IO;
 with DB.Locks.Mutexes;
 with DB.Utils;
 with DB.Utils.Gen_Hashtables;
+with DB.Utils.Global_Pool;
 
 generic
    with package P_IO is new Gen_IO (<>);
 package DB.IO.Blocks.Gen_Climb_Caches is
+   pragma Preelaborate;
 
    subtype Address_Type is P_IO.Address_Type;
    subtype Valid_Address_Type is P_IO.Valid_Address_Type;
@@ -45,7 +41,7 @@ package DB.IO.Blocks.Gen_Climb_Caches is
       Hash         => Hash,
       Rehash       => Rehash,
       "="          => P_IO."=",
-      Storage_Pool => Root_Storage_Pool'Class(Global_Pool_Object));
+      Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
    type Table_Ref_Type is access HT.Table_Type;
 
    type Buffer_Element_Type is

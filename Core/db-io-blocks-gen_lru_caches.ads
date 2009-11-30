@@ -22,6 +22,7 @@ with DB.Utils.Bounded_Pools;
 generic
    with package P_IO is new Gen_IO (<>);
 package DB.IO.Blocks.Gen_LRU_Caches is
+   pragma Elaborate_Body;
 
    subtype Address_Type is P_IO.Address_Type;
    subtype Valid_Address_Type is P_IO.Valid_Address_Type;
