@@ -34,6 +34,7 @@ generic
 
    Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.Utils.Gen_Hashtables is
+   pragma Preelaborate;
 
    type Table_Type (<>) is private;
    type Table_Ref_Type is access Table_Type;

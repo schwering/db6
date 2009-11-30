@@ -128,7 +128,6 @@ package body DB.IO.Blocks.File_IO is
       procedure LL_Read is new Low_Level.PRead(Block_Type);
    begin
       LL_Read(File.FD, To_File_Position(Address), Block);
-      Blocks(Address) := True;
    end Read;
 
 
@@ -209,9 +208,5 @@ package body DB.IO.Blocks.File_IO is
       return File.FD;
    end FD;
 
-begin
-   for I in Blocks'Range loop
-      Blocks(I) := False;
-   end loop;
 end DB.IO.Blocks.File_IO;
 

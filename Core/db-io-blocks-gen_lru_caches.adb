@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
-with Ada.Text_IO; use Ada.Text_IO;
+--with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 with Ada.Unchecked_Deallocation;
 
@@ -16,29 +16,29 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
    Count           : LLI := 0;
    Discard_Count   : LLI := 0;
 
-   task Superviser;
+--   task Superviser;
 
-   task body Superviser is
-   begin
-      loop
-         Put_Line("Hashtable Size       ="&
-                  LLI'Image(Hashtable_Size));
-         Put_Line("Compressed Size      ="&
-                  LLI'Image(Compressed_Size) &" ="&
-                  LLI'Image(Compressed_Size / 2**20) &"MB");
-         Put_Line("Uncompressed Size    ="&
-                  LLI'Image(Count * LLI(Block_Size)) &" ="&
-                  LLI'Image(Count * LLI(Block_Size) / 2**20) &"MB");
-         Put_Line("Discard Count        ="&
-                  Discard_Count'Img);
-         Put_Line("Pool Current Storage ="&
-                  LLI'Image(LLI(Pool.Current_Storage_Size) / 2**20) &"MB");
-         Put_Line("Pool Maximum Storage ="&
-                  LLI'Image(LLI(Pool.Max_Storage_Size) / 2**20) &"MB");
-         New_Line;
-         delay 30.0;
-      end loop;
-   end Superviser;
+--   task body Superviser is
+--   begin
+--      loop
+--         Put_Line("Hashtable Size       ="&
+--                  LLI'Image(Hashtable_Size));
+--         Put_Line("Compressed Size      ="&
+--                  LLI'Image(Compressed_Size) &" ="&
+--                  LLI'Image(Compressed_Size / 2**20) &"MB");
+--         Put_Line("Uncompressed Size    ="&
+--                  LLI'Image(Count * LLI(Block_Size)) &" ="&
+--                  LLI'Image(Count * LLI(Block_Size) / 2**20) &"MB");
+--         Put_Line("Discard Count        ="&
+--                  Discard_Count'Img);
+--         Put_Line("Pool Current Storage ="&
+--                  LLI'Image(LLI(Pool.Current_Storage_Size) / 2**20) &"MB");
+--         Put_Line("Pool Maximum Storage ="&
+--                  LLI'Image(LLI(Pool.Max_Storage_Size) / 2**20) &"MB");
+--         New_Line;
+--         delay 30.0;
+--      end loop;
+--   end Superviser;
 
 
    procedure Free_Entry is
