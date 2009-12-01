@@ -197,9 +197,85 @@ procedure IO_Dispatcher.MMap is
       P_Check         => Check);
 
 
+   procedure Map_Reduce
+   is
+      type Element_Type is
+         record
+            Key : DB.Types.Keys.Key_Type;
+         end record;
+      Neutral_Element : constant Element_Type
+          := Element_Type'
+                  (Key => DB.Types.Keys.Key_Type'
+                              (Row    => DB.Types.Keys.Rows.Empty_String,
+                               Column => DB.Types.Keys.Rows.Empty_String,
+                               Time   => 0));
+
+      I : Integer := 0;
+
+      function Map_Function (Key   : DB.Types.Keys.Key_Type;
+                             Value : DB.Tables.Value_Type'Class)
+                             return Element_Type is
+      begin
+         declare
+            task Delay_Task;
+            task body Delay_Task is begin delay 0.1; end Delay_Task;
+         begin
+            null;
+         end;
+         Put_Line(I'Img);
+         return Element_Type'(Key => Key);
+      end Map_Function;
+
+      procedure Reduce (Left  : in out Element_Type;
+                        Right : in     Element_Type)
+      is
+         use type DB.Types.Keys.Key_Type;
+      begin
+         I := I + 1;
+         if Right.Key <= Left.Key then
+            Put_Line(I'Img &" Less-than does not hold!");
+         end if;
+      end Reduce;
+
+      procedure Map_Reduce is new DB.Tables.Maps.Gen_Sequential_Map_Reduce
+        (Element_Type, Neutral_Element, Map_Function, Reduce);
+
+      Transaction : DB.Tables.Maps.RO_Transaction_Type
+                  := DB.Tables.Maps.New_RO_Transaction(Map);
+      Lower       : constant DB.Tables.Maps.Bound_Type
+                  := DB.Tables.Maps.Negative_Infinity_Bound(Map);
+      Upper       : constant DB.Tables.Maps.Bound_Type
+                  := DB.Tables.Maps.Positive_Infinity_Bound(Map);
+      Cursor      : DB.Tables.Maps.Cursor_Type
+                  := DB.Tables.Maps.New_Cursor(Map, Transaction, True,
+                                               Lower, Upper, False);
+      Element     : Element_Type;
+      Value_Impl  : Value_Type;
+      State       : DB.Tables.Maps.Result_Type;
+      use type DB.Tables.Maps.Result_Type;
+   begin
+      Put_Line("MapReduce");
+      DB.Tables.Maps.Start_Transaction(Map, Transaction);
+      Map_Reduce(Map, Transaction, Cursor, Element, Value_Impl, State);
+      Put_Line("State = "& State'Img);
+      if State /= DB.Tables.Maps.Success then
+         Put_Line("State = "& State'Img);
+      end if;
+      DB.Tables.Maps.Finalize(Map, Cursor);
+      DB.Tables.Maps.Finish_Transaction(Map, Transaction);
+   exception
+      when others =>
+         DB.Tables.Maps.Finish_Transaction(Map, Transaction);
+         raise;
+   end Map_Reduce;
+
+
    use type DB.Tables.Maps.Result_Type;
+   Job_Map  : constant Jobs.Map_Type
+            := Jobs.Add(Simple_Jobs.Job_Map, "MapReduce",
+                        Map_Reduce'Unrestricted_Access);
    Long_Job : constant Jobs.Long_Job_Type
-            := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
+            := Args.Create_Jobs_From_Command_Line(Job_Map);
    Cnt      : DB.Tables.Maps.Count_Type := 0;
 begin
    declare

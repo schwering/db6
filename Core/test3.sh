@@ -1,4 +1,4 @@
-IO=file
+IO=map
 BIN=bin/release/./ttree
 FILE=`cat .temp_path`btree
 C1=10k 
@@ -15,6 +15,7 @@ C1=10k
 C="$BIN $IO $FILE 0\
         \
 	Insert,$C1,Cont\
+        MapReduce\
 	Search,$C1,Reset\
         \
 	Insert,$C1,Cont\
@@ -31,7 +32,9 @@ C="$BIN $IO $FILE 0\
 	Search,$C1,Cont\
 	Antisearch,$C1,Reset\
 	Search,$C1,Cont\
-	Search,$C1,Cont"
+	Search,$C1,Cont\
+        \
+        MapReduce"
 echo $C
 $C
 

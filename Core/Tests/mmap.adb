@@ -21,7 +21,8 @@ with DB.Types.Times;
 
 with DB.Utils.Traceback;
 
-procedure MMap is
+procedure MMap
+is
    Max_Key_Size   : constant := 2 + 1000 + 8 
                                 ;--+ 1; -- to enforce heaped map
    Max_Value_Size : constant := 8;

@@ -4,19 +4,16 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
-with DB.Locks.Mutexes;
+with Ada.Text_IO; use Ada.Text_IO;
 
 procedure DB.Gen_BTrees.Gen_Sequential_Map_Reduce
-  (Tree               : in out Tree_Type;
-   Transaction        : in out Transaction_Type'Class;
-   Cursor             : in out Cursor_Type;
-   Element            :    out Element_Type;
-   State              :    out Result_Type)
+  (Tree        : in out Tree_Type;
+   Transaction : in out Transaction_Type'Class;
+   Cursor      : in out Cursor_Type;
+   Element     :    out Element_Type;
+   State       :    out Result_Type)
 is
    Concurrency_Degree : constant := 15;
-
-   Global_Mutex : Locks.Mutexes.Mutex_Type;
-   Global_Element      : Element_Type := Neutral_Element;
 
    ----------
    -- A queue for the tasks. See below in task-coordination for its use.
@@ -30,12 +27,13 @@ is
       protected Queue is
          function Top return Item_Type;
          entry Put (Item : in Item_Type);
-         entry Pop (Item : out Item_Type);
          entry Pop_When_Equal (Item_Type);
+         procedure Unlock;
       private
-         Arr   : Array_Type;
-         Head  : Index_Type := Index_Type'First;
-         Tail  : Index_Type := Index_Type'First;
+         Locked : Boolean    := False;
+         Arr    : Array_Type;
+         Head   : Index_Type := Index_Type'First;
+         Tail   : Index_Type := Index_Type'First;
       end Queue;
    end Gen_Consumer_Queue;
 
@@ -49,24 +47,25 @@ is
             return Arr(Head);
          end Top;
 
-         entry Put (Item : in Item_Type) when Head /= Tail + 1 is
+         entry Put (Item : in Item_Type) when not Locked and Head /= Tail + 1 is
          begin
             Arr(Tail) := Item;
             Tail      := Tail + 1;
+            Locked    := True;
          end Put;
 
-         entry Pop (Item : out Item_Type) when Head /= Tail is
-         begin
-            Item := Arr(Head);
-            Head := Head + 1;
-         end Pop;
-
          entry Pop_When_Equal (for Item in Item_Type)
-            when Head /= Tail and then Arr(Head) = Item is
+            when not Locked and (Head /= Tail and then Arr(Head) = Item) is
          begin
-            Head := Head + 1;
-            Locks.Mutexes.Lock(Global_Mutex);
+            --Item := Arr(Head);
+            Head   := Head + 1;
+            Locked := True;
          end Pop_When_Equal;
+
+         procedure Unlock is
+         begin
+            Locked := False;
+         end Unlock;
       end Queue;
    end Gen_Consumer_Queue;
 
@@ -118,7 +117,6 @@ is
             if not Queue.Final then
                Item := Arr(Head);
                Head := Head + 1;
-               Locks.Mutexes.Lock(Global_Mutex);
             end if;
             Final := Queue.Final;
          end Pop;
@@ -170,6 +168,7 @@ is
    end Consumer_Type;
 
    type Consumer_Index_Type is mod Consumer_ID_Type'Modulus + 1;
+   pragma Assert (Consumer_Index_Type'Modulus = 2**Consumer_Index_Type'Size);
    -- To have Consumer_ID_Type'Modulus slots in the queue, we need to have
    -- an index with Consumer_ID_Type'Modulus + 1 values.
    package Consumer_Queue is new Gen_Consumer_Queue
@@ -191,27 +190,25 @@ is
       loop
          declare
          begin
-            Key_Value_Queue.Queue.Pop(KV, Final); -- Locks Global_Mutex
-            exit when Final;
             Consumer_Queue.Queue.Put(Consumer_ID);
-            -- Consumer_Queue.Queue has space for exactly every consumer,
-            -- this guarantees that Put is not blocking. Hence, we have
-            -- no deadlock.
-            Locks.Mutexes.Unlock(Global_Mutex);
+            Key_Value_Queue.Queue.Pop(KV, Final);
+            Consumer_Queue.Queue.Unlock;
+            exit when Final;
+            Consumer_Queue.Queue.Unlock;
          exception
             when others =>
-               Locks.Mutexes.Unlock(Global_Mutex);
+               Consumer_Queue.Queue.Unlock;
                raise;
          end;
          declare
-            Right : constant Element_Type := Map(KV.Key, KV.Value);
+            Right : Element_Type := Map(KV.Key, KV.Value);
          begin
-            Consumer_Queue.Queue.Pop_When_Equal(Consumer_ID); -- Locks Global_M.
+            Consumer_Queue.Queue.Pop_When_Equal(Consumer_ID);
             Reduce(Element, Right);
-            Locks.Mutexes.Unlock(Global_Mutex);
+            Consumer_Queue.Queue.Unlock;
          exception
             when others =>
-               Locks.Mutexes.Unlock(Global_Mutex);
+               Consumer_Queue.Queue.Unlock;
                raise;
          end;
       end loop;

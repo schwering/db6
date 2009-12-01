@@ -4,16 +4,17 @@ with Ada.Exceptions; use Ada.Exceptions;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Gen_BTrees;
 with IO_Dispatcher.Gen_Blob_Trees;
+with IO_Dispatcher.MMap;
 
 with DB.BTrees;
 with DB.Blob_Trees;
 
 with DB.Utils.Traceback;
 
-package body IO_Dispatcher is
-
-   procedure Dispatch is
-
+package body IO_Dispatcher
+is
+   procedure Dispatch
+   is
       ----------
       -- Helper types for procedure map.
 
@@ -95,7 +96,9 @@ package body IO_Dispatcher is
                 (New_String("blob_direct"),  Direct_Blob'Access),
                 (New_String("blob_file"),    File_Blob'Access),
                 (New_String("blob_filesl"),  File_SL_Blob'Access),
-                (New_String("blob_memory"),  Memory_Blob'Access)
+                (New_String("blob_memory"),  Memory_Blob'Access),
+
+                (New_String("map"),          MMap'Access)
                 );
 
       IO_Name : constant String := Args.Pop_Argument(1);

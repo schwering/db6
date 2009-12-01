@@ -4,6 +4,8 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
+with DB.Gen_BTrees.Gen_Sequential_Map_Reduce;
+
 package body DB.Tables.Maps is
 
    function New_RO_Transaction
@@ -551,20 +553,16 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
-            V : Types.Values.Bounded.String_Type;
          begin
-            V := Value.To_Bounded;
-            BTrees.Insert(Map.Short_Tree, Key, V,
+            BTrees.Insert(Map.Short_Tree, Key, To_Bounded(Value),
                           BTrees.Count_Type(Position), S);
             State := To_State(S);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
-            V : Types.Values.Unbounded.String_Type;
          begin
-            V := Value.To_Unbounded;
-            Blob_Trees.Insert(Map.Long_Tree, Key, V,
+            Blob_Trees.Insert(Map.Long_Tree, Key, To_Unbounded(Value),
                               Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
          end;
@@ -585,21 +583,19 @@ package body DB.Tables.Maps is
       if Map.Short then
          declare
             S : BTrees.Result_Type;
-            V : Types.Values.Bounded.String_Type;
          begin
-            V := Value.To_Bounded;
             BTrees.Insert(Map.Short_Tree, Transaction.Short_Transaction,
-                          Key, V, BTrees.Count_Type(Position), S);
+                          Key, To_Bounded(Value), BTrees.Count_Type(Position),
+                          S);
             State := To_State(S);
          end;
       else
          declare
             S : Blob_Trees.Result_Type;
-            V : Types.Values.Unbounded.String_Type;
          begin
-            V := Value.To_Unbounded;
             Blob_Trees.Insert(Map.Long_Tree, Transaction.Long_Transaction,
-                              Key, V, Blob_Trees.Count_Type(Position), S);
+                              Key, To_Unbounded(Value),
+                              Blob_Trees.Count_Type(Position), S);
             State := To_State(S);
          end;
       end if;
@@ -1143,6 +1139,92 @@ package body DB.Tables.Maps is
          end;
       end if;
    end Clusterize;
+
+
+   procedure Gen_Random_Map_Reduce
+     (Map         : in out Map_Type;
+      Transaction : in out Transaction_Type'Class;
+      Cursor      : in out Cursor_Type;
+      Element     :    out Element_Type;
+      Value_Impl  : in     Value_Type'Class;
+      State       :    out Result_Type) is
+   begin
+      if Map.Short then
+         declare
+            function Map_Function_Wrapper
+              (Key   : Key_Type;
+               Value : Types.Values.Bounded.String_Type)
+               return Element_Type
+            is
+               V : Value_Type'Class := Value_Impl;
+            begin
+               V := From_Bounded(Value);
+               return Map_Function(Key, V);
+            end Map_Function_Wrapper;
+
+            procedure Map_Reduce is new BTrees.Gen_Sequential_Map_Reduce
+              (Element_Type, Neutral_Element, Map_Function_Wrapper, Reduce);
+
+            S : BTrees.Result_Type;
+         begin
+            if Transaction in RO_Transaction_Type'Class then
+               Map_Reduce(Map.Short_Tree,
+                          RO_Transaction_Type(Transaction).Short_Transaction,
+                          Cursor.Short_Cursor, Element, S);
+            else
+               Map_Reduce(Map.Short_Tree,
+                          RW_Transaction_Type(Transaction).Short_Transaction,
+                          Cursor.Short_Cursor, Element, S);
+            end if;
+            State := To_State(S);
+         end;
+      else
+         raise Tree_Error;
+      end if;
+   end Gen_Random_Map_Reduce;
+
+
+   procedure Gen_Sequential_Map_Reduce
+     (Map         : in out Map_Type;
+      Transaction : in out Transaction_Type'Class;
+      Cursor      : in out Cursor_Type;
+      Element     :    out Element_Type;
+      Value_Impl  : in     Value_Type'Class;
+      State       :    out Result_Type) is
+   begin
+      if Map.Short then
+         declare
+            function Map_Function_Wrapper
+              (Key   : Key_Type;
+               Value : Types.Values.Bounded.String_Type)
+               return Element_Type
+            is
+               V : Value_Type'Class := Value_Impl;
+            begin
+               V := From_Bounded(Value);
+               return Map_Function(Key, V);
+            end Map_Function_Wrapper;
+
+            procedure Map_Reduce is new BTrees.Gen_Sequential_Map_Reduce
+              (Element_Type, Neutral_Element, Map_Function_Wrapper, Reduce);
+
+            S : BTrees.Result_Type;
+         begin
+            if Transaction in RO_Transaction_Type'Class then
+               Map_Reduce(Map.Short_Tree,
+                          RO_Transaction_Type(Transaction).Short_Transaction,
+                          Cursor.Short_Cursor, Element, S);
+            else
+               Map_Reduce(Map.Short_Tree,
+                          RW_Transaction_Type(Transaction).Short_Transaction,
+                          Cursor.Short_Cursor, Element, S);
+            end if;
+            State := To_State(S);
+         end;
+      else
+         raise Tree_Error;
+      end if;
+   end Gen_Sequential_Map_Reduce;
 
 end DB.Tables.Maps;
 

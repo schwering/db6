@@ -34,9 +34,9 @@ generic
           (Left    : in out Element_Type;
            Right   : in     Element_Type);
 procedure DB.Gen_BTrees.Gen_Sequential_Map_Reduce
-  (Tree               : in out Tree_Type;
-   Transaction        : in out Transaction_Type'Class;
-   Cursor             : in out Cursor_Type;
-   Element            :    out Element_Type;
-   State              :    out Result_Type);
+  (Tree        : in out Tree_Type;
+   Transaction : in out Transaction_Type'Class;
+   Cursor      : in out Cursor_Type;
+   Element     :    out Element_Type;
+   State       :    out Result_Type);
 

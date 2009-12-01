@@ -28,6 +28,20 @@ package body IO_Dispatcher.Jobs is
    end "=";
 
 
+   function Add
+     (Job_Map     : Map_Type;
+      Description : String;
+      Short_Job   : Short_Job_Type)
+      return Map_Type
+   is
+      New_Job_Map : Map_Type(Job_Map'First .. Job_Map'Last + 1);
+   begin
+      New_Job_Map(Job_Map'Range)    := Job_Map;
+      New_Job_Map(Job_Map'Last + 1) := (To_Description(Description), Short_Job);
+      return New_Job_Map;
+   end Add;
+
+
    function New_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;

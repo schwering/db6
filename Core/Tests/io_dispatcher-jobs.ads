@@ -20,6 +20,12 @@ package IO_Dispatcher.Jobs is
    function To_String (D : Description_Type) return String;
    function "=" (D, E : Description_Type) return Boolean;
 
+   function Add
+     (Job_Map     : Map_Type;
+      Description : String;
+      Short_Job   : Short_Job_Type)
+      return Map_Type;
+
    function New_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
