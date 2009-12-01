@@ -5,7 +5,10 @@
 -- Copyright 2008, 2009 Christoph Schwering
 
 with Ada.Text_IO; use Ada.Text_IO;
+
 package body DB.Gen_Heaps is
+
+   package SSE renames System.Storage_Elements;
 
    package body Info_BTree_Types is
 
@@ -440,26 +443,24 @@ package body DB.Gen_Heaps is
    function Data
      (Block    : IO.Blocks.Block_Type;
       Max_Size : IO.Blocks.Size_Type)
-      return System.Storage_Elements.Storage_Array
+      return SSE.Storage_Array
    is
       Size : constant IO.Blocks.Size_Type
            := Min(Max_Size, IO.Blocks.Block_Size);
       subtype Range_Type is IO.Blocks.Size_Type range 1 .. Size;
-      type Definite_Base_Block_Type is
-         new System.Storage_Elements.Storage_Array(Range_Type);
-      procedure Read is new IO.Blocks.Read
-         (Item_Type => Definite_Base_Block_Type);
+      type Definite_Base_Block_Type is new SSE.Storage_Array(Range_Type);
+      procedure Read is new IO.Blocks.Read(Definite_Base_Block_Type);
       Arr    : Definite_Base_Block_Type;
       Cursor : IO.Blocks.Cursor_Type;
    begin
       Read(Block, Cursor, Arr);
-      return System.Storage_Elements.Storage_Array(Arr);
+      return SSE.Storage_Array(Arr);
    end Data;
 
 
    procedure Set_Data
      (Block  : in out IO.Blocks.Block_Type;
-      Arr    : in     System.Storage_Elements.Storage_Array;
+      Arr    : in     SSE.Storage_Array;
       From   : in     IO.Blocks.Size_Type;
       Length :    out IO.Blocks.Size_Type)
    is
@@ -468,10 +469,8 @@ package body DB.Gen_Heaps is
       Length := Min(Arr'Last - From + 1, IO.Blocks.Block_Size);
       declare
          subtype Range_Type is IO.Blocks.Size_Type range From .. From+Length-1;
-         type Definite_Base_Block_Type is
-            new System.Storage_Elements.Storage_Array(Range_Type);
-         procedure Write is new IO.Blocks.Write
-            (Item_Type => Definite_Base_Block_Type);
+         type Definite_Base_Block_Type is new SSE.Storage_Array(Range_Type);
+         procedure Write is new IO.Blocks.Write(Definite_Base_Block_Type);
          Cursor : IO.Blocks.Cursor_Type;
       begin
          Write(Block, Cursor, Definite_Base_Block_Type(Arr(Range_Type)));
@@ -563,7 +562,7 @@ package body DB.Gen_Heaps is
       declare
          use type IO.Blocks.Size_Type;
          Addr : Address_Type := Address;
-         Arr  : System.Storage_Elements.Storage_Array(1 .. Length);
+         Arr  : SSE.Storage_Array(1 .. Length);
       begin
          while Length > 0 loop
             declare
@@ -577,7 +576,7 @@ package body DB.Gen_Heaps is
                   Block_IO.Read(Heap.File, Addr, Block);
                end if;
                declare
-                  Sub_Arr : constant System.Storage_Elements.Storage_Array
+                  Sub_Arr : constant SSE.Storage_Array
                           := Data(Block, Length);
                   From    : constant IO.Blocks.Size_Type
                           := Arr'First + Arr'Length - Length;
@@ -938,9 +937,8 @@ package body DB.Gen_Heaps is
 
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
-      Arr     : constant System.Storage_Elements.Storage_Array
-              := To_Storage_Array(Item);
-      Length  : constant IO.Blocks.Size_Type                   := Arr'Length;
+      Arr     : constant SSE.Storage_Array   := To_Storage_Array(Item);
+      Length  : constant IO.Blocks.Size_Type := Arr'Length;
    begin
       declare
          Chunk_Length : Length_Type;

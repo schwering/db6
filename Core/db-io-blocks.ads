@@ -17,7 +17,7 @@ package DB.IO.Blocks is
    Long_Block_Size : constant := Block_Size * 5 / 4;
 
    type    Base_Position_Type is range 0 .. Long_Block_Size;
-   for Base_Position_Type'Size use 16;
+   for     Base_Position_Type'Size use 16;
    subtype Position_Type      is Base_Position_Type range 0 .. Block_Size;
    subtype Long_Position_Type is Base_Position_Type;
 

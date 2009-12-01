@@ -605,7 +605,7 @@ package body Cursors is
          pragma Inline (Initialize_Output_If_Successful_And_Bounds_Satisfied);
       begin
          if (not Cursor.Final and State = Success) and then
-         Has_Satisfied_Bounds(Cursor) then
+            Has_Satisfied_Bounds(Cursor) then
             State := Success;
             Key   := Nodes.Key(Cursor.Node, Cursor.Index);
             Value := Nodes.Value(Cursor.Node, Cursor.Index);

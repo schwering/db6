@@ -167,7 +167,6 @@ package DB.Gen_Heaps is
      (Heap : in out Heap_Type);
 
 private
-   type Offset_Type is mod IO.Blocks.Block_Size - 1;
    type Length_Type is mod 2**64;
    type Chunk_State_Type is (Free, Used);
    type Chunk_Info_Type is
@@ -224,7 +223,6 @@ private
          Value   : in     Value_Type);
    end Info_BTree_Types;
 
-
    package Info_BTrees is new Gen_BTrees
      (Key_Type                      => Info_BTree_Types.Key_Type,
       Key_Context_Type              => Info_BTree_Types.Key_Context_Type,
@@ -241,6 +239,7 @@ private
       Is_Context_Free_Serialization => True,
       Storage_Pool                  => Storage_Pool,
       Block_IO                      => Block_IO);
+
 
    package Free_BTree_Types is
       type Key_Type is
