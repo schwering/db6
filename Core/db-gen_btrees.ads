@@ -11,12 +11,22 @@
 -- read-only and read-write transactions. Transactions acquire locks.
 -- The implementation of the locks is in the generic Block_IO parameter.
 --
--- The Key_Context_Type and Value_Context_Type can be used for compression, for
--- example. This package guarantees that if the entries E_1 .. E_N are the
--- entries of a node, E_I is written before E_{I+1} for all I in 1 .. E_N.
+-- This package guarantees that if the entries E_1 .. E_N are the entries of a
+-- node, E_I is written before E_{I+1} for all I in 1 .. N.
 -- Howevever, entries are read randomly!
--- This must be taken in account by the formal Read/Write_Key and
--- Read/Write_Value operations.
+-- The Key/Value_Context_Types can be used for compression, for exmaple. In
+-- both, the reading and writing case, it is guaranteed that a context object is
+-- used only for one node, not more, and either for reading or writing, not both
+-- operation types. A context object handed to a Read/Write_Key/Value is either
+-- initialized with its default values or has been modified by a previous
+-- Read/Write_Key/Value call. Since entries E_1 .. E_N are written in a strictly
+-- sequentially, it is guaranteed that the write operation of E_1 is performed
+-- with a new context object and the following N - 1 write operations are with
+-- the same object.
+-- As a consequence, a trivial choice for the Key/Value_Context_Types is just
+-- null records.
+-- (Remind that in this case `written' does not mean that data is necessarily
+-- written to disk, it just means serialization of data.)
 --
 -- The Is_Context_Free_Serialization must be False if the count of bytes
 -- occupied by an entry depends on the other entries in a node.
@@ -24,7 +34,7 @@
 -- The effect of Is_Context_Free_Serialization being False is that the minimum
 -- node occupation is 0 instead of 3/8 (see below). The tree can still not
 -- degenerate to a list, because the minimum degree of each node is still 2.
--- 
+--
 -- Trivial choices for the Skip_Key and Skip_Value operations are mappings to
 -- Read_Key and Write_Key, respectively, just without returning the key or
 -- value.
