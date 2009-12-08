@@ -32,7 +32,7 @@ package DB.Blob_Trees is
 
    package Keys     renames DB.Types.Keys;
    package Values   renames DB.Types.Values.Bounded;
-   package Value_IO renames Values.Uncompressed;
+   package Value_IO renames Values.Parted;
 
    package Async_IO    renames DB.IO.Blocks.Asynchronous_IO.IO;
    package CFS_IO      renames DB.IO.Blocks.CFS_IO.IO;
@@ -48,21 +48,23 @@ package DB.Blob_Trees is
    package Gen_Wrappers is
 
       package Blob_Trees is new DB.Gen_Blob_Trees
-        (Key_Type           => Keys.Key_Type,
-         Key_Context_Type   => Keys.Context_Type,
-         Read_Key           => Keys.Read,
-         Skip_Key           => Keys.Skip,
-         Write_Key          => Keys.Write,
-         "="                => Keys."=",
-         "<="               => Keys."<=",
-         Value_Type         => Values.String_Type,
-         To_Storage_Array   => Value_IO.To_Storage_Array,
-         From_Storage_Array => Value_IO.From_Storage_Array,
-         Is_Context_Free_Serialization => 
-                               Keys.Is_Context_Free_Serialization and
-                               Value_IO.Is_Context_Free_Serialization,
-         Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
-         Block_IO           => Block_IO);
+        (Key_Type            => Keys.Key_Type,
+         Key_Context_Type    => Keys.Context_Type,
+         Read_Key            => Keys.Read,
+         Skip_Key            => Keys.Skip,
+         Write_Key           => Keys.Write,
+         "="                 => Keys."=",
+         "<="                => Keys."<=",
+         Value_Type          => Values.String_Type,
+         Value_Context_Type  => Value_IO.Context_Type,
+         Value_Size_Bound    => Value_IO.String_Size_Bound,
+         Read_Value_Context  => Value_IO.Read_Context,
+         Write_Value_Context => Value_IO.Write_Context,
+         Read_Part_Of_Value  => Value_IO.Read_Part_Of_String,
+         Write_Part_Of_Value => Value_IO.Write_Part_Of_String,
+         Is_Context_Free_Serialization => Keys.Is_Context_Free_Serialization,
+         Storage_Pool        => Root_Storage_Pool'Class(Global_Pool_Object),
+         Block_IO            => Block_IO);
 
 --      package Climb_Caches is new IO.Blocks.Gen_Climb_Caches(Block_IO);
 --      package Climb_Cached_Blob_Trees is new DB.Gen_Blob_Trees

@@ -30,7 +30,7 @@ package DB.IO.Blocks is
    subtype Block_Type      is Base_Block_Type(Index_Type);
    subtype Long_Block_Type is Base_Block_Type(Long_Index_Type);
 
-   type Cursor_Type is limited private;
+   type Cursor_Type (<>) is limited private;
 
 
    function To_Block
@@ -57,6 +57,11 @@ package DB.IO.Blocks is
    function Position
      (Cursor : Cursor_Type)
       return Base_Position_Type;
+
+   function Remaining_Space
+     (Block  : Base_Block_Type;
+      Cursor : Cursor_Type)
+      return Size_Type;
 
    function Bits_To_Units
      (Bits : Size_Type)
@@ -106,8 +111,9 @@ package DB.IO.Blocks is
       type Item_Type is private;
       type Array_Type is array (Index_Type) of Item_Type;
    function Size_Of_Array
-     (Arr : Array_Type;
-      To  : Index_Type'Base := Array_Type'Last)
+     (Arr  : Array_Type;
+      From : Index_Type;
+      To   : Index_Type'Base)
       return Size_Type;
 
    generic
@@ -118,7 +124,8 @@ package DB.IO.Blocks is
      (Block  : in out Base_Block_Type;
       Cursor : in out Cursor_Type;
       Arr    : in     Array_Type;
-      To     : in     Index_Type'Base := Array_Type'Last);
+      From   : in     Index_Type;
+      To     : in     Index_Type'Base);
 
    generic
       type Index_Type is (<>);
@@ -127,7 +134,8 @@ package DB.IO.Blocks is
    procedure Read_Array
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type;
-      Arr    :    out Array_Type;
+      Arr    : in out Array_Type;
+      From   : in     Index_Type;
       To     :    out Index_Type'Base);
 
 

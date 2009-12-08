@@ -6,9 +6,12 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with DB.Utils.Gen_Minimum;
+
 package body DB.Gen_Heaps is
 
-   package SSE renames System.Storage_Elements;
+   ----------
+   -- Info and Free BTree type packages.
 
    package body Info_BTree_Types is
 
@@ -56,9 +59,23 @@ package body DB.Gen_Heaps is
          Value   :    out Value_Type)
       is
          pragma Unreferenced (Context);
-         procedure Read is new IO.Blocks.Read(Value_Type);
+         procedure Read is new IO.Blocks.Read(Chunk_State_Type);
+         procedure Read is new IO.Blocks.Read(Length_Type);
+         procedure Read_A is new IO.Blocks.Read(Address_Type);
+         procedure Read_EA is new IO.Blocks.Read(Extended_Address_Type);
       begin
-         Read(Block, Cursor, Value);
+         Read(Block, Cursor, Value.State);
+         Read(Block, Cursor, Value.Length);
+         case Value.State is
+            when Used_First =>
+               Read_EA(Block, Cursor, Value.Succ);
+               Read_A(Block, Cursor, Value.Last);
+               Read_Context(Block, Cursor, Value.Context);
+            when Used_Cont =>
+               Read_EA(Block, Cursor, Value.Succ);
+            when Free =>
+               null;
+         end case;
       end Read_Value;
 
 
@@ -72,6 +89,7 @@ package body DB.Gen_Heaps is
          Read_Value(Context, Block, Cursor, Value);
       end Skip_Value;
 
+
       procedure Write_Value
         (Context : in out Value_Context_Type;
          Block   : in out IO.Blocks.Base_Block_Type;
@@ -79,9 +97,23 @@ package body DB.Gen_Heaps is
          Value   : in     Value_Type)
       is
          pragma Unreferenced (Context);
-         procedure Write is new IO.Blocks.Write(Value_Type);
+         procedure Write is new IO.Blocks.Write(Chunk_State_Type);
+         procedure Write is new IO.Blocks.Write(Length_Type);
+         procedure Write_A is new IO.Blocks.Write(Address_Type);
+         procedure Write_EA is new IO.Blocks.Write(Extended_Address_Type);
       begin
-         Write(Block, Cursor, Value);
+         Write(Block, Cursor, Value.State);
+         Write(Block, Cursor, Value.Length);
+         case Value.State is
+            when Used_First =>
+               Write_EA(Block, Cursor, Value.Succ);
+               Write_A(Block, Cursor, Value.Last);
+               Write_Context(Block, Cursor, Value.Context);
+            when Used_Cont =>
+               Write_EA(Block, Cursor, Value.Succ);
+            when Free =>
+               null;
+         end case;
       end Write_Value;
 
 
@@ -163,6 +195,7 @@ package body DB.Gen_Heaps is
          Read_Value(Context, Block, Cursor, Value);
       end Skip_Value;
 
+
       procedure Write_Value
         (Context : in out Value_Context_Type;
          Block   : in out IO.Blocks.Base_Block_Type;
@@ -197,24 +230,15 @@ package body DB.Gen_Heaps is
    end Free_BTree_Types;
 
 
+   ----------
+   -- Some small helpers.
+
    function Block_Identity
      (Block : IO.Blocks.Block_Type)
       return IO.Blocks.Block_Type is
    begin
       return Block;
    end Block_Identity;
-
-
-   procedure Create
-     (ID : in String)
-   is
-      File : Block_IO.File_Type;
-   begin
-      Block_IO.Create(ID, File);
-      Block_IO.Close(File);
-      Info_BTrees.Create(Info_Index_ID(ID));
-      Free_BTrees.Create(Free_Index_ID(ID));
-   end Create;
 
 
    function Chunk_Length
@@ -242,6 +266,14 @@ package body DB.Gen_Heaps is
    end Chunk_Length;
 
 
+   function "+" (Chunk_Length : Length_Type;
+                 Item_Size    : IO.Blocks.Size_Type)
+                 return Length_Type is
+   begin
+      return Chunk_Length + Length_Type(Item_Size);
+   end "+";
+
+
    function Succ
      (Address : Address_Type;
       Count   : Length_Type)
@@ -254,6 +286,54 @@ package body DB.Gen_Heaps is
       end loop;
       return Succ_Address;
    end Succ;
+
+
+   function Min is new Utils.Gen_Minimum(IO.Blocks.Size_Type);
+
+
+   function Result
+     (State : Info_BTrees.Result_Type)
+      return Result_Type is
+   begin
+      case State is
+         when Info_BTrees.Success =>
+            return Success;
+         when Info_BTrees.Failure =>
+            return Failure;
+         when Info_BTrees.Error =>
+            return Error;
+      end case;
+   end Result;
+
+
+   function Result
+     (State : Free_BTrees.Result_Type)
+      return Result_Type is
+   begin
+      case State is
+         when Free_BTrees.Success =>
+            return Success;
+         when Free_BTrees.Failure =>
+            return Failure;
+         when Free_BTrees.Error =>
+            return Error;
+      end case;
+   end Result;
+
+
+   ----------
+   -- The first meat! Creation etc.
+
+   procedure Create
+     (ID : in String)
+   is
+      File : Block_IO.File_Type;
+   begin
+      Block_IO.Create(ID, File);
+      Block_IO.Close(File);
+      Info_BTrees.Create(Info_Index_ID(ID));
+      Free_BTrees.Create(Free_Index_ID(ID));
+   end Create;
 
 
    procedure Initialize
@@ -302,6 +382,9 @@ package body DB.Gen_Heaps is
       Heap.Finalized := True;
    end Finalize;
 
+
+   ----------
+   -- Transaction procedures.
 
    function New_RO_Transaction
      (Heap : Heap_Type)
@@ -428,85 +511,8 @@ package body DB.Gen_Heaps is
    end Commit_Transaction;
 
 
-   function Min (A, B : IO.Blocks.Size_Type) return IO.Blocks.Size_Type
-   is
-      use type IO.Blocks.Size_Type;
-   begin
-      if A < B then
-         return A;
-      else
-         return B;
-      end if;
-   end Min;
-
-
-   function Data
-     (Block    : IO.Blocks.Block_Type;
-      Max_Size : IO.Blocks.Size_Type)
-      return SSE.Storage_Array
-   is
-      Size : constant IO.Blocks.Size_Type
-           := Min(Max_Size, IO.Blocks.Block_Size);
-      subtype Range_Type is IO.Blocks.Size_Type range 1 .. Size;
-      type Definite_Base_Block_Type is new SSE.Storage_Array(Range_Type);
-      procedure Read is new IO.Blocks.Read(Definite_Base_Block_Type);
-      Arr    : Definite_Base_Block_Type;
-      Cursor : IO.Blocks.Cursor_Type;
-   begin
-      Read(Block, Cursor, Arr);
-      return SSE.Storage_Array(Arr);
-   end Data;
-
-
-   procedure Set_Data
-     (Block  : in out IO.Blocks.Block_Type;
-      Arr    : in     SSE.Storage_Array;
-      From   : in     IO.Blocks.Size_Type;
-      Length :    out IO.Blocks.Size_Type)
-   is
-      use type IO.Blocks.Size_Type;
-   begin
-      Length := Min(Arr'Last - From + 1, IO.Blocks.Block_Size);
-      declare
-         subtype Range_Type is IO.Blocks.Size_Type range From .. From+Length-1;
-         type Definite_Base_Block_Type is new SSE.Storage_Array(Range_Type);
-         procedure Write is new IO.Blocks.Write(Definite_Base_Block_Type);
-         Cursor : IO.Blocks.Cursor_Type;
-      begin
-         Write(Block, Cursor, Definite_Base_Block_Type(Arr(Range_Type)));
-      end;
-   end Set_Data;
-
-
-   function Result
-     (State : Info_BTrees.Result_Type)
-      return Result_Type is
-   begin
-      case State is
-         when Info_BTrees.Success =>
-            return Success;
-         when Info_BTrees.Failure =>
-            return Failure;
-         when Info_BTrees.Error =>
-            return Error;
-      end case;
-   end Result;
-
-
-   function Result
-     (State : Free_BTrees.Result_Type)
-      return Result_Type is
-   begin
-      case State is
-         when Free_BTrees.Success =>
-            return Success;
-         when Free_BTrees.Failure =>
-            return Failure;
-         when Free_BTrees.Error =>
-            return Error;
-      end case;
-   end Result;
-
+   ----------
+   -- Wrappers for Get, Put, Append and Delete without Transactions.
 
    procedure Get
      (Heap    : in out Heap_Type;
@@ -522,82 +528,6 @@ package body DB.Gen_Heaps is
    exception
       when others =>
          Finish_Transaction(Heap, Transaction);
-         raise;
-   end Get;
-
-
-   procedure Get
-     (Heap        : in out Heap_Type;
-      Transaction : in out Transaction_Type'Class;
-      Address     : in     Address_Type;
-      Item        :    out Item_Type;
-      State       :    out Result_Type)
-   is
-      pragma Assert (Heap.Initialized);
-      pragma Assert (Transaction.Owning_Heap = Heap.Self);
-      Length : IO.Blocks.Size_Type;
-   begin
-      declare
-         use type Info_BTrees.Result_Type;
-         Pos : Info_BTrees.Count_Type;
-         St  : Info_BTrees.Result_Type;
-         CI  : Chunk_Info_Type;
-      begin
-         if Transaction in RW_Transaction_Type'Class then
-            Info_BTrees.Look_Up(Heap.Info_Tree,
-                              RW_Transaction_Type(Transaction).Info_Transaction,
-                              Address, CI, Pos, St);
-         else
-            Info_BTrees.Look_Up(Heap.Info_Tree,
-                              RO_Transaction_Type(Transaction).Info_Transaction,
-                              Address, CI, Pos, St);
-         end if;
-         if St /= Info_BTrees.Success or else CI.State /= Used then
-            State := Error;
-            return;
-         end if;
-         Length := IO.Blocks.Size_Type(CI.Length);
-      end;
-
-      declare
-         use type IO.Blocks.Size_Type;
-         Addr : Address_Type := Address;
-         Arr  : SSE.Storage_Array(1 .. Length);
-      begin
-         while Length > 0 loop
-            declare
-               Block : IO.Blocks.Block_Type;
-            begin
-               if Transaction in RW_Transaction_Type'Class then
-                  IO_Buffers.Read(Heap.File,
-                                  RW_Transaction_Type(Transaction).Buffer,
-                                  Addr, Block);
-               else
-                  Block_IO.Read(Heap.File, Addr, Block);
-               end if;
-               declare
-                  Sub_Arr : constant SSE.Storage_Array
-                          := Data(Block, Length);
-                  From    : constant IO.Blocks.Size_Type
-                          := Arr'First + Arr'Length - Length;
-                  To      : constant IO.Blocks.Size_Type
-                          := From + Sub_Arr'Length - 1;
-               begin
-                  Arr(From .. To) := Sub_Arr;
-                  Length          := Length - Sub_Arr'Length;
-               end;
-               Addr := Block_IO.Succ(Addr);
-            end;
-         end loop;
-         Item  := From_Storage_Array(Arr);
-         State := Success;
-      end;
-
-   exception
-      when others =>
-         pragma Warnings (Off);
-         State := Error;
-         pragma Warnings (On);
          raise;
    end Get;
 
@@ -624,62 +554,168 @@ package body DB.Gen_Heaps is
    end Put;
 
 
-   procedure Set_Used
+   procedure Append
      (Heap        : in out Heap_Type;
-      Transaction : in out RW_Transaction_Type'Class;
+      Item        : in     Item_Type;
       Address     : in     Address_Type;
-      Length      : in     IO.Blocks.Size_Type;
       State       :    out Result_Type)
    is
-      use type Info_BTrees.Result_Type;
-      Info : constant Chunk_Info_Type := (Used, Length_Type(Length));
-      Pos  : Info_BTrees.Count_Type;
-      St   : Info_BTrees.Result_Type;
+      Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
    begin
-      Info_BTrees.Insert(Heap.Info_Tree, Transaction.Info_Transaction,
-                         Address, Info, Pos, St);
-      if St /= Info_BTrees.Success then
-         State := Result(St);
-         return;
+      Start_Transaction(Heap, Transaction);
+      Append(Heap, Transaction, Item, Address, State);
+      if State = Success then
+         Commit_Transaction(Heap, Transaction);
+      else
+         Abort_Transaction(Heap, Transaction);
       end if;
-      State := Success;
+   exception
+      when others =>
+         Abort_Transaction(Heap, Transaction);
+         raise;
+   end Append;
+
+ 
+   procedure Delete
+     (Heap    : in out Heap_Type;
+      Address : in     Address_Type;
+      State   :    out Result_Type)
+   is
+      pragma Assert (Heap.Initialized);
+      Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
+   begin
+      Start_Transaction(Heap, Transaction);
+      Delete(Heap, Transaction, Address, State);
+      if State = Success then
+         Commit_Transaction(Heap, Transaction);
+      else
+         Abort_Transaction(Heap, Transaction);
+      end if;
+   exception
+      when others =>
+         Abort_Transaction(Heap, Transaction);
+         raise;
+   end Delete;
+
+
+   ----------
+   -- The real meat: the implementations of Get, Put, Append, Delete
+
+   procedure Get
+     (Heap        : in out Heap_Type;
+      Transaction : in out Transaction_Type'Class;
+      Address     : in     Address_Type;
+      Item        :    out Item_Type;
+      State       :    out Result_Type)
+   is
+      pragma Assert (Heap.Initialized);
+      pragma Assert (Transaction.Owning_Heap = Heap.Self);
+
+      procedure Read_Info
+        (Heap        : in out Heap_Type;
+         Transaction : in out Transaction_Type'Class;
+         Address     : in     Address_Type;
+         Info        :    out Chunk_Info_Type;
+         State       :    out Result_Type)
+      is
+         use type Info_BTrees.Result_Type;
+         Pos  : Info_BTrees.Count_Type;
+         St   : Info_BTrees.Result_Type;
+      begin
+         if Transaction in RW_Transaction_Type'Class then
+            Info_BTrees.Look_Up(Heap.Info_Tree,
+                              RW_Transaction_Type(Transaction).Info_Transaction,
+                              Address, Info, Pos, St);
+         else
+            Info_BTrees.Look_Up(Heap.Info_Tree,
+                              RO_Transaction_Type(Transaction).Info_Transaction,
+                              Address, Info, Pos, St);
+         end if;
+         if St /= Info_BTrees.Success or else Info.State = Free then
+            State := Error;
+         else
+            State := Success;
+         end if;
+      exception
+         when others =>
+            pragma Warnings (Off);
+            State := Error;
+            pragma Warnings (On);
+            raise;
+      end Read_Info;
+
+      procedure Read_Item_From_Chunk
+        (Heap          : in out Heap_Type;
+         Transaction   : in out Transaction_Type'Class;
+         First_Address : in     Address_Type;
+         Chunk_Length  : in     Length_Type;
+         Context       : in out Item_Context_Type;
+         Item          : in out Item_Type;
+         Done          :    out Boolean)
+      is
+         use type IO.Blocks.Size_Type;
+         use type IO.Blocks.Base_Position_Type;
+         Chunk_Size : constant IO.Blocks.Size_Type
+                    := IO.Blocks.Size_Type(Chunk_Length);
+         Read_Size  : IO.Blocks.Size_Type := 0;
+         Address    : Address_Type        := First_Address;
+      begin
+         Read_Size := 0;
+         loop
+            declare
+               Block  : IO.Blocks.Block_Type;
+               Cursor : IO.Blocks.Cursor_Type
+                      := IO.Blocks.New_Cursor(Block'First);
+            begin
+               if Transaction in RW_Transaction_Type'Class then
+                  IO_Buffers.Read(Heap.File,
+                                  RW_Transaction_Type(Transaction).Buffer,
+                                  Address, Block);
+               else
+                  Block_IO.Read(Heap.File, Address, Block);
+               end if;
+               loop
+                  Read_Part_Of_Item(Context, Block, Cursor, Item, Done);
+                  exit when not IO.Blocks.Is_Valid(Block, Cursor) or Done;
+               end loop;
+               Read_Size := Read_Size +
+                            IO.Blocks.Size_Type(IO.Blocks.Position(Cursor));
+               Address   := Block_IO.Succ(Address);
+               exit when Read_Size = Chunk_Size or Done;
+            end;
+         end loop;
+      end Read_Item_From_Chunk;
+
+      Current_Address : Address_Type := Address;
+      Context         : Item_Context_Type;
+   begin
+      loop
+         declare
+            Info : Chunk_Info_Type;
+            Done : Boolean;
+         begin
+            Read_Info(Heap, Transaction, Current_Address, Info, State);
+            if State /= Success then
+               return;
+            end if;
+            pragma Assert (Info.State = Used_First or Info.State = Used_Cont);
+            if Info.State = Used_First then
+               Context := Info.Context;
+            end if;
+            Read_Item_From_Chunk(Heap, Transaction, Current_Address,
+                                 Info.Length, Context, Item, Done);
+            exit when Done;
+            pragma Assert (Block_IO.Is_Valid_Address(Info.Succ));
+            Current_Address := Block_IO.To_Valid_Address(Info.Succ);
+         end;
+      end loop;
    exception
       when others =>
          pragma Warnings (Off);
          State := Error;
          pragma Warnings (On);
          raise;
-   end Set_Used;
-
-
-   procedure Unset_Used
-     (Heap        : in out Heap_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Address     : in     Address_Type;
-      Length      :    out Length_Type;
-      State       :    out Result_Type)
-   is
-      use type Info_BTrees.Result_Type;
-      Info : Chunk_Info_Type;
-      Pos  : Info_BTrees.Count_Type;
-      St   : Info_BTrees.Result_Type;
-   begin
-      Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
-                         Address, Info, Pos, St);
-      if St /= Info_BTrees.Success then
-         State  := Result(St);
-         Length := 0;
-         return;
-      end if;
-      Length := Info.Length;
-      State  := Success;
-   exception
-      when others =>
-         pragma Warnings (Off);
-         State := Error;
-         pragma Warnings (On);
-         raise;
-   end Unset_Used;
+   end Get;
 
 
    procedure Set_Free
@@ -705,12 +741,16 @@ package body DB.Gen_Heaps is
             return;
          end if;
       end;
+
       declare
          use type Info_BTrees.Result_Type;
-         Info : constant Chunk_Info_Type := (Free, Length);
+         Info : Chunk_Info_Type;
          Pos  : Info_BTrees.Count_Type;
          St   : Info_BTrees.Result_Type;
       begin
+         Info.State := Free;
+         Info.Length := Length;
+         -- rest of Info is not relevant
          Info_BTrees.Insert(Heap.Info_Tree, Transaction.Info_Transaction,
                             Address, Info, Pos, St);
          if St /= Info_BTrees.Success then
@@ -751,6 +791,7 @@ package body DB.Gen_Heaps is
             return;
          end if;
       end;
+
       declare
          use type Free_BTrees.Result_Type;
          Key : constant Free_BTree_Types.Key_Type := (Length, Address);
@@ -831,7 +872,7 @@ package body DB.Gen_Heaps is
          begin
             Info_BTrees.Next(Heap.Info_Tree, Transaction.Info_Transaction,
                              Cursor, Addr, Info, St);
-            if St /= Info_BTrees.Success or else Info.State = Used then
+            if St /= Info_BTrees.Success or else Info.State /= Free then
                State := Success;
                Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
                return;
@@ -880,6 +921,246 @@ package body DB.Gen_Heaps is
    end Unset_Free_Following;
 
 
+   procedure Put_Helper
+     (Heap            : in out Heap_Type;
+      Transaction     : in out RW_Transaction_Type'Class;
+      Context         : in out Item_Context_Type;
+      Item            : in     Item_Type;
+      Item_Size_Bound : in     IO.Blocks.Size_Type;
+      Chunk_State     : in     Chunk_State_Type;
+      Address         :    out Address_Type;
+      State           :    out Result_Type)
+   is
+
+      procedure Allocate_Chunk
+        (Heap            : in out Heap_Type;
+         Transaction     : in out RW_Transaction_Type'Class;
+         Item_Size_Bound : in     IO.Blocks.Size_Type;
+         Address         :    out Address_Type;
+         State           :    out Result_Type)
+      is
+
+         procedure Recycle_Free_Chunk
+           (Heap        : in out Heap_Type;
+            Transaction : in out RW_Transaction_Type'Class;
+            Min_Length  : in     Length_Type;
+            Address     :    out Address_Type;
+            Length      :    out Length_Type;
+            State       :    out Result_Type)
+         is
+            use type Free_BTrees.Result_Type;
+            LB     : constant Free_BTrees.Bound_Type
+                   := Free_BTrees.New_Bound(Free_BTrees.Greater_Or_Equal,
+                                            (Min_Length, Block_IO.First));
+            UB     : constant Free_BTrees.Bound_Type
+                   := Free_BTrees.Positive_Infinity_Bound;
+            Cursor : Free_BTrees.Cursor_Type
+                   := Free_BTrees.New_Cursor
+                       (Tree              => Heap.Free_Tree,
+                        Transaction       => Transaction.Free_Transaction,
+                        Thread_Safe       => False,
+                        Lower_Bound       => LB,
+                        Upper_Bound       => UB,
+                        Reverse_Direction => False);
+            Key    : Free_BTree_Types.Key_Type;
+            Val    : Free_BTree_Types.Value_Type;
+            St     : Free_BTrees.Result_Type;
+         begin
+            Free_BTrees.Next(Heap.Free_Tree, Transaction.Free_Transaction,
+                             Cursor, Key, Val, St);
+            Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
+            if St /= Free_BTrees.Success then
+               State  := Result(St);
+               Length := 0;
+               return;
+            end if;
+            Address := Key.Address;
+            Length  := Key.Length;
+            Unset_Free(Heap, Transaction, Address, Length, State);
+            if State /= Success then
+               return;
+            end if;
+         exception
+            when others =>
+               State := Error;
+               Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
+               raise;
+         end Recycle_Free_Chunk;
+
+         procedure Merge_Clipping_With_Next_Free_Chunk
+           (Heap            : in out Heap_Type;
+            Transaction     : in out RW_Transaction_Type'Class;
+            Address         : in     Address_Type;
+            Chunk_Length    : in     Length_Type;
+            Item_Size_Bound : in     IO.Blocks.Size_Type;
+            State           :    out Result_Type)
+         is
+            use type IO.Blocks.Size_Type;
+            Needed_Chunk_Length : constant Length_Type
+                                := Gen_Heaps.Chunk_Length(Item_Size_Bound);
+            Block_Count         : constant Length_Type
+                                := Needed_Chunk_Length /
+                                   Length_Type(IO.Blocks.Block_Size);
+            Free_Chunk_Length   : Length_Type
+                                := Chunk_Length - Needed_Chunk_Length;
+            Free_Address        : Address_Type
+                                := Succ(Address, Block_Count);
+         begin
+            Unset_Free_Following(Heap              => Heap,
+                                 Transaction       => Transaction,
+                                 Address           => Free_Address,
+                                 Reverse_Direction => False,
+                                 Length            => Free_Chunk_Length,
+                                 State             => State);
+            if State /= Success then
+               State := Error;
+               return;
+            end if;
+            if Free_Chunk_Length > 0 then
+               Set_Free(Heap, Transaction, Free_Address, Free_Chunk_Length,
+                        State);
+               if State /= Success then
+                  State := Error;
+                  return;
+               end if;
+            end if;
+         end Merge_Clipping_With_Next_Free_Chunk;
+
+         Chunk_Length : Length_Type;
+      begin
+         Recycle_Free_Chunk(Heap        => Heap,
+                            Transaction => Transaction,
+                            Min_Length  => Length_Type(Item_Size_Bound),
+                            Address     => Address,
+                            Length      => Chunk_Length,
+                            State       => State);
+         case State is
+            when Success =>
+               Merge_Clipping_With_Next_Free_Chunk
+                 (Heap            => Heap,
+                  Transaction     => Transaction,
+                  Address         => Address,
+                  Chunk_Length    => Chunk_Length,
+                  Item_Size_Bound => Item_Size_Bound,
+                  State           => State);
+            when Failure =>
+               IO_Buffers.Seek_New(Heap.File, Transaction.Buffer, Address);
+               State := Success;
+            when Error =>
+               null;
+         end case;
+      end Allocate_Chunk;
+
+      procedure Set_Used
+        (Heap        : in out Heap_Type;
+         Transaction : in out RW_Transaction_Type'Class;
+         Address     : in     Address_Type;
+         Chunk_State : in     Chunk_State_Type;
+         Item_Size   : in     IO.Blocks.Size_Type;
+         Context     : in     Item_Context_Type;
+         State       :    out Result_Type)
+      is
+         use type Info_BTrees.Result_Type;
+         Info : constant Chunk_Info_Type
+              := (State   => Chunk_State,
+                  Length  => Length_Type(Item_Size),
+                  Succ    => Block_IO.Invalid_Address,
+                  Last    => Address,
+                  Context => Context);
+         Pos  : Info_BTrees.Count_Type;
+         St   : Info_BTrees.Result_Type;
+      begin
+         Info_BTrees.Insert(Heap.Info_Tree, Transaction.Info_Transaction,
+                            Address, Info, Pos, St);
+         if St /= Info_BTrees.Success then
+            State := Result(St);
+            return;
+         end if;
+         State := Success;
+      exception
+         when others =>
+            pragma Warnings (Off);
+            State := Error;
+            pragma Warnings (On);
+            raise;
+      end Set_Used;
+
+      procedure Write_Item_To_Chunk
+        (Heap          : in out Heap_Type;
+         Transaction   : in out RW_Transaction_Type'Class;
+         First_Address : in     Address_Type;
+         Context       : in out Item_Context_Type;
+         Item          : in     Item_Type;
+         Written_Size  :    out IO.Blocks.Size_Type)
+      is
+         Address : Address_Type := First_Address;
+      begin
+         Written_Size := 0;
+         loop
+            declare
+               use type IO.Blocks.Size_Type;
+               use type IO.Blocks.Base_Position_Type;
+               Block     : IO.Blocks.Block_Type;
+               First_Pos : constant IO.Blocks.Base_Position_Type := Block'First;
+               Last_Pos  : IO.Blocks.Base_Position_Type;
+               Cursor    : IO.Blocks.Cursor_Type
+                         := IO.Blocks.New_Cursor(Block'First);
+               Done      : Boolean;
+            begin
+               loop
+                  Write_Part_Of_Item(Context, Block, Cursor, Item, Done);
+                  exit when not IO.Blocks.Is_Valid(Block, Cursor) or Done;
+               end loop;
+               IO_Buffers.Write(Heap.File, Transaction.Buffer, Address, Block);
+               Last_Pos     := IO.Blocks.Position(Cursor);
+               Written_Size := Written_Size +
+                               IO.Blocks.Size_Type(Last_Pos - First_Pos);
+               Address      := Block_IO.Succ(Address);
+               exit when Done;
+            end;
+         end loop;
+      end Write_Item_To_Chunk;
+
+      pragma Assert (Heap.Initialized);
+      pragma Assert (Transaction.Owning_Heap = Heap.Self);
+      use type IO.Blocks.Size_Type;
+      Written_Size : IO.Blocks.Size_Type;
+   begin
+      Allocate_Chunk(Heap            => Heap,
+                     Transaction     => Transaction,
+                     Item_Size_Bound => Item_Size_Bound,
+                     Address         => Address,
+                     State           => State);
+      if State /= Success then
+         State := Error;
+         return;
+      end if;
+
+      Write_Item_To_Chunk(Heap          => Heap,
+                          Transaction   => Transaction,
+                          First_Address => Address,
+                          Context       => Context,
+                          Item          => Item,
+                          Written_Size  => Written_Size);
+      pragma Assert (Written_Size <= Item_Size_Bound);
+
+      Set_Used(Heap, Transaction, Address, Chunk_State, Written_Size, Context,
+               State);
+      if State /= Success then
+         State := Error;
+         return;
+      end if;
+
+      State := Success;
+   exception
+      when others =>
+         pragma Warnings (Off);
+         State := Error;
+         pragma Warnings (On);
+         raise;
+   end Put_Helper;
+
+
    procedure Put
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
@@ -887,130 +1168,14 @@ package body DB.Gen_Heaps is
       Address     :    out Address_Type;
       State       :    out Result_Type)
    is
-
-      procedure Recycle_Free_Chunk
-        (Heap        : in out Heap_Type;
-         Transaction : in out RW_Transaction_Type'Class;
-         Min_Length  : in     Length_Type;
-         Address     :    out Address_Type;
-         Length      :    out Length_Type;
-         State       :    out Result_Type)
-      is
-         use type Free_BTrees.Result_Type;
-         LB     : constant Free_BTrees.Bound_Type
-                := Free_BTrees.New_Bound(Free_BTrees.Greater_Or_Equal,
-                                         (Min_Length, Block_IO.First));
-         UB     : constant Free_BTrees.Bound_Type
-                := Free_BTrees.Positive_Infinity_Bound;
-         Cursor : Free_BTrees.Cursor_Type
-                := Free_BTrees.New_Cursor
-                    (Tree              => Heap.Free_Tree,
-                     Transaction       => Transaction.Free_Transaction,
-                     Thread_Safe       => False,
-                     Lower_Bound       => LB,
-                     Upper_Bound       => UB,
-                     Reverse_Direction => False);
-         Key    : Free_BTree_Types.Key_Type;
-         Val    : Free_BTree_Types.Value_Type;
-         St     : Free_BTrees.Result_Type;
-      begin
-         Free_BTrees.Next(Heap.Free_Tree, Transaction.Free_Transaction,
-                          Cursor, Key, Val, St);
-         Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
-         if St /= Free_BTrees.Success then
-            State  := Result(St);
-            Length := 0;
-            return;
-         end if;
-         Address := Key.Address;
-         Length  := Key.Length;
-         Unset_Free(Heap, Transaction, Address, Length, State);
-         if State /= Success then
-            return;
-         end if;
-      exception
-         when others =>
-            State := Error;
-            Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
-            raise;
-      end Recycle_Free_Chunk;
-
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
-      Arr     : constant SSE.Storage_Array   := To_Storage_Array(Item);
-      Length  : constant IO.Blocks.Size_Type := Arr'Length;
+      Item_Size : constant IO.Blocks.Size_Type
+                := Gen_Heaps.Item_Size_Bound(Item);
+      Context   : Item_Context_Type;
    begin
-      declare
-         Chunk_Length : Length_Type;
-      begin
-         Recycle_Free_Chunk(Heap, Transaction, Length_Type(Length),
-                            Address, Chunk_Length, State);
-         case State is
-            when Success =>
-               -- Merge the clipping with the next free chunks
-               declare
-                  use type IO.Blocks.Size_Type;
-                  Needed_Chunk_Length : constant Length_Type
-                                      := Gen_Heaps.Chunk_Length(Length);
-                  Block_Count         : constant Length_Type
-                                      := Needed_Chunk_Length /
-                                         Length_Type(IO.Blocks.Block_Size);
-                  Free_Chunk_Length   : Length_Type
-                                      := Chunk_Length - Needed_Chunk_Length;
-                  Free_Address        : Address_Type
-                                      := Succ(Address, Block_Count);
-               begin
-                  Unset_Free_Following(Heap              => Heap,
-                                       Transaction       => Transaction,
-                                       Address           => Free_Address,
-                                       Reverse_Direction => False,
-                                       Length            => Free_Chunk_Length,
-                                       State             => State);
-                  if State /= Success then
-                     State := Error;
-                     return;
-                  end if;
-                  if Free_Chunk_Length > 0 then
-                     Set_Free(Heap, Transaction, Free_Address,
-                              Free_Chunk_Length, State);
-                     if State /= Success then
-                        State := Error;
-                        return;
-                     end if;
-                  end if;
-               end;
-            when Failure =>
-               IO_Buffers.Seek_New(Heap.File, Transaction.Buffer, Address);
-            when Error =>
-               return;
-         end case;
-      end;
-
-      Set_Used(Heap, Transaction, Address, Length, State);
-      if State /= Success then
-         State := Error;
-         return;
-      end if;
-      declare
-         use type IO.Blocks.Size_Type;
-         Block_Address    : Address_Type := Address;
-         Remaining_Length : IO.Blocks.Size_Type         := Arr'Length;
-      begin
-         while Remaining_Length > 0 loop
-            declare
-               Block  : IO.Blocks.Block_Type;
-               Length : IO.Blocks.Size_Type;
-            begin
-               Set_Data(Block, Arr, Arr'First + Arr'Length - Remaining_Length,
-                        Length);
-               Remaining_Length := Remaining_Length - Length;
-               IO_Buffers.Write(Heap.File, Transaction.Buffer, Block_Address,
-                                Block);
-               Block_Address := Block_IO.Succ(Block_Address);
-            end;
-         end loop;
-      end;
-      State := Success;
+      Put_Helper(Heap, Transaction, Context, Item, Item_Size, Used_First,
+                 Address, State);
    exception
       when others =>
          pragma Warnings (Off);
@@ -1020,26 +1185,242 @@ package body DB.Gen_Heaps is
    end Put;
 
 
-   procedure Delete
-     (Heap    : in out Heap_Type;
-      Address : in     Address_Type;
-      State   :    out Result_Type)
+   procedure Append
+     (Heap        : in out Heap_Type;
+      Transaction : in out RW_Transaction_Type'Class;
+      Item        : in     Item_Type;
+      Address     : in     Address_Type;
+      State       :    out Result_Type)
    is
+      procedure Fill_Last_Chunk
+        (Heap              : in out Heap_Type;
+         Transaction       : in out RW_Transaction_Type'Class;
+         Context           :    out Item_Context_Type;
+         Item              : in     Item_Type;
+         Item_Size         : in     IO.Blocks.Size_Type;
+         Address           : in     Address_Type;
+         Written_Size      :    out IO.Blocks.Size_Type;
+         Done              :    out Boolean;
+         State             :    out Result_Type)
+      is
+         use type Info_BTrees.Result_Type;
+         use type Address_Type;
+         Info : Chunk_Info_Type;
+         Pos  : Info_BTrees.Count_Type;
+         St   : Info_BTrees.Result_Type;
+         Last : Address_Type;
+      begin
+         Info_BTrees.Look_Up(Heap.Info_Tree, Transaction.Info_Transaction,
+                             Address, Info, Pos, St);
+         if St /= Info_BTrees.Success then
+            State := Result(St);
+            pragma Warnings (Off);
+            return;
+            pragma Warnings (On);
+         end if;
+         Last    := Info.Last;
+         Context := Info.Context;
+         if Last /= Address then
+            Info_BTrees.Look_Up(Heap.Info_Tree, Transaction.Info_Transaction,
+                                Address, Info, Pos, St);
+         end if;
+         declare
+            use type IO.Blocks.Base_Position_Type;
+            First_Pos : constant IO.Blocks.Base_Position_Type
+                      := IO.Blocks.Base_Position_Type(
+                          ((Info.Length mod Length_Type(IO.Blocks.Block_Size)) +
+                           Length_Type(1)));
+            Cursor    : IO.Blocks.Cursor_Type
+                      := IO.Blocks.New_Cursor(First_Pos);
+            Block     : IO.Blocks.Block_Type;
+         begin
+            IO_Buffers.Read(Heap.File, Transaction.Buffer, Address, Block);
+            loop
+               Write_Part_Of_Item(Context, Block, Cursor, Item, Done);
+               exit when not IO.Blocks.Is_Valid(Block, Cursor) or Done;
+            end loop;
+            IO_Buffers.Write(Heap.File, Transaction.Buffer, Address, Block);
+            Written_Size := IO.Blocks.Size_Type(IO.Blocks.Position(Cursor) -
+                                                First_Pos);
+         end;
+      end Fill_Last_Chunk;
+
+      procedure Update_Info
+        (Heap                     : in out Heap_Type;
+         Transaction              : in out RW_Transaction_Type'Class;
+         Address                  : in     Address_Type;
+         Size_Added_To_Last_Chunk : in     IO.Blocks.Size_Type;
+         Context                  : in     Item_Context_Type;
+         State                    :    out Result_Type)
+      is
+         use type Info_BTrees.Result_Type;
+         use type IO.Blocks.Size_Type;
+         use type Address_Type;
+         Last_Is_First : Boolean;
+         Info          : Chunk_Info_Type;
+         Pos           : Info_BTrees.Count_Type;
+         St            : Info_BTrees.Result_Type;
+      begin
+         Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
+                            Address, Info, Pos, St);
+         if St /= Info_BTrees.Success then
+            State := Result(St);
+            return;
+         end if;
+         pragma Assert (Info.State = Used_First);
+
+         Last_Is_First := Info.Last = Address;
+
+         Info.Context := Context;
+         if Size_Added_To_Last_Chunk > 0 and Last_Is_First then
+            Info.Length := Info.Length + Size_Added_To_Last_Chunk;
+         end if;
+         Info_BTrees.Insert(Heap.Info_Tree, Transaction.Info_Transaction,
+                            Address, Info, Pos, St);
+         if St /= Info_BTrees.Success then
+            State := Result(St);
+            return;
+         end if;
+
+         -- If the item occupies more than one chunk and if data has been
+         -- appended to the last chunk, we need to update its length info.
+         if Size_Added_To_Last_Chunk > 0 and not Last_Is_First then
+            Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
+                               Address, Info, Pos, St);
+            if St /= Info_BTrees.Success then
+               State := Result(St);
+               return;
+            end if;
+            pragma Assert (Info.State = Used_Cont);
+
+            Info.Length := Info.Length + Size_Added_To_Last_Chunk;
+            Info_BTrees.Insert(Heap.Info_Tree, Transaction.Info_Transaction,
+                               Address, Info, Pos, St);
+            if St /= Info_BTrees.Success then
+               State := Result(St);
+               return;
+            end if;
+         end if;
+
+         State := Success;
+      exception
+         when others =>
+            pragma Warnings (Off);
+            State := Error;
+            pragma Warnings (On);
+            raise;
+      end Update_Info;
+
+      procedure Update_Info
+        (Heap                      : in out Heap_Type;
+         Transaction               : in out RW_Transaction_Type'Class;
+         Address                   : in     Address_Type;
+         Size_Added_To_First_Chunk : in     IO.Blocks.Size_Type;
+         New_Chunk_Address         : in     Address_Type;
+         Context                   : in     Item_Context_Type;
+         State                     :    out Result_Type)
+      is
+         use type Info_BTrees.Result_Type;
+         use type Address_Type;
+         Last_Is_First : Boolean;
+         Info          : Chunk_Info_Type;
+         Pos           : Info_BTrees.Count_Type;
+         St            : Info_BTrees.Result_Type;
+      begin
+         Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
+                            Address, Info, Pos, St);
+         if St /= Info_BTrees.Success then
+            State := Result(St);
+            return;
+         end if;
+         pragma Assert (Info.State = Used_First);
+
+         Last_Is_First := Info.Last = Address;
+
+         if not Last_Is_First then
+            declare
+               Last_Info : Chunk_Info_Type;
+            begin
+               Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
+                                  Info.Last, Last_Info, Pos, St);
+               if St /= Info_BTrees.Success then
+                  State := Result(St);
+                  return;
+               end if;
+               pragma Assert (Info.State = Used_Cont);
+
+               Last_Info.Length := Last_Info.Length + Size_Added_To_First_Chunk;
+               Last_Info.Succ := Block_IO.To_Address(New_Chunk_Address);
+               Info_BTrees.Insert(Heap.Info_Tree, Transaction.Info_Transaction,
+                                  Info.Last, Last_Info, Pos, St);
+               if St /= Info_BTrees.Success then
+                  State := Result(St);
+                  return;
+               end if;
+            end;
+         end if;
+
+         if Last_Is_First then
+            Info.Length  := Info.Length + Size_Added_To_First_Chunk;
+         end if;
+         Info.Last    := New_Chunk_Address;
+         Info.Context := Context;
+         Info_BTrees.Insert(Heap.Info_Tree, Transaction.Info_Transaction,
+                            Address, Info, Pos, St);
+         if St /= Info_BTrees.Success then
+            State := Result(St);
+            return;
+         end if;
+         State := Success;
+      exception
+         when others =>
+            pragma Warnings (Off);
+            State := Error;
+            pragma Warnings (On);
+            raise;
+      end Update_Info;
+
       pragma Assert (Heap.Initialized);
-      Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
+      pragma Assert (Transaction.Owning_Heap = Heap.Self);
+      use type IO.Blocks.Size_Type;
+      Context                  : Item_Context_Type;
+      Item_Size_Bound          : IO.Blocks.Size_Type;
+      Size_Added_To_Last_Chunk : IO.Blocks.Size_Type;
+      Done                     : Boolean;
    begin
-      Start_Transaction(Heap, Transaction);
-      Delete(Heap, Transaction, Address, State);
-      if State = Success then
-         Commit_Transaction(Heap, Transaction);
-      else
-         Abort_Transaction(Heap, Transaction);
+      Item_Size_Bound := Gen_Heaps.Item_Size_Bound(Item);
+      Fill_Last_Chunk(Heap, Transaction, Context, Item, Item_Size_Bound,
+                      Address, Size_Added_To_Last_Chunk, Done, State);
+      if State /= Success then
+         return;
+      end if;
+      if not Done then
+         pragma Assert (Size_Added_To_Last_Chunk <= Item_Size_Bound);
+         if Size_Added_To_Last_Chunk = Item_Size_Bound then
+            Update_Info(Heap, Transaction, Address, Size_Added_To_Last_Chunk,
+                        Context, State);
+         elsif Size_Added_To_Last_Chunk < Item_Size_Bound then
+            declare
+               New_Chunk_Address : Address_Type;
+            begin
+               Put_Helper(Heap, Transaction, Context, Item,
+                          Item_Size_Bound - Size_Added_To_Last_Chunk,
+                          Used_Cont, New_Chunk_Address, State);
+               if State /= Success then
+                  return;
+               end if;
+               Update_Info(Heap, Transaction, Address, Item_Size_Bound,
+                           New_Chunk_Address, Context, State);
+            end;
+         end if;
       end if;
    exception
       when others =>
-         Abort_Transaction(Heap, Transaction);
+         pragma Warnings (Off);
+         State := Error;
+         pragma Warnings (On);
          raise;
-   end Delete;
+   end Append;
 
 
    procedure Delete
@@ -1048,39 +1429,81 @@ package body DB.Gen_Heaps is
       Address     : in     Address_Type;
       State       :    out Result_Type)
    is
+
+      procedure Delete_Info
+        (Heap        : in out Heap_Type;
+         Transaction : in out RW_Transaction_Type'Class;
+         Address     : in     Address_Type;
+         Info        :    out Chunk_Info_Type;
+         State       :    out Result_Type)
+      is
+         use type Info_BTrees.Result_Type;
+         Pos  : Info_BTrees.Count_Type;
+         St   : Info_BTrees.Result_Type;
+      begin
+         Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
+                            Address, Info, Pos, St);
+         if St /= Info_BTrees.Success or else Info.State = Free then
+            State := Error;
+         else
+            State := Success;
+         end if;
+      exception
+         when others =>
+            pragma Warnings (Off);
+            State := Error;
+            pragma Warnings (On);
+            raise;
+      end Delete_Info;
+
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
       Chunk_Address : Address_Type := Address;
-      Length        : Length_Type;
    begin
-      -- Remove from free index
-      Unset_Used(Heap, Transaction, Address, Length, State);
-      if State /= Success then
-         return;
-      end if;
-      Length := Chunk_Length(Length);
-      -- Prepare merge with next blocks
-      Unset_Free_Following(Heap              => Heap,
-                           Transaction       => Transaction,
-                           Address           => Chunk_Address,
-                           Reverse_Direction => False,
-                           Length            => Length,
-                           State             => State);
-      if State /= Success then
-         return;
-      end if;
-      -- Prepare merge with previous blocks
-      Unset_Free_Following(Heap              => Heap,
-                           Transaction       => Transaction,
-                           Address           => Chunk_Address,
-                           Reverse_Direction => True,
-                           Length            => Length,
-                           State             => State);
-      if State /= Success then
-         return;
-      end if;
-      -- Finally set as free
-      Set_Free(Heap, Transaction, Chunk_Address, Length, State);
+      loop
+         declare
+            Info              : Chunk_Info_Type;
+            Free_Chunk_Length : Length_Type;
+         begin
+            -- Remove from free index
+            Delete_Info(Heap, Transaction, Chunk_Address, Info, State);
+            if State /= Success then
+               return;
+            end if;
+            pragma Assert (Info.State = Used_First or Info.State = Used_Cont);
+
+            Free_Chunk_Length := Chunk_Length(Info.Length);
+
+            -- Prepare merge with next blocks
+            Unset_Free_Following(Heap              => Heap,
+                                 Transaction       => Transaction,
+                                 Address           => Chunk_Address,
+                                 Reverse_Direction => False,
+                                 Length            => Free_Chunk_Length,
+                                 State             => State);
+            if State /= Success then
+               return;
+            end if;
+
+            -- Prepare merge with previous blocks
+            Unset_Free_Following(Heap              => Heap,
+                                 Transaction       => Transaction,
+                                 Address           => Chunk_Address,
+                                 Reverse_Direction => True,
+                                 Length            => Free_Chunk_Length,
+                                 State             => State);
+            if State /= Success then
+               return;
+            end if;
+
+            -- Finally set as free
+            Set_Free(Heap, Transaction, Chunk_Address, Free_Chunk_Length,
+                     State);
+
+            exit when not Block_IO.Is_Valid_Address(Info.Succ);
+            Chunk_Address := Block_IO.To_Valid_Address(Info.Succ);
+         end;
+      end loop;
    exception
       when others =>
          pragma Warnings (Off);

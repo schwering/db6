@@ -447,21 +447,25 @@ private
       Block_IO           => Block_IO);
 
    package Blob_Trees is new Gen_Blob_Trees
-     (Key_Type           => Types.Keys.Key_Type,
-      Key_Context_Type   => Types.Keys.Context_Type,
-      Read_Key           => Types.Keys.Read,
-      Skip_Key           => Types.Keys.Skip,
-      Write_Key          => Types.Keys.Write,
-      "="                => Types.Keys."=",
-      "<="               => Types.Keys."<=",
-      Value_Type         => Types.Values.Unbounded.String_Type,
-      To_Storage_Array   => Unbounded_Values_IO.To_Storage_Array,
-      From_Storage_Array => Unbounded_Values_IO.From_Storage_Array,
+     (Key_Type            => Types.Keys.Key_Type,
+      Key_Context_Type    => Types.Keys.Context_Type,
+      Read_Key            => Types.Keys.Read,
+      Skip_Key            => Types.Keys.Skip,
+      Write_Key           => Types.Keys.Write,
+      "="                 => Types.Keys."=",
+      "<="                => Types.Keys."<=",
+      Value_Type          => Types.Values.Unbounded.String_Type,
+      Value_Context_Type  => Types.Values.Unbounded.Parted.Context_Type,
+      Value_Size_Bound    => Types.Values.Unbounded.Parted.String_Size_Bound,
+      Read_Value_Context  => Types.Values.Unbounded.Parted.Read_Context,
+      Write_Value_Context => Types.Values.Unbounded.Parted.Write_Context,
+      Read_Part_Of_Value  => Types.Values.Unbounded.Parted.Read_Part_Of_String,
+      Write_Part_Of_Value => Types.Values.Unbounded.Parted.Write_Part_Of_String,
       Is_Context_Free_Serialization =>
               Types.Keys.Is_Context_Free_Serialization and
               Types.Values.Unbounded.Uncompressed.Is_Context_Free_Serialization,
-      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
-      Block_IO           => Block_IO);
+      Storage_Pool        => Root_Storage_Pool'Class(Global_Pool_Object),
+      Block_IO            => Block_IO);
 
    ----------
    -- Type wrappers. Always Short (=> BTrees) and not Short (=> Blob_Trees).

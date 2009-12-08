@@ -130,6 +130,21 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
    end New_String;
 
 
+   function New_String
+     (Length : Length_Type)
+      return String_Type is
+   begin
+      if Length = 0 then
+         return Empty_String;
+      else
+         return String_Type'(Ada.Finalization.Controlled with
+                             new Bounded_String_Type'(Length   => Length,
+                                                      Refcount => 1,
+                                                      others   => <>));
+      end if;
+   end New_String;
+
+
    function Length
      (S : String_Type)
       return Length_Type is
@@ -180,6 +195,7 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
 
    package body Uncompressed is separate;
    package body Prefix_Compressed is separate;
+   package body Parted is separate;
 
 end DB.Types.Gen_Strings.Gen_Unbounded;
 

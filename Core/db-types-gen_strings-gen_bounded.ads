@@ -5,16 +5,12 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
-with System.Storage_Elements;
-
 with DB.IO.Blocks;
 
 generic
    Max_Length : in Positive := 1024;
 package DB.Types.Gen_Strings.Gen_Bounded is
    pragma Preelaborate;
-
-   package SSE renames System.Storage_Elements;
 
    subtype Length_Type is Gen_Strings.Length_Type range 0 .. Max_Length;
    subtype Index_Type is Gen_Strings.Index_Type range 1 .. Length_Type'Last;
@@ -104,14 +100,6 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type);
 
-      function To_Storage_Array
-        (String : String_Type)
-         return SSE.Storage_Array;
-
-      function From_Storage_Array
-        (Arr : SSE.Storage_Array)
-         return String_Type;
-
    private
       type Indefinite_Packed_Buffer_Type is
          array (Positive range <>) of Item_Type;
@@ -190,6 +178,42 @@ package DB.Types.Gen_Strings.Gen_Bounded is
       pragma Inline (Delta_Compressed.Read);
    end Delta_Compressed;
 
+
+   package Parted is
+      type Context_Type is
+         record
+            Length : Length_Type := 0;
+            First  : Boolean     := True;
+         end record;
+
+      function String_Size_Bound
+        (S : String_Type)
+         return IO.Blocks.Size_Type;
+
+      procedure Read_Context
+        (Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Context :    out Context_Type);
+
+      procedure Write_Context
+        (Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Context : in     Context_Type);
+
+      procedure Read_Part_Of_String
+        (Context : in out Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         S       : in out String_Type;
+         Done    :    out Boolean);
+
+      procedure Write_Part_Of_String
+        (Context : in out Context_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         S       : in     String_Type;
+         Done    :    out Boolean);
+   end Parted;
 
 private
    subtype Buffer_Type is Indefinite_Buffer_Type(Index_Type);

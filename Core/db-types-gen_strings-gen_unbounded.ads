@@ -44,6 +44,10 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
      (Arr : Indefinite_Buffer_Type)
       return String_Type;
 
+   function New_String
+     (Length : Length_Type)
+      return String_Type;
+
    function Length
      (S : String_Type)
       return Length_Type;
@@ -105,14 +109,6 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type);
 
-      function To_Storage_Array
-        (String : String_Type)
-         return SSE.Storage_Array;
-
-      function From_Storage_Array
-        (Arr : SSE.Storage_Array)
-         return String_Type;
-
    private
       pragma Inline (Uncompressed.Size_Of);
       pragma Inline (Uncompressed.Write);
@@ -152,6 +148,43 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
       pragma Inline (Prefix_Compressed.Write);
       pragma Inline (Prefix_Compressed.Read);
    end Prefix_Compressed;
+
+
+   package Parted is
+      type Context_Type is
+         record
+            Length : Length_Type := 0;
+            First  : Boolean     := True;
+         end record;
+
+      function String_Size_Bound
+        (S : String_Type)
+         return IO.Blocks.Size_Type;
+
+      procedure Read_Context
+        (Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Context :    out Context_Type);
+
+      procedure Write_Context
+        (Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         Context : in     Context_Type);
+
+      procedure Read_Part_Of_String
+        (Context : in out Context_Type;
+         Block   : in     IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         S       : in out String_Type;
+         Done    :    out Boolean);
+
+      procedure Write_Part_Of_String
+        (Context : in out Context_Type;
+         Block   : in out IO.Blocks.Base_Block_Type;
+         Cursor  : in out IO.Blocks.Cursor_Type;
+         S       : in     String_Type;
+         Done    :    out Boolean);
+   end Parted;
 
 private
    type Refcount_Type is new Positive;

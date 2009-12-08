@@ -40,12 +40,30 @@ generic
    with function "<=" (Left, Right : Key_Type) return Boolean is <>;
 
    type Value_Type is private;
-   with function To_Storage_Array
+   type Value_Context_Type is private;
+   with function Value_Size_Bound
           (Value : Value_Type)
-           return System.Storage_Elements.Storage_Array;
-   with function From_Storage_Array
-          (Arr : System.Storage_Elements.Storage_Array)
-           return Value_Type;
+           return IO.Blocks.Size_Type;
+   with procedure Read_Value_Context
+          (Block   : in     IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Context :    out Value_Context_Type);
+   with procedure Write_Value_Context
+          (Block   : in out IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Context : in     Value_Context_Type);
+   with procedure Read_Part_Of_Value
+          (Context : in out Value_Context_Type;
+           Block   : in     IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Value   : in out Value_Type;
+           Done    :    out Boolean);
+   with procedure Write_Part_Of_Value
+          (Context : in out Value_Context_Type;
+           Block   : in out IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Value   : in     Value_Type;
+           Done    :    out Boolean);
 
    Is_Context_Free_Serialization : in Boolean;
 
@@ -421,8 +439,12 @@ private
 
    package Heaps is new Gen_Heaps
      (Item_Type          => Value_Type,
-      To_Storage_Array   => To_Storage_Array,
-      From_Storage_Array => From_Storage_Array,
+      Item_Context_Type  => Value_Context_Type,
+      Item_Size_Bound    => Value_Size_Bound,
+      Read_Context       => Read_Value_Context,
+      Write_Context      => Write_Value_Context,
+      Read_Part_Of_Item  => Read_Part_Of_Value,
+      Write_Part_Of_Item => Write_Part_Of_Value,
       Info_Index_ID      => Heap_Utils.Info_Index_ID,
       Free_Index_ID      => Heap_Utils.Free_Index_ID,
       Storage_Pool       => Storage_Pool,

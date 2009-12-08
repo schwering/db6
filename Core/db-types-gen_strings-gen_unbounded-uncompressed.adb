@@ -106,23 +106,5 @@ package body Uncompressed is
       Read(Context, Block, Cursor, S);
    end Skip;
 
-
-   function To_Storage_Array
-     (String : String_Type)
-      return SSE.Storage_Array
-   is
-      Arr : constant SSE.Storage_Array(1 .. 0) := (others => 0);
-   begin
-      return Arr;
-   end To_Storage_Array;
-
-
-   function From_Storage_Array
-     (Arr : SSE.Storage_Array)
-      return String_Type is
-   begin
-      return Empty_String;
-   end From_Storage_Array;
-
 end Uncompressed;
 

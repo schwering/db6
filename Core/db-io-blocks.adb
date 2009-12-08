@@ -57,6 +57,15 @@ package body DB.IO.Blocks is
    end Position;
 
 
+   function Remaining_Space
+     (Block  : Base_Block_Type;
+      Cursor : Cursor_Type)
+      return Size_Type is
+   begin
+      return Size_Type(Block'Last - Cursor.Pos + 1);
+   end Remaining_Space;
+
+
    function Bits_To_Units
      (Bits : Size_Type)
       return Size_Type is
@@ -164,15 +173,15 @@ package body DB.IO.Blocks is
 
    function Size_Of_Array
      (Arr : Array_Type;
-      To  : Index_Type'Base := Array_Type'Last)
+      From : Index_Type;
+      To   : Index_Type'Base)
       return Size_Type
    is
       function Size_Of_Index is new Size_Of(Index_Type'Base);
-      type Array_Sub_Type is array (Arr'First .. To) of Item_Type;
+      type Array_Sub_Type is array (From .. To) of Item_Type;
       function Size_Of_Data is new Size_Of(Array_Sub_Type);
    begin
-      return Size_Of_Index(To)
-           + Size_Of_Data(Array_Sub_Type(Arr(Arr'First .. To)));
+      return Size_Of_Index(To) + Size_Of_Data(Array_Sub_Type(Arr(From .. To)));
    end Size_Of_Array;
 
 
@@ -180,15 +189,16 @@ package body DB.IO.Blocks is
      (Block  : in out Base_Block_Type;
       Cursor : in out Cursor_Type;
       Arr    : in     Array_Type;
-      To     : in     Index_Type'Base := Array_Type'Last)
+      From   : in     Index_Type;
+      To     : in     Index_Type'Base)
    is
       procedure Write_Index is new Write(Index_Type'Base);
-      type Array_Sub_Type is array (Arr'First .. To) of Item_Type;
+      type Array_Sub_Type is array (From .. To) of Item_Type;
       procedure Write_Data is new Write(Array_Sub_Type);
    begin
       Write_Index(Block, Cursor, To);
       if Is_Valid(Block, Cursor) then
-         Write_Data(Block, Cursor, Array_Sub_Type(Arr(Arr'First .. To)));
+         Write_Data(Block, Cursor, Array_Sub_Type(Arr(From .. To)));
       end if;
    end Write_Array;
 
@@ -196,7 +206,8 @@ package body DB.IO.Blocks is
    procedure Read_Array
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type;
-      Arr    :    out Array_Type;
+      Arr    : in out Array_Type;
+      From   : in     Index_Type;
       To     :    out Index_Type'Base)
    is
       procedure Read_Index is new Read(Index_Type'Base);
@@ -204,10 +215,10 @@ package body DB.IO.Blocks is
       Read_Index(Block, Cursor, To);
       if Is_Valid(Block, Cursor) then
          declare
-            type Array_Sub_Type is array (Arr'First .. To) of Item_Type;
+            type Array_Sub_Type is array (From .. To) of Item_Type;
             procedure Read_Data is new Read(Array_Sub_Type);
          begin
-            Read_Data(Block, Cursor, Array_Sub_Type(Arr(Arr'First .. To)));
+            Read_Data(Block, Cursor, Array_Sub_Type(Arr(From .. To)));
          end;
       end if;
    end Read_Array;

@@ -58,11 +58,13 @@ package body Delta_Compressed is
       begin
          Size := Size_Of_Meta_Data(Meta);
          if Diff.Actions'Length > 0 then
-            Size := Size
-               + Size_Of_Actions(Definite_Long_Action_Array_Type(Diff.Actions));
+            Size := Size +
+                 Size_Of_Actions(Definite_Long_Action_Array_Type(Diff.Actions),
+                                 1, Diff.Actions'Length);
          end if;
          if Diff.Chars'Length > 0 then
-            Size := Size + Size_Of_Items(Definite_Item_Array_Type(Diff.Chars));
+            Size := Size + Size_Of_Items(Definite_Item_Array_Type(Diff.Chars),
+                                         1, Diff.Chars'Length);
          end if;
          return Size;
       end Size_Of;
@@ -108,15 +110,15 @@ package body Delta_Compressed is
             new Compression.Long_Action_Array_Type(Action_Range);
          procedure Write_Actions is
             new IO.Blocks.Write_Array(Action_Range,
-                                       Compression.Long_Action_Type,
-                                       Definite_Long_Action_Array_Type);
+                                      Compression.Long_Action_Type,
+                                      Definite_Long_Action_Array_Type);
 
          subtype Items_Range is Positive range 1 .. Diff.Char_Count;
          type Definite_Item_Array_Type is array (Items_Range) of Item_Type;
          pragma Pack (Definite_Item_Array_Type);
          procedure Write_Items is
             new IO.Blocks.Write_Array(Items_Range, Item_Type,
-                                       Definite_Item_Array_Type);
+                                      Definite_Item_Array_Type);
 
          Meta : constant Meta_Data_Type := (Diff.Actions'Length = 0,
                                             Diff.Chars'Length = 0);
@@ -124,10 +126,12 @@ package body Delta_Compressed is
           Write_Meta_Data(Block, Cursor, Meta);
           if Diff.Actions'Length > 0 then
              Write_Actions(Block, Cursor,
-                            Definite_Long_Action_Array_Type(Diff.Actions));
+                           Definite_Long_Action_Array_Type(Diff.Actions),
+                           1, Diff.Actions'Length);
           end if;
           if Diff.Chars'Length > 0 then
-             Write_Items(Block, Cursor, Definite_Item_Array_Type(Diff.Chars));
+             Write_Items(Block, Cursor, Definite_Item_Array_Type(Diff.Chars),
+                         1, Diff.Chars'Length);
           end if;
       end Write;
 
@@ -178,11 +182,11 @@ package body Delta_Compressed is
 
          procedure Read_Actions is
             new IO.Blocks.Read_Array(Action_Range,
-                                        Compression.Long_Action_Type,
-                                        Definite_Long_Action_Array_Type);
+                                     Compression.Long_Action_Type,
+                                     Definite_Long_Action_Array_Type);
          procedure Read_Items is
             new IO.Blocks.Read_Array(Item_Range, Item_Type,
-                                        Definite_Item_Array_Type);
+                                     Definite_Item_Array_Type);
 
          Meta : Meta_Data_Type;
       begin
@@ -190,12 +194,12 @@ package body Delta_Compressed is
          if Meta.Actions_Empty then
             Actions_Length := 0;
          else
-            Read_Actions(Block, Cursor, Actions, Actions_Length);
+            Read_Actions(Block, Cursor, Actions, 1, Actions_Length);
          end if;
          if Meta.Chars_Empty then
             Items_Length := 0;
          else
-            Read_Items(Block, Cursor, Items, Items_Length);
+            Read_Items(Block, Cursor, Items, 1, Items_Length);
          end if;
       end Read_Diff;
 
@@ -214,8 +218,8 @@ package body Delta_Compressed is
             Items_Length   : Compression.Length_Type;
          begin
             Read_Diff(Block, Cursor,
-                         Actions, Actions_Length,
-                         Items, Items_Length);
+                      Actions, Actions_Length,
+                      Items, Items_Length);
             declare
                 Diff : constant Compression.Delta_Type
                      := (Action_Count => Actions_Length,

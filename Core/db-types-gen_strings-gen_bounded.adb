@@ -122,6 +122,7 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
    package body Uncompressed is separate;
    package body Prefix_Compressed is separate;
    package body Delta_Compressed is separate;
+   package body Parted is separate;
 
 end DB.Types.Gen_Strings.Gen_Bounded;
 

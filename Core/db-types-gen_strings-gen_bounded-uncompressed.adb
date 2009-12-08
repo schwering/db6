@@ -16,7 +16,7 @@ package body Uncompressed is
       function Size_Of_String is
          new IO.Blocks.Size_Of_Array(Index_Type, Item_Type, Buffer_Type);
    begin
-      return Size_Of_String(S.Buffer, S.Length);
+      return Size_Of_String(S.Buffer, 1, S.Length);
    end Size_Of;
 
 
@@ -39,7 +39,7 @@ package body Uncompressed is
       procedure Write_String is
          new IO.Blocks.Write_Array(Index_Type, Item_Type, Buffer_Type);
    begin
-      Write_String(Block, Cursor, S.Buffer, S.Length);
+      Write_String(Block, Cursor, S.Buffer, 1, S.Length);
    end Write;
 
 
@@ -63,7 +63,7 @@ package body Uncompressed is
       procedure Read_String is
          new IO.Blocks.Read_Array(Index_Type, Item_Type, Buffer_Type);
    begin
-      Read_String(Block, Cursor, S.Buffer, S.Length);
+      Read_String(Block, Cursor, S.Buffer, 1, S.Length);
    end Read;
 
 
@@ -88,24 +88,6 @@ package body Uncompressed is
    begin
       Read(Context, Block, Cursor, S);
    end Skip;
-
-
-   function To_Storage_Array
-     (String : String_Type)
-      return SSE.Storage_Array
-   is
-      Arr : constant SSE.Storage_Array(1 .. 0) := (others => 0);
-   begin
-      return Arr;
-   end To_Storage_Array;
-
-
-   function From_Storage_Array
-     (Arr : SSE.Storage_Array)
-      return String_Type is
-   begin
-      return Empty_String;
-   end From_Storage_Array;
 
 end Uncompressed;
 

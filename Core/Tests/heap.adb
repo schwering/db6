@@ -11,42 +11,18 @@ with This_Computer;
 with DB.Gen_Heaps;
 with DB.IO.Blocks;
 with DB.IO.Blocks.Direct_IO;
+with DB.Types.Strings;
+with DB.Types.Strings.Unbounded;
+with DB.Utils.Global_Pool;
 with DB.Utils.Traceback;
 
 procedure Heap
 is
    File_Name  : constant String  := This_Computer.Heap_File;
-   Count      : constant         := 1_00;
+   Count      : constant         := 1_000;
    Do_Puts    : constant Boolean := False;
    Do_Gets    : constant Boolean := True;
    Do_Deletes : constant Boolean := False;
-
-   subtype Storage_Element_Type is DB.IO.Blocks.Storage_Element_Type;
-   subtype Base_Block_Type is System.Storage_Elements.Storage_Array;
-   subtype Size_Type is DB.IO.Blocks.Size_Type;
-
-   type Item_Type is
-      record
-         I : Size_Type;
-      end record;
-
-   function To_Storage_Array (Item : Item_Type) return Base_Block_Type
-   is
-      use type Storage_Element_Type;
-      use type Size_Type;
-      Len  : constant Size_Type := Item.I;
-      Val  : Size_Type := (Item.I mod Size_Type(Storage_Element_Type'Last)) +
-                           Size_Type(Storage_Element_Type'First);
-      Byte : Storage_Element_Type := Storage_Element_Type(Val);
-      Arr  : Base_Block_Type(1 .. Len) := (others => Byte);
-   begin
-      return Arr;
-   end;
-
-   function From_Storage_Array (Arr : Base_Block_Type) return Item_Type is
-   begin
-      return (I => Arr'Length);
-   end;
 
    function Info_Index_ID (ID : String) return String is
    begin
@@ -58,20 +34,55 @@ is
       return ID &"_free";
    end;
 
+   package Items    renames DB.Types.Strings.Unbounded;
+   package Item_IO  renames DB.Types.Strings.Unbounded.Parted;
    package Block_IO renames DB.IO.Blocks.Direct_IO.IO;
+
+   subtype Buffer_Type is DB.Types.Strings.Indefinite_Buffer_Type;
+   subtype Length_Type is DB.Types.Strings.Length_Type;
+   subtype Index_Type is DB.Types.Strings.Index_Type;
+   subtype Item_Type is Items.String_Type;
+   use type Length_Type;
+   use type Item_Type;
 
    package Heaps is new DB.Gen_Heaps
      (Item_Type          => Item_Type,
-      To_Storage_Array   => To_Storage_Array,
-      From_Storage_Array => From_Storage_Array,
+      Item_Context_Type  => Item_IO.Context_Type,
+      Item_Size_Bound    => Item_IO.String_Size_Bound,
+      Read_Context       => Item_IO.Read_Context,
+      Write_Context      => Item_IO.Write_Context,
+      Read_Part_Of_Item  => Item_IO.Read_Part_Of_String,
+      Write_Part_Of_Item => Item_IO.Write_Part_Of_String,
       Info_Index_ID      => Info_Index_ID,
       Free_Index_ID      => Free_Index_ID,
-      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
+      Storage_Pool       => DB.Utils.Global_Pool.Global'Storage_Pool,
       Block_IO           => Block_IO);
 
-   type Address_Array_Type is array (Size_Type range <>) of Heaps.Address_Type;
+   function Make_Item (I : Positive) return Item_Type
+   is
+      Image  : constant String      := I'Img;
+      Count  : constant Length_Type := I;
+      Length : constant Length_Type := Count * Image'Length;
+      Buf    : Buffer_Type(1 .. Length);
+   begin
+      for I in 1 .. Count loop
+         declare
+            From : constant Index_Type := (I-1) * Image'Length + 1;
+            To   : constant Index_Type := I * Image'Length;
+         begin
+            Buf(From .. To) := Buffer_Type(Image);
+         end;
+      end loop;
+      return Items.New_String(Buf);
+   end Make_Item;
 
-   use type DB.IO.Blocks.Size_Type;
+   function To_String (Item : Item_Type) return String is
+   begin
+      return String(Items.To_Buffer(Item));
+   end To_String;
+
+   type Address_Array_Type is array (Positive range <>) of Heaps.Address_Type;
+
    use type Heaps.Result_Type;
    Heap      : Heaps.Heap_Type;
    Addresses : Address_Array_Type(1 .. Count);
@@ -103,14 +114,12 @@ begin
    Put_Line("PUTS");
    for I in 1 .. Count loop
       declare
-         S     : constant Size_Type := Size_Type(I);
-         Item  : Item_Type := (I => S);
+         Item  : constant Item_Type := Make_Item(I);
          State : Heaps.Result_Type;
       begin
-         Heaps.Put(Heap, Item, Addresses(S), State);
+         Heaps.Put(Heap, Item, Addresses(I), State);
          if State /= Heaps.Success then
-            Put_Line("Put"& Size_Type'Image(S) &" = "&
-                     Heaps.Result_Type'Image(State));
+            Put_Line("Put"& I'Img &" = "& State'Img);
          end if;
       end;
    end loop;
@@ -118,15 +127,12 @@ begin
    Put_Line("GETS");
    for I in 1 .. Count loop
       declare
-         S     : constant Size_Type := Size_Type(I);
          Item  : Item_Type;
          State : Heaps.Result_Type;
       begin
-         Heaps.Get(Heap, Addresses(S), Item, State);
-         if State /= Heaps.Success then
-            Put_Line("Get"& Size_Type'Image(S)&
-                     Size_Type'Image(Item.I) &" = "&
-                     Heaps.Result_Type'Image(State));
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Success or else Item /= Make_Item(I) then
+            Put_Line("Get"& I'Img & To_String(Item) &" = "& State'Img);
          end if;
       end;
    end loop;
@@ -140,13 +146,11 @@ begin
    Put_Line("DELETES [0.0, 0.25)");
    for I in Count*0/4+1 .. Count*1/4 loop
       declare
-         S     : constant Size_Type := Size_Type(I);
          State : Heaps.Result_Type := Heaps.Failure;
       begin
-         Heaps.Delete(Heap, Addresses(S), State);
+         Heaps.Delete(Heap, Addresses(I), State);
          if State /= Heaps.Success then
-            Put_Line("Delete"& Size_Type'Image(S) &" = "&
-                     Heaps.Result_Type'Image(State));
+            Put_Line("Delete"& I'Img &" = "& State'Img);
          end if;
       end;
    end loop;
@@ -159,13 +163,11 @@ begin
    Put_Line("DELETES (0.75, 1.0]");
    for I in Count*3/4+1 .. Count*4/4 loop
       declare
-         S     : constant Size_Type := Size_Type(I);
          State : Heaps.Result_Type := Heaps.Failure;
       begin
-         Heaps.Delete(Heap, Addresses(S), State);
+         Heaps.Delete(Heap, Addresses(I), State);
          if State /= Heaps.Success then
-            Put_Line("Delete"& Size_Type'Image(S) &" = "&
-                     Heaps.Result_Type'Image(State));
+            Put_Line("Delete"& I'Img &" = "& State'Img);
          end if;
       end;
    end loop;
@@ -179,13 +181,11 @@ begin
    for I in Count*1/4+1 .. Count*3/4 loop
       if I mod 2 = 0 then
          declare
-            S     : constant Size_Type := Size_Type(I);
             State : Heaps.Result_Type := Heaps.Failure;
          begin
-            Heaps.Delete(Heap, Addresses(S), State);
+            Heaps.Delete(Heap, Addresses(I), State);
             if State /= Heaps.Success then
-               Put_Line("Delete"& Size_Type'Image(S) &" = "&
-                        Heaps.Result_Type'Image(State));
+               Put_Line("Delete"& I'Img &" = "& State'Img);
             end if;
          end;
       end if;
@@ -200,13 +200,11 @@ begin
    for I in Count*1/4+1 .. Count*3/4 loop
       if I mod 2 = 1 then
          declare
-            S     : constant Size_Type := Size_Type(I);
             State : Heaps.Result_Type := Heaps.Failure;
          begin
-            Heaps.Delete(Heap, Addresses(S), State);
+            Heaps.Delete(Heap, Addresses(I), State);
             if State /= Heaps.Success then
-               Put_Line("Delete"& Size_Type'Image(S) &" = "&
-                        Heaps.Result_Type'Image(State));
+               Put_Line("Delete"& I'Img &" = "& State'Img);
             end if;
          end;
       end if;
@@ -219,14 +217,12 @@ begin
    Put_Line("PUTS");
    for I in 1 .. Count loop
       declare
-         S     : constant Size_Type := Size_Type(I);
-         Item  : Item_Type := (I => S);
+         Item  : constant Item_Type := Make_Item(I);
          State : Heaps.Result_Type;
       begin
-         Heaps.Put(Heap, Item, Addresses(S), State);
+         Heaps.Put(Heap, Item, Addresses(I), State);
          if State /= Heaps.Success then
-            Put_Line("Put"& --Size_Type'Image(S) &" = "&
-                     Heaps.Result_Type'Image(State));
+            Put_Line("Put"& I'Img &" = "& State'Img);
          end if;
       end;
    end loop;
@@ -234,15 +230,12 @@ begin
    Put_Line("GETS");
    for I in 1 .. Count loop
       declare
-         S     : constant Size_Type := Size_Type(I);
          Item  : Item_Type;
          State : Heaps.Result_Type;
       begin
-         Heaps.Get(Heap, Addresses(S), Item, State);
-         if State /= Heaps.Success then
-            Put_Line("Get"& Size_Type'Image(S)&
-                     Size_Type'Image(Item.I) &" = "&
-                     Heaps.Result_Type'Image(State));
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Success or else Item /= Make_Item(I) then
+            Put_Line("Get"& I'Img & To_String(Item) &" = "& State'Img);
          end if;
       end;
    end loop;
@@ -257,5 +250,6 @@ exception
    when Error : others =>
       Put_Line("Traceback");
       DB.Utils.Traceback.Print_Traceback(Error);
+      raise;
 end Heap;
 

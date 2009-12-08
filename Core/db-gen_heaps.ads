@@ -7,11 +7,25 @@
 --
 -- Design Notes:
 --
--- (TODO document)
+-- There are three different terms related with storage in this heap:
+-- blocks, chunks and items.
+-- A block is a simple disk block of fixed size. A chunk is a sequence of
+-- N blocks where the address of the (I+1)-th block is exactly Succ of the
+-- address of the I-th block. An item can be stored on one or more chunks.
+--
+-- The general idea is to have each item be stored in a single chunk. When an
+-- item is deleted, the chunk is marked as free and merged with its preceding
+-- and succeeding free chunks if they exist. The waste for each stored item is
+-- at most (Block_Size - 1).
+-- This idea was softened for the Append operation. In some cases, the appendum
+-- may fit into the waste space of the chunk. If it does not, a new chunk
+-- is allocated for the appendum (or, more exaclty, for that part of the
+-- appendum that does not fit into the waste space) and linked with that chunk
+-- of the item that has been the last one up to now. Hence, the chunks form a
+-- simple linked list.
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
-with System.Storage_Elements;
 with System.Storage_Pools;
 
 with DB.Gen_BTrees;
@@ -20,13 +34,32 @@ with DB.IO.Blocks.Gen_Buffers;
 with DB.IO.Blocks.Gen_IO;
 
 generic
-   type Item_Type (<>) is private; -- maybe, (<>) should be removed
-   with function To_Storage_Array
+   type Item_Type is private;
+   type Item_Context_Type is private;
+   with function Item_Size_Bound
           (Item : Item_Type)
-           return System.Storage_Elements.Storage_Array;
-   with function From_Storage_Array
-          (Arr : System.Storage_Elements.Storage_Array)
-           return Item_Type;
+           return IO.Blocks.Size_Type;
+   with procedure Read_Context
+          (Block   : in     IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Context :    out Item_Context_Type);
+   with procedure Write_Context
+          (Block   : in out IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Context : in     Item_Context_Type);
+   with procedure Read_Part_Of_Item
+          (Context : in out Item_Context_Type;
+           Block   : in     IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Item    : in out Item_Type;
+           Done    :    out Boolean);
+   with procedure Write_Part_Of_Item
+          (Context : in out Item_Context_Type;
+           Block   : in out IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Item    : in     Item_Type;
+           Done    :    out Boolean);
+
    with function Info_Index_ID
           (ID : String)
            return String;
@@ -140,6 +173,25 @@ package DB.Gen_Heaps is
    -- Generally, State = Failure should never occur because there is nothing
    -- that could fail.
 
+   procedure Append
+     (Heap        : in out Heap_Type;
+      Item        : in     Item_Type;
+      Address     : in     Address_Type;
+      State       :    out Result_Type);
+   -- Appends Item and to the item stored at Address or sets State = Failure
+   -- if no item exists on Address.
+   -- This procedure starts and commits a new transaction and might therefore
+   -- block.
+
+   procedure Append
+     (Heap        : in out Heap_Type;
+      Transaction : in out RW_Transaction_Type'Class;
+      Item        : in     Item_Type;
+      Address     : in     Address_Type;
+      State       :    out Result_Type);
+   -- Appends Item and to the item stored at Address or sets State = Failure
+   -- if no item exists on Address.
+
    procedure Delete
      (Heap    : in out Heap_Type;
       Address : in     Address_Type;
@@ -167,14 +219,26 @@ package DB.Gen_Heaps is
      (Heap : in out Heap_Type);
 
 private
-   type Length_Type is mod 2**64;
-   type Chunk_State_Type is (Free, Used);
+   Kilo : constant := 2**10;
+   Mega : constant := 2**10 * Kilo;
+   Giga : constant := 2**10 * Mega;
+   Tera : constant := 2**10 * Giga;
+
+   type Length_Type is mod 2**62;
+   -- Remember that Length_Type is the length of possibly really long chunks
+   -- which can be the complete file (when it's empty).
+
+   subtype Extended_Address_Type is Block_IO.Address_Type;
+
+   type Chunk_State_Type is (Free, Used_First, Used_Cont);
    type Chunk_Info_Type is
       record
-         State  : Chunk_State_Type;
-         Length : Length_Type;
+         State   : Chunk_State_Type;
+         Length  : Length_Type;
+         Succ    : Extended_Address_Type;
+         Last    : Address_Type;
+         Context : Item_Context_Type;
       end record;
-   pragma Pack (Chunk_Info_Type);
 
 
    package Info_BTree_Types is
