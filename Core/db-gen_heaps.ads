@@ -39,6 +39,10 @@ generic
    with function Item_Size_Bound
           (Item : Item_Type)
            return IO.Blocks.Size_Type;
+   with function Fold_Contexts
+          (Left     : Item_Context_Type;
+           Appended : Item_Context_Type)
+           return Item_Context_Type;
    with procedure Read_Context
           (Block   : in     IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;

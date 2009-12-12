@@ -58,6 +58,7 @@ package DB.Blob_Trees is
          Value_Type          => Values.String_Type,
          Value_Context_Type  => Value_IO.Context_Type,
          Value_Size_Bound    => Value_IO.String_Size_Bound,
+         Fold_Value_Contexts => Value_IO.Fold_Contexts,
          Read_Value_Context  => Value_IO.Read_Context,
          Write_Value_Context => Value_IO.Write_Context,
          Read_Part_Of_Value  => Value_IO.Read_Part_Of_String,

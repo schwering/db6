@@ -49,6 +49,7 @@ is
      (Item_Type          => Item_Type,
       Item_Context_Type  => Item_IO.Context_Type,
       Item_Size_Bound    => Item_IO.String_Size_Bound,
+      Fold_Contexts      => Item_IO.Fold_Contexts,
       Read_Context       => Item_IO.Read_Context,
       Write_Context      => Item_IO.Write_Context,
       Read_Part_Of_Item  => Item_IO.Read_Part_Of_String,
@@ -137,6 +138,33 @@ begin
       end;
    end loop;
 
+   Put_Line("APPEND");
+   for I in 1 .. Count loop
+      declare
+         Item  : constant Item_Type := Make_Item(I);
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Append(Heap, Item, Addresses(I), State);
+         if State /= Heaps.Success then
+            Put_Line("Append"& I'Img &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+
+   Put_Line("GETS");
+   for I in 1 .. Count loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Success or else
+            Item /= Make_Item(I) & Make_Item(I) then
+            Put_Line("Get"& I'Img & To_String(Item) &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+
    --New_Line;
    --Put_Line("LULU0");
    --Heaps.Print_Info_Index(Heap);
@@ -155,6 +183,31 @@ begin
       end;
    end loop;
 
+   Put_Line("GETS");
+   for I in Count*0/4+1 .. Count*1/4 loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Failure then
+            Put_Line("Get"& I'Img &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+   for I in Count*1/4+1 .. Count loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Success or else
+            Item /= Make_Item(I) & Make_Item(I) then
+            Put_Line("Get"& I'Img & To_String(Item) &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+
    --Put_Line("LULU1");
    --Heaps.Print_Info_Index(Heap);
    --Heaps.Print_Free_Index(Heap);
@@ -168,6 +221,42 @@ begin
          Heaps.Delete(Heap, Addresses(I), State);
          if State /= Heaps.Success then
             Put_Line("Delete"& I'Img &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+
+   Put_Line("GETS");
+   for I in Count*0/4+1 .. Count*1/4 loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Failure then
+            Put_Line("Get"& I'Img &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+   for I in Count*1/4+1 .. Count*3/4 loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Success or else
+            Item /= Make_Item(I) & Make_Item(I) then
+            Put_Line("Get"& I'Img & To_String(Item) &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+   for I in Count*3/4+1 .. Count*4/4 loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Failure then
+            Put_Line("Get"& I'Img &" = "& State'Img);
          end if;
       end;
    end loop;
@@ -191,6 +280,48 @@ begin
       end if;
    end loop;
 
+   Put_Line("GETS");
+   for I in Count*0/4+1 .. Count*1/4 loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Failure then
+            Put_Line("Get"& I'Img &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+   for I in Count*1/4+1 .. Count*3/4 loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if I mod 2 = 0 then
+            if State /= Heaps.Failure then
+               Put_Line("Get"& I'Img &" = "& State'Img);
+            end if;
+         else
+            if State /= Heaps.Success or else
+               Item /= Make_Item(I) & Make_Item(I) then
+               Put_Line("Get"& I'Img & To_String(Item) &" = "& State'Img);
+            end if;
+         end if;
+      end;
+   end loop;
+   for I in Count*3/4+1 .. Count*4/4 loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Failure then
+            Put_Line("Get"& I'Img &" = "& State'Img);
+         end if;
+      end;
+   end loop;
+
    --Put_Line("LULU3");
    --Heaps.Print_Info_Index(Heap);
    --Heaps.Print_Free_Index(Heap);
@@ -208,6 +339,19 @@ begin
             end if;
          end;
       end if;
+   end loop;
+
+   Put_Line("GETS");
+   for I in 1 .. Count loop
+      declare
+         Item  : Item_Type;
+         State : Heaps.Result_Type;
+      begin
+         Heaps.Get(Heap, Addresses(I), Item, State);
+         if State /= Heaps.Failure then
+            Put_Line("Get"& I'Img &" = "& State'Img);
+         end if;
+      end;
    end loop;
 
    --Put_Line("LULU4");

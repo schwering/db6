@@ -10,8 +10,22 @@ with System;
 package body DB.IO.Blocks is
 
    function To_Block
-     (Block     : Long_Block_Type;
-      Last_Used : Long_Position_Type)
+     (Block  : Base_Block_Type;
+      Cursor : Cursor_Type)
+      return Block_Type
+   is
+      B : Block_Type := Block(Index_Type);
+   begin
+      if Is_Valid(B, Cursor) then
+         B(Position(Cursor) .. B'Last) := (others => 0);
+      end if;
+      return B;
+   end To_Block;
+
+
+   function To_Block
+     (Block     : Base_Block_Type;
+      Last_Used : Base_Position_Type)
       return Block_Type
    is
       B : Block_Type := Block(Index_Type);
@@ -64,6 +78,20 @@ package body DB.IO.Blocks is
    begin
       return Size_Type(Block'Last - Cursor.Pos + 1);
    end Remaining_Space;
+
+
+   function Written_Since
+     (Block  : Base_Block_Type;
+      Cursor : Cursor_Type;
+      Since  : Base_Position_Type)
+      return Size_Type is
+   begin
+      if Is_Valid(Block, Cursor) then
+        return Size_Type(Cursor.Pos) - Size_Type(Since);
+      else
+         return Size_Type(Block'Last) + 1 - Size_Type(Since);
+      end if;
+   end Written_Since;
 
 
    function Bits_To_Units

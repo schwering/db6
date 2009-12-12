@@ -22,6 +22,15 @@ package body Parted is
    end String_Size_Bound;
 
 
+   function Fold_Contexts
+     (Left     : Context_Type;
+      Appended : Context_Type)
+      return Context_Type is
+   begin
+      return (Left.Length + Appended.Length, Left.First and Appended.First);
+   end Fold_Contexts;
+
+
    procedure Read_Context
      (Block   : in     IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type;

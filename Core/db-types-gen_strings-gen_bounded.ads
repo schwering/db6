@@ -190,6 +190,11 @@ package DB.Types.Gen_Strings.Gen_Bounded is
         (S : String_Type)
          return IO.Blocks.Size_Type;
 
+      function Fold_Contexts
+        (Left     : Context_Type;
+         Appended : Context_Type)
+         return Context_Type;
+
       procedure Read_Context
         (Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;

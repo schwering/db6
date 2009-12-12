@@ -44,6 +44,10 @@ generic
    with function Value_Size_Bound
           (Value : Value_Type)
            return IO.Blocks.Size_Type;
+   with function Fold_Value_Contexts
+          (Left     : Value_Context_Type;
+           Appended : Value_Context_Type)
+           return Value_Context_Type;
    with procedure Read_Value_Context
           (Block   : in     IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;
@@ -441,6 +445,7 @@ private
      (Item_Type          => Value_Type,
       Item_Context_Type  => Value_Context_Type,
       Item_Size_Bound    => Value_Size_Bound,
+      Fold_Contexts      => Fold_Value_Contexts,
       Read_Context       => Read_Value_Context,
       Write_Context      => Write_Value_Context,
       Read_Part_Of_Item  => Read_Part_Of_Value,

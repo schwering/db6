@@ -457,6 +457,7 @@ private
       Value_Type          => Types.Values.Unbounded.String_Type,
       Value_Context_Type  => Types.Values.Unbounded.Parted.Context_Type,
       Value_Size_Bound    => Types.Values.Unbounded.Parted.String_Size_Bound,
+      Fold_Value_Contexts => Types.Values.Unbounded.Parted.Fold_Contexts,
       Read_Value_Context  => Types.Values.Unbounded.Parted.Read_Context,
       Write_Value_Context => Types.Values.Unbounded.Parted.Write_Context,
       Read_Part_Of_Value  => Types.Values.Unbounded.Parted.Read_Part_Of_String,

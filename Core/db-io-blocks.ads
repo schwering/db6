@@ -34,10 +34,18 @@ package DB.IO.Blocks is
 
 
    function To_Block
-     (Block     : Long_Block_Type;
-      Last_Used : Long_Position_Type)
+     (Block  : Base_Block_Type;
+      Cursor : Cursor_Type)
       return Block_Type;
-   -- Truncates the long block to a short one and sets the remaining free
+   -- Truncates the base block to a short one and sets the free storage behind
+   -- the cursor. The latter is done because the block will probably be written
+   -- to disk.
+
+   function To_Block
+     (Block     : Base_Block_Type;
+      Last_Used : Base_Position_Type)
+      return Block_Type;
+   -- Truncates the base block to a short one and sets the remaining free
    -- storage elements to zero. The latter is done because the block will
    -- probably be written to disk.
 
@@ -61,6 +69,12 @@ package DB.IO.Blocks is
    function Remaining_Space
      (Block  : Base_Block_Type;
       Cursor : Cursor_Type)
+      return Size_Type;
+
+   function Written_Since
+     (Block  : Base_Block_Type;
+      Cursor : Cursor_Type;
+      Since  : Base_Position_Type)
       return Size_Type;
 
    function Bits_To_Units

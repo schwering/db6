@@ -9,6 +9,14 @@ with DB.IO.Blocks;
 separate (DB.Types.Gen_Strings.Gen_Unbounded)
 package body Parted is
 
+   procedure Print (S : String)
+   is
+      procedure Internal (S : String);
+      pragma Import (C, Internal, "printf");
+   begin
+      Internal(S & ASCII.LF & ASCII.NUL);
+   end Print;
+
    Item_Size : constant IO.Blocks.Size_Type
              := IO.Blocks.Bits_To_Units(Item_Type'Size);
 
@@ -20,6 +28,15 @@ package body Parted is
    begin
       return Item_Size * IO.Blocks.Size_Type(S.Length);
    end String_Size_Bound;
+
+
+   function Fold_Contexts
+     (Left     : Context_Type;
+      Appended : Context_Type)
+      return Context_Type is
+   begin
+      return (Left.Length + Appended.Length, Left.First and Appended.First);
+   end Fold_Contexts;
 
 
    procedure Read_Context
@@ -44,6 +61,11 @@ package body Parted is
       Write(Block, Cursor, Context.Length);
    end Write_Context;
 
+   type Last_Type is (Nothing, Space, One, Zero);
+   RLast : Last_Type := Nothing;
+   RCtr  : Natural := 0;
+   WLast : Last_Type := Nothing;
+   WCtr  : Natural := 0;
 
    procedure Read_Part_Of_String
      (Context : in out Context_Type;
@@ -70,7 +92,7 @@ package body Parted is
                       := 1;
          To           : constant Index_Type
                       := Read_Amount;
-         Buffer : Indefinite_Buffer_Type(From .. To);
+         Buffer       : Indefinite_Buffer_Type(From .. To);
       begin
          pragma Assert (Context.Length >= 0);
          pragma Assert (Remaining <= Context.Length);
@@ -79,8 +101,9 @@ package body Parted is
          for I in From .. To loop
             Read(Block, Cursor, Buffer(I));
          end loop;
-         S    := S & Indefinite_Buffer_Type(Buffer);
+         S    := S & Buffer;
          Done := Length(S) = Context.Length;
+         if Done then RLast := Nothing; end if;
       end;
    end Read_Part_Of_String;
 
@@ -120,6 +143,7 @@ package body Parted is
          end loop;
          Context.Length := Context.Length + Write_Amount;
          Done           := Length(S) = Context.Length;
+         if Done then WLast := Nothing; end if;
       end;
    end Write_Part_Of_String;
 
