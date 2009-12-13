@@ -25,8 +25,7 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
 
 
    overriding
-   procedure Finalize (String : in out String_Type)
-   is
+   procedure Finalize (String : in out String_Type) is
    begin
       if String.S /= null and then String.S.Refcount > 1 then
          String.S.Refcount := String.S.Refcount - 1;

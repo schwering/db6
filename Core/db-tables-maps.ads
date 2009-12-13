@@ -14,7 +14,7 @@ use System.Storage_Pools;
 with DB.Gen_BTrees;
 with DB.Gen_Blob_Trees;
 with DB.IO.Blocks;
-with DB.IO.Blocks.Memory_IO;
+with DB.IO.Blocks.File_IO;
 
 package DB.Tables.Maps is
    pragma Elaborate_Body;
@@ -425,7 +425,7 @@ package DB.Tables.Maps is
 private
    package Bounded_Values_IO   renames Types.Values.Bounded.Uncompressed;
    package Unbounded_Values_IO renames Types.Values.Unbounded.Uncompressed;
-   package Block_IO            renames IO.Blocks.Memory_IO.IO;
+   package Block_IO            renames IO.Blocks.File_IO.IO;
 
    package BTrees is new Gen_BTrees
      (Key_Type           => Types.Keys.Key_Type,

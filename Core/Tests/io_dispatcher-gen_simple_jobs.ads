@@ -22,7 +22,7 @@ generic
    type Result_Type is (<>);
 
    Object     : in out Object_Type;
-   Null_value : in Value_Type;
+   Null_value : in out Value_Type;
    Success    : in Result_Type;
    Failure    : in Result_Type;
 

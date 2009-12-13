@@ -31,7 +31,7 @@ pragma Warnings (On);
 package DB.Blob_Trees is
 
    package Keys     renames DB.Types.Keys;
-   package Values   renames DB.Types.Values.Bounded;
+   package Values   renames DB.Types.Values.Unbounded;
    package Value_IO renames Values.Parted;
 
    package Async_IO    renames DB.IO.Blocks.Asynchronous_IO.IO;

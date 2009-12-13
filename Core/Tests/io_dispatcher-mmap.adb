@@ -23,8 +23,9 @@ with DB.Utils.Traceback;
 
 procedure IO_Dispatcher.MMap is
    Max_Key_Size   : constant := 2 + 1000 + 8 
-                                ;--+ 1; -- to enforce heaped map
+                                + 1; -- to enforce heaped map
    Max_Value_Size : constant := 8;
+   package Values_Impl renames DB.Types.Values.Unbounded;
 
    Map : DB.Tables.Maps.Map_Type
        := DB.Tables.Maps.New_Map(Max_Key_Size, Max_Value_Size);
@@ -34,7 +35,7 @@ procedure IO_Dispatcher.MMap is
 
    type Value_Type is new DB.Tables.Value_Type with
       record
-         S : DB.Types.Values.Bounded.String_Type;
+         S : Values_Impl.String_Type := Values_Impl.Empty_String;
       end record;
 
    overriding function "=" (Left, Right : Value_Type) return Boolean;
@@ -47,40 +48,35 @@ procedure IO_Dispatcher.MMap is
    overriding function From_Unbounded (S: DB.Types.Values.Unbounded.String_Type)
       return Value_Type;
 
-   overriding function "=" (Left, Right : Value_Type) return Boolean
-   is
-      use type DB.Types.Values.Bounded.String_Type;
+   overriding function "=" (Left, Right : Value_Type) return Boolean is
    begin
-      return Left.S = Right.S;
+      return Values_Impl."="(Left.S, Right.S);
    end "=";
 
    overriding function To_Bounded
      (V : Value_Type)
-      return DB.Types.Values.Bounded.String_Type
-   is
-      use type DB.Types.Values.Bounded.String_Type;
+      return DB.Types.Values.Bounded.String_Type is
    begin
-      return V.S;
+      return DB.Types.Values.Bounded.New_String(Values_Impl.To_Buffer(V.S));
+      --return V.S;
    end To_Bounded;
 
    overriding function To_Unbounded
      (V : Value_Type)
-      return DB.Types.Values.Unbounded.String_Type
-   is
-      B : constant DB.Types.Values.Indefinite_Buffer_Type
-        := DB.Types.Values.Bounded.To_Buffer(V.S);
+      return DB.Types.Values.Unbounded.String_Type is
    begin
-      return DB.Types.Values.Unbounded.New_String(B);
+      --return DB.Types.Values.Unbounded.New_String(Values_Impl.To_Buffer(V.S));
+      return V.S;
    end To_Unbounded;
 
    overriding function From_Bounded
      (S : DB.Types.Values.Bounded.String_Type)
       return Value_Type
    is
-      use type DB.Types.Values.Bounded.String_Type;
       V : Value_Type;
    begin
-      V.S := S;
+      V.S := Values_Impl.New_String(DB.Types.Values.Bounded.To_Buffer(S));
+      --V.S := S;
       return V;
    end From_Bounded;
 
@@ -88,27 +84,23 @@ procedure IO_Dispatcher.MMap is
      (S : DB.Types.Values.Unbounded.String_Type)
       return Value_Type
    is
-      B : constant DB.Types.Values.Indefinite_Buffer_Type
-        := DB.Types.Values.Unbounded.To_Buffer(S);
       V : Value_Type;
    begin
-      V.S := DB.Types.Values.Bounded.New_String(B);
+      V.S := S;
+      --V.S := Values_Impl.New_String(DB.Types.Values.Bounded.To_Buffer(S));
       return V;
    end From_Unbounded;
 
 
    function Get_Value
      (KV : Random.Key_Value_Type)
-      return DB.Tables.Value_Type'Class
-   is
-      V : Value_Type;
+      return DB.Tables.Value_Type'Class is
    begin
-      V.S := KV.Value;
-      return V;
+      return From_Bounded(KV.Value);
    end Get_Value;
 
 
-   Null_Value : constant Value_Type
+   Null_Value : DB.Tables.Value_Type'Class
               := From_Bounded(DB.Types.Values.Bounded.Empty_String);
 
 
@@ -116,7 +108,11 @@ procedure IO_Dispatcher.MMap is
    is
       use DB.IO.Blocks;
       use DB.Types.Strings.Bounded;
+      pragma Warnings (Off);
       use DB.Types.Values.Bounded;
+      use DB.Types.Values.Unbounded;
+      use Values_Impl;
+      pragma Warnings (On);
       use type Size_Type;
 
       function KS return DB.IO.Blocks.Size_Type is
@@ -139,8 +135,8 @@ procedure IO_Dispatcher.MMap is
    begin
       if V in Value_Type'Class then
          declare
-            Len : constant DB.Types.Values.Bounded.Length_Type
-                := DB.Types.Values.Bounded.Length(Value_Type(V).S);
+            Len : constant DB.Types.Values.Length_Type
+                := Values_Impl.Length(Value_Type(V).S);
          begin
             return "'"& To_String(Value_Type(V).S) &"' ["& Len'Img &"]";
          end;

@@ -107,7 +107,7 @@ package body IO_Dispatcher.Random is
       type Definite_Buffer_Type is
          new DB.Types.Values.Indefinite_Buffer_Type(R);
       function Convert is new Ada.Unchecked_Conversion
-        (Definite_string_Type, Definite_Buffer_Type);
+        (Definite_String_Type, Definite_Buffer_Type);
 
       Buf : constant DB.Types.Values.Indefinite_Buffer_Type
           := DB.Types.Values.Indefinite_Buffer_Type

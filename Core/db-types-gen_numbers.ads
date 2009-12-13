@@ -40,14 +40,6 @@ package DB.Types.Gen_Numbers is
       Block   : in     IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type);
 
-   function To_Storage_Array
-     (Number : Number_Type)
-      return System.Storage_Elements.Storage_Array;
-
-   function From_Storage_Array
-     (Arr : System.Storage_Elements.Storage_Array)
-      return Number_Type;
-
 private
    type Context_Type is null record;
 

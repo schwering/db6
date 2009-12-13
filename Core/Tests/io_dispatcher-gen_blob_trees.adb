@@ -11,18 +11,39 @@ with IO_Dispatcher.To_Strings; use IO_Dispatcher.To_Strings;
 with DB;
 with DB.IO.Blocks;
 
+with DB.Blob_Trees;
+
 with DB.Types.Keys;
 with DB.Types.Times;
+with DB.Types.Values;
+with DB.Types.Values.Bounded;
+with DB.Types.Values.Unbounded;
 
 with DB.Utils.Traceback;
 
 procedure IO_Dispatcher.Gen_Blob_Trees is
-   package Keys     renames DB.Types.Keys;
-   package Rows     renames Random.Rows;
-   package Columns  renames Random.Columns;
-   package Value    renames Random.Values;
+   package Keys     renames DB.Blob_Trees.Keys;
+   package Rows     renames Keys.Rows;
+   package Columns  renames Keys.Columns;
+   package Values   renames DB.Blob_Trees.Values;
 
    Tree : Blob_Trees.Tree_Type;
+
+   function To_Bounded
+     (V : Random.Values.String_Type)
+      return DB.Types.Values.Bounded.String_Type is
+   begin
+      --return DB.Types.Values.Bounded.New_String(Random.Values.To_Buffer(V));
+      return V;
+   end To_Bounded;
+
+   function To_Unbounded
+     (V : Random.Values.String_Type)
+      return DB.Types.Values.Unbounded.String_Type is
+   begin
+      return DB.Types.Values.Unbounded.New_String(Random.Values.To_Buffer(V));
+      --return V;
+   end To_Unbounded;
 
    procedure Check_Key_Value (KV : Key_Value_Type)
    is
@@ -36,7 +57,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
           --2 + Size_Type(Columns.Length(KV.Key.Column)) +
             Bits_To_Units(DB.Types.Times.Number_Type'Size);
       VS : constant DB.IO.Blocks.Size_Type
-         := Size_Type(Values.Length(KV.Value));
+         := Size_Type(Random.Values.Length(KV.Value));
    begin
       if KS > Blob_Trees.Max_Key_Size then
          raise Key_Value_Error;
@@ -48,12 +69,8 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
    is
       function Convert is new Ada.Unchecked_Conversion
          (Keys.Key_Type, Blob_Trees.Key_Type);
-      --KK : aliased Blob_Trees.Key_Type;
-      --for KK'Address use K'Address;
-      --pragma Import (Ada, KK);
    begin
       return Convert(K);
-      --return KK;
    end To_Key;
 
    function To_Key (K : Blob_Trees.Key_Type) return Keys.Key_Type
@@ -64,7 +81,8 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       return Convert(K);
    end To_Key;
 
-   function To_Value (V : Values.String_Type) return Blob_Trees.Value_Type
+   function To_Value (V : Random.Values.String_Type)
+      return Blob_Trees.Value_Type
    is
       function Convert is new Ada.Unchecked_Conversion
          (Values.String_Type, Blob_Trees.Value_Type);
@@ -72,7 +90,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       --for VV'Address use V'Address;
       --pragma Import (Ada, VV);
    begin
-      return Convert(V);
+      return Convert(To_Unbounded(V));
       --return VV;
    end To_Value;
 
@@ -111,7 +129,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       return To_Value(Left) = To_Value(Right);
    end "=";
 
-   Null_Value : constant Blob_Trees.Value_Type := To_Value(Values.Empty_String);
+   Null_Value : Blob_Trees.Value_Type := To_Value(Random.Values.Empty_String);
 
    procedure Check (T : in out Blob_Trees.Tree_Type)
    is null;

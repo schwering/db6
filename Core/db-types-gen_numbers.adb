@@ -54,33 +54,5 @@ package body DB.Types.Gen_Numbers is
       Read(Context, Block, Cursor, Number);
    end Skip;
 
-
-   function To_Storage_Array
-     (Number : Number_Type)
-      return System.Storage_Elements.Storage_Array
-   is
-      Len : constant System.Storage_Elements.Storage_Offset
-          := IO.Blocks.Bits_To_Units(Number'Size);
-      subtype Raw_Type is System.Storage_Elements.Storage_Array(1 .. Len);
-      function Convert is new Ada.Unchecked_Conversion(Number_Type, Raw_Type);
-   begin
-      return Convert(Number);
-   end To_Storage_Array;
-
-
-   function From_Storage_Array
-     (Arr : System.Storage_Elements.Storage_Array)
-      return Number_Type
-   is
-      Number : Number_Type;
-      Len : constant System.Storage_Elements.Storage_Offset
-          := IO.Blocks.Bits_To_Units(Number'Size);
-      subtype Raw_Type is System.Storage_Elements.Storage_Array(1 .. Len);
-      function Convert is new Ada.Unchecked_Conversion(Raw_Type, Number_Type);
-   begin
-      Number := Convert(Arr);
-      return Number;
-   end From_Storage_Array;
-
 end DB.Types.Gen_Numbers;
 

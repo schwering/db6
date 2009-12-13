@@ -9,14 +9,6 @@ with DB.IO.Blocks;
 separate (DB.Types.Gen_Strings.Gen_Unbounded)
 package body Parted is
 
-   procedure Print (S : String)
-   is
-      procedure Internal (S : String);
-      pragma Import (C, Internal, "printf");
-   begin
-      Internal(S & ASCII.LF & ASCII.NUL);
-   end Print;
-
    Item_Size : constant IO.Blocks.Size_Type
              := IO.Blocks.Bits_To_Units(Item_Type'Size);
 
@@ -105,6 +97,7 @@ package body Parted is
          Done := Length(S) = Context.Length;
          if Done then RLast := Nothing; end if;
       end;
+
    end Read_Part_Of_String;
 
 

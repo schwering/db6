@@ -11,16 +11,39 @@ with IO_Dispatcher.To_Strings; use IO_Dispatcher.To_Strings;
 with DB;
 with DB.IO.Blocks;
 
+with DB.BTrees;
+
 with DB.Types.Keys;
 with DB.Types.Times;
+with DB.Types.Values;
+with DB.Types.Values.Bounded;
+with DB.Types.Values.Unbounded;
 
 with DB.Utils.Traceback;
 
 procedure IO_Dispatcher.Gen_BTrees is
-   package Keys     renames DB.Types.Keys;
-   package Rows     renames Random.Rows;
-   package Columns  renames Random.Columns;
-   package Value    renames Random.Values;
+   package Keys     renames DB.BTrees.Keys;
+   package Rows     renames Keys.Rows;
+   package Columns  renames Keys.Columns;
+   package Values   renames DB.BTrees.Values;
+
+   Tree : BTrees.Tree_Type;
+
+   function To_Bounded
+     (V : Random.Values.String_Type)
+      return DB.Types.Values.Bounded.String_Type is
+   begin
+      --return DB.Types.Values.Bounded.New_String(Random.Values.To_Buffer(V));
+      return V;
+   end To_Bounded;
+
+   function To_Unbounded
+     (V : Random.Values.String_Type)
+      return DB.Types.Values.Unbounded.String_Type is
+   begin
+      return DB.Types.Values.Unbounded.New_String(Random.Values.To_Buffer(V));
+      --return V;
+   end To_Unbounded;
 
    procedure Check_Key_Value (KV : Key_Value_Type)
    is
@@ -34,7 +57,7 @@ procedure IO_Dispatcher.Gen_BTrees is
           --2 + Size_Type(Columns.Length(KV.Key.Column)) +
             Bits_To_Units(DB.Types.Times.Number_Type'Size);
       VS : constant DB.IO.Blocks.Size_Type
-         := Size_Type(Values.Length(KV.Value));
+         := Size_Type(Random.Values.Length(KV.Value));
    begin
       if KS > BTrees.Max_Key_Size(VS) then
          raise Key_Value_Error;
@@ -62,16 +85,13 @@ procedure IO_Dispatcher.Gen_BTrees is
       return Convert(K);
    end To_Key;
 
-   function To_Value (V : Values.String_Type) return BTrees.Value_Type
+   function To_Value (V : Random.Values.String_Type)
+      return BTrees.Value_Type
    is
       function Convert is new Ada.Unchecked_Conversion
          (Values.String_Type, BTrees.Value_Type);
-      --VV : aliased BTrees.Value_Type;
-      --for VV'Address use V'Address;
-      --pragma Import (Ada, VV);
    begin
-      return Convert(V);
-      --return VV;
+      return Convert(To_Bounded(V));
    end To_Value;
 
    function To_Value (V : BTrees.Value_Type) return Values.String_Type
@@ -109,9 +129,7 @@ procedure IO_Dispatcher.Gen_BTrees is
       return To_Value(Left) = To_Value(Right);
    end "=";
 
-   Null_Value : constant BTrees.Value_Type := To_Value(Values.Empty_String);
-
-   Tree : BTrees.Tree_Type;
+   Null_Value : BTrees.Value_Type := To_Value(Random.Values.Empty_String);
 
    package Simple_Jobs is new Gen_Simple_Jobs
      (Object_Type     => BTrees.Tree_Type,
