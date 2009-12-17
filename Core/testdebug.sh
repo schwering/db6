@@ -1,3 +1,4 @@
+#!/bin/sh
 IO=map
 BIN=bin/debug/./ttree
 FILE=`cat .temp_path`btree

@@ -1,3 +1,4 @@
+#!/bin/sh
 IO=memory
 BIN=bin/release/./ttree
 FILE=`cat .temp_path`btree
