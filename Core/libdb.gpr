@@ -9,8 +9,8 @@ project LibDB is
    for Object_Dir  use "libdb/"& Attributes.Build &"/"& Attributes.Object_Dir;
    for Library_Dir use "libdb/"& Attributes.Build;
    for Library_Name use "db";
-   for Library_Kind use "relocatable";
-   --for Library_Kind use "static";
+   --for Library_Kind use "relocatable";
+   for Library_Kind use "static";
 
    for Languages use ("Ada", "C");
    for Source_Dirs use (".");
@@ -38,8 +38,9 @@ project LibDB is
          Attributes.Compiler'Default_Switches("C") & C_Sw;
    end Compiler;
 
-
    package Binder renames Attributes.Binder;
+
+   package Linker renames Attributes.Linker;
 
 end LibDB;
 

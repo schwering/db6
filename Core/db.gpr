@@ -29,6 +29,7 @@ project DB is
 
    package Compiler renames Attributes.Compiler;
    package Binder renames Attributes.Binder;
+   package Linker renames Attributes.Linker;
 
 end DB;
 

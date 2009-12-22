@@ -19,18 +19,20 @@ project Attributes is
          when "release" =>
             Ada_Sw := Ada_Sw & "-O2" & "-gnatp";
          when "debug" =>
-            Ada_Sw := Ada_Sw  &
-                "-g" &            -- debug info (needed for traceback)
-                "-fno-inline" &   -- no inlining
-                "-gnata" &        -- assertions on
-                "-gnatwa" &       -- all warnings
---              "-gnatD" &        -- dg-files
---              "-gnatwFa" &      -- turn off unref formal
-                "-gnato" &        -- overflow checking
---              "-fstack-check" & -- generate stack checking code
---              "-fstack-usage" & -- should make stack-usage
-                "-u0" &           -- should make per-thread-stack-usage
-                "-gnatE";         -- dynamic elaboration checking (what?)
+            Ada_Sw := Ada_Sw &
+                "-g" &             -- debug info (needed for traceback)
+                "-fno-inline" &    -- no inlining
+                "-gnata" &         -- assertions on
+                "-gnatwa" &        -- all warnings
+--              "-gnatD" &         -- dg-files
+--              "-gnatwFa" &       -- turn off unref formal
+                "-gnato" &         -- overflow checking
+--              "-fstack-check" &  -- generate stack checking code
+--              "-fstack-usage" &  -- should make stack-usage
+                "-u0" &            -- should make per-thread-stack-usage
+                "-gnatE" &         -- dynamic elaboration checking (what?)
+                "-fprofile-arcs" & -- for code coverage with gcov
+                "-ftest-coverage"; -- for code coverage with gcov
       end case;
       for Default_Switches ("Ada") use Ada_Sw;
 
@@ -57,6 +59,15 @@ project Attributes is
       end case;
    end Binder;
 
+
+   package Linker is
+      case Build is
+         when "release" =>
+         when "debug" =>
+            for Default_Switches ("Ada") use
+               ("-fprofile-arcs"); -- for code coverage with gcov
+      end case;
+   end Linker;
 
 end Attributes;
 

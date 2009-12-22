@@ -15,6 +15,17 @@ debug:
 release:
 	$(GPRBUILD) -p -Pdb -XBUILD=release
 
+gcov_release:
+	gcov -o libdb/release/objects libdb/release/objects/*.gcno
+	#gcov -o bin/release bin/release/*.gcno
+
+gcov_debug:
+	gcov -o libdb/debug/objects libdb/debug/objects/*.gcno
+	#gcov -o bin/debug bin/debug/*.gcno
+
+gcov_clean:
+	find . -name \*.gcda | xargs rm
+
 tags: *.ads *.adb
 	gnat xref -v -nostdinc -nostdlib -aOlibdb/debug/objects/ *.ad? | grep db- | grep \.ads | sort -fu >tags
 	gnat xref -v -nostdinc -nostdlib -aOlibdb/debug/objects/ *.ads >tags
