@@ -64,14 +64,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
       Is_Context_Free_Serialization : constant Boolean := True;
 
-      function Size_Of
+      function Size_Bound
         (S : String_Type)
          return IO.Blocks.Size_Type;
-
-      procedure Size_Of
-        (Context : in out Context_Type;
-         S       : in     String_Type;
-         Size    :    out IO.Blocks.Size_Type);
 
       procedure Write
         (Block   : in out IO.Blocks.Base_Block_Type;
@@ -106,7 +101,7 @@ package DB.Types.Gen_Strings.Gen_Bounded is
       pragma Pack (Indefinite_Packed_Buffer_Type);
       subtype Packed_Buffer_Type is Indefinite_Packed_Buffer_Type(Index_Type);
 
-      pragma Inline (Uncompressed.Size_Of);
+      pragma Inline (Uncompressed.Size_Bound);
       pragma Inline (Uncompressed.Write);
       pragma Inline (Uncompressed.Read);
       pragma Inline (Uncompressed.Skip);
@@ -122,11 +117,6 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
       Is_Context_Free_Serialization : constant Boolean := False;
 
-      procedure Size_Of
-        (Context : in out Context_Type;
-         S       : in     String_Type;
-         Size    :    out IO.Blocks.Size_Type);
-
       procedure Write
         (Context : in out Context_Type;
          Block   : in out IO.Blocks.Base_Block_Type;
@@ -140,7 +130,6 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          S       :    out String_Type);
 
    private
-      pragma Inline (Prefix_Compressed.Size_Of);
       pragma Inline (Prefix_Compressed.Write);
       pragma Inline (Prefix_Compressed.Read);
    end Prefix_Compressed;
@@ -155,11 +144,6 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
       Is_Context_Free_Serialization : constant Boolean := False;
 
-      procedure Size_Of
-        (Context : in out Context_Type;
-         S       : in     String_Type;
-         Size    :    out IO.Blocks.Size_Type);
-
       procedure Write
         (Context : in out Context_Type;
          Block   : in out IO.Blocks.Base_Block_Type;
@@ -173,7 +157,6 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          S       :    out String_Type);
 
    private
-      pragma Inline (Delta_Compressed.Size_Of);
       pragma Inline (Delta_Compressed.Write);
       pragma Inline (Delta_Compressed.Read);
    end Delta_Compressed;
@@ -186,7 +169,7 @@ package DB.Types.Gen_Strings.Gen_Bounded is
             First  : Boolean     := True;
          end record;
 
-      function String_Size_Bound
+      function Size_Bound
         (S : String_Type)
          return IO.Blocks.Size_Type;
 

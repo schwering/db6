@@ -19,7 +19,7 @@ package DB.Types.Gen_Numbers is
 
    Is_Context_Free_Serialization : constant Boolean := True;
 
-   function Size_Of
+   function Size_Bound
      (Number : Number_Type)
       return IO.Blocks.Size_Type;
 
@@ -43,7 +43,7 @@ package DB.Types.Gen_Numbers is
 private
    type Context_Type is null record;
 
-   pragma Inline (Size_Of);
+   pragma Inline (Size_Bound);
    pragma Inline (Write);
    pragma Inline (Read);
    pragma Inline (Skip);

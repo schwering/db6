@@ -24,35 +24,6 @@ package body Prefix_Compressed is
       "&"             => "&");
 
 
-
-   procedure Size_Of
-     (Context : in out Context_Type;
-      S       : in     String_Type;
-      Size    :    out IO.Blocks.Size_Type) is
-   begin
-      if not Context.Initialized then
-         Context.Initialized := True;
-         Context.Previous    := S;
-         Size                := Uncompressed.Size_Of(S);
-      else
-         declare
-            function Size_Of is new IO.Blocks.Size_Of(Length_Type);
-            function Size_Of is new IO.Blocks.Size_Of(Boolean);
-            Diff  : constant Compression.Delta_Type
-                  := Compression.Encode(Context.Previous, S);
-            Empty : constant Boolean := Diff.Postfix.Length = 0;
-            use type IO.Blocks.Size_Type;
-         begin
-            Size := Size_Of(Diff.Prefix_Length) + Size_Of(Empty);
-            if not Empty then
-               Size := Size + Uncompressed.Size_Of(Diff.Postfix);
-            end if;
-            Context.Previous := S;
-         end;
-      end if;
-   end Size_Of;
-
-
    procedure Write
      (Context : in out Context_Type;
       Block   : in out IO.Blocks.Base_Block_Type;

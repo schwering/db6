@@ -31,7 +31,7 @@ package DB.Types.Keys is
    function "<=" (Left, Right : Key_Type) return Boolean;
    function "="  (Left, Right : Key_Type) return Boolean;
 
-   function Size_Of
+   function Size_Bound
      (Key : Key_Type)
       return IO.Blocks.Size_Type;
 
@@ -70,7 +70,7 @@ private
 
    pragma Inline ("<=");
    pragma Inline ("=");
-   pragma Inline (Size_Of);
+   pragma Inline (Size_Bound);
    pragma Inline (Write);
    pragma Inline (Read);
    pragma Inline (Skip);

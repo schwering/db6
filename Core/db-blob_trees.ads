@@ -30,9 +30,10 @@ pragma Warnings (On);
 
 package DB.Blob_Trees is
 
-   package Keys     renames DB.Types.Keys;
-   package Values   renames DB.Types.Values.Unbounded;
-   package Value_IO renames Values.Parted;
+   package Keys            renames DB.Types.Keys;
+   package Values          renames DB.Types.Values.Unbounded;
+   package Value_IO        renames Values.Parted;
+   package Direct_Value_IO renames Values.Uncompressed;
 
    package Async_IO    renames DB.IO.Blocks.Asynchronous_IO.IO;
    package CFS_IO      renames DB.IO.Blocks.CFS_IO.IO;
@@ -48,24 +49,32 @@ package DB.Blob_Trees is
    package Gen_Wrappers is
 
       package Blob_Trees is new DB.Gen_Blob_Trees
-        (Key_Type            => Keys.Key_Type,
-         Key_Context_Type    => Keys.Context_Type,
-         Read_Key            => Keys.Read,
-         Skip_Key            => Keys.Skip,
-         Write_Key           => Keys.Write,
-         "="                 => Keys."=",
-         "<="                => Keys."<=",
-         Value_Type          => Values.String_Type,
-         Value_Context_Type  => Value_IO.Context_Type,
-         Value_Size_Bound    => Value_IO.String_Size_Bound,
-         Fold_Value_Contexts => Value_IO.Fold_Contexts,
-         Read_Value_Context  => Value_IO.Read_Context,
-         Write_Value_Context => Value_IO.Write_Context,
-         Read_Part_Of_Value  => Value_IO.Read_Part_Of_String,
-         Write_Part_Of_Value => Value_IO.Write_Part_Of_String,
+        (Key_Type                => Keys.Key_Type,
+         Key_Context_Type        => Keys.Context_Type,
+         Key_Size_Bound          => Keys.Size_Bound,
+         Read_Key                => Keys.Read,
+         Skip_Key                => Keys.Skip,
+         Write_Key               => Keys.Write,
+         "="                     => Keys."=",
+         "<="                    => Keys."<=",
+         Value_Type              => Values.String_Type,
+
+         Value_Context_Type      => Direct_Value_IO.Context_Type,
+         Value_Size_Bound        => Direct_Value_IO.Size_Bound,
+         Read_Value              => Direct_Value_IO.Read,
+         Skip_Value              => Direct_Value_IO.Skip,
+         Write_Value             => Direct_Value_IO.Write,
+
+         Parted_Value_Context_Type => Value_IO.Context_Type,
+         Parted_Value_Size_Bound => Value_IO.Size_Bound,
+         Fold_Value_Contexts      => Value_IO.Fold_Contexts,
+         Read_Value_Context      => Value_IO.Read_Context,
+         Write_Value_Context     => Value_IO.Write_Context,
+         Read_Part_Of_Value      => Value_IO.Read_Part_Of_String,
+         Write_Part_Of_Value     => Value_IO.Write_Part_Of_String,
          Is_Context_Free_Serialization => Keys.Is_Context_Free_Serialization,
-         Storage_Pool        => Root_Storage_Pool'Class(Global_Pool_Object),
-         Block_IO            => Block_IO);
+         Storage_Pool            => Root_Storage_Pool'Class(Global_Pool_Object),
+         Block_IO                => Block_IO);
 
 --      package Climb_Caches is new IO.Blocks.Gen_Climb_Caches(Block_IO);
 --      package Climb_Cached_Blob_Trees is new DB.Gen_Blob_Trees

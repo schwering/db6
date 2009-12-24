@@ -21,7 +21,6 @@ gcov_release:
 
 gcov_debug:
 	gcov -o libdb/debug/objects libdb/debug/objects/*.gcno
-	#gcov -o bin/debug bin/debug/*.gcno
 
 gcov_clean:
 	find . -name \*.gcda | xargs rm

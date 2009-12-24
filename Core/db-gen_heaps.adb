@@ -4,19 +4,10 @@
 --
 -- Copyright 2008, 2009 Christoph Schwering
 
-with Ada.Text_IO; use Ada.Text_IO;
-
 with DB.Utils.Gen_Minimum;
+with DB.Utils.Print;
 
 package body DB.Gen_Heaps is
-
-   procedure Print (S : String)
-   is
-      procedure Internal (S : String);
-      pragma Import (C, Internal, "printf");
-   begin
-      Internal(S & ASCII.LF & ASCII.NUL);
-   end Print;
 
    ----------
    -- Info and Free BTree type packages.
@@ -1556,18 +1547,18 @@ package body DB.Gen_Heaps is
       State   : Info_BTrees.Result_Type;
       use type Info_BTrees.Result_Type;
    begin
-      Put_Line("INFO INDEX");
+      DB.Utils.Print("INFO INDEX");
       Info_BTrees.Start_Transaction(Heap.Info_Tree, Trans);
       for I in Positive'Range loop
          Info_BTrees.Next(Heap.Info_Tree, Trans, Cursor, Address, Info, State);
          if State = Info_BTrees.Success then
-            Put_Line(Positive'Image(I) &
-                     Block_IO.Image(Address) &" "&
-                     Chunk_State_Type'Image(Info.State) &
-                     Length_Type'Image(Info.Length));
+            DB.Utils.Print(Positive'Image(I) &
+                           Block_IO.Image(Address) &" "&
+                           Chunk_State_Type'Image(Info.State) &
+                           Length_Type'Image(Info.Length));
          else
-            Put_Line("Finished with State = "&
-                     Info_BTrees.Result_Type'Image(State));
+            DB.Utils.Print("Finished with State = "&
+                           Info_BTrees.Result_Type'Image(State));
             Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
             return;
          end if;
@@ -1604,19 +1595,19 @@ package body DB.Gen_Heaps is
       State   : Free_BTrees.Result_Type;
       use type Free_BTrees.Result_Type;
    begin
-      Put_Line("FREE INDEX");
+      DB.Utils.Print("FREE INDEX");
       Free_BTrees.Start_Transaction(Heap.Free_Tree, Trans);
       for I in Positive'Range loop
          Free_BTrees.Next(Heap.Free_Tree, Trans, Cursor, Key, Value, State);
          Length  := Key.Length;
          Address := Key.Address;
          if State = Free_BTrees.Success then
-            Put_Line(Positive'Image(I) &
-                     Length_Type'Image(Length) &
-                     Block_IO.Image(Address));
+            DB.Utils.Print(Positive'Image(I) &
+                           Length_Type'Image(Length) &
+                           Block_IO.Image(Address));
          else
-            Put_Line("Finished with State = "&
-                     Free_BTrees.Result_Type'Image(State));
+            DB.Utils.Print("Finished with State = "&
+                           Free_BTrees.Result_Type'Image(State));
             Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
             return;
          end if;

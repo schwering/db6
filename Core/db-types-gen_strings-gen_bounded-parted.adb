@@ -12,14 +12,14 @@ package body Parted is
    Item_Size : constant IO.Blocks.Size_Type
              := IO.Blocks.Bits_To_Units(Item_Type'Size);
 
-   function String_Size_Bound
+   function Size_Bound
      (S : String_Type)
       return IO.Blocks.Size_Type
    is
       use type DB.IO.Blocks.Size_Type;
    begin
       return Item_Size * IO.Blocks.Size_Type(S.Length);
-   end String_Size_Bound;
+   end Size_Bound;
 
 
    function Fold_Contexts

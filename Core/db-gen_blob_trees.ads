@@ -21,6 +21,9 @@ with DB.IO.Blocks.Gen_IO;
 generic
    type Key_Type is private;
    type Key_Context_Type is limited private;
+   with function Key_Size_Bound
+          (Key : Key_Type)
+           return IO.Blocks.Size_Type;
    with procedure Read_Key
           (Context : in out Key_Context_Type;
            Block   : in     IO.Blocks.Base_Block_Type;
@@ -40,30 +43,50 @@ generic
    with function "<=" (Left, Right : Key_Type) return Boolean is <>;
 
    type Value_Type is private;
+
    type Value_Context_Type is private;
    with function Value_Size_Bound
           (Value : Value_Type)
            return IO.Blocks.Size_Type;
+   with procedure Read_Value
+          (Context : in out Value_Context_Type;
+           Block   : in     IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Value   :    out Value_Type);
+   with procedure Skip_Value
+          (Context : in out Value_Context_Type;
+           Block   : in     IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type);
+   with procedure Write_Value
+          (Context : in out Value_Context_Type;
+           Block   : in out IO.Blocks.Base_Block_Type;
+           Cursor  : in out IO.Blocks.Cursor_Type;
+           Value   : in     Value_Type);
+
+   type Parted_Value_Context_Type is private;
+   with function Parted_Value_Size_Bound
+          (Value : Value_Type)
+           return IO.Blocks.Size_Type;
    with function Fold_Value_Contexts
-          (Left     : Value_Context_Type;
-           Appended : Value_Context_Type)
-           return Value_Context_Type;
+          (Left     : Parted_Value_Context_Type;
+           Appended : Parted_Value_Context_Type)
+           return Parted_Value_Context_Type;
    with procedure Read_Value_Context
           (Block   : in     IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;
-           Context :    out Value_Context_Type);
+           Context :    out Parted_Value_Context_Type);
    with procedure Write_Value_Context
           (Block   : in out IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;
-           Context : in     Value_Context_Type);
+           Context : in     Parted_Value_Context_Type);
    with procedure Read_Part_Of_Value
-          (Context : in out Value_Context_Type;
+          (Context : in out Parted_Value_Context_Type;
            Block   : in     IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;
            Value   : in out Value_Type;
            Done    :    out Boolean);
    with procedure Write_Part_Of_Value
-          (Context : in out Value_Context_Type;
+          (Context : in out Parted_Value_Context_Type;
            Block   : in out IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;
            Value   : in     Value_Type;
@@ -443,8 +466,8 @@ private
 
    package Heaps is new Gen_Heaps
      (Item_Type          => Value_Type,
-      Item_Context_Type  => Value_Context_Type,
-      Item_Size_Bound    => Value_Size_Bound,
+      Item_Context_Type  => Parted_Value_Context_Type,
+      Item_Size_Bound    => Parted_Value_Size_Bound,
       Fold_Contexts      => Fold_Value_Contexts,
       Read_Context       => Read_Value_Context,
       Write_Context      => Write_Value_Context,
@@ -456,22 +479,40 @@ private
       Block_IO           => Block_IO);
 
    package BTree_Utils is
-      subtype Value_Type is Heaps.Address_Type;
-      type Value_Context_Type is null record;
+      type Value_Type (Direct : Boolean := True) is
+         record
+            case Direct is
+               when True  => Value   : Gen_Blob_Trees.Value_Type;
+               when False => Address : Heaps.Address_Type;
+            end case;
+         end record;
+
+      type Context_Type is
+         record
+            Value_Context : Value_Context_Type;
+         end record;
+
+      function Max_Key_Size
+         return IO.Blocks.Size_Type;
+
+      function Fits_Direct
+        (Key   : in Gen_Blob_Trees.Key_Type;
+         Value : in Gen_Blob_Trees.Value_Type)
+         return Boolean;
 
       procedure Read_Value
-        (Context : in out Value_Context_Type;
+        (Context : in out Context_Type;
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          Value   :    out Value_Type);
 
       procedure Skip_Value
-        (Context : in out Value_Context_Type;
+        (Context : in out Context_Type;
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type);
 
       procedure Write_Value
-        (Context : in out Value_Context_Type;
+        (Context : in out Context_Type;
          Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          Value   : in     Value_Type);
@@ -486,7 +527,7 @@ private
       "="                           => "=",
       "<="                          => "<=",
       Value_Type                    => BTree_Utils.Value_Type,
-      Value_Context_Type            => BTree_Utils.Value_Context_Type,
+      Value_Context_Type            => BTree_Utils.Context_Type,
       Read_Value                    => BTree_Utils.Read_Value,
       Skip_Value                    => BTree_Utils.Skip_Value,
       Write_Value                   => BTree_Utils.Write_Value,

@@ -9,7 +9,7 @@ with DB.IO.Blocks;
 separate (DB.Types.Gen_Strings.Gen_Bounded)
 package body Uncompressed is
 
-   function Size_Of
+   function Size_Bound
      (S : String_Type)
       return IO.Blocks.Size_Type
    is
@@ -17,18 +17,7 @@ package body Uncompressed is
          new IO.Blocks.Size_Of_Array(Index_Type, Item_Type, Buffer_Type);
    begin
       return Size_Of_String(S.Buffer, 1, S.Length);
-   end Size_Of;
-
-
-   procedure Size_Of
-     (Context : in out Context_Type;
-      S       : in     String_Type;
-      Size    :    out IO.Blocks.Size_Type)
-   is
-      pragma Unreferenced (Context);
-   begin
-      Size := Size_Of(S);
-   end Size_Of;
+   end Size_Bound;
 
 
    procedure Write

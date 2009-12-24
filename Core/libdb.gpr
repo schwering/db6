@@ -40,7 +40,5 @@ project LibDB is
 
    package Binder renames Attributes.Binder;
 
-   package Linker renames Attributes.Linker;
-
 end LibDB;
 

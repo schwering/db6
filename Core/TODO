@@ -20,22 +20,11 @@ taking the result modulo the reduce process count as index of the the
 reduce process. Pretty easy.
 
 
-So what's needed for that? First of all, the BLOB-Tree possibly should be
-changed as follows (or a new BTree/Heap wrapper with the following semantics
-should be created): besides the key/value-to-block-read/write-procedures and
-the value-from/to-storage-array-functions, a max-size-of-key/value-function
-is taken as formal generic parameter. When a (K, V) pair is inserted, it is
-checked whether Max_Size_Of_Key(K) + Max_Size_Of_Value(V) <= Max_Entry_Size-1.
-If this expression evaluates to true, the (K, V) pair is stored directly in
-the BTree leaves including a leading flag that indicates that this is a direct
-entry. Otherwise, V is stored in the Heap associated with the BTree at address
-A and the tuple (K, A) is stored in the BTree together with a flag that
-indicates that the value is stored in the heap.
-
 Would be cool to store (Key, List_Of_Values) tuples. While this is easy with
 the current BLOB_Tree and would also be easy with the heterogeneous BTree
 mentionted above (Max_Size_Of_Value(List) = +\infty suffices), the problem is
-how to append values (and possibly also delete something).
+how to append values (and possibly also delete something). <-- Das Problem
+ist mit der neuen Heap-Operation Append behoben.
 
 
 

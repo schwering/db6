@@ -12,14 +12,14 @@ package body Parted is
    Item_Size : constant IO.Blocks.Size_Type
              := IO.Blocks.Bits_To_Units(Item_Type'Size);
 
-   function String_Size_Bound
+   function Size_Bound
      (S : String_Type)
       return IO.Blocks.Size_Type
    is
       use type DB.IO.Blocks.Size_Type;
    begin
       return Item_Size * IO.Blocks.Size_Type(S.Length);
-   end String_Size_Bound;
+   end Size_Bound;
 
 
    function Fold_Contexts
@@ -53,11 +53,6 @@ package body Parted is
       Write(Block, Cursor, Context.Length);
    end Write_Context;
 
-   type Last_Type is (Nothing, Space, One, Zero);
-   RLast : Last_Type := Nothing;
-   RCtr  : Natural := 0;
-   WLast : Last_Type := Nothing;
-   WCtr  : Natural := 0;
 
    procedure Read_Part_Of_String
      (Context : in out Context_Type;
@@ -95,7 +90,6 @@ package body Parted is
          end loop;
          S    := S & Buffer;
          Done := Length(S) = Context.Length;
-         if Done then RLast := Nothing; end if;
       end;
 
    end Read_Part_Of_String;
@@ -136,7 +130,6 @@ package body Parted is
          end loop;
          Context.Length := Context.Length + Write_Amount;
          Done           := Length(S) = Context.Length;
-         if Done then WLast := Nothing; end if;
       end;
    end Write_Part_Of_String;
 

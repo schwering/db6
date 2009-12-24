@@ -42,16 +42,16 @@ package body DB.Types.Keys is
    end "=";
 
 
-   function Size_Of
+   function Size_Bound
      (Key : Key_Type)
       return IO.Blocks.Size_Type
    is
       use type IO.Blocks.Size_Type;
    begin
-      return Row_Serialization.Size_Of(Key.Row) +
-           --Column_Serialization.Size_Of(Key.Column) + 
-             Times.Size_Of(Key.Time);
-   end Size_Of;
+      return Row_Serialization.Size_Bound(Key.Row) +
+           --Column_Serialization.Size_Bound(Key.Column) + 
+             Times.Size_Bound(Key.Time);
+   end Size_Bound;
 
 
    procedure Write

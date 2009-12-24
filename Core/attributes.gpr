@@ -31,8 +31,8 @@ project Attributes is
 --              "-fstack-usage" &  -- should make stack-usage
                 "-u0" &            -- should make per-thread-stack-usage
                 "-gnatE" &         -- dynamic elaboration checking (what?)
-                "-fprofile-arcs" & -- for code coverage with gcov
-                "-ftest-coverage"; -- for code coverage with gcov
+                "";--"-fprofile-arcs" & -- for code coverage with gcov
+                --"-ftest-coverage"; -- for code coverage with gcov
       end case;
       for Default_Switches ("Ada") use Ada_Sw;
 
@@ -65,7 +65,7 @@ project Attributes is
          when "release" =>
          when "debug" =>
             for Default_Switches ("Ada") use
-               ("-fprofile-arcs"); -- for code coverage with gcov
+               ("");--"-fprofile-arcs"); -- for code coverage with gcov
       end case;
    end Linker;
 

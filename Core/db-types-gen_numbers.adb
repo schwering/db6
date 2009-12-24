@@ -8,14 +8,14 @@ with Ada.Unchecked_Conversion;
 
 package body DB.Types.Gen_Numbers is
 
-   function Size_Of
+   function Size_Bound
      (Number : Number_Type)
       return IO.Blocks.Size_Type
    is
       function Size_Of is new IO.Blocks.Size_Of(Number_Type);
    begin
       return Size_Of(Number);
-   end Size_Of;
+   end Size_Bound;
 
 
    procedure Write
