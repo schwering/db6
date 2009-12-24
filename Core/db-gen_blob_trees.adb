@@ -6,8 +6,6 @@
 
 with Ada.Unchecked_Conversion;
 
-with DB.Utils.Bla;
-
 package body DB.Gen_Blob_Trees is
 
    package body BTree_Utils is
@@ -530,13 +528,11 @@ package body DB.Gen_Blob_Trees is
       B_State : BTrees.Result_Type;
    begin
       if BTree_Utils.Fits_Direct(Key, Value) then
-         DB.Utils.Bla.Direct := DB.Utils.Bla.Direct + 1;
          B_Value := (Direct => True, Value => Value);
          BTrees.Insert(Tree.BTree, Key, B_Value,
                        BTrees.Count_Type(Position), B_State);
          State := To_State(B_State);
       else
-         DB.Utils.Bla.Indirect := DB.Utils.Bla.Indirect + 1;
          declare
             Address : Heaps.Address_Type;
             H_State : Heaps.Result_Type;

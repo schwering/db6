@@ -98,7 +98,7 @@ generic
 
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
 package DB.Gen_Blob_Trees is
-   --pragma Preelaborate;
+   pragma Preelaborate;
 
    ----------
    -- Tree initialization procedures.
