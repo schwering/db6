@@ -588,6 +588,64 @@ package body DB.Gen_Blob_Trees is
    end Insert;
 
 
+   procedure Append
+     (Tree     : in out Tree_Type;
+      Key      : in     Key_Type;
+      Value    : in     Value_Type;
+      Position :    out Count_Type;
+      State    :    out Result_Type)
+   is
+      B_Value : BTree_Utils.Value_Type;
+      B_State : BTrees.Result_Type;
+   begin
+      BTrees.Look_Up(Tree.BTree, Key, B_Value, BTrees.Count_Type(Position),
+                     B_State);
+      State := To_State(B_State);
+      if State = Success then
+         if B_Value.Direct then
+            State := Failure;
+            return;
+         end if;
+         declare
+            H_State : Heaps.Result_Type;
+         begin
+            Heaps.Append(Tree.Heap, Value, B_Value.Address, H_State);
+            State := To_State(H_State);
+         end;
+      end if;
+   end Append;
+
+
+   procedure Append
+     (Tree        : in out Tree_Type;
+      Transaction : in out RW_Transaction_Type'Class;
+      Key         : in     Key_Type;
+      Value       : in     Value_Type;
+      Position    :    out Count_Type;
+      State       :    out Result_Type)
+   is
+      B_Value : BTree_Utils.Value_Type;
+      B_State : BTrees.Result_Type;
+   begin
+      BTrees.Look_Up(Tree.BTree, Transaction.BTree_Transaction,
+                     Key, B_Value, BTrees.Count_Type(Position), B_State);
+      State := To_State(B_State);
+      if State = Success then
+         if B_Value.Direct then
+            State := Failure;
+            return;
+         end if;
+         declare
+            H_State : Heaps.Result_Type;
+         begin
+            Heaps.Append(Tree.Heap, Transaction.Heap_Transaction, Value,
+                         B_Value.Address, H_State);
+            State := To_State(H_State);
+         end;
+      end if;
+   end Append;
+
+
    procedure Delete
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;

@@ -269,6 +269,29 @@ package DB.Gen_Blob_Trees is
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
 
+   procedure Append
+     (Tree     : in out Tree_Type;
+      Key      : in     Key_Type;
+      Value    : in     Value_Type;
+      Position :    out Count_Type;
+      State    :    out Result_Type);
+   -- Appends the Value as part to the value stored under Key as long as this
+   -- value is stored indirectly, i.e. in the heap. In all other cases,
+   -- including when the value is stored directly in the BTree leaves,
+   -- State = Failure, or in case of serious errors State = Error.
+
+   procedure Append
+     (Tree        : in out Tree_Type;
+      Transaction : in out RW_Transaction_Type'Class;
+      Key         : in     Key_Type;
+      Value       : in     Value_Type;
+      Position    :    out Count_Type;
+      State       :    out Result_Type);
+   -- Appends the Value as part to the value stored under Key as long as this
+   -- value is stored indirectly, i.e. in the heap. In all other cases,
+   -- including when the value is stored directly in the BTree leaves,
+   -- State = Failure, or in case of serious errors State = Error.
+
    procedure Delete
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
