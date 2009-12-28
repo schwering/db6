@@ -43,6 +43,9 @@ generic
           (Left     : Item_Context_Type;
            Appended : Item_Context_Type)
            return Item_Context_Type;
+   with function Context_Size_Bound
+          (Context : Item_Context_Type)
+           return IO.Blocks.Size_Type;
    with procedure Read_Context
           (Block   : in     IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;
@@ -256,6 +259,10 @@ private
       function "<=" (A, B : Key_Type) return Boolean;
       pragma Inline ("<=");
 
+      function Key_Size_Bound
+        (Key : Key_Type)
+         return IO.Blocks.Size_Type;
+
       procedure Read_Key
         (Context : in out Key_Context_Type;
          Block   : in     IO.Blocks.Base_Block_Type;
@@ -272,6 +279,10 @@ private
          Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          Key     : in     Key_Type);
+
+      function Value_Size_Bound
+        (Value : Value_Type)
+         return IO.Blocks.Size_Type;
 
       procedure Read_Value
         (Context : in out Value_Context_Type;
@@ -294,6 +305,7 @@ private
    package Info_BTrees is new Gen_BTrees
      (Key_Type                      => Info_BTree_Types.Key_Type,
       Key_Context_Type              => Info_BTree_Types.Key_Context_Type,
+      Key_Size_Bound                => Info_BTree_Types.Key_Size_Bound,
       Write_Key                     => Info_BTree_Types.Write_Key,
       Read_Key                      => Info_BTree_Types.Read_Key,
       Skip_Key                      => Info_BTree_Types.Skip_Key,
@@ -301,6 +313,7 @@ private
       "<="                          => Info_BTree_Types."<=",
       Value_Type                    => Info_BTree_Types.Value_Type,
       Value_Context_Type            => Info_BTree_Types.Value_Context_Type,
+      Value_Size_Bound              => Info_BTree_Types.Value_Size_Bound,
       Write_Value                   => Info_BTree_Types.Write_Value,
       Read_Value                    => Info_BTree_Types.Read_Value,
       Skip_Value                    => Info_BTree_Types.Skip_Value,
@@ -326,6 +339,10 @@ private
       function "<=" (A, B : Key_Type) return Boolean;
       pragma Inline ("<=");
 
+      function Key_Size_Bound
+        (Key : Key_Type)
+         return IO.Blocks.Size_Type;
+
       procedure Read_Key
         (Context : in out Key_Context_Type;
          Block   : in     IO.Blocks.Base_Block_Type;
@@ -342,6 +359,10 @@ private
          Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          Key     : in     Key_Type);
+
+      function Value_Size_Bound
+        (Value : Value_Type)
+         return IO.Blocks.Size_Type;
 
       procedure Read_Value
         (Context : in out Value_Context_Type;
@@ -364,6 +385,7 @@ private
    package Free_BTrees is new Gen_BTrees
      (Key_Type                      => Free_BTree_Types.Key_Type,
       Key_Context_Type              => Free_BTree_Types.Key_Context_Type,
+      Key_Size_Bound                => Free_BTree_Types.Key_Size_Bound,
       Write_Key                     => Free_BTree_Types.Write_Key,
       Read_Key                      => Free_BTree_Types.Read_Key,
       Skip_Key                      => Free_BTree_Types.Skip_Key,
@@ -371,6 +393,7 @@ private
       "<="                          => Free_BTree_Types."<=",
       Value_Type                    => Free_BTree_Types.Value_Type,
       Value_Context_Type            => Free_BTree_Types.Value_Context_Type,
+      Value_Size_Bound              => Free_BTree_Types.Value_Size_Bound,
       Write_Value                   => Free_BTree_Types.Write_Value,
       Read_Value                    => Free_BTree_Types.Read_Value,
       Skip_Value                    => Free_BTree_Types.Skip_Value,

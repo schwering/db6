@@ -22,8 +22,8 @@ package body DB.Gen_Blob_Trees is
 
 
       function Fits_Direct
-        (Key   : in Gen_Blob_Trees.Key_Type;
-         Value : in Gen_Blob_Trees.Value_Type)
+        (Key   : Gen_Blob_Trees.Key_Type;
+         Value : Gen_Blob_Trees.Value_Type)
          return Boolean
       is
          use type IO.Blocks.Size_Type;
@@ -32,6 +32,29 @@ package body DB.Gen_Blob_Trees is
                 BTrees.Max_Key_Size(IO.Blocks.Bits_To_Units(Boolean'Size) +
                                     Value_Size_Bound(Value));
       end Fits_Direct;
+
+
+      function Value_Size_Bound
+        (Value : Value_Type)
+         return IO.Blocks.Size_Type
+      is
+         use type IO.Blocks.Size_Type;
+         function Size_Of is new IO.Blocks.Size_Of(Boolean);
+         Size : IO.Blocks.Size_Type;
+      begin
+         Size := Size_Of(Value.Direct);
+         case Value.Direct is
+            when True =>
+               Size := Size + Value_Size_Bound(Value.Value);
+            when False =>
+               declare
+                  function Size_Of is new IO.Blocks.Size_Of(Heaps.Address_Type);
+               begin
+                  Size := Size + Size_Of(Value.Address);
+               end;
+         end case;
+         return Size;
+      end Value_Size_Bound;
 
 
       procedure Write_Value

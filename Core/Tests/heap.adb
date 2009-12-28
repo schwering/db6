@@ -50,6 +50,7 @@ is
       Item_Context_Type  => Item_IO.Context_Type,
       Item_Size_Bound    => Item_IO.Size_Bound,
       Fold_Contexts      => Item_IO.Fold_Contexts,
+      Context_Size_Bound => Item_IO.Context_Size_Bound,
       Read_Context       => Item_IO.Read_Context,
       Write_Context      => Item_IO.Write_Context,
       Read_Part_Of_Item  => Item_IO.Read_Part_Of_String,

@@ -185,34 +185,61 @@ package body Nodes is
    package body Phys is
       use type IO.Blocks.Long_Position_Type;
 
-      function Size_Of is
-         new IO.Blocks.Size_Of(Boolean);
-      function Size_Of is
-         new IO.Blocks.Size_Of(Degree_Type);
-      function Size_Of is
-         new IO.Blocks.Size_Of(Address_Type);
-      function Size_Of is
-         new IO.Blocks.Size_Of(Child_Type);
-      function Size_Of is
-         new IO.Blocks.Size_Of(IO.Blocks.Long_Index_Type);
+      function Size_Of_Degree return IO.Blocks.Long_Position_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(Degree_Type);
+         pragma Inline (Size_Of);
+         pragma Inline (Size_Of_Degree);
+      begin
+         return IO.Blocks.Long_Position_Type(Size_Of(Degree_Type'(0)));
+      end Size_Of_Degree;
 
-      Size_Of_Degree : constant IO.Blocks.Long_Position_Type
-                     := IO.Blocks.Long_Position_Type(Size_Of(Degree_Type'(0)));
-      Size_Of_Boolean : constant IO.Blocks.Long_Position_Type
-                      := IO.Blocks.Long_Position_Type(Size_Of(Boolean'(True)));
-      Size_Of_Address : constant IO.Blocks.Long_Position_Type
-                      := IO.Blocks.Long_Position_Type(Size_Of(Invalid_Address));
-      Size_Of_Position : constant IO.Blocks.Long_Position_Type
-                       := IO.Blocks.Long_Position_Type
-                             (Size_Of(IO.Blocks.Long_Index_Type'First));
-      Size_Of_Child    : constant IO.Blocks.Long_Position_Type
-                       := IO.Blocks.Long_Position_Type
-                             (Size_Of(Child_Type'(others => <>)));
+      function Size_Of_Boolean return IO.Blocks.Long_Position_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(Boolean);
+         pragma Inline (Size_Of);
+         pragma Inline (Size_Of_Boolean);
+      begin
+         return IO.Blocks.Long_Position_Type(Size_Of(Boolean'(True)));
+      end Size_Of_Boolean;
 
-      Size_Of_Meta_Data : constant IO.Blocks.Long_Position_Type
-                        := Size_Of_Boolean + Size_Of_Degree +
-                           Size_Of_Boolean + Size_Of_Address +
-                           Size_Of_Address + Size_Of_Address;
+      function Size_Of_Address return IO.Blocks.Long_Position_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(Address_Type);
+         pragma Inline (Size_Of);
+         pragma Inline (Size_Of_Address);
+      begin
+         return IO.Blocks.Long_Position_Type(Size_Of(Invalid_Address));
+      end Size_Of_Address;
+
+      function Size_Of_Position return IO.Blocks.Long_Position_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(IO.Blocks.Long_Index_Type);
+         pragma Inline (Size_Of);
+         pragma Inline (Size_Of_Position);
+      begin
+         return IO.Blocks.Long_Position_Type(Size_Of
+                          (IO.Blocks.Long_Index_Type'First));
+      end Size_Of_Position;
+
+      function Size_Of_Child return IO.Blocks.Long_Position_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(Child_Type);
+         pragma Inline (Size_Of);
+         pragma Inline (Size_Of_Child);
+      begin
+         return IO.Blocks.Long_Position_Type(Size_Of
+                          (Child_Type'(others => <>)));
+      end Size_Of_Child;
+
+      function Size_Of_Meta_Data return IO.Blocks.Long_Position_Type
+      is
+         pragma Inline (Size_Of_Meta_Data);
+      begin
+         return Size_Of_Boolean + Size_Of_Degree +
+                Size_Of_Boolean + Size_Of_Address +
+                Size_Of_Address + Size_Of_Address;
+      end Size_Of_Meta_Data;
 
       -- Layout of Node Blocks is as follows:
       -- 1. Is_Free (Size_Of_Boolean)

@@ -20,7 +20,6 @@ with DB.Types.Values.Unbounded;
 with DB.Types.Times;
 
 with DB.Utils.Traceback;
-with DB.Utils.Bla;
 
 procedure IO_Dispatcher.MMap is
    Max_Key_Size   : constant := 2 + 1000 + 8 
@@ -296,8 +295,6 @@ begin
    end;
 
    Jobs.Execute_Jobs(Long_Job);
-            Put_Line("Direct:"& DB.Utils.Bla.Direct'Img);
-            Put_Line("InDirect:"& DB.Utils.Bla.InDirect'Img);
 
    DB.Tables.Maps.Finalize(Map);
 exception

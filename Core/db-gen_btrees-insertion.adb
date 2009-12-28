@@ -39,15 +39,21 @@ package body Insertion is
       Position    :    out Count_Type;
       State       :    out Result_Type)
    is
+      use type IO.Blocks.Size_Type;
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);
       pragma Assert (Transaction.Owning_Tree = Tree.Self);
       pragma Assert (Transaction.Started);
+      pragma Assert (Key_Size_Bound(Key) <=
+                     Max_Key_Size(Value_Size_Bound(Value)));
 
       N_A : Nodes.Valid_Address_Type;
       I   : Nodes.Index_Type;
    begin
-      State := Success;
+      if Key_Size_Bound(Key) > Max_Key_Size(Value_Size_Bound(Value)) then
+         State := Failure;
+         return;
+      end if;
 
       -- Search leaf, fill buffer. Correctly initialize N_A and I to the leaf
       -- node address and the position at which the (Key, Value) should be
@@ -87,6 +93,7 @@ package body Insertion is
       begin
          Read_Node(Tree, Transaction, N_A, N_Old);
          N_New := Nodes.Insertion(N_Old, I, Key, Value);
+         State := Success;
          Handle_Overflow(Tree, Transaction, N_A, N_New, State);
       end;
 

@@ -22,8 +22,12 @@ package body IO_Dispatcher.Random is
 
    Mutex             : DB.Locks.Mutexes.Mutex_Type;
    Max_Size          : constant := 1024;
-   --Max_Length      : constant := 1530 - 8 - 4 - 1;
-   Max_String_Length : constant := 1012 - 8 - 4;-- + 10;
+   Max_String_Length : constant := 1012 - 8 - 4 - 4;
+   --                               ^M    ^T  ^L  ^V
+   -- M = (4096 - Meta_Data_Size) * 1 / 4
+   -- T = Timestamp_Size (part of Key_Type)
+   -- L = Value_Length_Size
+   -- V = Value_Buffer_Size
 
 
    generic

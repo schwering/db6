@@ -430,6 +430,7 @@ private
    package BTrees is new Gen_BTrees
      (Key_Type           => Types.Keys.Key_Type,
       Key_Context_Type   => Types.Keys.Context_Type,
+      Key_Size_Bound     => Types.Keys.Size_Bound,
       Read_Key           => Types.Keys.Read,
       Skip_Key           => Types.Keys.Skip,
       Write_Key          => Types.Keys.Write,
@@ -437,6 +438,7 @@ private
       "<="               => Types.Keys."<=",
       Value_Type         => Types.Values.Bounded.String_Type,
       Value_Context_Type => Bounded_Values_IO.Context_Type,
+      Value_Size_Bound   => Bounded_Values_IO.Size_Bound,
       Read_Value         => Bounded_Values_IO.Read,
       Skip_Value         => Bounded_Values_IO.Skip,
       Write_Value        => Bounded_Values_IO.Write,
@@ -464,6 +466,8 @@ private
       Parted_Value_Context_Type => Types.Values.Unbounded.Parted.Context_Type,
       Parted_Value_Size_Bound => Types.Values.Unbounded.Parted.Size_Bound,
       Fold_Value_Contexts => Types.Values.Unbounded.Parted.Fold_Contexts,
+      Value_Context_Size_Bound =>
+                             Types.Values.Unbounded.Parted.Context_Size_Bound,
       Read_Value_Context  => Types.Values.Unbounded.Parted.Read_Context,
       Write_Value_Context => Types.Values.Unbounded.Parted.Write_Context,
       Read_Part_Of_Value  => Types.Values.Unbounded.Parted.Read_Part_Of_String,

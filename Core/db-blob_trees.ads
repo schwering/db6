@@ -30,25 +30,25 @@ pragma Warnings (On);
 
 package DB.Blob_Trees is
 
-   package Keys            renames DB.Types.Keys;
-   package Values          renames DB.Types.Values.Unbounded;
+   package Keys            renames Types.Keys;
+   package Values          renames Types.Values.Unbounded;
    package Value_IO        renames Values.Parted;
    package Direct_Value_IO renames Values.Uncompressed;
 
-   package Async_IO    renames DB.IO.Blocks.Asynchronous_IO.IO;
-   package CFS_IO      renames DB.IO.Blocks.CFS_IO.IO;
-   package Device_IO   renames DB.IO.Blocks.Device_IO.IO;
-   package Direct_IO   renames DB.IO.Blocks.Direct_IO.IO;
-   package File_IO     renames DB.IO.Blocks.File_IO.IO;
-   package File_SL_IO  renames DB.IO.Blocks.File_IO.System_Locking_IO;
-   package Memory_IO   renames DB.IO.Blocks.Memory_IO.IO;
-   package Cmp_Mem_IO  renames DB.IO.Blocks.Compressed_Memory_IO.IO;
+   package Async_IO    renames IO.Blocks.Asynchronous_IO.IO;
+   package CFS_IO      renames IO.Blocks.CFS_IO.IO;
+   package Device_IO   renames IO.Blocks.Device_IO.IO;
+   package Direct_IO   renames IO.Blocks.Direct_IO.IO;
+   package File_IO     renames IO.Blocks.File_IO.IO;
+   package File_SL_IO  renames IO.Blocks.File_IO.System_Locking_IO;
+   package Memory_IO   renames IO.Blocks.Memory_IO.IO;
+   package Cmp_Mem_IO  renames IO.Blocks.Compressed_Memory_IO.IO;
 
    generic
-      with package Block_IO is new DB.IO.Blocks.Gen_IO (<>);
+      with package Block_IO is new IO.Blocks.Gen_IO (<>);
    package Gen_Wrappers is
 
-      package Blob_Trees is new DB.Gen_Blob_Trees
+      package Blob_Trees is new Gen_Blob_Trees
         (Key_Type                => Keys.Key_Type,
          Key_Context_Type        => Keys.Context_Type,
          Key_Size_Bound          => Keys.Size_Bound,
@@ -66,18 +66,19 @@ package DB.Blob_Trees is
          Write_Value             => Direct_Value_IO.Write,
 
          Parted_Value_Context_Type => Value_IO.Context_Type,
-         Parted_Value_Size_Bound => Value_IO.Size_Bound,
-         Fold_Value_Contexts      => Value_IO.Fold_Contexts,
-         Read_Value_Context      => Value_IO.Read_Context,
-         Write_Value_Context     => Value_IO.Write_Context,
-         Read_Part_Of_Value      => Value_IO.Read_Part_Of_String,
-         Write_Part_Of_Value     => Value_IO.Write_Part_Of_String,
+         Parted_Value_Size_Bound   => Value_IO.Size_Bound,
+         Fold_Value_Contexts       => Value_IO.Fold_Contexts,
+         Value_Context_Size_Bound  => Value_IO.Context_Size_Bound,
+         Read_Value_Context        => Value_IO.Read_Context,
+         Write_Value_Context       => Value_IO.Write_Context,
+         Read_Part_Of_Value        => Value_IO.Read_Part_Of_String,
+         Write_Part_Of_Value       => Value_IO.Write_Part_Of_String,
          Is_Context_Free_Serialization => Keys.Is_Context_Free_Serialization,
          Storage_Pool            => Root_Storage_Pool'Class(Global_Pool_Object),
          Block_IO                => Block_IO);
 
 --      package Climb_Caches is new IO.Blocks.Gen_Climb_Caches(Block_IO);
---      package Climb_Cached_Blob_Trees is new DB.Gen_Blob_Trees
+--      package Climb_Cached_Blob_Trees is new Gen_Blob_Trees
 --        (Key_Type           => Keys.Key_Type,
 --         Key_Context_Type   => Keys.Context_Type,
 --         Read_Key           => Keys.Read,
@@ -97,7 +98,7 @@ package DB.Blob_Trees is
 --         Block_IO           => Climb_Caches.IO);
 
 --      package LRU_Caches is new IO.Blocks.Gen_LRU_Caches(Block_IO);
---      package LRU_Cached_Blob_Trees is new DB.Gen_Blob_Trees
+--      package LRU_Cached_Blob_Trees is new Gen_Blob_Trees
 --        (Key_Type           => Keys.Key_Type,
 --         Key_Context_Type   => Keys.Context_Type,
 --         Read_Key           => Keys.Read,

@@ -69,6 +69,9 @@ with DB.Locks.Mutexes;
 generic
    type Key_Type is private;
    type Key_Context_Type is limited private;
+   with function Key_Size_Bound
+          (Key : Key_Type)
+           return IO.Blocks.Size_Type;
    with procedure Read_Key
           (Context : in out Key_Context_Type;
            Block   : in     IO.Blocks.Base_Block_Type;
@@ -89,6 +92,9 @@ generic
 
    type Value_Type is private;
    type Value_Context_Type is limited private;
+   with function Value_Size_Bound
+          (Value : Value_Type)
+           return IO.Blocks.Size_Type;
    with procedure Read_Value
           (Context : in out Value_Context_Type;
            Block   : in     IO.Blocks.Base_Block_Type;

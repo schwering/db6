@@ -35,21 +35,21 @@ with DB.Utils.Gen_String_Image;
 
 package DB.BTrees is
 
-   package Keys     renames DB.Types.Keys;
-   package Values   renames DB.Types.Values.Bounded;
+   package Keys     renames Types.Keys;
+   package Values   renames Types.Values.Bounded;
    package Value_IO renames Values.Uncompressed;
 
-   package Async_IO    renames DB.IO.Blocks.Asynchronous_IO.IO;
-   package CFS_IO      renames DB.IO.Blocks.CFS_IO.IO;
-   package Device_IO   renames DB.IO.Blocks.Device_IO.IO;
-   package Direct_IO   renames DB.IO.Blocks.Direct_IO.IO;
-   package File_IO     renames DB.IO.Blocks.File_IO.IO;
-   package File_SL_IO  renames DB.IO.Blocks.File_IO.System_Locking_IO;
-   package Memory_IO   renames DB.IO.Blocks.Memory_IO.IO;
-   package Cmp_Mem_IO  renames DB.IO.Blocks.Compressed_Memory_IO.IO;
+   package Async_IO    renames IO.Blocks.Asynchronous_IO.IO;
+   package CFS_IO      renames IO.Blocks.CFS_IO.IO;
+   package Device_IO   renames IO.Blocks.Device_IO.IO;
+   package Direct_IO   renames IO.Blocks.Direct_IO.IO;
+   package File_IO     renames IO.Blocks.File_IO.IO;
+   package File_SL_IO  renames IO.Blocks.File_IO.System_Locking_IO;
+   package Memory_IO   renames IO.Blocks.Memory_IO.IO;
+   package Cmp_Mem_IO  renames IO.Blocks.Compressed_Memory_IO.IO;
 
    generic
-      with package Block_IO is new DB.IO.Blocks.Gen_IO (<>);
+      with package Block_IO is new IO.Blocks.Gen_IO (<>);
    package Gen_Wrappers is
 
       function Key_Image     is new Utils.Gen_String_Image(Keys.Key_Type);
@@ -57,9 +57,10 @@ package DB.BTrees is
       function Address_Image is
          new Utils.Gen_Integer_Image(Block_IO.Address_Type);
 
-      package BTrees is new DB.Gen_BTrees
+      package BTrees is new Gen_BTrees
         (Key_Type           => Keys.Key_Type,
          Key_Context_Type   => Keys.Context_Type,
+         Key_Size_Bound     => Keys.Size_Bound,
          Read_Key           => Keys.Read,
          Skip_Key           => Keys.Skip,
          Write_Key          => Keys.Write,
@@ -67,6 +68,7 @@ package DB.BTrees is
          "<="               => Keys."<=",
          Value_Type         => Values.String_Type,
          Value_Context_Type => Value_IO.Context_Type,
+         Value_Size_Bound   => Value_IO.Size_Bound,
          Read_Value         => Value_IO.Read,
          Skip_Value         => Value_IO.Skip,
          Write_Value        => Value_IO.Write,
@@ -80,7 +82,7 @@ package DB.BTrees is
          (Key_Image, Value_Image, Address_Image);
 
 --      package Climb_Caches is new IO.Blocks.Gen_Climb_Caches(Block_IO);
---      package Climb_Cached_BTrees is new DB.Gen_BTrees
+--      package Climb_Cached_BTrees is new Gen_BTrees
 --        (Key_Type           => Keys.Key_Type,
 --         Key_Context_Type   => Keys.Context_Type,
 --         Read_Key           => Keys.Read,
@@ -103,7 +105,7 @@ package DB.BTrees is
 --         (Key_Image, Value_Image, Address_Image);
 
 --      package LRU_Caches is new IO.Blocks.Gen_LRU_Caches(Block_IO);
---      package LRU_Cached_BTrees is new DB.Gen_BTrees
+--      package LRU_Cached_BTrees is new Gen_BTrees
 --        (Key_Type           => Keys.Key_Type,
 --         Key_Context_Type   => Keys.Context_Type,
 --         Read_Key           => Keys.Read,

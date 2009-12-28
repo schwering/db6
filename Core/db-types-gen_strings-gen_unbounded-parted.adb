@@ -31,6 +31,16 @@ package body Parted is
    end Fold_Contexts;
 
 
+   function Context_Size_Bound
+     (C : Context_Type)
+      return IO.Blocks.Size_Type
+   is
+      function Size_Of is new IO.Blocks.Size_Of(Length_Type);
+   begin
+      return Size_Of(C.Length);
+   end Context_Size_Bound;
+
+
    procedure Read_Context
      (Block   : in     IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type;

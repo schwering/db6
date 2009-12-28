@@ -14,6 +14,16 @@ package body DB.Gen_Heaps is
 
    package body Info_BTree_Types is
 
+      function Key_Size_Bound
+        (Key : Key_Type)
+         return IO.Blocks.Size_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(Key_Type);
+      begin
+         return Size_Of(Key);
+      end Key_Size_Bound;
+
+
       procedure Read_Key
         (Context : in out Key_Context_Type;
          Block   : in     IO.Blocks.Base_Block_Type;
@@ -49,6 +59,33 @@ package body DB.Gen_Heaps is
       begin
          Write(Block, Cursor, Key);
       end Write_Key;
+
+
+      function Value_Size_Bound
+        (Value : Value_Type)
+         return IO.Blocks.Size_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(Chunk_State_Type);
+         function Size_Of is new IO.Blocks.Size_Of(Length_Type);
+         function Size_Of is new IO.Blocks.Size_Of(Address_Type);
+         function Size_Of is new IO.Blocks.Size_Of(Extended_Address_Type);
+         use type IO.Blocks.Size_Type;
+         Size : IO.Blocks.Size_Type := 0;
+      begin
+         Size := Size + Size_Of(Value.State);
+         Size := Size + Size_Of(Value.Length);
+         case Value.State is
+            when Used_First =>
+               Size := Size + Size_Of(Value.Succ);
+               Size := Size + Size_Of(Value.Last);
+               Size := Size + Context_Size_Bound(Value.Context);
+            when Used_Cont =>
+               Size := Size + Size_Of(Value.Succ);
+            when Free =>
+               null;
+         end case;
+         return Size;
+      end Value_Size_Bound;
 
 
       procedure Read_Value
@@ -134,6 +171,16 @@ package body DB.Gen_Heaps is
 
    package body Free_BTree_Types is
 
+      function Key_Size_Bound
+        (Key : Key_Type)
+         return IO.Blocks.Size_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(Key_Type);
+      begin
+         return Size_Of(Key);
+      end Key_Size_Bound;
+
+
       procedure Read_Key
         (Context : in out Key_Context_Type;
          Block   : in     IO.Blocks.Base_Block_Type;
@@ -169,6 +216,16 @@ package body DB.Gen_Heaps is
       begin
          Write(Block, Cursor, Key);
       end Write_Key;
+
+
+      function Value_Size_Bound
+        (Value : Value_Type)
+         return IO.Blocks.Size_Type
+      is
+         function Size_Of is new IO.Blocks.Size_Of(Value_Type);
+      begin
+         return Size_Of(Value);
+      end Value_Size_Bound;
 
 
       procedure Read_Value

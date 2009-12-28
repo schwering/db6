@@ -71,6 +71,9 @@ generic
           (Left     : Parted_Value_Context_Type;
            Appended : Parted_Value_Context_Type)
            return Parted_Value_Context_Type;
+   with function Value_Context_Size_Bound
+          (Parted_Value_Context : Parted_Value_Context_Type)
+           return IO.Blocks.Size_Type;
    with procedure Read_Value_Context
           (Block   : in     IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;
@@ -492,6 +495,7 @@ private
       Item_Context_Type  => Parted_Value_Context_Type,
       Item_Size_Bound    => Parted_Value_Size_Bound,
       Fold_Contexts      => Fold_Value_Contexts,
+      Context_Size_Bound => Value_Context_Size_Bound,
       Read_Context       => Read_Value_Context,
       Write_Context      => Write_Value_Context,
       Read_Part_Of_Item  => Read_Part_Of_Value,
@@ -519,9 +523,13 @@ private
          return IO.Blocks.Size_Type;
 
       function Fits_Direct
-        (Key   : in Gen_Blob_Trees.Key_Type;
-         Value : in Gen_Blob_Trees.Value_Type)
+        (Key   : Gen_Blob_Trees.Key_Type;
+         Value : Gen_Blob_Trees.Value_Type)
          return Boolean;
+
+      function Value_Size_Bound
+        (Value : Value_Type)
+         return IO.Blocks.Size_Type;
 
       procedure Read_Value
         (Context : in out Context_Type;
@@ -544,6 +552,7 @@ private
    package BTrees is new Gen_BTrees
      (Key_Type                      => Key_Type,
       Key_Context_Type              => Key_Context_Type,
+      Key_Size_Bound                => Key_Size_Bound,
       Read_Key                      => Read_Key,
       Skip_Key                      => Skip_Key,
       Write_Key                     => Write_Key,
@@ -551,6 +560,7 @@ private
       "<="                          => "<=",
       Value_Type                    => BTree_Utils.Value_Type,
       Value_Context_Type            => BTree_Utils.Context_Type,
+      Value_Size_Bound              => BTree_Utils.Value_Size_Bound,
       Read_Value                    => BTree_Utils.Read_Value,
       Skip_Value                    => BTree_Utils.Skip_Value,
       Write_Value                   => BTree_Utils.Write_Value,

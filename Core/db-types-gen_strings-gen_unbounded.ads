@@ -155,6 +155,10 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
          Appended : Context_Type)
          return Context_Type;
 
+      function Context_Size_Bound
+        (C : Context_Type)
+         return IO.Blocks.Size_Type;
+
       procedure Read_Context
         (Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
