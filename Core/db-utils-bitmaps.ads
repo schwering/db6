@@ -2,7 +2,7 @@
 --
 -- Simple fixed-size bitmap implementation.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 package DB.Utils.Bitmaps is
    pragma Pure;

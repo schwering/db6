@@ -2,7 +2,7 @@
 --
 -- An implementation of the climb cache strategy.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.IO.Blocks.Gen_IO;
 with DB.Locks.Mutexes;

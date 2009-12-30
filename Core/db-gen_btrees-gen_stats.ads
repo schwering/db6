@@ -2,7 +2,7 @@
 --
 -- Calculates statistics of a BTree.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 generic
 procedure DB.Gen_BTrees.Gen_Stats

@@ -12,7 +12,7 @@
 -- The elements are read, mapped and reduced by multiple threads in parallel.
 -- They are 
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 generic
    type Element_Type is private;

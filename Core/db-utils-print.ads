@@ -6,7 +6,7 @@
 --
 -- This unit is preelaborated in contrast to normal IO via Ada.Text_IO.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 procedure DB.Utils.Print (S : String);
 pragma Preelaborate (Print);

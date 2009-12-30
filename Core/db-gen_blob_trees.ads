@@ -8,7 +8,7 @@
 -- This package makes use of Gen_BTrees and Gen_Heaps: Each Key/Value pair is
 -- mapped to a Key/Ref entry in a BTree and Value at position Ref in the Heap.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with System.Storage_Elements;
 with System.Storage_Pools;

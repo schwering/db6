@@ -14,7 +14,7 @@
 -- different value types to a single value type which is needed as formal
 -- generic parameter for the BTrees and Blob_Trees packages.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.Types.Keys;
 with DB.Types.Values.Bounded;

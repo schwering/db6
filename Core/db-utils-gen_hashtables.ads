@@ -16,7 +16,7 @@
 -- The current implementation is not very good, see the comment at the formal
 -- generic parameter Rehash.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with System.Storage_Pools;
 

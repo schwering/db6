@@ -11,7 +11,7 @@
 -- A file is defined only by its name and the sequence of chunks that belongs to
 -- it.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.IO.Low_Level;
 with DB.IO.Blocks.Gen_IO;

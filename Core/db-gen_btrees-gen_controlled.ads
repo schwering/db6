@@ -18,7 +18,7 @@
 -- due to changes in the meantime. For exact information, have a look at the
 -- respective procedures in Gen_BTrees.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Finalization;
 

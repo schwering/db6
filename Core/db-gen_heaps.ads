@@ -24,7 +24,7 @@
 -- of the item that has been the last one up to now. Hence, the chunks form a
 -- simple linked list.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with System.Storage_Pools;
 

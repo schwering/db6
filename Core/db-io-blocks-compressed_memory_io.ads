@@ -3,7 +3,7 @@
 -- Volatile IO implementation that compresses the blocks with DEFLATE and stores
 -- the buffers in main memory.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.Compression.Deflate;
 with DB.IO.Blocks.Gen_IO;

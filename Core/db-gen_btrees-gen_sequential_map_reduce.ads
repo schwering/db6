@@ -21,7 +21,7 @@
 -- consumer is allowed to enter the reduce phase) must have enough space to
 -- hold all tasks (this guarantees that its put-operation is not blocking).
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 generic
    type Element_Type is private;

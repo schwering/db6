@@ -2,7 +2,7 @@
 --
 -- Disk block container.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with System.Storage_Elements;
 

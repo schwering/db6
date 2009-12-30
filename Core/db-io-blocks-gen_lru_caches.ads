@@ -9,7 +9,7 @@
 -- The cache uses a storage pool with a certain size. When no new memory from
 -- this pool can be allocated, an cached block is discarded.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with System.Storage_Pools;
 

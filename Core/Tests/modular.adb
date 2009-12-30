@@ -1,5 +1,3 @@
--- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
-
 with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Modular

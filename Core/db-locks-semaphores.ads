@@ -48,7 +48,7 @@
 -- check for waiting write-lock or certify-lock calls and donate the permits
 -- to this application.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 package DB.Locks.Semaphores is
    pragma Pure;

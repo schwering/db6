@@ -2,7 +2,7 @@
 --
 -- see spec
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 function DB.Utils.Gen_Minimum
   (M : Number_Type;

@@ -1,5 +1,3 @@
--- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
-
 package This_Computer
 is
    DEVICE_NAME : constant String := "NONONO";

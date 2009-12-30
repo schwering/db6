@@ -2,7 +2,7 @@
 --
 -- Checks a BTree for consistency.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 generic
    with function Key_To_String (Key : Key_Type) return String;

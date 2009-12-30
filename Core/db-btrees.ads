@@ -2,7 +2,7 @@
 --
 -- Many instances of Gen_BTrees with various IO implementations.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with System.Pool_Global; use System.Pool_Global;
 with System.Storage_Pools; use System.Storage_Pools;

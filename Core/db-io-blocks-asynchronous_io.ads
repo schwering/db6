@@ -7,7 +7,7 @@
 --
 -- Currently broken when it comes to seeked addresses, I think.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.IO.Low_Level;
 with DB.IO.Blocks.Gen_IO;

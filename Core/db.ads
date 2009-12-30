@@ -10,7 +10,7 @@
 -- DB.Utils      -- Miscellaneous things.
 -- DB.Tables     -- Table wrapper.
 --
--- Copyright 2008, 2009 Christoph Schwering
+-- Copyright 2008, 2009, 2010 Christoph Schwering
 
 package DB is
    pragma Pure;

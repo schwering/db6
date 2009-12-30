@@ -1,31 +1,9 @@
 Upcoming: MapReduce
-However, this implementation will not live long.
-The next implementation will be nearer to the real MapReduce by Google:
-
-The Map function takes tuples from the (Key_Type_1, Value_Type_1) space and
-emits zero or more tuples from a (Key_Type_2, Value_Type_2) space.
-
-Emitted tuples are stored somewhere, probably in a BTree with keys of type
-Key_Type_2 and values of type List_Of_Value_Type_2. The reason for this storage
-is that this already aggregates the emitted tuples by the key of type Key_Type_2
-and makes iterating the values of type Value_Type_2 associated with the key
-of type Key_Type_2 easy.
-
-Then the Reduce function takes such an object of type Key_Type_2 an iterator
-(the BTree Cursor_Type or so) that represents the List_Of_Value_Type_2.
-
-Maybe an additional Partition function assigns each (Key_Type_2,
-List_Of_Value_Type_2) to a reduce process by just hashing Key_Type_2 and
-taking the result modulo the reduce process count as index of the the
-reduce process. Pretty easy.
-
-
-Would be cool to store (Key, List_Of_Values) tuples. While this is easy with
-the current BLOB_Tree and would also be easy with the heterogeneous BTree
-mentionted above (Max_Size_Of_Value(List) = +\infty suffices), the problem is
-how to append values (and possibly also delete something). <-- Das Problem
-ist mit der neuen Heap-Operation Append behoben.
-
+dafuer zu tun:
+ * Gen_Logs sortieren, dafuer benoetigt:
+    * externes Mergesort
+    * in-place in-memory Quicksort [oder Timsort] oder Heapsort oder so
+    * Fibonacci-Heap, um beim mergen das Minimum auszuwaehlen?
 
 
 Fahrplan:
