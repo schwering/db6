@@ -62,6 +62,11 @@ package DB.IO.Blocks is
       Cursor : Cursor_Type)
       return Boolean;
 
+   function Is_Valid
+     (Block    : Base_Block_Type;
+      Position : Base_Position_Type)
+      return Boolean;
+
    function Position
      (Cursor : Cursor_Type)
       return Base_Position_Type;
@@ -154,7 +159,7 @@ package DB.IO.Blocks is
 
 
 private
-   type Cursor_Type is limited
+   type Cursor_Type is
       record
          Pos : Base_Position_Type := Base_Index_Type'First;
       end record;

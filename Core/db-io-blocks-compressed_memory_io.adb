@@ -21,6 +21,7 @@ package body DB.IO.Blocks.Compressed_Memory_IO is
 
    Files : Entry_Ref_Array_Type := (others => null);
 
+
    procedure Create
      (ID   : in  String;
       File : out File_Type) is
@@ -38,6 +39,14 @@ package body DB.IO.Blocks.Compressed_Memory_IO is
       end loop;
       raise IO_Error;
    end Create;
+
+
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type) is
+   begin
+      raise IO_Error;
+   end Create_And_Open_Temporary;
 
 
    procedure Open

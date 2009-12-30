@@ -78,7 +78,7 @@ generic
 
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
 package DB.Gen_Heaps is
-   pragma Preelaborate;
+   pragma Elaborate_Body;
 
    ----------
    -- Heap initialization operations.

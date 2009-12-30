@@ -262,6 +262,21 @@ package body DB.IO.Blocks.Gen_LRU_Caches is
    end Create;
 
 
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type) is
+   begin
+      Locks.Mutexes.Lock(File.Mutex);
+      P_IO.Create_And_Open_Temporary(ID, File.File);
+      Hashtables.Allocate_Table(Hash_Table_Size, File.Table);
+      Locks.Mutexes.Unlock(File.Mutex);
+   exception
+      when others =>
+         Locks.Mutexes.Unlock(File.Mutex);
+         raise;
+   end Create_And_Open_Temporary;
+
+
    procedure Open
      (ID   : in  String;
       File : out File_Type) is

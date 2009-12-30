@@ -10,6 +10,7 @@ package body DB.IO.Blocks.File_IO is
      (Position : Low_Level.File_Position_Type)
       return Valid_Address_Type;
 
+
    procedure Create
      (ID   : in  String;
       File : out File_Type)
@@ -23,6 +24,22 @@ package body DB.IO.Blocks.File_IO is
       Low_Level.Get_Size(File          => File.FD,
                          Last_Position => Last_Position);
    end Create;
+
+
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type) is
+   begin
+      declare
+      begin
+         Create(ID, File);
+      exception
+         when others =>
+            Low_Level.Unlink(ID);
+            raise;
+      end;
+      Low_Level.Unlink(ID);
+   end Create_And_Open_Temporary;
 
 
    procedure Open

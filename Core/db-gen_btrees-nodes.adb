@@ -19,6 +19,7 @@ package body Nodes is
    -- 3. If Is_Leaf(N): Key1, Value1, ..., KeyDegree(N), ValueDegree(N)
    --    Else:          Key1, Child_Type, ..., KeyDegree(N), Child_Type
    package Phys is
+      pragma Elaborate_Body;
 
       type Child_Type is
          record
@@ -179,67 +180,38 @@ package body Nodes is
          pragma Inline (Read_Entry);
          pragma Inline (Write_Entry);
          pragma Inline (Write_Child);
+
    end Phys;
 
 
    package body Phys is
       use type IO.Blocks.Long_Position_Type;
 
-      function Size_Of_Degree return IO.Blocks.Long_Position_Type
-      is
-         function Size_Of is new IO.Blocks.Size_Of(Degree_Type);
-         pragma Inline (Size_Of);
-         pragma Inline (Size_Of_Degree);
-      begin
-         return IO.Blocks.Long_Position_Type(Size_Of(Degree_Type'(0)));
-      end Size_Of_Degree;
+      function Size_Of is new IO.Blocks.Size_Of(Degree_Type);
+      function Size_Of is new IO.Blocks.Size_Of(Boolean);
+      function Size_Of is new IO.Blocks.Size_Of(Address_Type);
+      function Size_Of is new IO.Blocks.Size_Of(IO.Blocks.Position_Type);
+      function Size_Of is new IO.Blocks.Size_Of(Child_Type);
 
-      function Size_Of_Boolean return IO.Blocks.Long_Position_Type
-      is
-         function Size_Of is new IO.Blocks.Size_Of(Boolean);
-         pragma Inline (Size_Of);
-         pragma Inline (Size_Of_Boolean);
-      begin
-         return IO.Blocks.Long_Position_Type(Size_Of(Boolean'(True)));
-      end Size_Of_Boolean;
+      Size_Of_Degree    : constant IO.Blocks.Long_Position_Type :=
+         IO.Blocks.Long_Position_Type(Size_Of(Degree_Type'(0)));
 
-      function Size_Of_Address return IO.Blocks.Long_Position_Type
-      is
-         function Size_Of is new IO.Blocks.Size_Of(Address_Type);
-         pragma Inline (Size_Of);
-         pragma Inline (Size_Of_Address);
-      begin
-         return IO.Blocks.Long_Position_Type(Size_Of(Invalid_Address));
-      end Size_Of_Address;
+      Size_Of_Boolean   : constant IO.Blocks.Long_Position_Type :=
+         IO.Blocks.Long_Position_Type(Size_Of(Boolean'(True)));
 
-      function Size_Of_Position return IO.Blocks.Long_Position_Type
-      is
-         function Size_Of is new IO.Blocks.Size_Of(IO.Blocks.Long_Index_Type);
-         pragma Inline (Size_Of);
-         pragma Inline (Size_Of_Position);
-      begin
-         return IO.Blocks.Long_Position_Type(Size_Of
-                          (IO.Blocks.Long_Index_Type'First));
-      end Size_Of_Position;
+      Size_Of_Address   : constant IO.Blocks.Long_Position_Type :=
+         IO.Blocks.Long_Position_Type(Size_Of(Invalid_Address));
 
-      function Size_Of_Child return IO.Blocks.Long_Position_Type
-      is
-         function Size_Of is new IO.Blocks.Size_Of(Child_Type);
-         pragma Inline (Size_Of);
-         pragma Inline (Size_Of_Child);
-      begin
-         return IO.Blocks.Long_Position_Type(Size_Of
-                          (Child_Type'(others => <>)));
-      end Size_Of_Child;
+      Size_Of_Position  : constant  IO.Blocks.Long_Position_Type :=
+         IO.Blocks.Long_Position_Type(Size_Of(IO.Blocks.Long_Index_Type'First));
 
-      function Size_Of_Meta_Data return IO.Blocks.Long_Position_Type
-      is
-         pragma Inline (Size_Of_Meta_Data);
-      begin
-         return Size_Of_Boolean + Size_Of_Degree +
-                Size_Of_Boolean + Size_Of_Address +
-                Size_Of_Address + Size_Of_Address;
-      end Size_Of_Meta_Data;
+      Size_Of_Child     : constant IO.Blocks.Long_Position_Type :=
+         IO.Blocks.Long_Position_Type(Size_Of(Child_Type'(others => <>)));
+
+      Size_Of_Meta_Data : constant IO.Blocks.Long_Position_Type :=
+         Size_Of_Boolean + Size_Of_Degree +
+         Size_Of_Boolean + Size_Of_Address +
+         Size_Of_Address + Size_Of_Address;
 
       -- Layout of Node Blocks is as follows:
       -- 1. Is_Free (Size_Of_Boolean)

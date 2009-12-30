@@ -78,6 +78,11 @@ inline int db_io_low_level_open(char *path, int flags, int mode)
 	return open(path, flags, mode);
 }
 
+inline int db_io_low_level_unlink(char *path)
+{
+	return unlink(path);
+}
+
 inline int db_io_low_level_close(int fd)
 {
 	return close(fd);

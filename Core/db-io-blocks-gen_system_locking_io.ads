@@ -25,6 +25,10 @@ package DB.IO.Blocks.Gen_System_Locking_IO is
      (ID   : in  String;
       File : out File_Type);
 
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type);
+
    procedure Open
      (ID   : in  String;
       File : out File_Type);
@@ -83,6 +87,7 @@ package DB.IO.Blocks.Gen_System_Locking_IO is
       Valid_Address_Type         => P_IO.Valid_Address_Type,
       Invalid_Address            => P_IO.Invalid_Address,
       Create                     => Create,
+      Create_And_Open_Temporary  => Create_And_Open_Temporary,
       Open                       => Open,
       Set_Block_Count            => Set_Block_Count,
       Close                      => Close,

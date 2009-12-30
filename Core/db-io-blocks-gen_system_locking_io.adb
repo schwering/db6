@@ -14,6 +14,14 @@ package body DB.IO.Blocks.Gen_System_Locking_IO is
    end Create;
 
 
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type) is
+   begin
+      P_IO.Create_And_Open_Temporary(ID, File.File);
+   end Create_And_Open_Temporary;
+
+
    procedure Open
      (ID   : in  String;
       File : out File_Type) is

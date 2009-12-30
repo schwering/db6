@@ -67,6 +67,10 @@ package DB.IO.Blocks.Gen_Climb_Caches is
      (ID   : in  String;
       File : out File_Type);
 
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type);
+
    procedure Open
      (ID   : in  String;
       File : out File_Type);
@@ -164,6 +168,7 @@ package DB.IO.Blocks.Gen_Climb_Caches is
       Valid_Address_Type         => Valid_Address_Type,
       Invalid_Address            => Invalid_Address,
       Create                     => Create,
+      Create_And_Open_Temporary  => Create_And_Open_Temporary,
       Open                       => Open,
       Set_Block_Count            => Set_Block_Count,
       Close                      => Close,

@@ -30,6 +30,9 @@ package DB.IO.Low_Level is
       Open_Kind : in  Open_Kind_Type := Read_Write;
       File      : out File_Descriptor_Type);
 
+   procedure Unlink
+     (Path : in String);
+
    procedure Close
      (File : in File_Descriptor_Type);
 

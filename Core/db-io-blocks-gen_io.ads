@@ -33,6 +33,17 @@ generic
    -- Creates a File. If this fails, an IO_Error is raised. The File is opened
    -- in read/write-mode.
 
+   with procedure Create_And_Open_Temporary
+          (ID   : in  String;
+           File : out File_Type);
+   -- Creates a temporary File. The exact semantic is that the file cannot be
+   -- opened ever again, after the return of Create_And_Open_Temporary next
+   -- calls with the same ID should succeed and File becomes invalid after the
+   -- next Close.
+   -- If this procedure fails, an IO_Error is raised. The File is opened in
+   -- read/write-mode.
+   -- This operation might be unsupported in which case IO_Error must be raised.
+
    with procedure Open
           (ID   : in  String;
            File : out File_Type);

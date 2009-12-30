@@ -59,7 +59,16 @@ package body DB.IO.Blocks is
       Cursor : Cursor_Type)
       return Boolean is
    begin
-      return Cursor.Pos in Block'Range;
+      return Is_Valid(Block, Cursor.Pos);
+   end Is_Valid;
+
+
+   function Is_Valid
+     (Block    : Base_Block_Type;
+      Position : Base_Position_Type)
+      return Boolean is
+   begin
+      return Position in Block'Range;
    end Is_Valid;
 
 
@@ -105,9 +114,7 @@ package body DB.IO.Blocks is
    procedure Reset
      (Block : in out Base_Block_Type) is
    begin
-      for I in Block'Range loop
-         Block(I) := Storage_Element_Type'First;
-      end loop;
+      Block(Block'Range) := (others => Storage_Element_Type'First);
    end Reset;
 
 

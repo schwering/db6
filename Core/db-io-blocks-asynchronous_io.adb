@@ -163,6 +163,22 @@ package body DB.IO.Blocks.Asynchronous_IO is
    end Create;
 
 
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type) is
+   begin
+      declare
+      begin
+         Create(ID, File);
+      exception
+         when others =>
+            Low_Level.Unlink(ID);
+            raise;
+      end;
+      Low_Level.Unlink(ID);
+   end Create_And_Open_Temporary;
+
+
    procedure Open
      (ID   : in  String;
       File : out File_Type)

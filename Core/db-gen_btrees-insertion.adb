@@ -50,6 +50,7 @@ package body Insertion is
       N_A : Nodes.Valid_Address_Type;
       I   : Nodes.Index_Type;
    begin
+      Position := 0;
       if Key_Size_Bound(Key) > Max_Key_Size(Value_Size_Bound(Value)) then
          State := Failure;
          return;
@@ -58,8 +59,7 @@ package body Insertion is
       -- Search leaf, fill buffer. Correctly initialize N_A and I to the leaf
       -- node address and the position at which the (Key, Value) should be
       -- inserted.
-      N_A      := Transaction.Current_Root_Address;
-      Position := 0;
+      N_A := Transaction.Current_Root_Address;
       loop
          declare
             use type Nodes.Degree_Type;

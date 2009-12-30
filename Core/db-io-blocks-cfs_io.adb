@@ -245,6 +245,14 @@ package body DB.IO.Blocks.CFS_IO is
    end Create;
 
 
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type) is
+   begin
+      raise IO_Error;
+   end Create_And_Open_Temporary;
+
+
    procedure Open
      (ID   : in  String;
       File : out File_Type)

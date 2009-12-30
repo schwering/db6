@@ -345,9 +345,6 @@ package body DB.Gen_Heaps is
    end Succ;
 
 
-   function Min is new Utils.Gen_Minimum(IO.Blocks.Size_Type);
-
-
    function Result
      (State : Info_BTrees.Result_Type)
       return Result_Type is
@@ -449,11 +446,11 @@ package body DB.Gen_Heaps is
    is
       pragma Assert (Heap.Initialized);
    begin
-      return
-         (Owning_Heap      => Heap.Self,
-          Initialized      => True,
-          Info_Transaction => Info_BTrees.New_RO_Transaction(Heap.Info_Tree),
-          others           => <>);
+      return (Owning_Heap      => Heap.Self,
+              Initialized      => True,
+              Info_Transaction =>
+                  Info_BTrees.New_RO_Transaction(Heap.Info_Tree),
+              others           => <>);
    end New_RO_Transaction;
 
 
@@ -497,12 +494,13 @@ package body DB.Gen_Heaps is
    is
       pragma Assert (Heap.Initialized);
    begin
-      return
-         (Owning_Heap      => Heap.Self,
-          Initialized      => True,
-          Info_Transaction => Info_BTrees.New_RW_Transaction(Heap.Info_Tree),
-          Free_Transaction => Free_BTrees.New_RW_Transaction(Heap.Free_Tree),
-          others           => <>);
+      return (Owning_Heap      => Heap.Self,
+              Initialized      => True,
+              Info_Transaction =>
+                  Info_BTrees.New_RW_Transaction(Heap.Info_Tree),
+              Free_Transaction =>
+                  Free_BTrees.New_RW_Transaction(Heap.Free_Tree),
+              others           => <>);
    end New_RW_Transaction;
 
 
@@ -1255,7 +1253,6 @@ package body DB.Gen_Heaps is
          Transaction       : in out RW_Transaction_Type'Class;
          Context           :    out Item_Context_Type;
          Item              : in     Item_Type;
-         Item_Size         : in     IO.Blocks.Size_Type;
          Address           : in     Address_Type;
          Written_Size      :    out IO.Blocks.Size_Type;
          Done              :    out Boolean;
@@ -1459,8 +1456,8 @@ package body DB.Gen_Heaps is
       Done                     : Boolean;
    begin
       Item_Size_Bound := Gen_Heaps.Item_Size_Bound(Item);
-      Fill_Last_Chunk(Heap, Transaction, Context, Item, Item_Size_Bound,
-                      Address, Size_Added_To_Last_Chunk, Done, State);
+      Fill_Last_Chunk(Heap, Transaction, Context, Item, Address,
+                      Size_Added_To_Last_Chunk, Done, State);
       if State /= Success then
          return;
       end if;

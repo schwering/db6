@@ -57,6 +57,9 @@ package body DB.IO.Low_Level is
       function open (Path : char_ptr; Flags : int; Mode : int) return int;
       pragma Import (C, open, "db_io_low_level_open");
 
+      function unlink (Path : char_ptr) return int;
+      pragma Import (C, unlink, "db_io_low_level_unlink");
+
       function close (FD : int) return int;
       pragma Import (C, close, "db_io_low_level_close");
 
@@ -154,6 +157,17 @@ package body DB.IO.Low_Level is
       end if;
       File := File_Descriptor_Type(FD);
    end Open_Direct;
+
+
+   procedure Unlink
+     (Path : in String)
+   is
+      use type C.int;
+   begin
+      if C.unlink(C.To_C(Path)) /= 0 then
+         raise IO_Error;
+      end if;
+   end Unlink;
 
 
    procedure Close

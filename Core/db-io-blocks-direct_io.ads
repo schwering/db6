@@ -30,6 +30,10 @@ package DB.IO.Blocks.Direct_IO is
      (ID   : in  String;
       File : out File_Type);
 
+   procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type);
+
    procedure Open
      (ID   : in  String;
       File : out File_Type);
@@ -116,6 +120,7 @@ package DB.IO.Blocks.Direct_IO is
       Needs_Explicit_Block_Count => False,
       Invalid_Address            => Invalid_Address,
       Create                     => Create,
+      Create_And_Open_Temporary  => Create_And_Open_Temporary,
       Open                       => Open,
       Set_Block_Count            => Set_Block_Count,
       Close                      => Close,
