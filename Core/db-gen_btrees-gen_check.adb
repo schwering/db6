@@ -45,10 +45,17 @@ is
          procedure App (S : in out String; T : in String) is
          begin
             S(Offset .. Offset + T'Length - 1) := T;
+            for I in Offset .. Offset + T'Length - 1 loop
+               if S(I) not in 'A'..'Z' and
+                  S(I) not in 'a'..'z' and
+                  S(I) not in '0'..'9' and
+                  S(I) /= ' ' then
+                  S(I) := '_';
+               end if;
+            end loop;
             Offset := Offset + T'Length;
-            S(Offset .. Offset) := "\n";
+            S(Offset) := ASCII.LF;
             Offset := Offset + 1;
-            Ada.Text_IO.Put_Line(T);
          end App;
 
          function To_String (A : Nodes.Address_Type) return String is
@@ -102,6 +109,7 @@ is
                   end if;
                end loop;
             end if;
+            Ada.Text_IO.Put_Line(S);
             Ada.Text_IO.New_Line;
             Ada.Text_IO.New_Line;
             Ada.Text_IO.New_Line;
@@ -218,68 +226,6 @@ is
                Inv_Parent := Inv_Parent + 1;
             end if;
 
-            -- Check left neighbor
-            if Nodes.Is_Valid(Nodes.Left_Neighbor(N)) then
-               Block_IO.Read(Tree.File,
-                             Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
-                              (Nodes.Left_Neighbor(N))),
-                             B);
-               declare
-                  use type Nodes.Valid_Address_Type;
-                  L : constant Nodes.Node_Type := Nodes.From_Block(B);
-               begin
-                  if Nodes.Valid_Right_Neighbor(L) /= Address then
-                     Raise_Exception(Tree_Error'Identity,
-                             Message("Left neighbor doesn't point back", L, N));
-                     return;
-                  end if;
-                  if Nodes.Is_Inner(L) /= Nodes.Is_Inner(N) then
-                     Raise_Exception(Tree_Error'Identity,
-                                     Message("Left branch has different height",
-                                             L, N));
-                     return;
-                  end if;
-                  if not (Nodes.Key(L, Nodes.Degree(L)) <= Nodes.Key(N, 1)) then
-                     Raise_Exception(Tree_Error'Identity,
-                                     Message("Left key not smaller", L, N));
-                  end if;
-               end;
-            else
-               Inv_Left := Inv_Left + 1;
-            end if;
-
-            -- Check right neighbor
-            if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
-               Block_IO.Read(Tree.File,
-                             Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
-                                (Nodes.Right_Neighbor(N))),
-                             B);
-               declare
-                  use type Nodes.Valid_Address_Type;
-                  R : constant Nodes.Node_Type := Nodes.From_Block(B);
-               begin
-                  if Nodes.Valid_Left_Neighbor(R) /= Address then
-                     Raise_Exception(Tree_Error'Identity,
-                                  Message("Right neighbor doesn't point back",
-                                          N, R));
-                     return;
-                  end if;
-                  if Nodes.Is_Inner(N) /= Nodes.Is_Inner(R) then
-                     Raise_Exception(Tree_Error'Identity,
-                                  Message("Right branch has different height",
-                                          N, R));
-                     return;
-                  end if;
-                  if not (Nodes.Key(N, Nodes.Degree(N)) <= Nodes.Key(R, 1)) then
-                     Raise_Exception(Tree_Error'Identity,
-                                     Message("Right key not greater",
-                                             N, R));
-                  end if;
-               end;
-            else
-               Inv_Right := Inv_Right + 1;
-            end if;
-
             -- Check key order
             for I in 2 .. Nodes.Degree(N) loop
                if not (Nodes.Key(N, I-1) <= Nodes.Key(N, I)) then
@@ -324,6 +270,98 @@ end;
                                   N));
                end if;
             end loop;
+
+            -- Check left neighbor
+            if Nodes.Is_Valid(Nodes.Left_Neighbor(N)) then
+               Block_IO.Read(Tree.File,
+                             Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
+                              (Nodes.Left_Neighbor(N))),
+                             B);
+               declare
+                  use type Nodes.Valid_Address_Type;
+                  L : constant Nodes.Node_Type := Nodes.From_Block(B);
+               begin
+                  if Nodes.Valid_Right_Neighbor(L) /= Address then
+                     Raise_Exception(Tree_Error'Identity,
+                             Message("Left neighbor doesn't point back", L, N));
+                     return;
+                  end if;
+                  if Nodes.Is_Inner(L) /= Nodes.Is_Inner(N) then
+                     Raise_Exception(Tree_Error'Identity,
+                                     Message("Left branch has different height",
+                                             L, N));
+                     return;
+                  end if;
+                  if not (Nodes.Key(L, Nodes.Degree(L)) <= Nodes.Key(N, 1)) then
+declare
+
+   function R(A : Nodes.Valid_Address_Type) return Nodes.Node_Type
+   is
+      B : DB.IO.Blocks.Block_Type;
+   begin
+      Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(A), B);
+      return Nodes.From_Block(B);
+   end R;
+
+   function R(A : Nodes.Address_Type) return Nodes.Node_Type is
+   begin
+      return R(Nodes.To_Valid_Address(A));
+   end R;
+   pragma Unreferenced (R);
+
+   S : String := Message("PARENT PARENT PARENT", R(Nodes.Parent(N)));
+   U : String := Message("LEFT LEFT LEFT", R(Nodes.Left_Neighbor(N)));
+   T : String := Message("NODE NODE NODE", N);
+   V : String := Message("RIGHT RIGHT RIGHT", R(Nodes.Right_Neighbor(N)));
+begin
+   for I in 1 .. Nodes.Degree(N) loop
+      declare
+         X : String := Message("CHILD "& Nodes.Degree_Type'Image(I),
+                               R(Nodes.Child(N, I)));
+      begin
+         null;
+      end;
+   end loop;
+end;
+                     Raise_Exception(Tree_Error'Identity,
+                                     Message("Left key not smaller", L, N));
+                  end if;
+               end;
+            else
+               Inv_Left := Inv_Left + 1;
+            end if;
+
+            -- Check right neighbor
+            if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
+               Block_IO.Read(Tree.File,
+                             Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
+                                (Nodes.Right_Neighbor(N))),
+                             B);
+               declare
+                  use type Nodes.Valid_Address_Type;
+                  R : constant Nodes.Node_Type := Nodes.From_Block(B);
+               begin
+                  if Nodes.Valid_Left_Neighbor(R) /= Address then
+                     Raise_Exception(Tree_Error'Identity,
+                                  Message("Right neighbor doesn't point back",
+                                          N, R));
+                     return;
+                  end if;
+                  if Nodes.Is_Inner(N) /= Nodes.Is_Inner(R) then
+                     Raise_Exception(Tree_Error'Identity,
+                                  Message("Right branch has different height",
+                                          N, R));
+                     return;
+                  end if;
+                  if not (Nodes.Key(N, Nodes.Degree(N)) <= Nodes.Key(R, 1)) then
+                     Raise_Exception(Tree_Error'Identity,
+                                     Message("Right key not greater",
+                                             N, R));
+                  end if;
+               end;
+            else
+               Inv_Right := Inv_Right + 1;
+            end if;
 
             -- Depth first search
             if Nodes.Is_Inner(N) then

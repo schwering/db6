@@ -73,9 +73,9 @@ package body Insertion is
                else
                   I := Nodes.Degree(N) + 1;
                end if;
-            elsif Key = Nodes.Key(N, I) then
-               State := Failure;
-               return;
+            --elsif Key = Nodes.Key(N, I) then
+               --State := Failure;
+               --return;
             end if;
             if Nodes.Is_Leaf(N) then
                Position := Position + Nodes.Count_Sum(N, I);
@@ -247,12 +247,14 @@ package body Insertion is
          procedure Insert_Into_Parent
            (Tree  : in out Tree_Type;
             T     : in out RW_Transaction_Type'Class;
-            N_A   : in     Nodes.Valid_Address_Type;
-            N     : in     Nodes.Node_Type;
+            L_A   : in     Nodes.Valid_Address_Type;
+            L     : in     Nodes.Node_Type;
             State : in out Result_Type)
          is
             P_A   : constant Nodes.Valid_Address_Type
-                  := Nodes.Valid_Parent(N);
+                  := Nodes.Valid_Parent(L);
+            R_A   : constant Nodes.Valid_Address_Type
+                  := Nodes.Valid_Right_Neighbor(L);
             P_Old : Nodes.Node_Type;
             Key   : Key_Type;
             I     : Nodes.Index_Type;
@@ -260,13 +262,13 @@ package body Insertion is
             P_New : Nodes.Node_Type;
          begin -- Insert_Into_Parent
             Read_Node(Tree, T, P_A, P_Old);
-            Key   := Nodes.Key(N, Nodes.Degree(N));
-            I     := Nodes.Key_Position(P_Old, Key);
-            Cnt   := Nodes.Count_Sum(N);
+            Key   := Nodes.Key(L, Nodes.Degree(L));
+            I     := Nodes.Child_Position(P_Old, R_A);
+            Cnt   := Nodes.Count_Sum(L);
             P_New := Nodes.Insertion(Node  => P_Old,
                                      Index => I,
                                      Key   => Key,
-                                     Child => N_A,
+                                     Child => L_A,
                                      Count => Cnt);
             Handle_Overflow(Tree, T, P_A, P_New, State);
          end Insert_Into_Parent;

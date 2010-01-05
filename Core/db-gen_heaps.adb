@@ -732,11 +732,13 @@ package body DB.Gen_Heaps is
                end if;
                loop
                   Read_Part_Of_Item(Context, Block, Cursor, Item, Done);
-                  exit when not IO.Blocks.Is_Valid(Block, Cursor) or Done;
+                  exit when not IO.Blocks.Is_Valid(Cursor);
+                  Read_Size := Read_Size +
+                               IO.Blocks.Moved_Since(Block, Cursor,
+                                                     First_Pos);
+                  exit when Done;
                end loop;
-               Read_Size := Read_Size +
-                            IO.Blocks.Written_Since(Block, Cursor, First_Pos);
-               Address   := Block_IO.Succ(Address);
+               Address := Block_IO.Succ(Address);
                exit when Read_Size = Chunk_Size or Done;
             end;
          end loop;
@@ -1164,13 +1166,15 @@ package body DB.Gen_Heaps is
             begin
                loop
                   Write_Part_Of_Item(Context, Block, Cursor, Item, Done);
-                  exit when not IO.Blocks.Is_Valid(Block, Cursor) or Done;
+                  exit when not IO.Blocks.Is_Valid(Cursor);
+                  Written_Size := Written_Size +
+                                 IO.Blocks.Moved_Since(Block, Cursor,
+                                                       First_Pos);
+                  exit when Done;
                end loop;
                IO_Buffers.Write(Heap.File, Transaction.Buffer, Address,
                                 IO.Blocks.To_Block(Block, Cursor));
-               Written_Size := Written_Size +
-                              IO.Blocks.Written_Since(Block, Cursor, First_Pos);
-               Address      := Block_IO.Succ(Address);
+               Address := Block_IO.Succ(Address);
                exit when Done;
             end;
          end loop;
@@ -1305,11 +1309,13 @@ package body DB.Gen_Heaps is
             IO_Buffers.Read(Heap.File, Transaction.Buffer, Last_Block, Block);
             loop
                Write_Part_Of_Item(Context, Block, Cursor, Item, Done);
-               exit when not IO.Blocks.Is_Valid(Block, Cursor) or Done;
+               exit when not IO.Blocks.Is_Valid(Cursor);
+               Written_Size := IO.Blocks.Moved_Since(Block, Cursor,
+                                                     First_Pos);
+               exit when Done;
             end loop;
             IO_Buffers.Write(Heap.File, Transaction.Buffer, Last_Block,
                              IO.Blocks.To_Block(Block, Cursor));
-            Written_Size := IO.Blocks.Written_Since(Block, Cursor, First_Pos);
          end;
          State := Success;
       end Fill_Last_Chunk;

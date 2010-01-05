@@ -16,7 +16,7 @@ package body DB.IO.Blocks is
    is
       B : Block_Type := Block(Index_Type);
    begin
-      if Is_Valid(B, Cursor) then
+      if Is_Valid(Cursor) then
          B(Position(Cursor) .. B'Last) := (others => 0);
       end if;
       return B;
@@ -47,28 +47,27 @@ package body DB.IO.Blocks is
 
 
    function New_Cursor
-     (Start : Base_Index_Type)
+     (Start : Base_Position_Type)
       return Cursor_Type is
    begin
+      pragma Assert (Start /= Invalid_Position);
       return Cursor_Type'(Pos => Start);
    end New_Cursor;
 
 
    function Is_Valid
-     (Block  : Base_Block_Type;
-      Cursor : Cursor_Type)
+     (Cursor : Cursor_Type)
       return Boolean is
    begin
-      return Is_Valid(Block, Cursor.Pos);
+      return Is_Valid(Cursor.Pos);
    end Is_Valid;
 
 
    function Is_Valid
-     (Block    : Base_Block_Type;
-      Position : Base_Position_Type)
+     (Position : Base_Position_Type)
       return Boolean is
    begin
-      return Position in Block'Range;
+      return Position /= Invalid_Position;
    end Is_Valid;
 
 
@@ -85,22 +84,20 @@ package body DB.IO.Blocks is
       Cursor : Cursor_Type)
       return Size_Type is
    begin
+      pragma Assert (Is_Valid(Cursor));
       return Size_Type(Block'Last - Cursor.Pos + 1);
    end Remaining_Space;
 
 
-   function Written_Since
+   function Moved_Since
      (Block  : Base_Block_Type;
       Cursor : Cursor_Type;
       Since  : Base_Position_Type)
       return Size_Type is
    begin
-      if Is_Valid(Block, Cursor) then
-        return Size_Type(Cursor.Pos) - Size_Type(Since);
-      else
-         return Size_Type(Block'Last) + 1 - Size_Type(Since);
-      end if;
-   end Written_Since;
+      pragma Assert (Is_Valid(Cursor));
+      return Size_Type(Cursor.Pos) - Size_Type(Since);
+   end Moved_Since;
 
 
    function Bits_To_Units
@@ -161,21 +158,17 @@ package body DB.IO.Blocks is
           := Base_Position_Type(Bits_To_Units(Item'Size));
       subtype Raw_Type is Base_Block_Type(1 .. Len);
       function Convert is new Ada.Unchecked_Conversion(Item_Type, Raw_Type);
+      subtype Block_Range is
+         Integer range Integer(Block'First) ..  Integer(Block'Last);
    begin
-      if Integer(Cursor.Pos) < Integer(Block'First) or
-         Integer(Cursor.Pos) > Integer(Block'Last) or
-         Integer(Cursor.Pos) + Integer(Len) - 1 < Integer(Block'First) or
-         Integer(Cursor.Pos) + Integer(Len) - 1 > Integer(Block'Last) then
-         Cursor.Pos := 0;
+      if Integer(Cursor.Pos) not in Block_Range or
+         Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
+         Cursor.Pos := Invalid_Position;
          pragma Assert (Cursor.Pos not in Block'Range);
          return;
       end if;
       Block(Cursor.Pos .. Cursor.Pos + Len - 1) := Convert(Item);
-      if Integer(Cursor.Pos) + Integer(Len) <= Integer(Block'Last) then
-         Cursor.Pos := Cursor.Pos + Len;
-      else
-         Cursor.Pos := Base_Position_Type'First;
-      end if;
+      Cursor.Pos := Cursor.Pos + Len;
    end Write;
 
 
@@ -188,21 +181,17 @@ package body DB.IO.Blocks is
           := Base_Position_Type(Bits_To_Units(Item'Size));
       subtype Raw_Type is Base_Block_Type(1 .. Len);
       function Convert is new Ada.Unchecked_Conversion(Raw_Type, Item_Type);
+      subtype Block_Range is
+         Integer range Integer(Block'First) ..  Integer(Block'Last);
    begin
-      if Integer(Cursor.Pos) < Integer(Block'First) or
-         Integer(Cursor.Pos) > Integer(Block'Last) or
-         Integer(Cursor.Pos) + Integer(Len) - 1 < Integer(Block'First) or
-         Integer(Cursor.Pos) + Integer(Len) - 1 > Integer(Block'Last) then
-         Cursor.Pos := 0;
+      if Integer(Cursor.Pos) not in Block_Range or
+         Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
+         Cursor.Pos := Invalid_Position;
          pragma Assert (Cursor.Pos not in Block'Range);
          return;
       end if;
       Item := Convert(Block(Cursor.Pos .. Cursor.Pos + Len - 1));
-      if Integer(Cursor.Pos) + Integer(Len) <= Integer(Block'Last) then
-         Cursor.Pos := Cursor.Pos + Len;
-      else
-         Cursor.Pos := Base_Position_Type'First;
-      end if;
+      Cursor.Pos := Cursor.Pos + Len;
    end Read;
 
 
@@ -232,7 +221,7 @@ package body DB.IO.Blocks is
       procedure Write_Data is new Write(Array_Sub_Type);
    begin
       Write_Index(Block, Cursor, To);
-      if Is_Valid(Block, Cursor) then
+      if Is_Valid(Cursor) then
          Write_Data(Block, Cursor, Array_Sub_Type(Arr(From .. To)));
       end if;
    end Write_Array;
@@ -248,7 +237,7 @@ package body DB.IO.Blocks is
       procedure Read_Index is new Read(Index_Type'Base);
    begin
       Read_Index(Block, Cursor, To);
-      if Is_Valid(Block, Cursor) then
+      if Is_Valid(Cursor) then
          declare
             type Array_Sub_Type is array (From .. To) of Item_Type;
             procedure Read_Data is new Read(Array_Sub_Type);

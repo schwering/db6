@@ -7,6 +7,7 @@
 with DB.Utils.Binary_Search;
 with DB.Utils.Gen_Minimum;
 with DB.Utils.Gen_Maximum;
+with DB.Utils.Print;
 
 separate (DB.Gen_BTrees)
 package body Nodes is
@@ -203,7 +204,8 @@ package body Nodes is
          IO.Blocks.Long_Position_Type(Size_Of(Invalid_Address));
 
       Size_Of_Position  : constant  IO.Blocks.Long_Position_Type :=
-         IO.Blocks.Long_Position_Type(Size_Of(IO.Blocks.Long_Index_Type'First));
+         IO.Blocks.Long_Position_Type
+            (Size_Of(IO.Blocks.Position_Type'Last));
 
       Size_Of_Child     : constant IO.Blocks.Long_Position_Type :=
          IO.Blocks.Long_Position_Type(Size_Of(Child_Type'(others => <>)));
@@ -283,7 +285,7 @@ package body Nodes is
       function Entry_From_Pos
         (Block       : IO.Blocks.Long_Block_Type;
          Entry_Index : Valid_Index_Type)
-         return IO.Blocks.Long_Index_Type
+         return IO.Blocks.Long_Position_Type
       is
          pragma Inline (Entry_From_Pos);
          pragma Assert (not Is_Free(Block));
@@ -295,6 +297,17 @@ package body Nodes is
             return Entry_To_Pos(Block, Entry_Index - 1) + 1;
          end if;
       end Entry_From_Pos;
+
+
+      function New_Cursor_From
+        (Block : IO.Blocks.Long_Block_Type;
+         Index : Valid_Index_Type)
+         return IO.Blocks.Cursor_Type
+      is
+         pragma Inline (New_Cursor_From);
+      begin
+         return IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+      end New_Cursor_From;
 
 
       procedure Set_Entry_Size
@@ -628,11 +641,14 @@ package body Nodes is
          Key         :    out Key_Type;
          Success     :    out Boolean)
       is
-         Cursor : IO.Blocks.Cursor_Type
-                := IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+         Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
+         Success := IO.Blocks.Is_Valid(Cursor);
+         if not Success then
+            return;
+         end if;
          Read_Key(Key_Context, Block, Cursor, Key);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
       end Read_Key;
 
 
@@ -645,16 +661,19 @@ package body Nodes is
       is
          pragma Assert (not Is_Leaf(Block));
          procedure Read_Child is new IO.Blocks.Read(Child_Type);
-         Cursor : IO.Blocks.Cursor_Type
-                := IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+         Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
+         Success := IO.Blocks.Is_Valid(Cursor);
+         if not Success then
+            return;
+         end if;
          Skip_Key(Key_Context, Block, Cursor);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
          Read_Child(Block, Cursor, Child);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
       end Read_Child;
 
 
@@ -667,16 +686,19 @@ package body Nodes is
          Success       :    out Boolean)
       is
          pragma Assert (Is_Leaf(Block));
-         Cursor : IO.Blocks.Cursor_Type
-                := IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+         Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
+         Success := IO.Blocks.Is_Valid(Cursor);
+         if not Success then
+            return;
+         end if;
          Skip_Key(Key_Context, Block, Cursor);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
          Read_Value(Value_Context, Block, Cursor, Value);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
       end Read_Value;
 
 
@@ -690,16 +712,19 @@ package body Nodes is
       is
          pragma Assert (not Is_Leaf(Block));
          procedure Read_Child is new IO.Blocks.Read(Child_Type);
-         Cursor : IO.Blocks.Cursor_Type
-                := IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+         Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
+         Success := IO.Blocks.Is_Valid(Cursor);
+         if not Success then
+            return;
+         end if;
          Read_Key(Key_Context, Block, Cursor, Key);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
          Read_Child(Block, Cursor, Child);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
       end Read_Entry;
 
 
@@ -713,16 +738,19 @@ package body Nodes is
          Success       :    out Boolean)
       is
          pragma Assert (Is_Leaf(Block));
-         Cursor : IO.Blocks.Cursor_Type
-                := IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+         Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
+         Success := IO.Blocks.Is_Valid(Cursor);
+         if not Success then
+            return;
+         end if;
          Read_Key(Key_Context, Block, Cursor, Key);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
          Read_Value(Value_Context, Block, Cursor, Value);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
       end Read_Entry;
 
 
@@ -736,16 +764,19 @@ package body Nodes is
       is
          pragma Assert (not Is_Leaf(Block));
          procedure Write_Child is new IO.Blocks.Write(Child_Type);
-         Cursor : IO.Blocks.Cursor_Type
-                := IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+         Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
+         Success := IO.Blocks.Is_Valid(Cursor);
+         if not Success then
+            return;
+         end if;
          Write_Key(Key_Context, Block, Cursor, Key);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
          Write_Child(Block, Cursor, Child);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
@@ -768,16 +799,19 @@ package body Nodes is
          Success       :    out Boolean)
       is
          pragma Assert (Is_Leaf(Block));
-         Cursor : IO.Blocks.Cursor_Type
-                := IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+         Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
+         Success := IO.Blocks.Is_Valid(Cursor);
+         if not Success then
+            return;
+         end if;
          Write_Key(Key_Context, Block, Cursor, Key);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
          Write_Value(Value_Context, Block, Cursor, Value);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
@@ -798,7 +832,7 @@ package body Nodes is
          --   Read_Entry(Key_Context, Value_Context, Block, Index, K, V, S);
          --   pragma Assert (S);
          --   pragma Assert (K = Key);
-         --   pragma Assert (V = Value);
+         --   --pragma Assert (V = Value);
          --end;
       end Write_Entry;
 
@@ -812,16 +846,19 @@ package body Nodes is
       is
          pragma Assert (not Is_Leaf(Block));
          procedure Write_Child is new IO.Blocks.Write(Child_Type);
-         Cursor : IO.Blocks.Cursor_Type
-                := IO.Blocks.New_Cursor(Entry_From_Pos(Block, Index));
+         Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
+         Success := IO.Blocks.Is_Valid(Cursor);
+         if not Success then
+            return;
+         end if;
          Skip_Key(Key_Context, Block, Cursor);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
          if not Success then
             return;
          end if;
          Write_Child(Block, Cursor, Child);
-         Success := IO.Blocks.Is_Valid(Block, Cursor);
+         Success := IO.Blocks.Is_Valid(Cursor);
       end Write_Child;
 
     end Phys;

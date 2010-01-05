@@ -16,9 +16,9 @@ package DB.IO.Blocks is
    Block_Size      : constant := 4 * 1024;
    Long_Block_Size : constant := Block_Size * 5 / 4;
 
-   type    Base_Position_Type is range 0 .. Long_Block_Size;
+   type    Base_Position_Type is range 0 .. Long_Block_Size + 1;
    for     Base_Position_Type'Size use 16;
-   subtype Position_Type      is Base_Position_Type range 0 .. Block_Size;
+   subtype Position_Type      is Base_Position_Type range 0 .. Block_Size + 1;
    subtype Long_Position_Type is Base_Position_Type;
 
    subtype Base_Index_Type is Base_Position_Type range 1 .. Long_Block_Size;
@@ -54,17 +54,15 @@ package DB.IO.Blocks is
       return Long_Block_Type;
 
    function New_Cursor
-     (Start : Base_Index_Type)
+     (Start : Base_Position_Type)
       return Cursor_Type;
 
    function Is_Valid
-     (Block  : Base_Block_Type;
-      Cursor : Cursor_Type)
+     (Cursor : Cursor_Type)
       return Boolean;
 
    function Is_Valid
-     (Block    : Base_Block_Type;
-      Position : Base_Position_Type)
+     (Position : Base_Position_Type)
       return Boolean;
 
    function Position
@@ -76,7 +74,7 @@ package DB.IO.Blocks is
       Cursor : Cursor_Type)
       return Size_Type;
 
-   function Written_Since
+   function Moved_Since
      (Block  : Base_Block_Type;
       Cursor : Cursor_Type;
       Since  : Base_Position_Type)
@@ -159,8 +157,15 @@ package DB.IO.Blocks is
 
 
 private
+   Invalid_Position : constant Base_Position_Type := 0;
+
    type Cursor_Type is
       record
+         -- Pos = Block'Last + 1 means that the last write was successful,
+         -- but no more data can be written, while
+         -- Pos = 0 means that the Cursor has become invalid, which can
+         -- be the case due to a write of data that does not fit in the
+         -- remaining space of the Block.
          Pos : Base_Position_Type := Base_Index_Type'First;
       end record;
 
@@ -169,6 +174,7 @@ private
    pragma Inline (New_Cursor);
    pragma Inline (Is_Valid);
    pragma Inline (Position);
+   pragma Inline (Moved_Since);
    pragma Inline (Bits_To_Units);
    pragma Inline (Reset);
    pragma Inline (Size_Of);
