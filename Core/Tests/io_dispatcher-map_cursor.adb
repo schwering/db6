@@ -20,9 +20,11 @@ procedure IO_Dispatcher.Map_Cursor is
 
    protected Count_Container is
       procedure Found (C : in Natural);
+      function Total_Count return Natural;
    private
       Initialized : Boolean := False;
       Count       : Natural;
+      Total       : Natural := 0;
    end Count_Container;
 
    protected body Count_Container is
@@ -37,15 +39,19 @@ procedure IO_Dispatcher.Map_Cursor is
                Ada.Text_IO.Put_Line("Error:"& C'Img &" /="& Count'Img);
             end if;
          end if;
+         Total := Total + C;
       end Found;
+
+      function Total_Count return Natural is
+      begin
+         return Total;
+      end Total_Count;
    end Count_Container;
 
    procedure Job
    is
       use type Map_Types.Key_Type;
       use type Map_Types.Value_Type;
-      Thread_Safe : constant Boolean               := False;
-      Reverse_Dir : constant Boolean               := True;
       KV          : constant Random.Key_Value_Type := Random.Random_Entry;
       Key         : constant Map_Types.Key_Type    := KV.Key;
       Value       : constant Map_Types.Value_Type 
@@ -56,8 +62,12 @@ procedure IO_Dispatcher.Map_Cursor is
       Upper       : constant Maps.Bound_Type := Maps.New_Bound(Map, UC, Key);
       Trans       : Maps.RO_Transaction_Type := Maps.New_RO_Transaction(Map);
       Cursor      : Maps.Cursor_Type
-                  := Maps.New_Cursor(Map, Trans, Thread_Safe, Lower, 
-                                     Upper, Reverse_Dir);
+                  := Maps.New_Cursor(Map               => Map,
+                                     Transaction       => Trans,
+                                     Thread_Safe       => False,
+                                     Lower_Bound       => Lower,
+                                     Upper_Bound       => Upper,
+                                     Reverse_Direction => False);
       State       : Maps.Result_Type;
       Count       : Natural := 0;
    begin
@@ -91,13 +101,13 @@ begin
    declare
    begin
       DB.Tables.Maps.Create(Args.File_Name, Max_Key_Size, Max_Value_Size);
-      Put_Line("Newly created Map "& Args.File_Name);
+      Ada.Text_IO.Put_Line("Newly created Map "& Args.File_Name);
    exception
       when DB.IO_Error => Put_Line("Using existing Map "& Args.File_Name);
    end;
    Maps.Initialize(Map, Args.File_Name);
    Maps.Count(Map, Cnt);
-   Put_Line("Size ="& Maps.Count_Type'Image(Cnt));
+   Ada.Text_IO.Put_Line("Size ="& Maps.Count_Type'Image(Cnt));
 
    declare
       use type Maps.Count_Type;
@@ -107,7 +117,7 @@ begin
       I  : constant Random.Count_Type := (RC - Random.Count_Type'Min(RC, IO))+1;
    begin
       Random.Init_Key_Value_Pairs(I);
-      Put_Line("Init ="& Random.Count_Type'Image(I));
+      Ada.Text_IO.Put_Line("Init ="& Random.Count_Type'Image(I));
    end;
 
    Jobs.Execute_Job(Description               => Jobs.To_Description("Cursor"),
@@ -115,6 +125,7 @@ begin
                     Short_Job_Execution_Count => 1000,
                     Concurrency_Degree        => 10,
                     Reset                     => False);
+   Ada.Text_IO.Put_Line("Total:"& Count_Container.Total_Count'Img);
 
    DB.Tables.Maps.Finalize(Map);
 exception

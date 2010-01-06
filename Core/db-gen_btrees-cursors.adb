@@ -59,6 +59,35 @@ package body Cursors is
       Reverse_Direction : Boolean := False)
       return Cursor_Type
    is
+      procedure Check_Bounds
+        (Lower_Bound : in Bound_Type;
+         Upper_Bound : in Bound_Type) is
+      begin
+         case Lower_Bound.Kind is
+            when Abstract_Bound =>
+               if Lower_Bound.Location = Positive_Infinity then
+                  raise Tree_Error;
+               end if;
+            when Concrete_Bound =>
+               if Lower_Bound.Comparison = Less_Or_Equal or
+                  Lower_Bound.Comparison = Less then
+                  raise Tree_Error;
+               end if;
+         end case;
+
+         case Upper_Bound.Kind is
+            when Abstract_Bound =>
+               if Upper_Bound.Location = Negative_Infinity then
+                  raise Tree_Error;
+               end if;
+            when Concrete_Bound =>
+               if Upper_Bound.Comparison = Greater_Or_Equal or
+                  Upper_Bound.Comparison = Greater then
+                  raise Tree_Error;
+               end if;
+         end case;
+      end Check_Bounds;
+
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);
       pragma Assert (Transaction.Owning_Tree = Tree.Self);
@@ -70,6 +99,7 @@ package body Cursors is
          when True =>
             Direction := From_Upper_To_Lower;
       end case;
+      Check_Bounds(Lower_Bound, Upper_Bound);
       return Cursor_Type'(Lower_Bound        => Lower_Bound,
                           Upper_Bound        => Upper_Bound,
                           Direction          => Direction,
@@ -242,94 +272,115 @@ package body Cursors is
       State       :    out Result_Type)
    is
 
-      procedure Move_To_Next
+      function Has_Lower
+        (Cursor : Cursor_Type)
+         return Boolean
+      is
+         use type Nodes.Degree_Type;
+      begin
+         return Cursor.Index > 1 or
+                Nodes.Is_Valid(Nodes.Left_Neighbor(Cursor.Node));
+      end Has_Lower;
+
+
+      procedure Move_To_Lower
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
          State       :    out Result_Type)
       is
-
-         procedure Move_To_Lower
-           (Tree        : in out Tree_Type;
-            Transaction : in out Transaction_Type'Class;
-            Cursor      : in out Cursor_Type;
-            State       :    out Result_Type)
-         is
-            pragma Inline (Move_To_Lower);
-            use type Nodes.Degree_Type;
-         begin
-            if Cursor.Index = 1 then
-               if Nodes.Is_Valid(Nodes.Left_Neighbor(Cursor.Node)) then
-                  declare
-                     N   : Nodes.Node_Type renames Cursor.Node;
-                     L_A : constant Nodes.Valid_Address_Type
-                         := Nodes.To_Valid_Address(Nodes.Left_Neighbor(N));
-                     L   : Nodes.Node_Type;
-                  begin
-                     Read_Node(Tree, Transaction, L_A, L);
-                     Cursor.Node  := L;
-                     Cursor.Index := Nodes.Degree(L);
-                     State        := Success;
-                  end;
-               else
-                  Cursor.Final := True;
+         pragma Inline (Move_To_Lower);
+         use type Nodes.Degree_Type;
+      begin
+         if Cursor.Index = 1 then
+            if Nodes.Is_Valid(Nodes.Left_Neighbor(Cursor.Node)) then
+               declare
+                  N   : Nodes.Node_Type renames Cursor.Node;
+                  L_A : constant Nodes.Valid_Address_Type
+                      := Nodes.To_Valid_Address(Nodes.Left_Neighbor(N));
+                  L   : Nodes.Node_Type;
+               begin
+                  Read_Node(Tree, Transaction, L_A, L);
+                  Cursor.Node  := L;
+                  Cursor.Index := Nodes.Degree(L);
                   State        := Success;
-               end if;
+               end;
             else
-               Cursor.Index := Cursor.Index - 1;
+               Cursor.Final := True;
                State        := Success;
             end if;
+         else
+            Cursor.Index := Cursor.Index - 1;
+            State        := Success;
+         end if;
 
-         exception
-            when others =>
-               Cursor.Final := True;
-               pragma Warnings (Off);
-               State        := Error;
-               pragma Warnings (On);
-               raise;
-         end Move_To_Lower;
+      exception
+         when others =>
+            Cursor.Final := True;
+            pragma Warnings (Off);
+            State        := Error;
+            pragma Warnings (On);
+            raise;
+      end Move_To_Lower;
 
 
-         procedure Move_To_Upper
-           (Tree        : in out Tree_Type;
-            Transaction : in out Transaction_Type'Class;
-            Cursor      : in out Cursor_Type;
-            State       :    out Result_Type)
-         is
-            pragma Inline (Move_To_Upper);
-            use type Nodes.Degree_Type;
-         begin
-            if Cursor.Index = Nodes.Degree(Cursor.Node) then
-               if Nodes.Is_Valid(Nodes.Right_Neighbor(Cursor.Node)) then
-                  declare
-                     N   : Nodes.Node_Type renames Cursor.Node;
-                     R_A : constant Nodes.Valid_Address_Type
-                         := Nodes.To_Valid_Address(Nodes.Right_Neighbor(N));
-                     R   : Nodes.Node_Type;
-                  begin
-                     Read_Node(Tree, Transaction, R_A, R);
-                     Cursor.Node  := R;
-                     Cursor.Index := 1;
-                     State        := Success;
-                  end;
-               else
-                  Cursor.Final := True;
+      function Has_Upper
+        (Cursor : Cursor_Type)
+         return Boolean
+      is
+         use type Nodes.Degree_Type;
+      begin
+         return Cursor.Index < Nodes.Degree(Cursor.Node) or
+                Nodes.Is_Valid(Nodes.Right_Neighbor(Cursor.Node));
+      end Has_Upper;
+
+
+      procedure Move_To_Upper
+        (Tree        : in out Tree_Type;
+         Transaction : in out Transaction_Type'Class;
+         Cursor      : in out Cursor_Type;
+         State       :    out Result_Type)
+      is
+         pragma Inline (Move_To_Upper);
+         use type Nodes.Degree_Type;
+      begin
+         if Cursor.Index = Nodes.Degree(Cursor.Node) then
+            if Nodes.Is_Valid(Nodes.Right_Neighbor(Cursor.Node)) then
+               declare
+                  N   : Nodes.Node_Type renames Cursor.Node;
+                  R_A : constant Nodes.Valid_Address_Type
+                      := Nodes.To_Valid_Address(Nodes.Right_Neighbor(N));
+                  R   : Nodes.Node_Type;
+               begin
+                  Read_Node(Tree, Transaction, R_A, R);
+                  Cursor.Node  := R;
+                  Cursor.Index := 1;
                   State        := Success;
-               end if;
+               end;
             else
-               Cursor.Index := Cursor.Index + 1;
+               Cursor.Final := True;
                State        := Success;
             end if;
+         else
+            Cursor.Index := Cursor.Index + 1;
+            State        := Success;
+         end if;
 
-         exception
-            when others =>
-               Cursor.Final := True;
-               pragma Warnings (Off);
-               State        := Error;
-               pragma Warnings (On);
-               raise;
-         end Move_To_Upper;
+      exception
+         when others =>
+            Cursor.Final := True;
+            pragma Warnings (Off);
+            State        := Error;
+            pragma Warnings (On);
+            raise;
+      end Move_To_Upper;
 
+
+      procedure Move_To_Next
+        (Tree        : in out Tree_Type;
+         Transaction : in out Transaction_Type'Class;
+         Cursor      : in out Cursor_Type;
+         State       :    out Result_Type) is
       begin
          case Cursor.Direction is
             when From_Lower_To_Upper =>
@@ -571,27 +622,66 @@ package body Cursors is
             return;
          end if;
 
-         declare
-            K : constant Key_Type := Nodes.Key(Cursor.Node, Cursor.Index);
-         begin
-            case FB.Comparison is
-               when Less | Less_Or_Equal | Greater =>
-                  if not Key_Matches(K, FB.Comparison, FB.Key) then
-                     Move_To_Next(Tree, Transaction, Cursor, State);
-                  else
+         case Cursor.Direction is
+            when From_Lower_To_Upper =>
+               case FB.Comparison is
+                  when Less | Less_Or_Equal =>
+                     pragma Assert (False);
+                     null;
+                  when Equal | Greater =>
+                     declare
+                        K : constant Key_Type
+                          := Nodes.Key(Cursor.Node, Cursor.Index);
+                     begin
+                        if not Key_Matches(K, FB.Comparison, FB.Key) then
+                           Move_To_Upper(Tree, Transaction, Cursor, State);
+                        else
+                           State := Success;
+                        end if;
+                     end;
+                  when Greater_Or_Equal =>
                      State := Success;
-                  end if;
-               when Greater_Or_Equal =>
-                  State := Success;
-               when Equal =>
-                  if not Key_Matches(K, FB.Comparison, FB.Key) then
-                     Cursor.Final := True;
-                     State        := Failure;
-                  else
-                     State := Success;
-                  end if;
-            end case;
-         end;
+               end case;
+
+            when From_Upper_To_Lower =>
+               case FB.Comparison is
+                  when Less =>
+                     declare
+                        K : constant Key_Type
+                          := Nodes.Key(Cursor.Node, Cursor.Index);
+                     begin
+                        if not Key_Matches(K, FB.Comparison, FB.Key) then
+                           Move_To_Lower(Tree, Transaction, Cursor, State);
+                        else
+                           State := Success;
+                        end if;
+                     end;
+                  when Less_Or_Equal | Equal =>
+                     loop
+                        declare
+                           K : constant Key_Type
+                             := Nodes.Key(Cursor.Node, Cursor.Index);
+                        begin
+                           exit when not Has_Upper(Cursor) or
+                                     not Key_Matches(K, FB.Comparison, FB.Key);
+                           Move_To_Upper(Tree, Transaction, Cursor, State);
+                        end;
+                     end loop;
+                     declare
+                        K : constant Key_Type
+                          := Nodes.Key(Cursor.Node, Cursor.Index);
+                     begin
+                        if not Key_Matches(K, FB.Comparison, FB.Key) then
+                           Move_To_Lower(Tree, Transaction, Cursor, State);
+                        else
+                           State := Success;
+                        end if;
+                     end;
+                  when Greater_Or_Equal | Greater =>
+                     pragma Assert (False);
+                     null;
+               end case;
+         end case;
       end Look_Up_Concrete_From_Bound;
 
 
