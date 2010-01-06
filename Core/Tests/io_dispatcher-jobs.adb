@@ -86,8 +86,8 @@ package body IO_Dispatcher.Jobs is
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
       Short_Job_Execution_Count : in Random.Count_Type;
-      Concurrency_Degree        : in Positive := 10;
-      Reset                     : in Boolean  := True)
+      Concurrency_Degree        : in Positive;
+      Reset                     : in Boolean)
    is
       use type Random.Count_Type;
       Total_Timer : DB.Utils.Timers.Timer_Type;
@@ -117,6 +117,12 @@ package body IO_Dispatcher.Jobs is
                      Put_Line("Exception: "& Exception_Message(Error));
                      Put_Line("Exception: "& Exception_Information(Error));
                      DB.Utils.Traceback.Print_Traceback(Error);
+                     declare
+                        procedure Kill_Program (Exit_Value : in Integer);
+                        pragma Import (C, Kill_Program, "exit");
+                     begin
+                        Kill_Program(1);
+                     end;
                      exit;
                end;
             end loop;

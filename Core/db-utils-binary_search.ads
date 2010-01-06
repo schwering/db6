@@ -36,13 +36,13 @@ package DB.Utils.Binary_Search is
       type Item_Type is limited private;
       with function Get (C : Container_Type; I : Index_Type) return Item_Type;
       with function "<=" (A, B : Item_Type) return Boolean is <>;
+   procedure Find_Best_In_Container
+     (Container   : in  Container_Type;
       First_Index : in Index_Type;
       Last_Index  : in Index_Type;
-   procedure Find_Best_In_Container
-     (Container : in  Container_Type;
-      Item      : in  Item_Type;
-      Found     : out Boolean;
-      Index     : out Index_Type);
+      Item        : in  Item_Type;
+      Found       : out Boolean;
+      Index       : out Index_Type);
 
 private
    pragma Inline (Find_Exact);

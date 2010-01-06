@@ -131,9 +131,6 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
 
    Null_Value : Blob_Trees.Value_Type := To_Value(Random.Values.Empty_String);
 
-   procedure Check (T : in out Blob_Trees.Tree_Type)
-   is null;
-
    procedure Stats
      (Tree                   : in out Blob_Trees.Tree_Type;
       Height                 :    out Natural;

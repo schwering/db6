@@ -425,7 +425,8 @@ package DB.Tables.Maps is
 private
    package Bounded_Values_IO   renames Types.Values.Bounded.Uncompressed;
    package Unbounded_Values_IO renames Types.Values.Unbounded.Uncompressed;
-   package Block_IO            renames IO.Blocks.File_IO.IO;
+   package Block_IO_Impl       renames IO.Blocks.File_IO;
+   package Block_IO            renames Block_IO_Impl.IO;
 
    package BTrees is new Gen_BTrees
      (Key_Type           => Types.Keys.Key_Type,

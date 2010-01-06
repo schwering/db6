@@ -4,7 +4,8 @@ with Ada.Exceptions; use Ada.Exceptions;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Gen_BTrees;
 with IO_Dispatcher.Gen_Blob_Trees;
-with IO_Dispatcher.MMap;
+with IO_Dispatcher.Map;
+with IO_Dispatcher.Map_Cursor;
 
 with DB.BTrees;
 with DB.Blob_Trees;
@@ -70,14 +71,14 @@ is
       procedure File_SL_BTree  is new Gen_BTrees(File_SL_BTrees, Check, Stats);
       procedure Memory_BTree   is new Gen_BTrees(Memory_BTrees, Check, Stats);
 
-      procedure Async_Blob    is new Gen_Blob_Trees(Async_Blob_Trees);
-      procedure CFS_Blob      is new Gen_Blob_Trees(CFS_Blob_Trees);
-      procedure Cmp_Mem_Blob  is new Gen_Blob_Trees(Cmp_Mem_Blob_Trees);
-      procedure Device_Blob   is new Gen_Blob_Trees(Device_Blob_Trees);
-      procedure Direct_Blob   is new Gen_Blob_Trees(Direct_Blob_Trees);
-      procedure File_Blob     is new Gen_Blob_Trees(File_Blob_Trees);
-      procedure File_SL_Blob  is new Gen_Blob_Trees(File_SL_Blob_Trees);
-      procedure Memory_Blob   is new Gen_Blob_Trees(Memory_Blob_Trees);
+      procedure Async_Blob    is new Gen_Blob_Trees(Async_Blob_Trees, Check);
+      procedure CFS_Blob      is new Gen_Blob_Trees(CFS_Blob_Trees, Check);
+      procedure Cmp_Mem_Blob  is new Gen_Blob_Trees(Cmp_Mem_Blob_Trees, Check);
+      procedure Device_Blob   is new Gen_Blob_Trees(Device_Blob_Trees, Check);
+      procedure Direct_Blob   is new Gen_Blob_Trees(Direct_Blob_Trees, Check);
+      procedure File_Blob     is new Gen_Blob_Trees(File_Blob_Trees, Check);
+      procedure File_SL_Blob  is new Gen_Blob_Trees(File_SL_Blob_Trees, Check);
+      procedure Memory_Blob   is new Gen_Blob_Trees(Memory_Blob_Trees, Check);
 
       Procs : constant Entries_Type
             := ((New_String("async"),        Async_BTree'Access),
@@ -98,8 +99,8 @@ is
                 (New_String("blob_filesl"),  File_SL_Blob'Access),
                 (New_String("blob_memory"),  Memory_Blob'Access),
 
-                (New_String("map"),          MMap'Access)
-                );
+                (New_String("map"),          Map'Access),
+                (New_String("map_cursor"),   Map_Cursor'Access));
 
       IO_Name : constant String := Args.Pop_Argument(1);
    begin

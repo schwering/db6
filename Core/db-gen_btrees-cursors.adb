@@ -481,8 +481,7 @@ package body Cursors is
          end if;
 
          declare
-            Key : constant Key_Type
-                := Nodes.Key(Cursor.Node, Cursor.Index);
+            Key : constant Key_Type := Nodes.Key(Cursor.Node, Cursor.Index);
          begin
             Look_Up_Node(Tree, Transaction, Key, Cursor.Node, Cursor.Index,
                          State);

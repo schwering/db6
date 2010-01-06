@@ -54,7 +54,7 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
    is
       S : String_Type;
    begin
-      S.Length := Left'Length + Right.Length;
+      S.Length                := Left'Length + Right.Length;
       S.Buffer(1 .. S.Length) := Left & Right.Buffer(1 .. Right.Length);
       return S;
    end "&";

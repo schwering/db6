@@ -67,6 +67,7 @@ package IO_Dispatcher.Gen_Simple_Jobs is
    procedure Delete;
    procedure Search;
    procedure Antisearch;
+   procedure Count;
    procedure Make_Stats;
    procedure Check;
 
@@ -80,6 +81,7 @@ private
    Delete_Access     : Short_Job_Type := Delete'Access;
    Search_Access     : Short_Job_Type := Search'Access;
    Antisearch_Access : Short_Job_Type := Antisearch'Access;
+   Count_Access      : Short_Job_Type := Count'Access;
    Make_Stats_Access : Short_Job_Type := Make_Stats'Access;
    Check_Access      : Short_Job_Type := Check'Access;
 
@@ -91,6 +93,7 @@ private
                (Jobs.To_Description("Delete"),     Convert(Delete_Access)),
                (Jobs.To_Description("Search"),     Convert(Search_Access)),
                (Jobs.To_Description("Antisearch"), Convert(Antisearch_Access)),
+               (Jobs.To_Description("Count"),      Convert(Count_Access)),
                (Jobs.To_Description("Make_Stats"), Convert(Make_Stats_Access)),
                (Jobs.To_Description("Check"),      Convert(Check_Access)));
 

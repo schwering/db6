@@ -5,113 +5,28 @@ with IO_Dispatcher.Random; use IO_Dispatcher.Random;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Jobs;
 with IO_Dispatcher.Gen_Simple_Jobs;
-with IO_Dispatcher.To_Strings; use IO_Dispatcher.To_Strings;
+with IO_Dispatcher.Map_Types;
 
-with DB;
 with DB.IO.Blocks;
-
 with DB.Tables.Maps;
-
 with DB.Types.Keys;
-with DB.Types.Strings;
 with DB.Types.Strings.Bounded;
 with DB.Types.Values.Bounded;
-with DB.Types.Values.Unbounded;
 with DB.Types.Times;
-
 with DB.Utils.Traceback;
 
-procedure IO_Dispatcher.MMap is
-   Max_Key_Size   : constant := 2 + 1000 + 8 
-                                + 1; -- to enforce heaped map
-   Max_Value_Size : constant := 8;
-   package Values_Impl renames DB.Types.Values.Unbounded;
+procedure IO_Dispatcher.Map is
 
    Map : DB.Tables.Maps.Map_Type
-       := DB.Tables.Maps.New_Map(Max_Key_Size, Max_Value_Size);
+       := DB.Tables.Maps.New_Map(Map_Types.Max_Key_Size,
+                                 Map_Types.Max_Value_Size);
 
-   ----------
-   -- Value definition.
-
-   type Value_Type is new DB.Tables.Value_Type with
-      record
-         S : Values_Impl.String_Type := Values_Impl.Empty_String;
-      end record;
-
-   overriding function "=" (Left, Right : Value_Type) return Boolean;
-   overriding function To_Bounded (V : Value_Type)
-      return DB.Types.Values.Bounded.String_Type;
-   overriding function To_Unbounded (V : Value_Type)
-      return DB.Types.Values.Unbounded.String_Type;
-   overriding function From_Bounded (S : DB.Types.Values.Bounded.String_Type)
-      return Value_Type;
-   overriding function From_Unbounded (S: DB.Types.Values.Unbounded.String_Type)
-      return Value_Type;
-
-   overriding function "=" (Left, Right : Value_Type) return Boolean is
-   begin
-      return Values_Impl."="(Left.S, Right.S);
-   end "=";
-
-   overriding function To_Bounded
-     (V : Value_Type)
-      return DB.Types.Values.Bounded.String_Type is
-   begin
-      return DB.Types.Values.Bounded.New_String(Values_Impl.To_Buffer(V.S));
-      --return V.S;
-   end To_Bounded;
-
-   overriding function To_Unbounded
-     (V : Value_Type)
-      return DB.Types.Values.Unbounded.String_Type is
-   begin
-      --return DB.Types.Values.Unbounded.New_String(Values_Impl.To_Buffer(V.S));
-      return V.S;
-   end To_Unbounded;
-
-   overriding function From_Bounded
-     (S : DB.Types.Values.Bounded.String_Type)
-      return Value_Type
-   is
-      V : Value_Type;
-   begin
-      V.S := Values_Impl.New_String(DB.Types.Values.Bounded.To_Buffer(S));
-      --V.S := S;
-      return V;
-   end From_Bounded;
-
-   overriding function From_Unbounded
-     (S : DB.Types.Values.Unbounded.String_Type)
-      return Value_Type
-   is
-      V : Value_Type;
-   begin
-      V.S := S;
-      --V.S := Values_Impl.New_String(DB.Types.Values.Bounded.To_Buffer(S));
-      return V;
-   end From_Unbounded;
-
-
-   function Get_Value
-     (KV : Random.Key_Value_Type)
-      return DB.Tables.Value_Type'Class is
-   begin
-      return From_Bounded(KV.Value);
-   end Get_Value;
-
-
-   Null_Value : DB.Tables.Value_Type'Class
-              := From_Bounded(DB.Types.Values.Bounded.Empty_String);
-
-
-   procedure Check_Key_Value (KV : Key_Value_Type)
+   procedure Check_Key_Value (KV : Random.Key_Value_Type)
    is
       use DB.IO.Blocks;
       use DB.Types.Strings.Bounded;
       pragma Warnings (Off);
       use DB.Types.Values.Bounded;
-      use DB.Types.Values.Unbounded;
-      use Values_Impl;
       pragma Warnings (On);
       use type Size_Type;
 
@@ -130,22 +45,6 @@ procedure IO_Dispatcher.MMap is
       null;
    end Check_Key_Value;
 
-
-   function To_String (V : DB.Tables.Value_Type'Class) return String is
-   begin
-      if V in Value_Type'Class then
-         declare
-            Len : constant DB.Types.Values.Length_Type
-                := Values_Impl.Length(Value_Type(V).S);
-         begin
-            return "'"& To_String(Value_Type(V).S) &"' ["& Len'Img &"]";
-         end;
-      else
-         return "wrong instance";
-      end if;
-   end To_String;
-
-
    procedure Make_Stats
      (Tree                   : in out DB.Tables.Maps.Map_Type;
       Height                 :    out Natural;
@@ -158,15 +57,15 @@ procedure IO_Dispatcher.MMap is
       Bytes_In_Blocks        :    out Long_Integer) is null;
    procedure Check (Tree : in out DB.Tables.Maps.Map_Type) is null;
 
-
+   Null_Value : DB.Tables.Value_Type'Class := Map_Types.Null_Value;
 
    package Simple_Jobs is new Gen_Simple_Jobs
      (Object_Type     => DB.Tables.Maps.Map_Type,
-      Key_Type        => DB.Types.Keys.Key_Type,
+      Key_Type        => Map_Types.Key_Type,
       Value_Type      => DB.Tables.Value_Type'Class,
  
-      Key_To_String   => To_String,
-      Value_To_String => To_String,
+      Key_To_String   => Map_Types.To_String,
+      Value_To_String => Map_Types.To_String,
 
       "="             => DB.Tables."=",
 
@@ -175,7 +74,7 @@ procedure IO_Dispatcher.MMap is
       Key_Value_Type  => Random.Key_Value_Type,
       Random_Entry    => Random.Random_Entry,
       Get_Key         => Random.Key,
-      Get_Value       => Get_Value,
+      Get_Value       => Map_Types.Get_Value,
 
       Count_Type      => DB.Tables.Maps.Count_Type,
       Result_Type     => DB.Tables.Maps.Result_Type,
@@ -199,6 +98,7 @@ procedure IO_Dispatcher.MMap is
          record
             Key : DB.Types.Keys.Key_Type;
          end record;
+
       Neutral_Element : constant Element_Type
           := Element_Type'
                   (Key => DB.Types.Keys.Key_Type'
@@ -210,7 +110,9 @@ procedure IO_Dispatcher.MMap is
 
       function Map_Function (Key   : DB.Types.Keys.Key_Type;
                              Value : DB.Tables.Value_Type'Class)
-                             return Element_Type is
+                             return Element_Type
+      is
+         pragma Unreferenced (Value);
       begin
          declare
             task Delay_Task;
@@ -246,7 +148,7 @@ procedure IO_Dispatcher.MMap is
                   := DB.Tables.Maps.New_Cursor(Map, Transaction, True,
                                                Lower, Upper, False);
       Element     : Element_Type;
-      Value_Impl  : Value_Type;
+      Value_Impl  : Map_Types.Value_Type;
       State       : DB.Tables.Maps.Result_Type;
       use type DB.Tables.Maps.Result_Type;
    begin
@@ -276,7 +178,9 @@ procedure IO_Dispatcher.MMap is
 begin
    declare
    begin
-      DB.Tables.Maps.Create(Args.File_Name, Max_Key_Size, Max_Value_Size);
+      DB.Tables.Maps.Create(Args.File_Name,
+                            Map_Types.Max_Key_Size,
+                            Map_Types.Max_Value_Size);
       Put_Line("Newly created Map "& Args.File_Name);
    exception
       when DB.IO_Error => Put_Line("Using existing Map "& Args.File_Name);
@@ -302,5 +206,5 @@ exception
       Put_Line("Exception: "& Exception_Message(Error));
       Put_Line("Exception: "& Exception_Information(Error));
       DB.Utils.Traceback.Print_Traceback(Error);
-end IO_Dispatcher.MMap;
+end IO_Dispatcher.Map;
 

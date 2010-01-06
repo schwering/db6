@@ -1257,13 +1257,11 @@ package body Nodes is
                Index_Type     => Valid_Index_Type,
                Item_Type      => Key_Type,
                Get            => Nodes.Key,
-               "<="           => "<=",
-               First_Index    => 1,
-               Last_Index     => Degree(Node));
+               "<="           => "<=");
             Found : Boolean;
             Index : Index_Type;
          begin
-            Find(Node, Key, Found, Index);
+            Find(Node, 1, Degree(Node), Key, Found, Index);
             if Found then
                return Index;
             else

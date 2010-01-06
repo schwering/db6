@@ -71,6 +71,15 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
    end Antisearch;
 
 
+   procedure Count
+   is
+      Count : Count_Type;
+   begin
+      P_Count(Object, Count);
+      Put_Line("Count:"& Count'Img);
+   end Count;
+
+
    procedure Make_Stats
    is
       Count                                    : Count_Type;

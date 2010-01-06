@@ -50,8 +50,8 @@ package IO_Dispatcher.Jobs is
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
       Short_Job_Execution_Count : in Random.Count_Type;
-      Concurrency_Degree        : in Positive := 10;
-      Reset                     : in Boolean  := True);
+      Concurrency_Degree        : in Positive;
+      Reset                     : in Boolean);
 
 private
    type Description_Type is

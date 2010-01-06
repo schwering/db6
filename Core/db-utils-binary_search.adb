@@ -73,10 +73,12 @@ package body DB.Utils.Binary_Search is
 
 
    procedure Find_Best_In_Container
-     (Container : in  Container_Type;
-      Item      : in  Item_Type;
-      Found     : out Boolean;
-      Index     : out Index_Type)
+     (Container   : in  Container_Type;
+      First_Index : in Index_Type;
+      Last_Index  : in Index_Type;
+      Item        : in  Item_Type;
+      Found       : out Boolean;
+      Index       : out Index_Type)
    is
       From : Index_Type;
       To   : Index_Type;
@@ -89,7 +91,7 @@ package body DB.Utils.Binary_Search is
          begin
             if Item <= Get(Container, I) then -- Left half or found.
                if (I = First_Index) or else
-                  not (Item <= Get(Container, I-1)) then -- Found.
+                  not (Item <= Get(Container, I - 1)) then -- Found.
                   Index := I;
                   Found := True;
                   return;

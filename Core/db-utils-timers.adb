@@ -103,23 +103,33 @@ package body DB.Utils.Timers is
    end Real_Time;
 
 
-   function CPU_String (Timer : Timer_Type) return String
-   is
-      T : constant Ticks_Type := CPU_Ticks(Timer);
-      M : constant Natural := Natural(T / CLOCKS_PER_SEC / 60);
-      S : constant Natural := Natural((T / CLOCKS_PER_SEC) mod 60);
+   function CPU_String (Timer : Timer_Type) return String is
    begin
-      return Natural'Image(M) &"m"& Natural'Image(S) &"s";
+      declare
+         T : constant Ticks_Type := CPU_Ticks(Timer);
+         M : constant Natural := Natural(T / CLOCKS_PER_SEC / 60);
+         S : constant Natural := Natural((T / CLOCKS_PER_SEC) mod 60);
+      begin
+         return Natural'Image(M) &"m"& Natural'Image(S) &"s";
+      end;
+   exception
+      when Constraint_Error =>
+         return "0m0s";
    end CPU_String;
 
 
-   function Real_String (Timer : Timer_Type) return String
-   is
-      T : constant Time_Type := Real_Time(Timer);
-      M : constant Natural := Natural(T / TIMES_PER_SEC / 60);
-      S : constant Natural := Natural((T / TIMES_PER_SEC) mod 60);
+   function Real_String (Timer : Timer_Type) return String is
    begin
-      return Natural'Image(M) &"m"& Natural'Image(S) &"s";
+      declare
+         T : constant Time_Type := Real_Time(Timer);
+         M : constant Natural := Natural(T / TIMES_PER_SEC / 60);
+         S : constant Natural := Natural((T / TIMES_PER_SEC) mod 60);
+      begin
+         return Natural'Image(M) &"m"& Natural'Image(S) &"s";
+      end;
+   exception
+      when Constraint_Error =>
+         return "0m0s";
    end Real_String;
 
 
