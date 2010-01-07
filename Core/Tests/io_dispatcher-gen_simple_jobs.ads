@@ -19,31 +19,31 @@ generic
    with procedure Check_Key_Value (KV : Key_Value_Type);
 
    type Count_Type is range <>;
-   type Result_Type is (<>);
+   type State_Type is (<>);
 
    Object     : in out Object_Type;
    Null_value : in out Value_Type;
-   Success    : in Result_Type;
-   Failure    : in Result_Type;
+   Success    : in State_Type;
+   Failure    : in State_Type;
 
    with procedure P_Insert
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    : in     Value_Type;
            Position :    out Count_Type;
-           State    :    out Result_Type);
+           State    :    out State_Type);
    with procedure P_Delete
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    :    out Value_Type;
            Position :    out Count_Type;
-           State    :    out Result_Type);
+           State    :    out State_Type);
    with procedure P_Look_Up
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    :    out Value_Type;
            Position :    out Count_Type;
-           State    :    out Result_Type);
+           State    :    out State_Type);
    with procedure P_Count
           (Object : in out Object_Type;
            Count  :    out Count_Type);

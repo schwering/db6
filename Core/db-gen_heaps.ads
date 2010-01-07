@@ -138,13 +138,13 @@ package DB.Gen_Heaps is
    -- Core operations: Get, Put and Delete.
 
    subtype Address_Type is Block_IO.Valid_Address_Type;
-   type Result_Type is (Success, Failure, Error);
+   type State_Type is (Success, Failure, Error);
 
    procedure Get
      (Heap    : in out Heap_Type;
       Address : in     Address_Type;
       Item    :    out Item_Type;
-      State   :    out Result_Type);
+      State   :    out State_Type);
    -- Get the Item stored under Address or set State = Failure if no such
    -- Item exists.
    -- This procedure acquires a read-lock and might therefore block due to
@@ -155,7 +155,7 @@ package DB.Gen_Heaps is
       Transaction : in out Transaction_Type'Class;
       Address     : in     Address_Type;
       Item        :    out Item_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Get the Item stored under Address or set State = Failure if no such
    -- Item exists.
 
@@ -163,7 +163,7 @@ package DB.Gen_Heaps is
      (Heap    : in out Heap_Type;
       Item    : in     Item_Type;
       Address :    out Address_Type;
-      State   :    out Result_Type);
+      State   :    out State_Type);
    -- Inserts Item and sets Address to the address of Item.
    -- Generally, State = Failure should never occur because there is nothing
    -- that could fail.
@@ -175,7 +175,7 @@ package DB.Gen_Heaps is
       Transaction : in out RW_Transaction_Type'Class;
       Item        : in     Item_Type;
       Address     :    out Address_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Inserts Item and sets Address to the address of Item.
    -- Generally, State = Failure should never occur because there is nothing
    -- that could fail.
@@ -184,7 +184,7 @@ package DB.Gen_Heaps is
      (Heap        : in out Heap_Type;
       Item        : in     Item_Type;
       Address     : in     Address_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Appends Item and to the item stored at Address or sets State = Failure
    -- if no item exists on Address.
    -- This procedure starts and commits a new transaction and might therefore
@@ -195,14 +195,14 @@ package DB.Gen_Heaps is
       Transaction : in out RW_Transaction_Type'Class;
       Item        : in     Item_Type;
       Address     : in     Address_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Appends Item and to the item stored at Address or sets State = Failure
    -- if no item exists on Address.
 
    procedure Delete
      (Heap    : in out Heap_Type;
       Address : in     Address_Type;
-      State   :    out Result_Type);
+      State   :    out State_Type);
    -- Deletes Item at Address and set Item to the deleted one or set
    -- State = Failure if no item exists on Address.
    -- This procedure starts and commits a new transaction and might therefore
@@ -212,7 +212,7 @@ package DB.Gen_Heaps is
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Address_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Deletes Item at Address and set Item to the deleted one or set
    -- State = Failure if no item exists on Address.
 

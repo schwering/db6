@@ -30,6 +30,6 @@ procedure DB.Gen_BTrees.Gen_Random_Map_Reduce
    Transaction        : in out Transaction_Type'Class;
    Cursor             : in out Cursor_Type;
    Element            :    out Element_Type;
-   State              :    out Result_Type;
+   State              :    out State_Type;
    Concurrency_Degree : in     Positive := Default_Concurrency_Degree);
 

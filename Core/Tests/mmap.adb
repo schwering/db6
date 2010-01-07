@@ -183,7 +183,7 @@ is
       Get_Value       => Get_Value,
 
       Count_Type      => DB.Tables.Maps.Count_Type,
-      Result_Type     => DB.Tables.Maps.Result_Type,
+      State_Type     => DB.Tables.Maps.State_Type,
 
       Object          => Map,
       Null_Value      => Null_Value,
@@ -198,7 +198,7 @@ is
       P_Check         => Check);
 
 
-   use type DB.Tables.Maps.Result_Type;
+   use type DB.Tables.Maps.State_Type;
    Long_Job : constant Jobs.Long_Job_Type
             := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
    Cnt      : DB.Tables.Maps.Count_Type := 0;

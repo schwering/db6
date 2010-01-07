@@ -137,12 +137,12 @@ is
    procedure Perform_Insertion (Tree  : in out BTrees.Tree_Type)
    is
       use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
       use type DB.IO.Blocks.Size_Type;
       KV     : constant Key_Value_Type := Random_Entry;
       T      : BTrees.RW_Transaction_Type := BTrees.New_RW_Transaction(Tree);
       Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
+      State  : BTrees.State_Type;
    begin
       BTrees.Start_Transaction(Tree, T);
       BTrees.Insert(Tree, T, KV.Key, KV.Value, Pos, State);
@@ -157,13 +157,13 @@ is
    procedure Perform_Deletion (Tree  : in out BTrees.Tree_Type)
    is
       use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
       use type DB.IO.Blocks.Size_Type;
       KV     : constant Key_Value_Type := Random_Entry;
       T      : BTrees.RW_Transaction_Type := BTrees.New_RW_Transaction(Tree);
       Val    : Value_Type;
       Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
+      State  : BTrees.State_Type;
    begin
       BTrees.Start_Transaction(Tree, T);
       BTrees.Delete(Tree, T, KV.Key, Val, Pos, State);
@@ -178,16 +178,16 @@ is
    procedure Perform_Search (Tree  : in out BTrees.Tree_Type)
    is
       use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
       use type DB.IO.Blocks.Size_Type;
       KV     : constant Key_Value_Type := Random_Entry;
       Val    : Value_Type;
       Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
+      State  : BTrees.State_Type;
    begin
       BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
       if State /= BTrees.Success or else KV.Value /= Val then
-         Put_Line("Look up failed "& BTrees.Result_Type'Image(State));
+         Put_Line("Look up failed "& BTrees.State_Type'Image(State));
       end if;
    end Perform_Search;
 
@@ -195,12 +195,12 @@ is
    procedure Perform_Antisearch (Tree  : in out BTrees.Tree_Type)
    is
       use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
       use type DB.IO.Blocks.Size_Type;
       KV     : constant Key_Value_Type := Random_Entry;
       Val    : Value_Type;
       Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
+      State  : BTrees.State_Type;
    begin
       BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
       if State /= BTrees.Failure then
@@ -225,7 +225,7 @@ is
       Key       : Key_Type;
       Value     : Value_Type;
       Pos       : BTrees.Count_Type;
-      State     : BTrees.Result_Type;
+      State     : BTrees.State_Type;
       I         : Natural := 0;
    begin
       BTrees.Start_Transaction(Tree, Trans);
@@ -331,7 +331,7 @@ is
       Put_Line("Done");
    end Iterate;
 
-   use type BTrees.Result_Type;
+   use type BTrees.State_Type;
    Tree : BTrees.Tree_Type;
    Cnt  : BTrees.Count_Type;
 begin

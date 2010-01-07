@@ -44,18 +44,18 @@ is
    is
       pragma Unreferenced (S);
       use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
    begin
       for I in 1 .. Count/2 loop
          declare
             KV    : constant Key_Value_Type := Random_Entry;
             Val   : DB.Types.Values.Value_Type;
             Pos   : BTrees.Count_Type;
-            State : BTrees.Result_Type;
+            State : BTrees.State_Type;
          begin
             BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
             --if State /= BTrees.Success then
-               --Put_Line(S &" "& BTrees.Result_Type'Image(State));
+               --Put_Line(S &" "& BTrees.State_Type'Image(State));
             --end if;
          end;
       end loop;
@@ -65,19 +65,19 @@ is
    procedure Insertions (S     : String;
                          Count : BTrees.Count_Type)
    is
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
       use type BTrees.Count_Type;
    begin
       for I in 1 .. Count loop
          declare
             KV    : constant Key_Value_Type := Random_Entry;
             Pos   : BTrees.Count_Type;
-            State : BTrees.Result_Type;
+            State : BTrees.State_Type;
          begin
             BTrees.Insert(Tree, KV.Key, KV.Value, Pos, State);
             Check(Tree);
             if State /= BTrees.Success then
-               Put_Line(S &" "& BTrees.Result_Type'Image(State));
+               Put_Line(S &" "& BTrees.State_Type'Image(State));
             end if;
          exception
             when Error : others =>

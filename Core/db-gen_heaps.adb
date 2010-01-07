@@ -346,8 +346,8 @@ package body DB.Gen_Heaps is
 
 
    function Result
-     (State : Info_BTrees.Result_Type)
-      return Result_Type is
+     (State : Info_BTrees.State_Type)
+      return State_Type is
    begin
       case State is
          when Info_BTrees.Success =>
@@ -361,8 +361,8 @@ package body DB.Gen_Heaps is
 
 
    function Result
-     (State : Free_BTrees.Result_Type)
-      return Result_Type is
+     (State : Free_BTrees.State_Type)
+      return State_Type is
    begin
       case State is
          when Free_BTrees.Success =>
@@ -403,11 +403,11 @@ package body DB.Gen_Heaps is
       if Block_IO.Needs_Explicit_Block_Count then
          declare
             use type IO.Blocks.Size_Type;
-            use type Info_BTrees.Result_Type;
+            use type Info_BTrees.State_Type;
             Address : Address_Type;
             Info    : Chunk_Info_Type;
             Pos     : Info_BTrees.Count_Type;
-            St      : Info_BTrees.Result_Type;
+            St      : Info_BTrees.State_Type;
          begin
             Info_BTrees.Maximum(Heap.Info_Tree, Address, Info, Pos, St);
             if St = Info_BTrees.Success then
@@ -573,7 +573,7 @@ package body DB.Gen_Heaps is
      (Heap    : in out Heap_Type;
       Address : in     Address_Type;
       Item    :    out Item_Type;
-      State   :    out Result_Type)
+      State   :    out State_Type)
    is
       Transaction : RO_Transaction_Type := New_RO_Transaction(Heap);
    begin
@@ -591,7 +591,7 @@ package body DB.Gen_Heaps is
      (Heap    : in out Heap_Type;
       Item    : in     Item_Type;
       Address :    out Address_Type;
-      State   :    out Result_Type)
+      State   :    out State_Type)
    is
       Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
    begin
@@ -613,7 +613,7 @@ package body DB.Gen_Heaps is
      (Heap        : in out Heap_Type;
       Item        : in     Item_Type;
       Address     : in     Address_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
    begin
@@ -634,7 +634,7 @@ package body DB.Gen_Heaps is
    procedure Delete
      (Heap    : in out Heap_Type;
       Address : in     Address_Type;
-      State   :    out Result_Type)
+      State   :    out State_Type)
    is
       pragma Assert (Heap.Initialized);
       Transaction : RW_Transaction_Type := New_RW_Transaction(Heap);
@@ -661,7 +661,7 @@ package body DB.Gen_Heaps is
       Transaction : in out Transaction_Type'Class;
       Address     : in     Address_Type;
       Item        :    out Item_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
@@ -671,11 +671,11 @@ package body DB.Gen_Heaps is
          Transaction : in out Transaction_Type'Class;
          Address     : in     Address_Type;
          Info        :    out Chunk_Info_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
-         use type Info_BTrees.Result_Type;
+         use type Info_BTrees.State_Type;
          Pos  : Info_BTrees.Count_Type;
-         St   : Info_BTrees.Result_Type;
+         St   : Info_BTrees.State_Type;
       begin
          if Transaction in RW_Transaction_Type'Class then
             Info_BTrees.Look_Up(Heap.Info_Tree,
@@ -781,16 +781,16 @@ package body DB.Gen_Heaps is
       Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Address_Type;
       Length      : in     Length_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Length = Chunk_Length(Length));
    begin
       declare
-         use type Free_BTrees.Result_Type;
+         use type Free_BTrees.State_Type;
          Key : constant Free_BTree_Types.Key_Type := (Length, Address);
          Val : Free_BTree_Types.Value_Type;
          Pos : Free_BTrees.Count_Type;
-         St  : Free_BTrees.Result_Type;
+         St  : Free_BTrees.State_Type;
       begin
          Free_BTrees.Insert(Heap.Free_Tree, Transaction.Free_Transaction,
                             Key, Val, Pos, St);
@@ -801,10 +801,10 @@ package body DB.Gen_Heaps is
       end;
 
       declare
-         use type Info_BTrees.Result_Type;
+         use type Info_BTrees.State_Type;
          Info : Chunk_Info_Type;
          Pos  : Info_BTrees.Count_Type;
-         St   : Info_BTrees.Result_Type;
+         St   : Info_BTrees.State_Type;
       begin
          Info.State := Free;
          Info.Length := Length;
@@ -831,16 +831,16 @@ package body DB.Gen_Heaps is
       Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Address_Type;
       Length      : in     Length_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       use type IO.Blocks.Size_Type;
       pragma Assert (Length = Chunk_Length(Length));
    begin
       declare
-         use type Info_BTrees.Result_Type;
+         use type Info_BTrees.State_Type;
          Info : Chunk_Info_Type;
          Pos  : Info_BTrees.Count_Type;
-         St   : Info_BTrees.Result_Type;
+         St   : Info_BTrees.State_Type;
       begin
          Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
                             Address, Info, Pos, St);
@@ -851,11 +851,11 @@ package body DB.Gen_Heaps is
       end;
 
       declare
-         use type Free_BTrees.Result_Type;
+         use type Free_BTrees.State_Type;
          Key : constant Free_BTree_Types.Key_Type := (Length, Address);
          Val : Free_BTree_Types.Value_Type;
          Pos : Free_BTrees.Count_Type;
-         St  : Free_BTrees.Result_Type;
+         St  : Free_BTrees.State_Type;
       begin
          Free_BTrees.Delete(Heap.Free_Tree, Transaction.Free_Transaction,
                             Key, Val, Pos, St);
@@ -880,7 +880,7 @@ package body DB.Gen_Heaps is
       Address           : in out Address_Type;
       Reverse_Direction : in     Boolean;
       Length            : in out Length_Type;
-      State             :    out Result_Type)
+      State             :    out State_Type)
    is
 
       function Lower_Bound
@@ -908,7 +908,7 @@ package body DB.Gen_Heaps is
       end Upper_Bound;
 
       use type IO.Blocks.Size_Type;
-      use type Info_BTrees.Result_Type;
+      use type Info_BTrees.State_Type;
       LB     : constant Info_BTrees.Bound_Type
              := Lower_Bound(Address, Reverse_Direction);
       UB     : constant Info_BTrees.Bound_Type
@@ -926,7 +926,7 @@ package body DB.Gen_Heaps is
          declare
             Addr : Address_Type;
             Info : Chunk_Info_Type;
-            St   : Info_BTrees.Result_Type;
+            St   : Info_BTrees.State_Type;
          begin
             Info_BTrees.Next(Heap.Info_Tree, Transaction.Info_Transaction,
                              Cursor, Addr, Info, St);
@@ -955,11 +955,11 @@ package body DB.Gen_Heaps is
             end;
 
             declare
-               use type Free_BTrees.Result_Type;
+               use type Free_BTrees.State_Type;
                Key : constant Free_BTree_Types.Key_Type := (Info.Length, Addr);
                Val : Free_BTree_Types.Value_Type;
                Pos : Free_BTrees.Count_Type;
-               St  : Free_BTrees.Result_Type;
+               St  : Free_BTrees.State_Type;
             begin
                Free_BTrees.Delete(Heap.Free_Tree, Transaction.Free_Transaction,
                                   Key, Val, Pos, St);
@@ -987,7 +987,7 @@ package body DB.Gen_Heaps is
       Item_Size_Bound : in     IO.Blocks.Size_Type;
       Chunk_State     : in     Chunk_State_Type;
       Address         :    out Address_Type;
-      State           :    out Result_Type)
+      State           :    out State_Type)
    is
 
       procedure Allocate_Chunk
@@ -995,7 +995,7 @@ package body DB.Gen_Heaps is
          Transaction     : in out RW_Transaction_Type'Class;
          Item_Size_Bound : in     IO.Blocks.Size_Type;
          Address         :    out Address_Type;
-         State           :    out Result_Type)
+         State           :    out State_Type)
       is
 
          procedure Recycle_Free_Chunk
@@ -1004,9 +1004,9 @@ package body DB.Gen_Heaps is
             Min_Length  : in     Length_Type;
             Address     :    out Address_Type;
             Length      :    out Length_Type;
-            State       :    out Result_Type)
+            State       :    out State_Type)
          is
-            use type Free_BTrees.Result_Type;
+            use type Free_BTrees.State_Type;
             LB     : constant Free_BTrees.Bound_Type
                    := Free_BTrees.New_Bound(Free_BTrees.Greater_Or_Equal,
                                             (Min_Length, Block_IO.First));
@@ -1022,7 +1022,7 @@ package body DB.Gen_Heaps is
                         Reverse_Direction => False);
             Key    : Free_BTree_Types.Key_Type;
             Val    : Free_BTree_Types.Value_Type;
-            St     : Free_BTrees.Result_Type;
+            St     : Free_BTrees.State_Type;
          begin
             Free_BTrees.Next(Heap.Free_Tree, Transaction.Free_Transaction,
                              Cursor, Key, Val, St);
@@ -1051,7 +1051,7 @@ package body DB.Gen_Heaps is
             Address         : in     Address_Type;
             Chunk_Length    : in     Length_Type;
             Item_Size_Bound : in     IO.Blocks.Size_Type;
-            State           :    out Result_Type)
+            State           :    out State_Type)
          is
             use type IO.Blocks.Size_Type;
             Needed_Chunk_Length : constant Length_Type
@@ -1116,9 +1116,9 @@ package body DB.Gen_Heaps is
          Chunk_State : in     Chunk_State_Type;
          Item_Size   : in     IO.Blocks.Size_Type;
          Context     : in     Item_Context_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
-         use type Info_BTrees.Result_Type;
+         use type Info_BTrees.State_Type;
          Info : constant Chunk_Info_Type
               := (State   => Chunk_State,
                   Length  => Length_Type(Item_Size),
@@ -1126,7 +1126,7 @@ package body DB.Gen_Heaps is
                   Last    => Address,
                   Context => Context);
          Pos  : Info_BTrees.Count_Type;
-         St   : Info_BTrees.Result_Type;
+         St   : Info_BTrees.State_Type;
       begin
          Info_BTrees.Insert(Heap.Info_Tree, Transaction.Info_Transaction,
                             Address, Info, Pos, St);
@@ -1225,7 +1225,7 @@ package body DB.Gen_Heaps is
       Transaction : in out RW_Transaction_Type'Class;
       Item        : in     Item_Type;
       Address     :    out Address_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
@@ -1249,7 +1249,7 @@ package body DB.Gen_Heaps is
       Transaction : in out RW_Transaction_Type'Class;
       Item        : in     Item_Type;
       Address     : in     Address_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
 
       procedure Fill_Last_Chunk
@@ -1260,13 +1260,13 @@ package body DB.Gen_Heaps is
          Address           : in     Address_Type;
          Written_Size      :    out IO.Blocks.Size_Type;
          Done              :    out Boolean;
-         State             :    out Result_Type)
+         State             :    out State_Type)
       is
-         use type Info_BTrees.Result_Type;
+         use type Info_BTrees.State_Type;
          use type Address_Type;
          Info       : Chunk_Info_Type;
          Pos        : Info_BTrees.Count_Type;
-         St         : Info_BTrees.Result_Type;
+         St         : Info_BTrees.State_Type;
          Last_Chunk : Address_Type;
       begin
          Info_BTrees.Look_Up(Heap.Info_Tree, Transaction.Info_Transaction,
@@ -1326,14 +1326,14 @@ package body DB.Gen_Heaps is
          Address                  : in     Address_Type;
          Size_Added_To_Last_Chunk : in     IO.Blocks.Size_Type;
          Context                  : in     Item_Context_Type;
-         State                    :    out Result_Type)
+         State                    :    out State_Type)
       is
-         use type Info_BTrees.Result_Type;
+         use type Info_BTrees.State_Type;
          use type IO.Blocks.Size_Type;
          use type Address_Type;
          Info : Chunk_Info_Type;
          Pos  : Info_BTrees.Count_Type;
-         St   : Info_BTrees.Result_Type;
+         St   : Info_BTrees.State_Type;
       begin
          Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
                             Address, Info, Pos, St);
@@ -1391,14 +1391,14 @@ package body DB.Gen_Heaps is
          Size_Added_To_Last_Chunk : in     IO.Blocks.Size_Type;
          New_Chunk_Address        : in     Address_Type;
          Context                  : in     Item_Context_Type;
-         State                    :    out Result_Type)
+         State                    :    out State_Type)
       is
-         use type Info_BTrees.Result_Type;
+         use type Info_BTrees.State_Type;
          use type IO.Blocks.Size_Type;
          use type Address_Type;
          Info : Chunk_Info_Type;
          Pos  : Info_BTrees.Count_Type;
-         St   : Info_BTrees.Result_Type;
+         St   : Info_BTrees.State_Type;
       begin
          Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
                             Address, Info, Pos, St);
@@ -1499,7 +1499,7 @@ package body DB.Gen_Heaps is
      (Heap        : in out Heap_Type;
       Transaction : in out RW_Transaction_Type'Class;
       Address     : in     Address_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
 
       procedure Delete_Info
@@ -1507,11 +1507,11 @@ package body DB.Gen_Heaps is
          Transaction : in out RW_Transaction_Type'Class;
          Address     : in     Address_Type;
          Info        :    out Chunk_Info_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
-         use type Info_BTrees.Result_Type;
+         use type Info_BTrees.State_Type;
          Pos  : Info_BTrees.Count_Type;
-         St   : Info_BTrees.Result_Type;
+         St   : Info_BTrees.State_Type;
       begin
          Info_BTrees.Delete(Heap.Info_Tree, Transaction.Info_Transaction,
                             Address, Info, Pos, St);
@@ -1604,8 +1604,8 @@ package body DB.Gen_Heaps is
                                        Reverse_Direction => False);
       Address : Address_Type;
       Info    : Chunk_Info_Type;
-      State   : Info_BTrees.Result_Type;
-      use type Info_BTrees.Result_Type;
+      State   : Info_BTrees.State_Type;
+      use type Info_BTrees.State_Type;
    begin
       DB.Utils.Print("INFO INDEX");
       Info_BTrees.Start_Transaction(Heap.Info_Tree, Trans);
@@ -1618,7 +1618,7 @@ package body DB.Gen_Heaps is
                            Length_Type'Image(Info.Length));
          else
             DB.Utils.Print("Finished with State = "&
-                           Info_BTrees.Result_Type'Image(State));
+                           Info_BTrees.State_Type'Image(State));
             Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
             return;
          end if;
@@ -1652,8 +1652,8 @@ package body DB.Gen_Heaps is
       Address : Address_Type;
       Key     : Free_BTree_Types.Key_Type;
       Value   : Free_BTree_Types.Value_Type;
-      State   : Free_BTrees.Result_Type;
-      use type Free_BTrees.Result_Type;
+      State   : Free_BTrees.State_Type;
+      use type Free_BTrees.State_Type;
    begin
       DB.Utils.Print("FREE INDEX");
       Free_BTrees.Start_Transaction(Heap.Free_Tree, Trans);
@@ -1667,7 +1667,7 @@ package body DB.Gen_Heaps is
                            Block_IO.Image(Address));
          else
             DB.Utils.Print("Finished with State = "&
-                           Free_BTrees.Result_Type'Image(State));
+                           Free_BTrees.State_Type'Image(State));
             Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
             return;
          end if;

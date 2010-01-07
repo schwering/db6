@@ -11,7 +11,7 @@ procedure DB.Gen_BTrees.Gen_Sequential_Map_Reduce
    Transaction : in out Transaction_Type'Class;
    Cursor      : in out Cursor_Type;
    Element     :    out Element_Type;
-   State       :    out Result_Type)
+   State       :    out State_Type)
 is
    Concurrency_Degree : constant := 15;
 
@@ -137,13 +137,13 @@ is
 
    task type Producer_Type is
       entry Start;
-      entry Is_Done (State : out Result_Type);
+      entry Is_Done (State : out State_Type);
    end Producer_Type;
 
    task body Producer_Type
    is
       KV    : Key_Value_Type;
-      State : Result_Type := Success;
+      State : State_Type := Success;
    begin
       accept Start;
       loop
@@ -152,7 +152,7 @@ is
          Key_Value_Queue.Queue.Put(KV);
       end loop;
       Key_Value_Queue.Queue.Set_Final;
-      accept Is_Done (State : out Result_Type) do
+      accept Is_Done (State : out State_Type) do
          State := Producer_Type.State;
       end Is_Done;
    end Producer_Type;

@@ -55,7 +55,7 @@
 --
 -- Exceptions should only be raised under really serious circumstances or in
 -- debugging mode.
--- In productive use, the Result_Type should be used.
+-- In productive use, the State_Type should be used.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -184,7 +184,7 @@ package DB.Gen_BTrees is
    ----------
    -- Core operations: Look_Up, Insertion, Deletion.
 
-   type Result_Type is (Success, Failure, Error);
+   type State_Type is (Success, Failure, Error);
    type Count_Type is new Natural;
 
    procedure Look_Up
@@ -192,7 +192,7 @@ package DB.Gen_BTrees is
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type);
+      State    :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
    -- This procedure acquires a read-lock and might therefore block due to
@@ -204,7 +204,7 @@ package DB.Gen_BTrees is
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
 
@@ -213,7 +213,7 @@ package DB.Gen_BTrees is
       Position : in     Count_Type;
       Value    :    out Value_Type;
       Key      :    out Key_Type;
-      State    :    out Result_Type);
+      State    :    out State_Type);
    -- Searches the Position-th Key / Value pair or sets State = Failure if
    -- no such key exists.
    -- This procedure acquires a read-lock and might therefore block due to
@@ -225,7 +225,7 @@ package DB.Gen_BTrees is
       Position    : in     Count_Type;
       Value       :    out Value_Type;
       Key         :    out Key_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Searches the Position-th Key / Value pair or sets State = Failure if
    -- no such key exists.
 
@@ -234,7 +234,7 @@ package DB.Gen_BTrees is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type);
+      State    :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
    -- This procedure acquires a read-lock and might therefore block due to
@@ -246,7 +246,7 @@ package DB.Gen_BTrees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
 
@@ -255,7 +255,7 @@ package DB.Gen_BTrees is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type);
+      State    :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
    -- This procedure acquires a read-lock and might therefore block due to
@@ -267,7 +267,7 @@ package DB.Gen_BTrees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
 
@@ -276,7 +276,7 @@ package DB.Gen_BTrees is
       Key      : in     Key_Type;
       Value    : in     Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type);
+      State    :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
    -- This procedure starts and commits a new transaction and might therefore
@@ -288,7 +288,7 @@ package DB.Gen_BTrees is
       Key         : in     Key_Type;
       Value       : in     Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
 
@@ -297,7 +297,7 @@ package DB.Gen_BTrees is
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type);
+      State    :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
    -- This procedure starts and commits a new transaction and might therefore
@@ -309,7 +309,7 @@ package DB.Gen_BTrees is
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
 
@@ -318,7 +318,7 @@ package DB.Gen_BTrees is
       Position : in     Count_Type;
       Value    :    out Value_Type;
       Key      :    out Key_Type;
-      State    :    out Result_Type);
+      State    :    out State_Type);
    -- Deletes the Position-th Key / Value pair or sets State = Failure if no
    -- such key exists.
    -- This procedure starts and commits a new transaction and might therefore
@@ -330,7 +330,7 @@ package DB.Gen_BTrees is
       Position    : in     Count_Type;
       Value       :    out Value_Type;
       Key         :    out Key_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Deletes the Position-th Key / Value pair or sets State = Failure if no
    -- such key exists.
 
@@ -367,7 +367,7 @@ package DB.Gen_BTrees is
 
    procedure Clusterize
      (Tree  : in out Tree_Type;
-      State :    out Result_Type);
+      State :    out State_Type);
    -- Reorganizes the nodes in the file.
    -- Not implemented yet.
 
@@ -456,7 +456,7 @@ package DB.Gen_BTrees is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Steps forward to the next Key/Value-pair and sets State to Success.
    -- If no such pair exists (with regard to the set bounds), State is set to
    -- Failure or Error.
@@ -471,7 +471,7 @@ package DB.Gen_BTrees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it
    -- was not successful, the deletion is not successful, either, and State is
@@ -492,7 +492,7 @@ package DB.Gen_BTrees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type);
+      State       :    out State_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it
    -- was not successful, the deletion is not successful, either, and State is
@@ -512,7 +512,7 @@ private
       type Node_Type is private;
 
       type State_Type is (Valid, Too_Small, Too_Large);
-      subtype Validation_Result_Type is State_Type;
+      subtype Validation_State_Type is State_Type;
 
       Invalid_Index   : constant Index_Type
                       := Index_Type'First;
@@ -835,7 +835,7 @@ private
       function Validation
         (Node           : Node_Type;
          Force_Non_Root : Boolean := False)
-         return Validation_Result_Type;
+         return Validation_State_Type;
       -- Checks whether the given node is valid, i.e. whether it fits into a
       -- single disk block.
 

@@ -70,7 +70,7 @@ is
    type Address_Array_Type is array (Size_Type range <>) of Heaps.Address_Type;
 
    use type DB.IO.Blocks.Size_Type;
-   use type Heaps.Result_Type;
+   use type Heaps.State_Type;
    Heap      : Heaps.Heap_Type;
    Addresses : Address_Array_Type(1 .. Count);
 begin
@@ -103,12 +103,12 @@ begin
       declare
          S     : constant Size_Type := Size_Type(I);
          Item  : Item_Type := (I => S);
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Put(Heap, Item, Addresses(S), State);
          if State /= Heaps.Success then
             Put_Line("Put"& Size_Type'Image(S) &" = "&
-                     Heaps.Result_Type'Image(State));
+                     Heaps.State_Type'Image(State));
          end if;
       end;
    end loop;
@@ -118,13 +118,13 @@ begin
       declare
          S     : constant Size_Type := Size_Type(I);
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(S), Item, State);
          if State /= Heaps.Success then
             Put_Line("Get"& Size_Type'Image(S)&
                      Size_Type'Image(Item.I) &" = "&
-                     Heaps.Result_Type'Image(State));
+                     Heaps.State_Type'Image(State));
          end if;
       end;
    end loop;
@@ -139,12 +139,12 @@ begin
    for I in Count*0/4+1 .. Count*1/4 loop
       declare
          S     : constant Size_Type := Size_Type(I);
-         State : Heaps.Result_Type := Heaps.Failure;
+         State : Heaps.State_Type := Heaps.Failure;
       begin
          Heaps.Delete(Heap, Addresses(S), State);
          if State /= Heaps.Success then
             Put_Line("Delete"& Size_Type'Image(S) &" = "&
-                     Heaps.Result_Type'Image(State));
+                     Heaps.State_Type'Image(State));
          end if;
       end;
    end loop;
@@ -157,12 +157,12 @@ begin
    for I in Count*3/4+1 .. Count*4/4 loop
       declare
          S     : constant Size_Type := Size_Type(I);
-         State : Heaps.Result_Type := Heaps.Failure;
+         State : Heaps.State_Type := Heaps.Failure;
       begin
          Heaps.Delete(Heap, Addresses(S), State);
          if State /= Heaps.Success then
             Put_Line("Delete"& Size_Type'Image(S) &" = "&
-                     Heaps.Result_Type'Image(State));
+                     Heaps.State_Type'Image(State));
          end if;
       end;
    end loop;
@@ -176,12 +176,12 @@ begin
       if I mod 2 = 0 then
          declare
             S     : constant Size_Type := Size_Type(I);
-            State : Heaps.Result_Type := Heaps.Failure;
+            State : Heaps.State_Type := Heaps.Failure;
          begin
             Heaps.Delete(Heap, Addresses(S), State);
             if State /= Heaps.Success then
                Put_Line("Delete"& Size_Type'Image(S) &" = "&
-                        Heaps.Result_Type'Image(State));
+                        Heaps.State_Type'Image(State));
                return;
             end if;
          end;
@@ -197,12 +197,12 @@ begin
       if I mod 2 = 1 then
          declare
             S     : constant Size_Type := Size_Type(I);
-            State : Heaps.Result_Type := Heaps.Failure;
+            State : Heaps.State_Type := Heaps.Failure;
          begin
             Heaps.Delete(Heap, Addresses(S), State);
             if State /= Heaps.Success then
                Put_Line("Delete"& Size_Type'Image(S) &" = "&
-                        Heaps.Result_Type'Image(State));
+                        Heaps.State_Type'Image(State));
                return;
             end if;
          end;
@@ -218,12 +218,12 @@ begin
       declare
          S     : constant Size_Type := Size_Type(I);
          Item  : Item_Type := (I => S);
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Put(Heap, Item, Addresses(S), State);
          if State /= Heaps.Success then
             Put_Line("Put"& --Size_Type'Image(S) &" = "&
-                     Heaps.Result_Type'Image(State));
+                     Heaps.State_Type'Image(State));
          end if;
       end;
    end loop;
@@ -233,13 +233,13 @@ begin
       declare
          S     : constant Size_Type := Size_Type(I);
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(S), Item, State);
          if State /= Heaps.Success then
             Put_Line("Get"& Size_Type'Image(S)&
                      Size_Type'Image(Item.I) &" = "&
-                     Heaps.Result_Type'Image(State));
+                     Heaps.State_Type'Image(State));
          end if;
       end;
    end loop;

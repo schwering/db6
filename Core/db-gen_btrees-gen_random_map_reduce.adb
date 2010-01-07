@@ -9,12 +9,12 @@ procedure DB.Gen_BTrees.Gen_Random_Map_Reduce
    Transaction        : in out Transaction_Type'Class;
    Cursor             : in out Cursor_Type;
    Element            :    out Element_Type;
-   State              :    out Result_Type;
+   State              :    out State_Type;
    Concurrency_Degree : in     Positive := Default_Concurrency_Degree)
 is
    task type Task_Type is
       entry Start;
-      entry Is_Done (Element : out Element_Type; State : out Result_Type);
+      entry Is_Done (Element : out Element_Type; State : out State_Type);
    end Task_Type;
 
    task body Task_Type
@@ -22,7 +22,7 @@ is
       Element : Element_Type := Neutral_Element;
       Key     : Key_Type;
       Value   : Value_Type;
-      State   : Result_Type;
+      State   : State_Type;
    begin
       accept Start;
       loop
@@ -30,7 +30,7 @@ is
          exit when State /= Success;
          Reduce(Element, Map(Key, Value));
       end loop;
-      accept Is_Done (Element : out Element_Type; State : out Result_Type) do
+      accept Is_Done (Element : out Element_Type; State : out State_Type) do
          Element := Task_Type.Element;
          State   := Task_Type.State;
       end Is_Done;
@@ -50,7 +50,7 @@ begin
    for I in Tasks'Range loop
       declare
          Step_Element : Element_Type;
-         Step_State   : Result_Type;
+         Step_State   : State_Type;
       begin
          Tasks(I).Is_Done(Step_Element, Step_State);
          Reduce(Element, Step_Element);

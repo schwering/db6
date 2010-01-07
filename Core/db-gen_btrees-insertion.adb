@@ -12,7 +12,7 @@ package body Insertion is
       Key      : in     Key_Type;
       Value    : in     Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       Transaction : RW_Transaction_Type := New_RW_Transaction(Tree);
@@ -37,7 +37,7 @@ package body Insertion is
       Key         : in     Key_Type;
       Value       : in     Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       use type IO.Blocks.Size_Type;
       pragma Assert (Tree.Initialized);
@@ -116,7 +116,7 @@ package body Insertion is
       T     : in out RW_Transaction_Type'Class;
       N_A   : in     Nodes.Valid_Address_Type;
       N     : in     Nodes.Node_Type;
-      State : in out Result_Type)
+      State : in out State_Type)
    is
 
       -- Simply inserts.
@@ -127,7 +127,7 @@ package body Insertion is
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
          N     : in     Nodes.Node_Type;
-         State : in out Result_Type) is
+         State : in out State_Type) is
       begin
          if Nodes.Is_Valid(N) then
             Write_Node(Tree, T, N_A, N);
@@ -148,7 +148,7 @@ package body Insertion is
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
          N     : in     Nodes.Node_Type;
-         State : in out Result_Type) is
+         State : in out State_Type) is
       begin
          if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
             declare
@@ -175,7 +175,7 @@ package body Insertion is
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
          N     : in     Nodes.Node_Type;
-         State : in out Result_Type) is
+         State : in out State_Type) is
       begin
          if Nodes.Is_Valid(Nodes.Left_Neighbor(N)) then
             declare
@@ -205,7 +205,7 @@ package body Insertion is
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
          N     : in     Nodes.Node_Type;
-         State : in out Result_Type)
+         State : in out State_Type)
       is
 
          procedure Insert_Into_New_Root
@@ -215,7 +215,7 @@ package body Insertion is
             L     : in out Nodes.Node_Type;
             R_A   : in     Nodes.Valid_Address_Type;
             R     : in out Nodes.Node_Type;
-            State : in out Result_Type) is
+            State : in out State_Type) is
          begin
             Allocate_Node(Tree, T, T.Current_Root_Address);
             Nodes.Set_Parent(L, T.Current_Root_Address);
@@ -249,7 +249,7 @@ package body Insertion is
             T     : in out RW_Transaction_Type'Class;
             L_A   : in     Nodes.Valid_Address_Type;
             L     : in     Nodes.Node_Type;
-            State : in out Result_Type)
+            State : in out State_Type)
          is
             P_A   : constant Nodes.Valid_Address_Type
                   := Nodes.Valid_Parent(L);

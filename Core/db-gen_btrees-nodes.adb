@@ -2087,7 +2087,7 @@ package body Nodes is
    function Validation
      (Node           : Node_Type;
       Force_Non_Root : Boolean := False)
-      return Validation_Result_Type
+      return Validation_State_Type
    is
       use type IO.Blocks.Size_Type;
    begin

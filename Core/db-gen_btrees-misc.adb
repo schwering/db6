@@ -84,19 +84,19 @@ package body Misc is
 
    procedure Clusterize
      (Tree  : in out Tree_Type;
-      State :    out Result_Type)
+      State :    out State_Type)
    is
       procedure Traverse_Breadth_First
         (Tree   : in out Tree_Type;
          T      : in out RO_Transaction_Type'Class;
-         State  :    out Result_Type)
+         State  :    out State_Type)
       is
          procedure Find_Outermost_Left_In_Level
            (Tree   : in out Tree_Type;
             T      : in out RO_Transaction_Type'Class;
             Level  : in     Height_Type;
             N_A    :    out Nodes.Valid_Address_Type;
-            State  :    out Result_Type)
+            State  :    out State_Type)
          is
             Current_Level : Height_Type := 1;
          begin

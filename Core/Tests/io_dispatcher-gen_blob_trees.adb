@@ -158,7 +158,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       Check_Key_Value => Check_Key_Value,
 
       Count_Type      => Blob_Trees.Count_Type,
-      Result_Type     => Blob_Trees.Result_Type,
+      State_Type     => Blob_Trees.State_Type,
 
       Object          => Tree,
       Null_Value      => Null_Value,
@@ -173,7 +173,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       P_Check         => Check);
 
 
-   use type Blob_Trees.Result_Type;
+   use type Blob_Trees.State_Type;
    Long_Job : constant Jobs.Long_Job_Type
             := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
    Cnt      : Blob_Trees.Count_Type := 0;

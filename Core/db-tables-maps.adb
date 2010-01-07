@@ -187,10 +187,10 @@ package body DB.Tables.Maps is
 
 
    function To_State
-     (State : BTrees.Result_Type)
-      return Result_Type
+     (State : BTrees.State_Type)
+      return State_Type
    is
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
    begin
       case State is
          when BTrees.Success => return Success;
@@ -201,10 +201,10 @@ package body DB.Tables.Maps is
 
 
    function To_State
-     (State : Blob_Trees.Result_Type)
-      return Result_Type
+     (State : Blob_Trees.State_Type)
+      return State_Type
    is
-      use type Blob_Trees.Result_Type;
+      use type Blob_Trees.State_Type;
    begin
       case State is
          when Blob_Trees.Success => return Success;
@@ -219,11 +219,11 @@ package body DB.Tables.Maps is
       Key      : in     Key_Type;
       Value    :    out Value_Type'Class;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Look_Up(Map.Short_Tree, Key, V,
@@ -233,7 +233,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Look_Up(Map.Long_Tree, Key, V,
@@ -251,7 +251,7 @@ package body DB.Tables.Maps is
       Key         : in     Key_Type;
       Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert ((Transaction not in RO_Transaction_Type'Class or else
                       Map.Short = RO_Transaction_Type(Transaction).Short) and
@@ -260,7 +260,7 @@ package body DB.Tables.Maps is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -277,7 +277,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -301,11 +301,11 @@ package body DB.Tables.Maps is
       Position : in     Count_Type;
       Value    :    out Value_Type'Class;
       Key      :    out Key_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Look_Up(Map.Short_Tree, BTrees.Count_Type(Position), V,
@@ -315,7 +315,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Look_Up(Map.Long_Tree, Blob_Trees.Count_Type(Position),
@@ -333,7 +333,7 @@ package body DB.Tables.Maps is
       Position    : in     Count_Type;
       Value       :    out Value_Type'Class;
       Key         :    out Key_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert ((Transaction not in RO_Transaction_Type'Class or else
                       Map.Short = RO_Transaction_Type(Transaction).Short) and
@@ -342,7 +342,7 @@ package body DB.Tables.Maps is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -360,7 +360,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -384,11 +384,11 @@ package body DB.Tables.Maps is
       Key      :    out Key_Type;
       Value    :    out Value_Type'Class;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Minimum(Map.Short_Tree, Key, V,
@@ -398,7 +398,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Minimum(Map.Long_Tree, Key, V,
@@ -416,7 +416,7 @@ package body DB.Tables.Maps is
       Key         :    out Key_Type;
       Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert ((Transaction not in RO_Transaction_Type'Class or else
                       Map.Short = RO_Transaction_Type(Transaction).Short) and
@@ -425,7 +425,7 @@ package body DB.Tables.Maps is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -442,7 +442,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -466,11 +466,11 @@ package body DB.Tables.Maps is
       Key      :    out Key_Type;
       Value    :    out Value_Type'Class;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Maximum(Map.Short_Tree, Key, V,
@@ -480,7 +480,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Maximum(Map.Long_Tree, Key, V,
@@ -498,7 +498,7 @@ package body DB.Tables.Maps is
       Key         :    out Key_Type;
       Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert ((Transaction not in RO_Transaction_Type'Class or else
                       Map.Short = RO_Transaction_Type(Transaction).Short) and
@@ -507,7 +507,7 @@ package body DB.Tables.Maps is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -524,7 +524,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -548,11 +548,11 @@ package body DB.Tables.Maps is
       Key      : in     Key_Type;
       Value    : in     Value_Type'Class;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
          begin
             BTrees.Insert(Map.Short_Tree, Key, To_Bounded(Value),
                           BTrees.Count_Type(Position), S);
@@ -560,7 +560,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
          begin
             Blob_Trees.Insert(Map.Long_Tree, Key, To_Unbounded(Value),
                               Blob_Trees.Count_Type(Position), S);
@@ -576,13 +576,13 @@ package body DB.Tables.Maps is
       Key         : in     Key_Type;
       Value       : in     Value_Type'Class;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Map.Short = Transaction.Short);
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
          begin
             BTrees.Insert(Map.Short_Tree, Transaction.Short_Transaction,
                           Key, To_Bounded(Value), BTrees.Count_Type(Position),
@@ -591,7 +591,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
          begin
             Blob_Trees.Insert(Map.Long_Tree, Transaction.Long_Transaction,
                               Key, To_Unbounded(Value),
@@ -607,11 +607,11 @@ package body DB.Tables.Maps is
       Key      : in     Key_Type;
       Value    :    out Value_Type'Class;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, Key, V,
@@ -621,7 +621,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Key, V,
@@ -639,13 +639,13 @@ package body DB.Tables.Maps is
       Key         : in     Key_Type;
       Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Map.Short = Transaction.Short);
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, Transaction.Short_Transaction,
@@ -655,7 +655,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Transaction.Long_Transaction,
@@ -672,11 +672,11 @@ package body DB.Tables.Maps is
       Position : in     Count_Type;
       Value    :    out Value_Type'Class;
       Key      :    out Key_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, BTrees.Count_Type(Position),
@@ -686,7 +686,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Blob_Trees.Count_Type(Position),
@@ -704,13 +704,13 @@ package body DB.Tables.Maps is
       Position    : in     Count_Type;
       Value       :    out Value_Type'Class;
       Key         :    out Key_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Map.Short = Transaction.Short);
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, Transaction.Short_Transaction,
@@ -720,7 +720,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Transaction.Long_Transaction,
@@ -943,7 +943,7 @@ package body DB.Tables.Maps is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type'Class;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Map.Short = Cursor.Short);
       pragma Assert ((Transaction not in RO_Transaction_Type'Class or else
@@ -953,7 +953,7 @@ package body DB.Tables.Maps is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -970,7 +970,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
@@ -996,14 +996,14 @@ package body DB.Tables.Maps is
       Key         :    out Key_Type;
       Value       :    out Value_Type'Class;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Map.Short = Cursor.Short);
       pragma Assert (Map.Short = Transaction.Short);
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
             BTrees.Delete(Map.Short_Tree, Transaction.Short_Transaction,
@@ -1014,7 +1014,7 @@ package body DB.Tables.Maps is
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
             Blob_Trees.Delete(Map.Long_Tree, Transaction.Long_Transaction,
@@ -1121,18 +1121,18 @@ package body DB.Tables.Maps is
 
    procedure Clusterize
      (Map   : in out Map_Type;
-      State :    out Result_Type) is
+      State :    out State_Type) is
    begin
       if Map.Short then
          declare
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
          begin
             BTrees.Clusterize(Map.Short_Tree, S);
             State := To_State(S);
          end;
       else
          declare
-            S : Blob_Trees.Result_Type;
+            S : Blob_Trees.State_Type;
          begin
             Blob_Trees.Clusterize(Map.Long_Tree, S);
             State := To_State(S);
@@ -1147,7 +1147,7 @@ package body DB.Tables.Maps is
       Cursor      : in out Cursor_Type;
       Element     :    out Element_Type;
       Value_Impl  : in     Value_Type'Class;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       if Map.Short then
          declare
@@ -1165,7 +1165,7 @@ package body DB.Tables.Maps is
             procedure Map_Reduce is new BTrees.Gen_Sequential_Map_Reduce
               (Element_Type, Neutral_Element, Map_Function_Wrapper, Reduce);
 
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                Map_Reduce(Map.Short_Tree,
@@ -1190,7 +1190,7 @@ package body DB.Tables.Maps is
       Cursor      : in out Cursor_Type;
       Element     :    out Element_Type;
       Value_Impl  : in     Value_Type'Class;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       if Map.Short then
          declare
@@ -1208,7 +1208,7 @@ package body DB.Tables.Maps is
             procedure Map_Reduce is new BTrees.Gen_Sequential_Map_Reduce
               (Element_Type, Neutral_Element, Map_Function_Wrapper, Reduce);
 
-            S : BTrees.Result_Type;
+            S : BTrees.State_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
                Map_Reduce(Map.Short_Tree,

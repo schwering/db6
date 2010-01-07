@@ -78,11 +78,11 @@ is
    procedure Insert
    is
       use type BTrees.Count_Type;
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
       use type DB.IO.Blocks.Size_Type;
       KV     : constant Key_Value_Type := Random_Entry;
       Pos    : BTrees.Count_Type;
-      State  : BTrees.Result_Type;
+      State  : BTrees.State_Type;
       --Size   : DB.IO.Blocks.Size_Type;
       --Context : DB.Types.Keys.Context_Type;
    begin
@@ -100,11 +100,11 @@ is
    end Insert;
 
    package Simple_Jobs is new Gen_Simple_Jobs
-     (BTrees.Tree_Type, BTrees.Count_Type, BTrees.Result_Type,
+     (BTrees.Tree_Type, BTrees.Count_Type, BTrees.State_Type,
       Tree, BTrees.Success, BTrees.Failure,
       BTrees.Insert, BTrees.Delete, BTrees.Look_Up);
 
-   use type BTrees.Result_Type;
+   use type BTrees.State_Type;
    Long_Job : constant Jobs.Long_Job_Type
             := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
    Cnt      : BTrees.Count_Type := 0;

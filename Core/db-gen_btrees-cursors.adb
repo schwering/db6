@@ -269,7 +269,7 @@ package body Cursors is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
 
       function Has_Lower
@@ -287,7 +287,7 @@ package body Cursors is
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
          pragma Inline (Move_To_Lower);
          use type Nodes.Degree_Type;
@@ -339,7 +339,7 @@ package body Cursors is
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
          pragma Inline (Move_To_Upper);
          use type Nodes.Degree_Type;
@@ -380,7 +380,7 @@ package body Cursors is
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
-         State       :    out Result_Type) is
+         State       :    out State_Type) is
       begin
          case Cursor.Direction is
             when From_Lower_To_Upper =>
@@ -397,7 +397,7 @@ package body Cursors is
          Key         : in     Key_Type;
          Node        :    out Nodes.Node_Type;
          Index       :    out Nodes.Valid_Index_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
          N_A : Nodes.Valid_Address_Type;
          I   : Nodes.Index_Type;
@@ -443,7 +443,7 @@ package body Cursors is
          Transaction : in out Transaction_Type'Class;
          Node        :    out Nodes.Node_Type;
          Index       :    out Nodes.Valid_Index_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
          N_A : Nodes.Valid_Address_Type;
       begin
@@ -484,7 +484,7 @@ package body Cursors is
          Transaction : in out Transaction_Type'Class;
          Node        :    out Nodes.Node_Type;
          Index       :    out Nodes.Valid_Index_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
          N_A : Nodes.Valid_Address_Type;
       begin
@@ -524,7 +524,7 @@ package body Cursors is
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
-         State       :    out Result_Type) is
+         State       :    out State_Type) is
       begin
          if Cursor.Final or not Cursor.Has_Node then
             State := Success;
@@ -581,7 +581,7 @@ package body Cursors is
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
          pragma Inline (Look_Up_Abstract_From_Bound);
          pragma Assert (not Cursor.Has_Node);
@@ -609,7 +609,7 @@ package body Cursors is
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
-         State       :    out Result_Type)
+         State       :    out State_Type)
       is
          pragma Inline (Look_Up_Concrete_From_Bound);
          pragma Assert (not Cursor.Has_Node);
@@ -687,7 +687,7 @@ package body Cursors is
 
       procedure Initialize_Output_If_Successful_And_Bounds_Satisfied
         (Cursor : in     Cursor_Type;
-         State  : in out Result_Type;
+         State  : in out State_Type;
          Key    :    out Key_Type;
          Value  :    out Value_Type)
       is
@@ -751,7 +751,7 @@ package body Cursors is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Cursor.Initialized);
@@ -799,7 +799,7 @@ package body Cursors is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Cursor.Initialized);

@@ -68,7 +68,7 @@ procedure IO_Dispatcher.Map_Cursor is
                                      Lower_Bound       => Lower,
                                      Upper_Bound       => Upper,
                                      Reverse_Direction => False);
-      State       : Maps.Result_Type;
+      State       : Maps.State_Type;
       Count       : Natural := 0;
    begin
       Maps.Start_Transaction(Map, Trans);

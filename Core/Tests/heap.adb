@@ -83,7 +83,7 @@ is
 
    type Address_Array_Type is array (Positive range <>) of Heaps.Address_Type;
 
-   use type Heaps.Result_Type;
+   use type Heaps.State_Type;
    Heap      : Heaps.Heap_Type;
    Addresses : Address_Array_Type(1 .. Count);
 begin
@@ -115,7 +115,7 @@ begin
    for I in 1 .. Count loop
       declare
          Item  : constant Item_Type := Make_Item(I);
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Put(Heap, Item, Addresses(I), State);
          if State /= Heaps.Success then
@@ -128,7 +128,7 @@ begin
    for I in 1 .. Count loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Success or else Item /= Make_Item(I) then
@@ -141,7 +141,7 @@ begin
    for I in 1 .. Count loop
       declare
          Item  : constant Item_Type := Make_Item(I);
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Append(Heap, Item, Addresses(I), State);
          if State /= Heaps.Success then
@@ -154,7 +154,7 @@ begin
    for I in 1 .. Count loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Success or else
@@ -173,7 +173,7 @@ begin
    Put_Line("DELETES [0.0, 0.25)");
    for I in Count*0/4+1 .. Count*1/4 loop
       declare
-         State : Heaps.Result_Type := Heaps.Failure;
+         State : Heaps.State_Type := Heaps.Failure;
       begin
          Heaps.Delete(Heap, Addresses(I), State);
          if State /= Heaps.Success then
@@ -186,7 +186,7 @@ begin
    for I in Count*0/4+1 .. Count*1/4 loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Failure then
@@ -197,7 +197,7 @@ begin
    for I in Count*1/4+1 .. Count loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Success or else
@@ -215,7 +215,7 @@ begin
    Put_Line("DELETES (0.75, 1.0]");
    for I in Count*3/4+1 .. Count*4/4 loop
       declare
-         State : Heaps.Result_Type := Heaps.Failure;
+         State : Heaps.State_Type := Heaps.Failure;
       begin
          Heaps.Delete(Heap, Addresses(I), State);
          if State /= Heaps.Success then
@@ -228,7 +228,7 @@ begin
    for I in Count*0/4+1 .. Count*1/4 loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Failure then
@@ -239,7 +239,7 @@ begin
    for I in Count*1/4+1 .. Count*3/4 loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Success or else
@@ -251,7 +251,7 @@ begin
    for I in Count*3/4+1 .. Count*4/4 loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Failure then
@@ -269,7 +269,7 @@ begin
    for I in Count*1/4+1 .. Count*3/4 loop
       if I mod 2 = 0 then
          declare
-            State : Heaps.Result_Type := Heaps.Failure;
+            State : Heaps.State_Type := Heaps.Failure;
          begin
             Heaps.Delete(Heap, Addresses(I), State);
             if State /= Heaps.Success then
@@ -283,7 +283,7 @@ begin
    for I in Count*0/4+1 .. Count*1/4 loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Failure then
@@ -294,7 +294,7 @@ begin
    for I in Count*1/4+1 .. Count*3/4 loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if I mod 2 = 0 then
@@ -312,7 +312,7 @@ begin
    for I in Count*3/4+1 .. Count*4/4 loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Failure then
@@ -330,7 +330,7 @@ begin
    for I in Count*1/4+1 .. Count*3/4 loop
       if I mod 2 = 1 then
          declare
-            State : Heaps.Result_Type := Heaps.Failure;
+            State : Heaps.State_Type := Heaps.Failure;
          begin
             Heaps.Delete(Heap, Addresses(I), State);
             if State /= Heaps.Success then
@@ -344,7 +344,7 @@ begin
    for I in 1 .. Count loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Failure then
@@ -361,7 +361,7 @@ begin
    for I in 1 .. Count loop
       declare
          Item  : constant Item_Type := Make_Item(I);
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Put(Heap, Item, Addresses(I), State);
          if State /= Heaps.Success then
@@ -374,7 +374,7 @@ begin
    for I in 1 .. Count loop
       declare
          Item  : Item_Type;
-         State : Heaps.Result_Type;
+         State : Heaps.State_Type;
       begin
          Heaps.Get(Heap, Addresses(I), Item, State);
          if State /= Heaps.Success or else Item /= Make_Item(I) then

@@ -8,7 +8,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
    is
       KV    : constant Key_Value_Type := Random_Entry;
       Pos   : Count_Type;
-      State : Result_Type := Success;
+      State : State_Type := Success;
    begin
       Check_Key_Value(KV);
       P_Insert(Object, Get_Key(KV), Get_Value(KV), Pos, State);
@@ -25,7 +25,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       KV    : constant Key_Value_Type := Random_Entry;
       Val   : Value_Type := Null_Value;
       Pos   : Count_Type;
-      State : Result_Type := Success;
+      State : State_Type := Success;
    begin
       P_Delete(Object, Get_Key(KV), Val, Pos, State);
       if State /= Success or else Get_Value(KV) /= Val then
@@ -41,7 +41,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       KV    : constant Key_Value_Type := Random_Entry;
       Val   : Value_Type := Null_Value;
       Pos   : Count_Type;
-      State : Result_Type := Success;
+      State : State_Type := Success;
    begin
       P_Look_Up(Object, Get_Key(KV), Val, Pos, State);
       if State /= Success or else Get_Value(KV) /= Val then
@@ -61,7 +61,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       KV    : constant Key_Value_Type := Random_Entry;
       Val   : Value_Type := Null_Value;
       Pos   : Count_Type;
-      State : Result_Type := Failure;
+      State : State_Type := Failure;
    begin
       P_Look_Up(Object, Get_Key(KV), Val, Pos, State);
       if State /= Failure then

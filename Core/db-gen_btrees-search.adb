@@ -12,7 +12,7 @@ package body Search is
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       T : RO_Transaction_Type := New_RO_Transaction(Tree);
    begin
@@ -31,7 +31,7 @@ package body Search is
       Position : in     Count_Type;
       Value    :    out Value_Type;
       Key      :    out Key_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       T : RO_Transaction_Type := New_RO_Transaction(Tree);
    begin
@@ -50,7 +50,7 @@ package body Search is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       T : RO_Transaction_Type := New_RO_Transaction(Tree);
    begin
@@ -69,7 +69,7 @@ package body Search is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       T : RO_Transaction_Type := New_RO_Transaction(Tree);
    begin
@@ -89,7 +89,7 @@ package body Search is
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);
@@ -139,7 +139,7 @@ package body Search is
       Position    : in     Count_Type;
       Value       :    out Value_Type;
       Key         :    out Key_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);
@@ -189,7 +189,7 @@ package body Search is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);
@@ -236,7 +236,7 @@ package body Search is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);

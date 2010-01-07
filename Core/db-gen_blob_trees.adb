@@ -249,10 +249,10 @@ package body DB.Gen_Blob_Trees is
 
 
    function To_State
-     (State : BTrees.Result_Type)
-      return Result_Type
+     (State : BTrees.State_Type)
+      return State_Type
    is
-      use type BTrees.Result_Type;
+      use type BTrees.State_Type;
    begin
       case State is
          when BTrees.Success => return Success;
@@ -263,10 +263,10 @@ package body DB.Gen_Blob_Trees is
 
 
    function To_State
-     (State : Heaps.Result_Type)
-      return Result_Type
+     (State : Heaps.State_Type)
+      return State_Type
    is
-      use type Heaps.Result_Type;
+      use type Heaps.State_Type;
    begin
       case State is
          when Heaps.Success => return Success;
@@ -281,11 +281,11 @@ package body DB.Gen_Blob_Trees is
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Look_Up(Tree.BTree, Key, B_Value, BTrees.Count_Type(Position),
                      B_State);
@@ -307,11 +307,11 @@ package body DB.Gen_Blob_Trees is
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Look_Up(Tree.BTree,
@@ -347,11 +347,11 @@ package body DB.Gen_Blob_Trees is
       Position : in     Count_Type;
       Value    :    out Value_Type;
       Key      :    out Key_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Look_Up(Tree.BTree, BTrees.Count_Type(Position), B_Value, Key,
                      B_State);
@@ -373,11 +373,11 @@ package body DB.Gen_Blob_Trees is
       Position    : in     Count_Type;
       Value       :    out Value_Type;
       Key         :    out Key_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Look_Up(Tree.BTree,
@@ -413,11 +413,11 @@ package body DB.Gen_Blob_Trees is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Minimum(Tree.BTree, Key, B_Value, BTrees.Count_Type(Position),
                      B_State);
@@ -439,11 +439,11 @@ package body DB.Gen_Blob_Trees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Minimum(Tree.BTree,
@@ -479,11 +479,11 @@ package body DB.Gen_Blob_Trees is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Maximum(Tree.BTree, Key, B_Value, BTrees.Count_Type(Position),
                      B_State);
@@ -505,11 +505,11 @@ package body DB.Gen_Blob_Trees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Maximum(Tree.BTree,
@@ -545,10 +545,10 @@ package body DB.Gen_Blob_Trees is
       Key      : in     Key_Type;
       Value    : in     Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
+      B_State : BTrees.State_Type;
    begin
       if BTree_Utils.Fits_Direct(Key, Value) then
          B_Value := (Direct => True, Value => Value);
@@ -558,7 +558,7 @@ package body DB.Gen_Blob_Trees is
       else
          declare
             Address : Heaps.Address_Type;
-            H_State : Heaps.Result_Type;
+            H_State : Heaps.State_Type;
          begin
             Heaps.Put(Tree.Heap, Value, Address, H_State);
             State := To_State(H_State);
@@ -579,10 +579,10 @@ package body DB.Gen_Blob_Trees is
       Key         : in     Key_Type;
       Value       : in     Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
+      B_State : BTrees.State_Type;
    begin
       if BTree_Utils.Fits_Direct(Key, Value) then
          B_Value := (Direct => True, Value => Value);
@@ -591,7 +591,7 @@ package body DB.Gen_Blob_Trees is
       else
          declare
             Address : Heaps.Address_Type;
-            H_State : Heaps.Result_Type;
+            H_State : Heaps.State_Type;
          begin
             Heaps.Put(Tree.Heap, Transaction.Heap_Transaction, Value, Address,
                       H_State);
@@ -612,10 +612,10 @@ package body DB.Gen_Blob_Trees is
       Key      : in     Key_Type;
       Value    : in     Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
+      B_State : BTrees.State_Type;
    begin
       BTrees.Look_Up(Tree.BTree, Key, B_Value, BTrees.Count_Type(Position),
                      B_State);
@@ -626,7 +626,7 @@ package body DB.Gen_Blob_Trees is
             return;
          end if;
          declare
-            H_State : Heaps.Result_Type;
+            H_State : Heaps.State_Type;
          begin
             Heaps.Append(Tree.Heap, Value, B_Value.Address, H_State);
             State := To_State(H_State);
@@ -641,10 +641,10 @@ package body DB.Gen_Blob_Trees is
       Key         : in     Key_Type;
       Value       : in     Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
+      B_State : BTrees.State_Type;
    begin
       BTrees.Look_Up(Tree.BTree, Transaction.BTree_Transaction,
                      Key, B_Value, BTrees.Count_Type(Position), B_State);
@@ -655,7 +655,7 @@ package body DB.Gen_Blob_Trees is
             return;
          end if;
          declare
-            H_State : Heaps.Result_Type;
+            H_State : Heaps.State_Type;
          begin
             Heaps.Append(Tree.Heap, Transaction.Heap_Transaction, Value,
                          B_Value.Address, H_State);
@@ -670,11 +670,11 @@ package body DB.Gen_Blob_Trees is
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Delete(Tree.BTree, Key, B_Value, BTrees.Count_Type(Position),
                     B_State);
@@ -700,11 +700,11 @@ package body DB.Gen_Blob_Trees is
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Delete(Tree.BTree, Transaction.BTree_Transaction, Key, B_Value,
                     BTrees.Count_Type(Position), B_State);
@@ -731,11 +731,11 @@ package body DB.Gen_Blob_Trees is
       Position : in     Count_Type;
       Value    :    out Value_Type;
       Key      :    out Key_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Delete(Tree.BTree, BTrees.Count_Type(Position), B_Value, Key,
                     B_State);
@@ -761,11 +761,11 @@ package body DB.Gen_Blob_Trees is
       Position    : in     Count_Type;
       Value       :    out Value_Type;
       Key         :    out Key_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Delete(Tree.BTree, Transaction.BTree_Transaction,
                     BTrees.Count_Type(Position), B_Value, Key, B_State);
@@ -916,11 +916,11 @@ package body DB.Gen_Blob_Trees is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Next(Tree.BTree,
@@ -956,11 +956,11 @@ package body DB.Gen_Blob_Trees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       B_Value : BTree_Utils.Value_Type;
-      B_State : BTrees.Result_Type;
-      H_State : Heaps.Result_Type;
+      B_State : BTrees.State_Type;
+      H_State : Heaps.State_Type;
    begin
       BTrees.Delete(Tree.BTree, Transaction.BTree_Transaction, Cursor.Cursor,
                     Key, B_Value, BTrees.Count_Type(Position), B_State);
@@ -1034,9 +1034,9 @@ package body DB.Gen_Blob_Trees is
 
    procedure Clusterize
      (Tree  : in out Tree_Type;
-      State :    out Result_Type)
+      State :    out State_Type)
    is
-      B_State : BTrees.Result_Type;
+      B_State : BTrees.State_Type;
    begin
       BTrees.Clusterize(Tree.BTree, B_State);
       State := To_State(B_State);

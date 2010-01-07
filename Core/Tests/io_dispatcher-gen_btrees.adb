@@ -146,7 +146,7 @@ procedure IO_Dispatcher.Gen_BTrees is
       Check_Key_Value => Check_Key_Value,
 
       Count_Type      => BTrees.Count_Type,
-      Result_Type     => BTrees.Result_Type,
+      State_Type     => BTrees.State_Type,
 
       Object          => Tree,
       Null_Value      => Null_Value,
@@ -161,7 +161,7 @@ procedure IO_Dispatcher.Gen_BTrees is
       P_Check         => Check);
 
 
-   use type BTrees.Result_Type;
+   use type BTrees.State_Type;
    Long_Job : constant Jobs.Long_Job_Type
             := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
    Cnt      : BTrees.Count_Type := 0;

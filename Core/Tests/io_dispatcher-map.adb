@@ -77,7 +77,7 @@ procedure IO_Dispatcher.Map is
       Get_Value       => Map_Types.Get_Value,
 
       Count_Type      => DB.Tables.Maps.Count_Type,
-      Result_Type     => DB.Tables.Maps.Result_Type,
+      State_Type     => DB.Tables.Maps.State_Type,
 
       Object          => Map,
       Null_Value      => Null_Value,
@@ -149,8 +149,8 @@ procedure IO_Dispatcher.Map is
                                                Lower, Upper, False);
       Element     : Element_Type;
       Value_Impl  : Map_Types.Value_Type;
-      State       : DB.Tables.Maps.Result_Type;
-      use type DB.Tables.Maps.Result_Type;
+      State       : DB.Tables.Maps.State_Type;
+      use type DB.Tables.Maps.State_Type;
    begin
       Put_Line("MapReduce");
       DB.Tables.Maps.Start_Transaction(Map, Transaction);
@@ -168,7 +168,7 @@ procedure IO_Dispatcher.Map is
    end Map_Reduce;
 
 
-   use type DB.Tables.Maps.Result_Type;
+   use type DB.Tables.Maps.State_Type;
    Job_Map  : constant Jobs.Map_Type
             := Jobs.Add(Simple_Jobs.Job_Map, "MapReduce",
                         Map_Reduce'Unrestricted_Access);

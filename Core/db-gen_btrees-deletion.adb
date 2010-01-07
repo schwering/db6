@@ -12,7 +12,7 @@ package body Deletion is
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       Transaction : RW_Transaction_Type := New_RW_Transaction(Tree);
@@ -37,7 +37,7 @@ package body Deletion is
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);
@@ -98,7 +98,7 @@ package body Deletion is
       Position : in     Count_Type;
       Value    :    out Value_Type;
       Key      :    out Key_Type;
-      State    :    out Result_Type)
+      State    :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       Transaction : RW_Transaction_Type := New_RW_Transaction(Tree);
@@ -123,7 +123,7 @@ package body Deletion is
       Position    : in     Count_Type;
       Value       :    out Value_Type;
       Key         :    out Key_Type;
-      State       :    out Result_Type)
+      State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);
@@ -189,7 +189,7 @@ package body Deletion is
       T     : in out RW_Transaction_Type'Class;
       N_A   : in     Nodes.Valid_Address_Type;
       N     : in     Nodes.Node_Type;
-      State : in out Result_Type)
+      State : in out State_Type)
    is
 
       procedure Handle_Empty_Root
@@ -197,7 +197,7 @@ package body Deletion is
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
          N     : in     Nodes.Node_Type;
-         State : in out Result_Type)
+         State : in out State_Type)
       is
          use type Nodes.Degree_Type;
       begin
@@ -228,7 +228,7 @@ package body Deletion is
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
          N     : in     Nodes.Node_Type;
-         State : in out Result_Type) is
+         State : in out State_Type) is
       begin
          if Nodes.Is_Valid(N) then
             Write_Node(Tree, T, N_A, N);
@@ -249,7 +249,7 @@ package body Deletion is
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
          N     : in     Nodes.Node_Type;
-         State : in out Result_Type) is
+         State : in out State_Type) is
       begin
          if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
             declare
@@ -276,7 +276,7 @@ package body Deletion is
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
          N     : in     Nodes.Node_Type;
-         State : in out Result_Type) is
+         State : in out State_Type) is
       begin
          if Nodes.Is_Valid(Nodes.Left_Neighbor(N)) then
             declare
@@ -305,7 +305,7 @@ package body Deletion is
          L     : in     Nodes.Node_Type;
          R_A   : in     Nodes.Valid_Address_Type;
          R     : in     Nodes.Node_Type;
-         State : in out Result_Type)
+         State : in out State_Type)
       is
 
          procedure Delete_From_Parent
@@ -313,7 +313,7 @@ package body Deletion is
             T     : in out RW_Transaction_Type'Class;
             N_A   : in     Nodes.Valid_Address_Type;
             N     : in     Nodes.Node_Type;
-            State : in out Result_Type) is
+            State : in out State_Type) is
          begin -- Delete_From_Parent
             if Nodes.Is_Valid(Nodes.Parent(N)) then
                declare
@@ -381,7 +381,7 @@ package body Deletion is
          T     : in out RW_Transaction_Type'Class;
          R_A   : in     Nodes.Valid_Address_Type;
          R     : in     Nodes.Node_Type;
-         State : in out Result_Type) is
+         State : in out State_Type) is
       begin -- Merge_With_Left
          if Nodes.Is_Valid(Nodes.Left_Neighbor(R)) then
             declare
@@ -405,7 +405,7 @@ package body Deletion is
          T     : in out RW_Transaction_Type'Class;
          L_A   : in     Nodes.Valid_Address_Type;
          L     : in     Nodes.Node_Type;
-         State : in out Result_Type) is
+         State : in out State_Type) is
       begin -- Merge_With_Right
          if Nodes.Is_Valid(Nodes.Right_Neighbor(L)) then
             declare

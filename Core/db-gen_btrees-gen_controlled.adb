@@ -152,11 +152,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       Gen_BTrees.Look_Up(Tree.Tree, Key, Value,
                          Gen_BTrees.Count_Type(Position),
-                         Gen_BTrees.Result_Type(State));
+                         Gen_BTrees.State_Type(State));
    end Look_Up;
 
 
@@ -166,12 +166,12 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Look_Up(Tree.Tree, Transaction_Impl(Transaction).all,
                          Key, Value,
                          Gen_BTrees.Count_Type(Position),
-                         Gen_BTrees.Result_Type(State));
+                         Gen_BTrees.State_Type(State));
    end Look_Up;
 
 
@@ -180,10 +180,10 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Position : in     Count_Type;
       Value    :    out Value_Type;
       Key      :    out Key_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       Gen_BTrees.Look_Up(Tree.Tree, Gen_BTrees.Count_Type(Position),
-                         Value, Key, Gen_BTrees.Result_Type(State));
+                         Value, Key, Gen_BTrees.State_Type(State));
    end Look_Up;
 
 
@@ -193,11 +193,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Position    : in     Count_Type;
       Value       :    out Value_Type;
       Key         :    out Key_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Look_Up(Tree.Tree, Transaction_Impl(Transaction).all,
                          Gen_BTrees.Count_Type(Position), Value, Key,
-                         Gen_BTrees.Result_Type(State));
+                         Gen_BTrees.State_Type(State));
    end Look_Up;
 
 
@@ -206,11 +206,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       Gen_BTrees.Minimum(Tree.Tree, Key, Value,
                          Gen_BTrees.Count_Type(Position),
-                         Gen_BTrees.Result_Type(State));
+                         Gen_BTrees.State_Type(State));
    end Minimum;
 
 
@@ -220,11 +220,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Minimum(Tree.Tree, Transaction_Impl(Transaction).all,
                          Key, Value, Gen_BTrees.Count_Type(Position),
-                         Gen_BTrees.Result_Type(State));
+                         Gen_BTrees.State_Type(State));
    end Minimum;
 
 
@@ -233,11 +233,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       Gen_BTrees.Maximum(Tree.Tree, Key, Value,
                          Gen_BTrees.Count_Type(Position),
-                         Gen_BTrees.Result_Type(State));
+                         Gen_BTrees.State_Type(State));
    end Maximum;
 
 
@@ -247,11 +247,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Maximum(Tree.Tree, Transaction_Impl(Transaction).all,
                          Key, Value, Gen_BTrees.Count_Type(Position),
-                         Gen_BTrees.Result_Type(State));
+                         Gen_BTrees.State_Type(State));
    end Maximum;
 
 
@@ -260,11 +260,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key      : in     Key_Type;
       Value    : in     Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       Gen_BTrees.Insert(Tree.Tree, Key, Value,
                         Gen_BTrees.Count_Type(Position),
-                        Gen_BTrees.Result_Type(State));
+                        Gen_BTrees.State_Type(State));
    end Insert;
 
    procedure Insert
@@ -273,11 +273,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key         : in     Key_Type;
       Value       : in     Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Insert(Tree.Tree, Transaction.Transaction,
                         Key, Value, Gen_BTrees.Count_Type(Position),
-                        Gen_BTrees.Result_Type(State));
+                        Gen_BTrees.State_Type(State));
    end Insert;
 
 
@@ -286,11 +286,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       Position :    out Count_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       Gen_BTrees.Delete(Tree.Tree, Key, Value,
                         Gen_BTrees.Count_Type(Position),
-                        Gen_BTrees.Result_Type(State));
+                        Gen_BTrees.State_Type(State));
    end Delete;
 
 
@@ -300,11 +300,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Delete(Tree.Tree, Transaction.Transaction,
                         Key, Value, Gen_BTrees.Count_Type(Position),
-                        Gen_BTrees.Result_Type(State));
+                        Gen_BTrees.State_Type(State));
    end Delete;
 
 
@@ -313,10 +313,10 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Position : in     Count_Type;
       Value    :    out Value_Type;
       Key      :    out Key_Type;
-      State    :    out Result_Type) is
+      State    :    out State_Type) is
    begin
       Gen_BTrees.Delete(Tree.Tree, Gen_BTrees.Count_Type(Position),
-                        Value, Key, Gen_BTrees.Result_Type(State));
+                        Value, Key, Gen_BTrees.State_Type(State));
    end Delete;
 
 
@@ -326,11 +326,11 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Position    : in     Count_Type;
       Value       :    out Value_Type;
       Key         :    out Key_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Delete(Tree.Tree, Transaction.Transaction,
                         Gen_BTrees.Count_Type(Position), Value, Key,
-                        Gen_BTrees.Result_Type(State));
+                        Gen_BTrees.State_Type(State));
    end Delete;
 
 
@@ -372,9 +372,9 @@ package body DB.Gen_BTrees.Gen_Controlled is
 
    procedure Clusterize
      (Tree  : in out Tree_Type'Class;
-      State :    out Result_Type) is
+      State :    out State_Type) is
    begin
-      Gen_BTrees.Clusterize(Tree.Tree, Gen_BTrees.Result_Type(State));
+      Gen_BTrees.Clusterize(Tree.Tree, Gen_BTrees.State_Type(State));
    end Clusterize;
 
 
@@ -453,10 +453,10 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Cursor      : in out Cursor_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Next(Tree.Tree, Transaction_Impl(Transaction).all,
-                      Cursor.Cursor, Key, Value, Gen_BTrees.Result_Type(State));
+                      Cursor.Cursor, Key, Value, Gen_BTrees.State_Type(State));
    end Next;
 
 
@@ -467,12 +467,12 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Delete(Tree.Tree, Transaction.Transaction,
                         Cursor.Cursor, Key, Value,
                         Gen_BTrees.Count_Type(Position),
-                        Gen_BTrees.Result_Type(State));
+                        Gen_BTrees.State_Type(State));
    end Delete;
 
 
@@ -483,12 +483,12 @@ package body DB.Gen_BTrees.Gen_Controlled is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       Position    :    out Count_Type;
-      State       :    out Result_Type) is
+      State       :    out State_Type) is
    begin
       Gen_BTrees.Delete(Tree.Tree, Transaction.Transaction,
                         Cursor.Cursor, Key, Value,
                         Gen_BTrees.Count_Type(Position),
-                        Gen_BTrees.Result_Type(State));
+                        Gen_BTrees.State_Type(State));
    end Delete;
 
 end DB.Gen_BTrees.Gen_Controlled;
