@@ -1,0 +1,256 @@
+<!-- vim:syntax=off:noautoindent
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Dingsbums</title>
+<style type="text/css">
+	body {
+		width: 98%; height: 98%; font-family: sans-serif; 
+		position: absolute; }
+	.box {
+                top: 25px;
+		position: relative;
+		margin-left: auto;
+		margin-right: auto;
+		width: 60em; min-width: 60em; max-width: 60em;
+		/*width: 60%; min-width: 300px; max-width: 500px;*/
+		text-align: center; }
+	.boxhead {
+		color: white; background-color: #0000FF /* blue */;
+		font-size: 200%; font-weight: bold; 
+		padding: 10px 10px 10px 10px;
+		border-top-left-radius: 20px;
+		border-top-right-radius: 20px; 
+		-webkit-border-top-left-radius: 20px;
+		-webkit-border-top-right-radius: 20px;
+		-moz-border-radius-topleft: 20px;
+		-moz-border-radius-topright: 20px; }
+	.boxbody {
+		color: black; background-color: #ADD8E6 /* lightblue */;
+		font-size: 100%;
+		padding: 20px 10px 10px 10px;
+		border-bottom-left-radius: 20px;
+		border-bottom-right-radius: 20px;
+		-webkit-border-bottom-left-radius: 20px;
+		-webkit-border-bottom-right-radius: 20px;
+		-moz-border-radius-bottomleft: 20px;
+		-moz-border-radius-bottomright: 20px; }
+	.boxhead a {
+		color: white; } 
+	.boxbody a {
+		color: black; } 
+	.boxbody input {
+		color: black; background-color: white;
+		border: 0px #000000 solid;
+		padding-left: 5px; padding-right: 5px;
+		border-radius: 5px 10px;
+		-webkit-border-radius: 5px 10px;
+		-moz-border-radius: 5px; }
+	.small {
+		font-size: 70%; font-weight: normal; }
+	a:link,
+	a:visited {
+		text-decoration: underline; } 
+	a:active,
+	a:hover {
+		text-decoration: none; } 
+	.b {
+		border: 1pt black solid; }
+
+	h1 {
+		font-size: 140%;
+		padding-top: 25pt; }
+	p, ul {
+		text-align: justify;
+		font-size: 90%;
+		line-height: 150%; }
+
+        table.arch {
+                border-spacing: 4px;
+                table-layout: fixed;
+                width: 100%; }
+        table.arch tr {
+                border-width: 0pt; }
+        table.arch td {
+                padding: 7px 7px 7px 7px;
+                background-color: white;
+                border: 1pt #000000 solid; vertical-align: top;
+		border-radius: 5px 5px;
+		-webkit-border-radius: 5px 5px;
+		-moz-border-radius: 5px; }
+        table.arch td.descr {
+                background-color: #6495ED /* cornflowerblue */;
+                vertical-align: middle;
+                white-space: nowrap;
+                width: 12em; }
+        table.arch ul {
+		position: relative;
+		margin-left: auto;
+		margin-right: auto;
+                width: 13em;
+                text-align: left;
+                list-style: none; padding: 0px; font-size: 80%; }
+</style>
+</head>
+<body>
+<div class="box">
+	<div class="boxhead">
+		Dingsbums Building Blocks
+	</div>
+	<div class="boxbody">
+
+                <table class="arch">
+                        <tr>
+                                <td class="descr">Application</td>
+                                <td colspan="2">
+                                        <b>Web-Interface</b>
+                                        <ul>
+                                                <li> Public user interface </li>
+                                                <li> Ada </li>
+                                                <li> AWS (embedded webserver) </li>
+                                        </ul>
+                                </td>
+                                <td colspan="2">
+                                        <b>Crawler</b>
+                                        <ul>
+                                                <li> Indexes feeds </li>
+                                                <li> Java </li>
+                                                <li> ROME Atom and RSS library </li>
+                                        </ul>
+                                </td>
+                                <td colspan="2">
+                                        <b>Batcher</b>
+                                        <ul>
+                                                <li> Reasoning </li>
+                                                <li> Map-Reduce jobs </li>
+                                                <li> using Ada library </li>
+                                                <li> Ada, C++, C or so </li>
+                                        </ul>
+                                </td>
+                        </tr>
+                        <tr>
+                                <td class="descr">Interface</td>
+                                <td colspan="4">
+                                        <b>REST</b>
+                                        <ul>
+                                                <li> Insert/Delete </li>
+                                                <li> Exact and Range Queries </li>
+                                                <li> more when possible </li>
+                                                <li> HTTP </li>
+                                        </ul>
+                                </td>
+                                <td colspan="2">
+                                        <b>Ada library</b>
+                                        <ul>
+                                                <li> Insert/Delete </li>
+                                                <li> Cursors </li>
+                                                <li> Map-Reduce </li>
+                                                <li> userspace-library </li>
+                                                <li> Ada (DSA &rarr; Data Mgmt.) </li>
+                                        </ul>
+                                </td>
+                        </tr>
+
+                        <tr>
+                                <td class="descr">Data Management</td>
+                                <td colspan="6">
+                                        <b>Data Management</b>
+                                        <ul>
+                                                <li> Table abstraction </li>
+                                                <li> Column families </li>
+                                                <li> Pattern matching </li>
+                                                <li> Joins </li>
+                                                <li> Distribution </li>
+                                                <li> Redundancy </li>
+                                                <li> Ada (DSA &rarr; Data Strg.) </li>
+                                        </ul>
+                                </td>
+                        </tr>
+
+                        <!--<tr>
+                                <td class="descr">Virtual Cluster</td>
+                                <td colspan="2">
+                                        <b>Slave #1</b>
+                                </td>
+                                <td colspan="2"> ... </td>
+                                <td colspan="2">
+                                        <b>Slave #N</b>
+                                </td>
+                        </tr>-->
+
+                        <tr>
+                                <td class="descr">Data Storage</td>
+                                <td colspan="3">
+                                        <b>Data Storage</b>
+                                        <ul>
+                                                <li> Sparse map </li>
+                                                <li> BTrees </li>
+                                                <li> Map-Reduce </li>
+                                                <li> Ada </li>
+                                        </ul>
+                                </td>
+                                <td colspan="3">
+                                        <b>Data Storage</b>
+                                        <ul>
+                                                <li> Sparse map </li>
+                                                <li> BTrees </li>
+                                                <li> Map-Reduce </li>
+                                                <li> Ada </li>
+                                        </ul>
+                                </td>
+                        </tr>
+
+                        <tr>
+                                <td class="descr">Hardware</td>
+                                <td colspan="3">
+                                        <b>Node #1</b>
+                                        <ul>
+                                                <li> AMD Athlon 64 X2 2.8 GHz </li>
+                                                <li> Dual Core </li>
+                                                <li> 3 GB DDRAM </li>
+                                                <li> 640 MB SATA2 Disk </li>
+                                                <li> Gigabit Ethernet </li>
+                                                <li> Linux </li>
+                                        </ul>
+                                </td>
+                                <td colspan="3">
+                                        <b>Node #2</b>
+                                        <ul>
+                                                <li> AMD Athlon II X2 2.8 GHz </li>
+                                                <li> Dual Core </li>
+                                                <li> 3 GB DDRAM </li>
+                                                <li> 640 MB SATA2 Disk </li>
+                                                <li> Gigabit Ethernet </li>
+                                                <li> Linux </li>
+                                        </ul>
+                                </td>
+                        </tr>
+
+                </table>
+
+        </div>
+
+        <p> Noch unklar: </p>
+        <ul>
+                <li> Beziehung Data Storage &harr; Data Management 
+                <ul>
+                        <li> Cluster-Nodes in Master/Slave einteilen und immer einen Master w&auml;hlen, auf dem das Management l&auml;uft? </li>
+                </ul> </li>
+                <li> Beziehung Data Management &harr; Ada library
+                <ul>
+                        <li> Eigenes Netzwerk-Protokoll daf&uuml;r? W&auml;re aber im Prinzip RPC </li>
+                        <li> Einfach Distributed Systems Annex? </li>
+                        <li> Da es in erster Linie um Map-Reduce-Jobs gehen d&uuml;rfte, k&ouml;nnte man die Jobs in einer interpretierten Sprache schreiben, die dann vom Data Management Prozess interpretiert wird (dann: eigene Sprache vs. existierende Skriptsprache?) </li>
+                        <li> Fazit: Performance und Zeit sprechen f&uuml;r DSA; wird nicht so viele Jobs geben, dass man sie nicht hart in Ada schreiben k&ouml;nnte </li>
+                </ul> </li>
+        </ul>
+
+
+        <p> <span style="white-space: nowrap;"><em>schwering (&auml;t) gmail.com</em></span> </p>
+</div>
+</body>
+</html>
+
