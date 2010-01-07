@@ -590,7 +590,7 @@ private
 
    type Bound_Type is new BTrees.Bound_Type;
 
-   type Cursor_Type is
+   type Cursor_Type is limited
       record
          Cursor : BTrees.Cursor_Type;
       end record;

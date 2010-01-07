@@ -1033,7 +1033,7 @@ private
    pragma Controlled (Nullable_Transaction_Ref_Type);
    for Nullable_Transaction_Ref_Type'Storage_Size use 0;
 
-   type Cursor_Type is
+   type Cursor_Type is limited
       record
          Final              : Boolean                       := False;
          Lower_Bound        : Bound_Type;
