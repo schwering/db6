@@ -148,14 +148,14 @@
                                                 <li> Insert/Delete </li>
                                                 <li> Cursors </li>
                                                 <li> Map-Reduce </li>
-                                                <li> userspace-library </li>
+                                                <li> userspace library </li>
                                                 <li> Ada (DSA &rarr; Data Mgmt.) </li>
                                         </ul>
                                 </td>
                         </tr>
 
                         <tr>
-                                <td class="descr">Data Management</td>
+                                <td class="descr" rowspan="2">Data Management</td>
                                 <td colspan="6">
                                         <b>Data Management</b>
                                         <ul>
@@ -169,17 +169,22 @@
                                         </ul>
                                 </td>
                         </tr>
-
-                        <!--<tr>
-                                <td class="descr">Virtual Cluster</td>
-                                <td colspan="2">
-                                        <b>Slave #1</b>
+                        <tr>
+                                <td colspan="3">
+                                        <b>Data Management</b>
+                                        <ul>
+                                                <li> RPC server </li>
+                                                <li> Ada (DSA) </li>
+                                        </ul>
                                 </td>
-                                <td colspan="2"> ... </td>
-                                <td colspan="2">
-                                        <b>Slave #N</b>
+                                <td colspan="3">
+                                        <b>Data Management</b>
+                                        <ul>
+                                                <li> RPC server </li>
+                                                <li> Ada (DSA) </li>
+                                        </ul>
                                 </td>
-                        </tr>-->
+                        </tr>
 
                         <tr>
                                 <td class="descr">Data Storage</td>
@@ -233,18 +238,48 @@
 
         </div>
 
+        <p> Referenzen: </p>
+        <ul>
+                <li> <a href="http://schwering.ath.cx/~chs/db6/btree.pdf">BTree with bounded-length entries</a> </li>
+                <li> <a href="http://www.adaic.org/standards/95lrm/html/RM-E.html">Ada Distributed Systems Annex (DSA)</a> <br />
+                        <a href="https://docs.google.com/viewer?url=https%3A%2F%2Fwww.acm.org%2Fsigada%2Fconf%2Fsigada99%2Fproceedings%2Fp39-kermarrec.pdf">CORBA vs Ada DSA</a> <br />
+                        <a href="http://libre.adacore.com/libre/tools/polyorb/">Ada DSA in GNAT mit PolyORB</a><br />
+                        <code>/usr/gnat/share/examples/polyorb/dsa</code> </li>
+                <li> <a href="http://libre.adacore.com/libre/tools/aws/">Ada AWS Webserver</a> </li>
+                <li> <a href="http://de.wikipedia.org/wiki/Representational_State_Transfer">Representational State Transfer (REST)</a> </li>
+                <li> <a href="http://schwering.ath.cx/~chs/Fotos/Computer2.jpg">Cluster node hardware</a> </li>
+                <li> <a href="http://www.mozilla.org/js/spidermonkey/">SpiderMonkey JavaScript Engine in C</a> </li>
+
+        </ul>
+
         <p> Noch unklar: </p>
         <ul>
                 <li> Beziehung Data Storage &harr; Data Management 
                 <ul>
                         <li> Cluster-Nodes in Master/Slave einteilen und immer einen Master w&auml;hlen, auf dem das Management l&auml;uft? </li>
                 </ul> </li>
+
                 <li> Beziehung Data Management &harr; Ada library
                 <ul>
                         <li> Eigenes Netzwerk-Protokoll daf&uuml;r? W&auml;re aber im Prinzip RPC </li>
                         <li> Einfach Distributed Systems Annex? </li>
                         <li> Da es in erster Linie um Map-Reduce-Jobs gehen d&uuml;rfte, k&ouml;nnte man die Jobs in einer interpretierten Sprache schreiben, die dann vom Data Management Prozess interpretiert wird (dann: eigene Sprache vs. existierende Skriptsprache?) </li>
                         <li> Fazit: Performance und Zeit sprechen f&uuml;r DSA; wird nicht so viele Jobs geben, dass man sie nicht hart in Ada schreiben k&ouml;nnte </li>
+                </ul> </li>
+
+                <li> Nochmal die alte ganz andere Architekturidee:
+                <ul>
+                        <li> Data Storage + Data Management Layer &uuml;berall lokal mit eingebautem AWS und REST-Schnittstelle </li>
+                        <li> Cursor-Anfragen &uuml;ber HTTP-Antworten ohne <code>Content-Length</code> </li>
+                        <li> wohin mit der Tabellenabstraktion, wo wird gejoint? Die gleiche Frage stellt sich aber bei der anderen Architektur auch </li>
+                        <li> Master/Slave oder Meta-Informationen &uuml;berall ablegen? </li>
+                        <li> Wie sollen Map-Reduce-Jobs ausgef&uuml;hrt werden? Wieder die Skriptsprachen-Idee (JavaScript mit SpiderMonkey?) </li>
+                </ul> </li>
+
+                <li> Verteilung: top-down (wie oben), bottom-up (<code>Block_IO</code>), beides?
+                <ul>
+                        <li> bottom-up k&ouml;nnte ganz gut Rechenlast verteilen </li>
+                        <li> bottom-up auf jeden Fall sinnvoll, wenn Netzwerk-IO schneller als Platten-IO </li>
                 </ul> </li>
         </ul>
 
