@@ -13,7 +13,7 @@ generic
 package DB.Types.Gen_Numbers is
    pragma Pure;
 
-   type Number_Type is new P_Number_Type;
+   subtype Number_Type is P_Number_Type;
 
    type Context_Type is private;
 

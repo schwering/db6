@@ -10,10 +10,6 @@ package body DB.Types.Keys is
    renames Rows."<";
    function "=" (Left, Right : Rows.String_Type) return Boolean
    renames Rows."=";
-   function "<" (Left, Right : Times.Number_Type) return Boolean
-   renames Times."<";
-   function "=" (Left, Right : Times.Number_Type) return Boolean
-   renames Times."=";
 
    function "<=" (Left, Right : Key_Type) return Boolean is
    begin
