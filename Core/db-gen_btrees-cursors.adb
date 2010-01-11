@@ -274,17 +274,6 @@ package body Cursors is
       State       :    out State_Type)
    is
 
-      function Has_Lower
-        (Cursor : Cursor_Type)
-         return Boolean
-      is
-         use type Nodes.Degree_Type;
-      begin
-         return Cursor.Index > 1 or
-                Nodes.Is_Valid(Nodes.Left_Neighbor(Cursor.Node));
-      end Has_Lower;
-
-
       procedure Move_To_Lower
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;

@@ -13,7 +13,6 @@ with DB.IO.Blocks;
 
 with DB.BTrees;
 
-with DB.Types.Keys;
 with DB.Types.Times;
 with DB.Types.Values;
 with DB.Types.Values.Bounded;
@@ -24,7 +23,7 @@ with DB.Utils.Traceback;
 procedure IO_Dispatcher.Gen_BTrees is
    package Keys     renames DB.BTrees.Keys;
    package Rows     renames Keys.Rows;
-   package Columns  renames Keys.Columns;
+   --package Columns  renames Keys.Columns;
    package Values   renames DB.BTrees.Values;
 
    Tree : BTrees.Tree_Type;
@@ -44,6 +43,7 @@ procedure IO_Dispatcher.Gen_BTrees is
       return DB.Types.Values.Unbounded.New_String(Random.Values.To_Buffer(V));
       --return V;
    end To_Unbounded;
+   pragma Unreferenced (To_Unbounded);
 
    procedure Check_Key_Value (KV : Key_Value_Type)
    is

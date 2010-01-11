@@ -6,7 +6,6 @@ with DB.Tables;
 with DB.Types.Keys;
 with DB.Types.Values.Bounded;
 with DB.Types.Values.Unbounded;
-with DB.Types.Times;
 
 private
 package IO_Dispatcher.Map_Types is

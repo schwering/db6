@@ -17,7 +17,7 @@ with DB.IO.Blocks.File_IO;
 with DB.IO.Blocks.Memory_IO;
 --with DB.IO.Blocks.Gen_Climb_Caches;
 --with DB.IO.Blocks.Gen_LRU_Caches;
-with DB.IO.Blocks.Gen_System_Locking_IO;
+--with DB.IO.Blocks.Gen_System_Locking_IO;
 
 with DB.Gen_BTrees;
 with DB.Gen_BTrees.Gen_Stats;

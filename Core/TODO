@@ -1,9 +1,4 @@
 Upcoming: MapReduce
-dafuer zu tun:
- * Gen_Logs sortieren, dafuer benoetigt:
-    * externes Mergesort
-    * in-place in-memory Quicksort [oder Timsort] oder Heapsort oder so
-    * Fibonacci-Heap, um beim mergen das Minimum auszuwaehlen?
 
 
 Fahrplan:
@@ -39,6 +34,12 @@ Fahrplan:
     * zusaetzlich: Anfrage "auf welchen Computern liegen welche Teile einer
       Datenbank?"
   
+
+
+* MapReduce auf externes Sortieren umstellen:
+  * externes Mergesort
+  * in-place in-memory Quicksort [oder Timsort] oder Heapsort oder so
+  * Fibonacci-Heap, um beim mergen das Minimum auszuwaehlen?
 
 
 
@@ -85,6 +86,7 @@ Fahrplan:
 * Storage_Pools fuer Caches
 
 * Die Heap-Geschichte mit 32 Bit TESTEN TESTEN TEST
+
 
 ERLEDIGT:
 * Transaktionen: Gen_Buffers: mit einer Write-Liste und einem kleinen Cache

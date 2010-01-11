@@ -4,29 +4,21 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with DB.Utils.Gen_Minimum;
+
 package body DB.Compression.Gen_Prefix is
 
    function Encode
      (S, T : String_Type)
       return Delta_Type
    is
-      function Min (X, Y : Length_Type) return Length_Type is
-      begin
-         if X < Y then
-            return X;
-         else
-            return Y;
-         end if;
-      end Min;
+      function Min is new Utils.Gen_Minimum(Length_Type);
 
       Prefix_Length : Length_Type := 0;
    begin
       for I in 1 .. Min(Length(S), Length(T)) loop
-         if Element(S, To_Index(I)) = Element(T, To_Index(I)) then
-            Prefix_Length := Prefix_Length + 1;
-         else
-            exit;
-         end if;
+         exit when Element(S, To_Index(I)) /= Element(T, To_Index(I));
+         Prefix_Length := I;
       end loop;
       if Prefix_Length /= Length(T) then
          declare

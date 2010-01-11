@@ -13,7 +13,6 @@ with DB.IO.Blocks;
 
 with DB.Blob_Trees;
 
-with DB.Types.Keys;
 with DB.Types.Times;
 with DB.Types.Values;
 with DB.Types.Values.Bounded;
@@ -24,7 +23,7 @@ with DB.Utils.Traceback;
 procedure IO_Dispatcher.Gen_Blob_Trees is
    package Keys     renames DB.Blob_Trees.Keys;
    package Rows     renames Keys.Rows;
-   package Columns  renames Keys.Columns;
+   --package Columns  renames Keys.Columns;
    package Values   renames DB.Blob_Trees.Values;
 
    Tree : Blob_Trees.Tree_Type;
@@ -56,8 +55,6 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
          := 2 + Size_Type(Rows.Length(KV.Key.Row)) +
           --2 + Size_Type(Columns.Length(KV.Key.Column)) +
             Bits_To_Units(DB.Types.Times.Number_Type'Size);
-      VS : constant DB.IO.Blocks.Size_Type
-         := Size_Type(Random.Values.Length(KV.Value));
    begin
       if KS > Blob_Trees.Max_Key_Size then
          raise Key_Value_Error;

@@ -6,15 +6,12 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Finalization;
-with System.Storage_Elements;
 
 with DB.IO.Blocks;
 
 generic
 package DB.Types.Gen_Strings.Gen_Unbounded is
    pragma Preelaborate;
-
-   package SSE renames System.Storage_Elements;
 
    type String_Type is new Ada.Finalization.Controlled with private;
 

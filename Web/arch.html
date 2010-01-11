@@ -97,8 +97,26 @@
 </head>
 <body>
 <div class="box">
+        <p>The search engine is powered by the Dingsbums 6 database.
+        It's a column-oriented database written in Ada 2005. In fact, the whole
+        search engine only exists because I wanted to haven an application that
+        uses Dingsbums 6.</p>
+        <p>The further custom components of the search engine are the Crawler
+        and the Batcher. The crawler is written in Java and is a rather simple
+        (it's really bad) web crawler that populates a Dingsbums storage.
+        The Batcher runs Map-Reduce jobs on Dingsbums which organize and
+        mine the data.</p>
+        <p>The used third-party software is the GNU/Linux operating system
+        (Ubuntu and Fedora).
+        As main programming language, Ada 2005 with the GNAT compiler is used.
+        Also, the Ada Web Server (AWS) is used for the User Interface and the
+        REST interface and GNAT's implementation of the Ada Distributed Systems
+        Annex (DSA), PolyORB.
+        Some components are written in Java, compiled and run with OpenJDK.
+        The crawler uses the ROME library to process RSS and Atom feeds.</p>
+
 	<div class="boxhead">
-		Dingsbums Building Blocks
+		B&ouml;hnchen Building Blocks
 	</div>
 	<div class="boxbody">
 
