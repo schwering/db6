@@ -22,7 +22,7 @@ project DB is
 
    --for Main use Heap_Tests & Tree_Tests & Ttree_Tests & Cursor_Tests &
                 --Thread_Tests & Compression_Tests & String_Tests & Mixed_Tests;
-   for Main use ("ttree", "heap");
+   for Main use ("ttree", "heap", "queues");
    for Source_Dirs use ("Tests");
    for Object_Dir use Test_Dir &"/"& Attributes.Build;
    for Exec_Dir   use Test_Dir &"/"& Attributes.Build;
