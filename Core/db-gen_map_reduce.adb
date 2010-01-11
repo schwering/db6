@@ -8,7 +8,6 @@ with Ada.Unchecked_Deallocation;
 with System.Storage_Pools;
 
 with DB.Gen_BTrees;
-with DB.Gen_BTrees.Gen_Check;
 with DB.Utils.Gen_Queues;
 with DB.Utils.Global_Pool;
 
@@ -35,31 +34,6 @@ procedure DB.Gen_Map_Reduce is
       Is_Context_Free_Serialization => False,
       Storage_Pool                  => Utils.Global_Pool.Global'Storage_Pool,
       Block_IO                      => Intermediate_Block_IO);
-
-   function Key_To_String (K : Intermediate_Key_Type) return String is
-   begin
-      return "(Key)";
-   end;
-
-   function Value_To_String (K : Intermediate_Value_Type) return String is
-   begin
-      return "(Value)";
-   end;
-
-   function Address_To_String
-     (A : Intermediate_Block_IO.Workaround_Address_Type)
-      return String is
-   begin
-      if Intermediate_Block_IO.E_Is_Valid_Address(A) then
-         return Intermediate_Block_IO.E_Image
-                  (Intermediate_Block_IO.E_To_Valid_Address(A));
-      else
-         return "InvalidAddress";
-      end if;
-   end;
-
-   procedure Check is new Intermediate_BTrees.Gen_Check
-     (Key_To_String, Value_To_String, Address_To_String);
 
    type Context_Type is
       record
@@ -92,7 +66,6 @@ procedure DB.Gen_Map_Reduce is
          begin
             Intermediate_BTrees.Insert(Context.Intermediates, Key, Value,
                                        Position, State);
-            Check(Context.Intermediates);
             if State /= Intermediate_BTrees.Success then
                raise Tree_Error;
             end if;
