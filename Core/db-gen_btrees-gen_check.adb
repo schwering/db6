@@ -49,6 +49,9 @@ is
                if S(I) not in 'A'..'Z' and
                   S(I) not in 'a'..'z' and
                   S(I) not in '0'..'9' and
+                  S(I) /= '=' and
+                  S(I) /= '(' and
+                  S(I) /= ')' and
                   S(I) /= ' ' then
                   S(I) := '_';
                end if;

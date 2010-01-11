@@ -233,9 +233,10 @@ package DB.Gen_BTrees.Gen_Controlled is
       Reverse_Direction : Boolean := False)
       return Cursor_Type;
 
-   procedure Finalize
-     (Tree   : in out Tree_Type'Class;
-      Cursor : in out Cursor_Type'Class);
+   procedure Finalize_Cursor
+     (Tree        : in out Tree_Type'Class;
+      Transaction : in out Transaction_Type'Class;
+      Cursor      : in out Cursor_Type'Class);
 
    procedure Pause
      (Tree   : in out Tree_Type'Class;

@@ -7,7 +7,6 @@
 with DB.Utils.Binary_Search;
 with DB.Utils.Gen_Minimum;
 with DB.Utils.Gen_Maximum;
-with DB.Utils.Print;
 
 separate (DB.Gen_BTrees)
 package body Nodes is

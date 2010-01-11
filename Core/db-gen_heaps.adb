@@ -932,7 +932,9 @@ package body DB.Gen_Heaps is
                              Cursor, Addr, Info, St);
             if St /= Info_BTrees.Success or else Info.State /= Free then
                State := Success;
-               Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
+               Info_BTrees.Finalize_Cursor(Heap.Info_Tree,
+                                           Transaction.Info_Transaction,
+                                           Cursor);
                return;
             end if;
             if Reverse_Direction then
@@ -949,7 +951,9 @@ package body DB.Gen_Heaps is
                                   Cursor, Key, Val, Pos, St);
                if St /= Info_BTrees.Success then
                   State := Error;
-                  Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
+                  Info_BTrees.Finalize_Cursor(Heap.Info_Tree,
+                                              Transaction.Info_Transaction,
+                                              Cursor);
                   return;
                end if;
             end;
@@ -965,7 +969,9 @@ package body DB.Gen_Heaps is
                                   Key, Val, Pos, St);
                if St /= Free_BTrees.Success then
                   State := Error;
-                  Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
+                  Info_BTrees.Finalize_Cursor(Heap.Info_Tree,
+                                              Transaction.Info_Transaction,
+                                              Cursor);
                   return;
                end if;
             end;
@@ -974,7 +980,9 @@ package body DB.Gen_Heaps is
    exception
       when others =>
          State := Error;
-         Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
+         Info_BTrees.Finalize_Cursor(Heap.Info_Tree,
+                                     Transaction.Info_Transaction,
+                                     Cursor);
          raise;
    end Unset_Free_Following;
 
@@ -1026,7 +1034,9 @@ package body DB.Gen_Heaps is
          begin
             Free_BTrees.Next(Heap.Free_Tree, Transaction.Free_Transaction,
                              Cursor, Key, Val, St);
-            Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
+            Free_BTrees.Finalize_Cursor(Heap.Free_Tree,
+                                        Transaction.Free_Transaction,
+                                        Cursor);
             if St /= Free_BTrees.Success then
                State  := Result(St);
                Length := 0;
@@ -1041,7 +1051,9 @@ package body DB.Gen_Heaps is
          exception
             when others =>
                State := Error;
-               Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
+               Free_BTrees.Finalize_Cursor(Heap.Free_Tree,
+                                           Transaction.Free_Transaction,
+                                           Cursor);
                raise;
          end Recycle_Free_Chunk;
 
@@ -1619,7 +1631,7 @@ package body DB.Gen_Heaps is
          else
             DB.Utils.Print("Finished with State = "&
                            Info_BTrees.State_Type'Image(State));
-            Info_BTrees.Finalize(Heap.Info_Tree, Cursor);
+            Info_BTrees.Finalize_Cursor(Heap.Info_Tree, Trans, Cursor);
             return;
          end if;
       end loop;
@@ -1668,7 +1680,7 @@ package body DB.Gen_Heaps is
          else
             DB.Utils.Print("Finished with State = "&
                            Free_BTrees.State_Type'Image(State));
-            Free_BTrees.Finalize(Heap.Free_Tree, Cursor);
+            Free_BTrees.Finalize_Cursor(Heap.Free_Tree, Trans, Cursor);
             return;
          end if;
       end loop;

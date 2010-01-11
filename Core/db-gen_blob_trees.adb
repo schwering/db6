@@ -877,12 +877,23 @@ package body DB.Gen_Blob_Trees is
    end Set_Thread_Safety;
 
 
-   procedure Finalize
-     (Tree   : in out Tree_Type;
-      Cursor : in out Cursor_Type) is
+   procedure Finalize_Cursor
+     (Tree        : in     Tree_Type;
+      Transaction : in     Transaction_Type'Class;
+      Cursor      : in out Cursor_Type) is
    begin
-      BTrees.Finalize(Tree.BTree, Cursor.Cursor);
-   end Finalize;
+      if Transaction in RO_Transaction_Type'Class then
+         BTrees.Finalize_Cursor
+           (Tree.BTree,
+            RO_Transaction_Type(Transaction).BTree_Transaction,
+            Cursor.Cursor);
+      else
+         BTrees.Finalize_Cursor
+           (Tree.BTree,
+            RW_Transaction_Type(Transaction).BTree_Transaction,
+            Cursor.Cursor);
+      end if;
+   end Finalize_Cursor;
 
 
    procedure Pause

@@ -37,7 +37,9 @@ package body DB.Gen_BTrees.Gen_Controlled is
    procedure Finalize (Cursor : in out Cursor_Type) is
    begin
       if Cursor.Cursor.Owning_Tree /= null then
-         Gen_BTrees.Finalize(Cursor.Cursor.Owning_Tree.all, Cursor.Cursor);
+         Gen_BTrees.Finalize_Cursor(Cursor.Cursor.Owning_Tree.all,
+                                    Cursor.Cursor.Owning_Transaction.all,
+                                    Cursor.Cursor);
       end if;
    end Finalize;
 
@@ -421,12 +423,21 @@ package body DB.Gen_BTrees.Gen_Controlled is
    end New_Cursor;
 
 
-   procedure Finalize
-     (Tree   : in out Tree_Type'Class;
-      Cursor : in out Cursor_Type'Class) is
+   procedure Finalize_Cursor
+     (Tree        : in out Tree_Type'Class;
+      Transaction : in out Transaction_Type'Class;
+      Cursor      : in out Cursor_Type'Class) is
    begin
-      Gen_BTrees.Finalize(Tree.Tree, Cursor.Cursor);
-   end Finalize;
+      if Transaction in RO_Transaction_Type'Class then
+         Gen_BTrees.Finalize_Cursor
+            (Tree.Tree, RO_Transaction_Type(Transaction).Transaction,
+             Cursor.Cursor);
+      else
+         Gen_BTrees.Finalize_Cursor
+            (Tree.Tree, RW_Transaction_Type(Transaction).Transaction,
+             Cursor.Cursor);
+      end if;
+   end Finalize_Cursor;
 
 
    procedure Pause

@@ -874,18 +874,39 @@ package body DB.Tables.Maps is
    end Set_Thread_Safety;
 
 
-   procedure Finalize
-     (Map    : in out Map_Type;
-      Cursor : in out Cursor_Type)
+   procedure Finalize_Cursor
+     (Map         : in     Map_Type;
+      Transaction : in     Transaction_Type'Class;
+      Cursor      : in out Cursor_Type)
    is
       pragma Assert (Map.Short = Cursor.Short);
    begin
       if Cursor.Short then
-         BTrees.Finalize(Map.Short_Tree, Cursor.Short_Cursor);
+         if Transaction in RO_Transaction_Type'Class then
+            BTrees.Finalize_Cursor
+              (Map.Short_Tree,
+               RO_Transaction_Type(Transaction).Short_Transaction,
+               Cursor.Short_Cursor);
+         else
+            BTrees.Finalize_Cursor
+              (Map.Short_Tree,
+               RW_Transaction_Type(Transaction).Short_Transaction,
+               Cursor.Short_Cursor);
+         end if;
       else
-         Blob_Trees.Finalize(Map.Long_Tree, Cursor.Long_Cursor);
+         if Transaction in RO_Transaction_Type'Class then
+            Blob_Trees.Finalize_Cursor
+              (Map.Long_Tree,
+               RO_Transaction_Type(Transaction).Long_Transaction,
+               Cursor.Long_Cursor);
+         else
+            Blob_Trees.Finalize_Cursor
+              (Map.Long_Tree,
+               RW_Transaction_Type(Transaction).Long_Transaction,
+               Cursor.Long_Cursor);
+         end if;
       end if;
-   end Finalize;
+   end Finalize_Cursor;
 
 
    procedure Pause

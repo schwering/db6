@@ -334,9 +334,10 @@ package DB.Tables.Maps is
    -- If thread safety is enabled, all operations of the cursor are mutually
    -- exclusive.
 
-   procedure Finalize
-     (Map    : in out Map_Type;
-      Cursor : in out Cursor_Type);
+   procedure Finalize_Cursor
+     (Map         : in     Map_Type;
+      Transaction : in     Transaction_Type'Class;
+      Cursor      : in out Cursor_Type);
    -- Releases all resources hold be the cursor. In particular, this is a
    -- small amount of memory (the cursors use the heap; it would be possible
    -- without the heap, but probably not faster) and, in case of the
