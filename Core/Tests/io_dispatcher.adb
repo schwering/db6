@@ -6,6 +6,7 @@ with IO_Dispatcher.Gen_BTrees;
 with IO_Dispatcher.Gen_Blob_Trees;
 with IO_Dispatcher.Map;
 with IO_Dispatcher.Map_Cursor;
+with IO_Dispatcher.Map_MR;
 
 with DB.BTrees;
 with DB.Blob_Trees;
@@ -100,6 +101,7 @@ is
                 (New_String("blob_memory"),  Memory_Blob'Access),
 
                 (New_String("map"),          Map'Access),
+                (New_String("map_reduce"),   Map_MR'Access),
                 (New_String("map_cursor"),   Map_Cursor'Access));
 
       IO_Name : constant String := Args.Pop_Argument(1);

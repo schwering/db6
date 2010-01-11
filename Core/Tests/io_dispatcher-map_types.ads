@@ -11,14 +11,25 @@ with DB.Types.Times;
 private
 package IO_Dispatcher.Map_Types is
 
-   Max_Key_Size   : constant := 2 + 1000 + 8 
-                                + 1; -- to enforce heaped map
+   Max_Key_Size : constant := 1020 - 2 - 4 - 4
+   --                          ^M    ^P  ^L  ^V
+                                ;--+ 1; -- to enforce heaped map
+   -- M = (4096 - Meta_Data_Size) * 1 / 4
+   -- P = Long_Position_Type for inner nodes
+   -- L = Value_Length_Size for value
+   -- V = Value_Buffer_Size for value
    Max_Value_Size : constant := 8;
 
    ----------
    -- Key_Type
 
    subtype Key_Type is DB.Types.Keys.Key_Type;
+
+   function "=" (Left, Right : Key_Type) return Boolean
+   renames DB.Types.Keys."=";
+
+   function "<=" (Left, Right : Key_Type) return Boolean
+   renames DB.Types.Keys."<=";
 
    function To_String (K : Key_Type) return String
    renames To_Strings.To_String;

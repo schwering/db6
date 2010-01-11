@@ -5,18 +5,17 @@ with IO_Dispatcher.Random;
 with IO_Dispatcher.Map_Types;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Jobs;
+with IO_Dispatcher.Map_Types;
 
 with DB.Tables.Maps;
 
 with DB.Utils.Traceback;
 
 procedure IO_Dispatcher.Map_Cursor is
-   Max_Key_Size   : constant := 2 + 1000 + 8 
-                                + 1; -- to enforce heaped map
-   Max_Value_Size : constant := 8;
 
    package Maps renames DB.Tables.Maps;
-   Map : Maps.Map_Type := Maps.New_Map(Max_Key_Size, Max_Value_Size);
+   Map : Maps.Map_Type := Maps.New_Map(Map_Types.Max_Key_Size,
+                                       Map_Types.Max_Value_Size);
 
    protected Count_Container is
       procedure Found (C : in Natural);
@@ -91,7 +90,7 @@ procedure IO_Dispatcher.Map_Cursor is
             end case;
          end;
       end loop;
-      Maps.Finalize(Map, Cursor);
+      Maps.Finalize_Cursor(Map, Trans, Cursor);
       Maps.Finish_Transaction(Map, Trans);
       Count_Container.Found(Count);
    end Job;
@@ -100,7 +99,8 @@ procedure IO_Dispatcher.Map_Cursor is
 begin
    declare
    begin
-      DB.Tables.Maps.Create(Args.File_Name, Max_Key_Size, Max_Value_Size);
+      DB.Tables.Maps.Create(Args.File_Name, Map_Types.Max_Key_Size,
+                            Map_Types.Max_Value_Size);
       Ada.Text_IO.Put_Line("Newly created Map "& Args.File_Name);
    exception
       when DB.IO_Error => Put_Line("Using existing Map "& Args.File_Name);

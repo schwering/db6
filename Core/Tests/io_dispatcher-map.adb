@@ -159,7 +159,7 @@ procedure IO_Dispatcher.Map is
       if State /= DB.Tables.Maps.Success then
          Put_Line("State = "& State'Img);
       end if;
-      DB.Tables.Maps.Finalize(Map, Cursor);
+      DB.Tables.Maps.Finalize_Cursor(Map, Transaction, Cursor);
       DB.Tables.Maps.Finish_Transaction(Map, Transaction);
    exception
       when others =>

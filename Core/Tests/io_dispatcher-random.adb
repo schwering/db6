@@ -21,13 +21,14 @@ with Ada.Unchecked_Conversion;
 package body IO_Dispatcher.Random is
 
    Mutex             : DB.Locks.Mutexes.Mutex_Type;
-   Max_Size          : constant := 1024;
-   Max_String_Length : constant := 1012 - 8 - 4 - 4;
-   --                               ^M    ^T  ^L  ^V
+   Max_String_Length : constant := 1020 - 2 - 8 - 4 - 4
+   --                               ^M    ^P  ^T  ^L  ^V
+                                ;--+ 1; -- to enforce heaped map
    -- M = (4096 - Meta_Data_Size) * 1 / 4
+   -- P = Long_Position_Type for inner nodes
    -- T = Timestamp_Size (part of Key_Type)
-   -- L = Value_Length_Size
-   -- V = Value_Buffer_Size
+   -- L = Value_Length_Size for value
+   -- V = Value_Buffer_Size for value
 
 
    generic
@@ -192,6 +193,7 @@ package body IO_Dispatcher.Random is
    begin
       Free(Key_Value_Pairs);
    end Finalize_Key_Value_Pairs;
+
 
    function Key (KV : Key_Value_Type) return DB.Types.Keys.Key_Type is
    begin
