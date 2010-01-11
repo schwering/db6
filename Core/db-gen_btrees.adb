@@ -308,10 +308,11 @@ package body DB.Gen_BTrees is
       N_A  : in     Nodes.Valid_Address_Type)
    is
       procedure Prepare_References
-        (Tree : in out Tree_Type;
-         T    : in out RW_Transaction_Type'Class;
-         N_A  : in     Nodes.Valid_Address_Type;
-         N    : in     Nodes.Node_Type)
+        (Tree    : in out Tree_Type;
+         T       : in out RW_Transaction_Type'Class;
+         N       : in     Nodes.Node_Type;
+         Old_N_A : in     Nodes.Valid_Address_Type;
+         New_N_A : in     Nodes.Valid_Address_Type)
       is
          P_A : constant Nodes.Address_Type := Nodes.Parent(N);
          L_A : constant Nodes.Address_Type := Nodes.Left_Neighbor(N);
@@ -320,15 +321,13 @@ package body DB.Gen_BTrees is
          if Nodes.Is_Valid(P_A) then
             declare
                P   : Nodes.Node_Type;
-               Key : Key_Type;
                I   : Nodes.Index_Type;
                Cnt : Count_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(P_A), P);
-               Key := Nodes.Key(N, Nodes.Degree(N));
-               I   := Nodes.Key_Position(P, Key);
+               I   := Nodes.Child_Position(P, Old_N_A);
                Cnt := Nodes.Count(P, I);
-               Nodes.Set_Child_And_Count(P, I, N_A, Cnt);
+               Nodes.Set_Child_And_Count(P, I, New_N_A, Cnt);
                Write_Node(Tree, T, Nodes.To_Valid_Address(P_A), P);
             end;
          end if;
@@ -337,7 +336,7 @@ package body DB.Gen_BTrees is
                L : Nodes.Node_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(L_A), L);
-               Nodes.Set_Right_Neighbor(L, N_A);
+               Nodes.Set_Right_Neighbor(L, New_N_A);
                Write_Node(Tree, T, Nodes.To_Valid_Address(L_A), L);
             end;
          end if;
@@ -346,7 +345,7 @@ package body DB.Gen_BTrees is
                R : Nodes.Node_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(R_A), R);
-               Nodes.Set_Left_Neighbor(R, N_A);
+               Nodes.Set_Left_Neighbor(R, New_N_A);
                Write_Node(Tree, T, Nodes.To_Valid_Address(R_A), R);
             end;
          end if;
@@ -357,7 +356,7 @@ package body DB.Gen_BTrees is
                   C   : Nodes.Node_Type;
                begin
                   Read_Node(Tree, T, C_A, C);
-                  Nodes.Set_Parent(C, N_A);
+                  Nodes.Set_Parent(C, New_N_A);
                   Write_Node(Tree, T, C_A, C);
                end;
             end loop;
@@ -365,10 +364,10 @@ package body DB.Gen_BTrees is
       end Prepare_References;
 
       procedure Prepare_Free_References
-        (Tree : in out Tree_Type;
-         T    : in out RW_Transaction_Type'Class;
-         N_A  : in     Nodes.Valid_Address_Type;
-         N    : in     Nodes.Node_Type)
+        (Tree    : in out Tree_Type;
+         T       : in out RW_Transaction_Type'Class;
+         N       : in     Nodes.Node_Type;
+         New_N_A : in     Nodes.Valid_Address_Type)
       is
          L_A : constant Nodes.Address_Type := Nodes.Left_Neighbor(N);
          R_A : constant Nodes.Address_Type := Nodes.Right_Neighbor(N);
@@ -378,7 +377,7 @@ package body DB.Gen_BTrees is
                L : Nodes.Node_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(L_A), L);
-               Nodes.Set_Right_Neighbor(L, N_A);
+               Nodes.Set_Right_Neighbor(L, New_N_A);
                Write_Node(Tree, T, Nodes.To_Valid_Address(L_A), L);
             end;
          end if;
@@ -387,7 +386,7 @@ package body DB.Gen_BTrees is
                R : Nodes.Node_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(R_A), R);
-               Nodes.Set_Left_Neighbor(R, N_A);
+               Nodes.Set_Left_Neighbor(R, New_N_A);
                Write_Node(Tree, T, Nodes.To_Valid_Address(R_A), R);
             end;
          end if;
@@ -406,14 +405,14 @@ package body DB.Gen_BTrees is
          Read_Node(Tree, T, M_A, M);
          Read_Node(Tree, T, N_A, N);
          if not Nodes.Is_Free(M) then
-            Prepare_References(Tree, T, N_A, M);
+            Prepare_References(Tree, T, M, Old_N_A => M_A, New_N_A => N_A);
          else
-            Prepare_Free_References(Tree, T, N_A, M);
+            Prepare_Free_References(Tree, T, M, New_N_A => N_A);
          end if;
          if not Nodes.Is_Free(N) then
-            Prepare_References(Tree, T, M_A, N);
+            Prepare_References(Tree, T, N, Old_N_A => N_A, New_N_A => M_A);
          else
-            Prepare_Free_References(Tree, T, M_A, N);
+            Prepare_Free_References(Tree, T, N, New_N_A => M_A);
          end if;
       end;
       -- Nodes have to be re-read before being written to their destination.
