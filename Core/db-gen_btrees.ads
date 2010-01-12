@@ -2,7 +2,7 @@
 --
 -- A generic implementation of [BTree] which basically is a B+ Tree.
 -- It stores ordered bounded length key/value pairs.
--- Values can be either searched by specifying a key or a position.
+-- Values can be searched by specifying a key.
 -- The same applies for deletion.
 -- This package also implements sophisticated cursors which can be used to
 -- scan certain key intervals.
@@ -185,13 +185,11 @@ package DB.Gen_BTrees is
    -- Core operations: Look_Up, Insertion, Deletion.
 
    type State_Type is (Success, Failure, Error);
-   type Count_Type is new Natural;
 
    procedure Look_Up
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
@@ -203,37 +201,14 @@ package DB.Gen_BTrees is
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
-   -- no such key exists.
-
-   procedure Look_Up
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-   -- Searches the Position-th Key / Value pair or sets State = Failure if
-   -- no such key exists.
-   -- This procedure acquires a read-lock and might therefore block due to
-   -- uncommitted transactions.
-
-   procedure Look_Up
-     (Tree        : in out Tree_Type;
-      Transaction : in out Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
-      State       :    out State_Type);
-   -- Searches the Position-th Key / Value pair or sets State = Failure if
    -- no such key exists.
 
    procedure Minimum
      (Tree     : in out Tree_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -245,7 +220,6 @@ package DB.Gen_BTrees is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -254,7 +228,6 @@ package DB.Gen_BTrees is
      (Tree     : in out Tree_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -266,7 +239,6 @@ package DB.Gen_BTrees is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -275,7 +247,6 @@ package DB.Gen_BTrees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    : in     Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -287,7 +258,6 @@ package DB.Gen_BTrees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -296,7 +266,6 @@ package DB.Gen_BTrees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
@@ -308,36 +277,15 @@ package DB.Gen_BTrees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
-
-   procedure Delete
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-   -- Deletes the Position-th Key / Value pair or sets State = Failure if no
-   -- such key exists.
-   -- This procedure starts and commits a new transaction and might therefore
-   -- block.
-
-   procedure Delete
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
-      State       :    out State_Type);
-   -- Deletes the Position-th Key / Value pair or sets State = Failure if no
-   -- such key exists.
 
    ----------
    -- Miscellaneous information procedures.
 
    subtype Height_Type is Positive;
+   subtype Count_Type is Natural;
 
    procedure Count
      (Tree  : in out Tree_Type;
@@ -471,7 +419,6 @@ package DB.Gen_BTrees is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it
@@ -492,7 +439,6 @@ package DB.Gen_BTrees is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it
@@ -655,27 +601,6 @@ private
       -- Returns the Index-th value. This function is determined for inner nodes
       -- only.
 
-      function Count
-        (Node  : Node_Type;
-         Index : Valid_Index_Type)
-         return Count_Type;
-      -- Returns the Index-th value. This function is determined for inner nodes
-      -- only.
-
-      function Count_Sum
-        (Node : Node_Type)
-         return Count_Type;
-      -- Sums all counts in the node or, if the node is a leaf, simply returns
-      -- the degree. This function is determined for both, leaves and inner
-      -- nodes.
-
-      function Count_Sum
-        (Node     : Node_Type;
-         To_Index : Index_Type)
-         return Count_Type;
-      -- Sums all counts in the node up to the given index (exclusive).
-      -- This function is determined for both, leaves and inner nodes.
-
       function Value
         (Node  : Node_Type;
          Index : Valid_Index_Type)
@@ -690,12 +615,6 @@ private
          Key  : Key_Type)
          return Index_Type;
       -- Returns the (first) position of the given key.
-
-      function Count_Position
-        (Node      : Node_Type;
-         Count_Sum : Count_Type)
-         return Index_Type;
-      -- Returns the position of the subtree that contains the Counth-th child.
 
       function Child_Position
         (Node  : Node_Type;
@@ -731,8 +650,7 @@ private
         (Node  : Node_Type;
          Index : Valid_Index_Type;
          Key   : Key_Type;
-         Child : Valid_Address_Type;
-         Count : Count_Type)
+         Child : Valid_Address_Type)
          return Node_Type;
       -- Returns the node that results from the insertion of (Key, Child,
       -- Count) at position Index. This function is determined for inner nodes.
@@ -750,8 +668,7 @@ private
         (Node  : Node_Type;
          Index : Valid_Index_Type;
          Key   : Key_Type;
-         Child : Valid_Address_Type;
-         Count : Count_Type)
+         Child : Valid_Address_Type)
          return Node_Type;
       -- Returns the node that results from the substitution of (Key, Child,
       -- Count) at position Index. This function is determined for inner nodes.
@@ -765,20 +682,12 @@ private
       -- Returns the node that results from the insertion of (Key, Value) at
       -- position Index. This function is determined for leaves.
 
-      procedure Set_Count
+      procedure Set_Child
         (Node  : in out Node_Type;
          Index : in     Valid_Index_Type;
-         Count : in     Count_Type);
-      -- Updates the count at position Index. This function works for inner
-      -- nodes.
-
-      procedure Set_Child_And_Count
-        (Node  : in out Node_Type;
-         Index : in     Valid_Index_Type;
-         Child : in     Valid_Address_Type;
-         Count : in     Count_Type);
-      -- Updates the child address and count at position Index. This function
-      -- works for inner nodes.
+         Child : in     Valid_Address_Type);
+      -- Updates the child address at position Index. This function works for
+      -- inner nodes.
 
       function Deletion
         (Node  : Node_Type;
@@ -875,15 +784,12 @@ private
       pragma Inline (Right_Neighbor);
       pragma Inline (Key);
       pragma Inline (Child);
-      pragma Inline (Count);
-      pragma Inline (Count_Sum);
       pragma Inline (Value);
       pragma Inline (Key_Position);
       pragma Inline (Child_Position);
       pragma Inline (Split_Position);
       pragma Inline (Is_Valid);
-      pragma Inline (Set_Count);
-      pragma Inline (Set_Child_And_Count);
+      pragma Inline (Set_Child);
       pragma Inline (To_Valid_Address);
       pragma Inline (To_Address);
       pragma Inline (To_Block);

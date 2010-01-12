@@ -165,13 +165,11 @@ package DB.Gen_Blob_Trees is
    -- Core operations: Look_Up, Insertion, Deletion.
 
    type State_Type is (Success, Failure, Error);
-   type Count_Type is new Natural;
 
    procedure Look_Up
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
@@ -183,37 +181,14 @@ package DB.Gen_Blob_Trees is
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
 
-   procedure Look_Up
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-   -- Searches the Position-th Key / Value pair or sets State = Failure if
-   -- no such key exists.
-   -- This procedure acquires a read-lock and might therefore block due to
-   -- uncommitted transactions.
-
-   procedure Look_Up
-     (Tree        : in out Tree_Type;
-      Transaction : in out Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
-      State       :    out State_Type);
-   -- Searches the Position-th Key / Value pair or sets State = Failure if
-   -- no such key exists.
-
    procedure Minimum
      (Tree     : in out Tree_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -225,7 +200,6 @@ package DB.Gen_Blob_Trees is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -234,7 +208,6 @@ package DB.Gen_Blob_Trees is
      (Tree     : in out Tree_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -246,7 +219,6 @@ package DB.Gen_Blob_Trees is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -255,7 +227,6 @@ package DB.Gen_Blob_Trees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    : in     Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -267,7 +238,6 @@ package DB.Gen_Blob_Trees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -276,7 +246,6 @@ package DB.Gen_Blob_Trees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    : in     Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Appends the Value as part to the value stored under Key as long as this
    -- value is stored indirectly, i.e. in the heap. In all other cases,
@@ -288,7 +257,6 @@ package DB.Gen_Blob_Trees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Appends the Value as part to the value stored under Key as long as this
    -- value is stored indirectly, i.e. in the heap. In all other cases,
@@ -299,7 +267,6 @@ package DB.Gen_Blob_Trees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
@@ -311,36 +278,15 @@ package DB.Gen_Blob_Trees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
-
-   procedure Delete
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-   -- Deletes the Position-th Key / Value pair or sets State = Failure if no
-   -- such key exists.
-   -- This procedure starts and commits a new transaction and might therefore
-   -- block.
-
-   procedure Delete
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
-      State       :    out State_Type);
-   -- Deletes the Position-th Key / Value pair or sets State = Failure if no
-   -- such key exists.
 
    ----------
    -- Miscellaneous information procedures.
 
    subtype Height_Type is Positive;
+   subtype Count_Type is Natural;
 
    procedure Count
      (Tree  : in out Tree_Type;
@@ -471,7 +417,6 @@ package DB.Gen_Blob_Trees is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it

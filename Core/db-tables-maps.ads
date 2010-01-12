@@ -91,13 +91,11 @@ package DB.Tables.Maps is
    -- Core operations: Look_Up, Insertion, Deletion.
 
    type State_Type is (Success, Failure, Error);
-   type Count_Type is new Natural;
 
    procedure Look_Up
      (Map      : in out Map_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type'Class;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
@@ -109,37 +107,14 @@ package DB.Tables.Maps is
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type'Class;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
-   -- no such key exists.
-
-   procedure Look_Up
-     (Map      : in out Map_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type'Class;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-   -- Searches the Position-th Key / Value pair or sets State = Failure if
-   -- no such key exists.
-   -- This procedure acquires a read-lock and might therefore block due to
-   -- uncommitted transactions.
-
-   procedure Look_Up
-     (Map         : in out Map_Type;
-      Transaction : in out Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type'Class;
-      Key         :    out Key_Type;
-      State       :    out State_Type);
-   -- Searches the Position-th Key / Value pair or sets State = Failure if
    -- no such key exists.
 
    procedure Minimum
      (Map      : in out Map_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type'Class;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -151,7 +126,6 @@ package DB.Tables.Maps is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type'Class;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -160,7 +134,6 @@ package DB.Tables.Maps is
      (Map      : in out Map_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type'Class;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -172,7 +145,6 @@ package DB.Tables.Maps is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type'Class;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -181,7 +153,6 @@ package DB.Tables.Maps is
      (Map      : in out Map_Type;
       Key      : in     Key_Type;
       Value    : in     Value_Type'Class;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -193,7 +164,6 @@ package DB.Tables.Maps is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type'Class;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -202,7 +172,6 @@ package DB.Tables.Maps is
      (Map      : in out Map_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type'Class;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
@@ -214,36 +183,15 @@ package DB.Tables.Maps is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type'Class;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
-
-   procedure Delete
-     (Map      : in out Map_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type'Class;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-   -- Deletes the Position-th Key / Value pair or sets State = Failure if no
-   -- such key exists.
-   -- This procedure starts and commits a new transaction and might therefore
-   -- block.
-
-   procedure Delete
-     (Map         : in out Map_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type'Class;
-      Key         :    out Key_Type;
-      State       :    out State_Type);
-   -- Deletes the Position-th Key / Value pair or sets State = Failure if no
-   -- such key exists.
 
    ----------
    -- Miscellaneous information procedures.
 
    subtype Height_Type is Positive;
+   subtype Count_Type is Natural;
 
    procedure Count
      (Map   : in out Map_Type;
@@ -378,7 +326,6 @@ package DB.Tables.Maps is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type'Class;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it

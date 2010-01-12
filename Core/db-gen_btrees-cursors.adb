@@ -741,7 +741,6 @@ package body Cursors is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
@@ -752,7 +751,6 @@ package body Cursors is
    begin
       Lock_Mutex(Cursor);
       if not Cursor.Has_Node then
-         Position := Count_Type'First;
          State := Failure;
          Unlock_Mutex(Cursor);
          return;
@@ -761,7 +759,7 @@ package body Cursors is
       declare
       begin
          Start_Transaction(Tree, Sub_Transaction);
-         Delete(Tree, Sub_Transaction, Key, Value, Position, State);
+         Delete(Tree, Sub_Transaction, Key, Value, State);
          if State /= Success then
             Abort_Transaction(Tree, Sub_Transaction);
          else
@@ -789,7 +787,6 @@ package body Cursors is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
@@ -802,13 +799,12 @@ package body Cursors is
    begin
       Lock_Mutex(Cursor);
       if not Cursor.Has_Node then
-         Position := Count_Type'First;
          State := Failure;
          Unlock_Mutex(Cursor);
          return;
       end if;
       Key := Nodes.Key(Cursor.Node, Cursor.Index);
-      Delete(Tree, Transaction, Key, Value, Position, State);
+      Delete(Tree, Transaction, Key, Value, State);
       Cursor.Force_Recalibrate := True;
       Unlock_Mutex(Cursor);
 

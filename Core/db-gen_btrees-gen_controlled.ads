@@ -34,8 +34,8 @@ package DB.Gen_BTrees.Gen_Controlled is
    type RW_Transaction_Type is new Transaction_Type with private;
 
    type State_Type is new Gen_BTrees.State_Type;
-   type Count_Type is new Gen_BTrees.Count_Type;
-   type Height_Type is new Gen_BTrees.Height_Type;
+   subtype Count_Type is Gen_BTrees.Count_Type;
+   subtype Height_Type is Gen_BTrees.Height_Type;
 
    type Comparison_Type is new Gen_BTrees.Comparison_Type;
    type Bound_Type is new Gen_BTrees.Bound_Type;
@@ -90,7 +90,6 @@ package DB.Gen_BTrees.Gen_Controlled is
      (Tree     : in out Tree_Type'Class;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
 
    procedure Look_Up
@@ -98,29 +97,12 @@ package DB.Gen_BTrees.Gen_Controlled is
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
-      State       :    out State_Type);
-
-   procedure Look_Up
-     (Tree     : in out Tree_Type'Class;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-
-   procedure Look_Up
-     (Tree        : in out Tree_Type'Class;
-      Transaction : in out Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
       State       :    out State_Type);
 
    procedure Minimum
      (Tree     : in out Tree_Type'Class;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
 
    procedure Minimum
@@ -128,14 +110,12 @@ package DB.Gen_BTrees.Gen_Controlled is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
 
    procedure Maximum
      (Tree     : in out Tree_Type'Class;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
 
    procedure Maximum
@@ -143,14 +123,12 @@ package DB.Gen_BTrees.Gen_Controlled is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
 
    procedure Insert
      (Tree     : in out Tree_Type'Class;
       Key      : in     Key_Type;
       Value    : in     Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
 
    procedure Insert
@@ -158,14 +136,12 @@ package DB.Gen_BTrees.Gen_Controlled is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
 
    procedure Delete
      (Tree     : in out Tree_Type'Class;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
 
    procedure Delete
@@ -173,22 +149,6 @@ package DB.Gen_BTrees.Gen_Controlled is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
-      State       :    out State_Type);
-
-   procedure Delete
-     (Tree     : in out Tree_Type'Class;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-
-   procedure Delete
-     (Tree        : in out Tree_Type'Class;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
       State       :    out State_Type);
 
    procedure Count
@@ -261,7 +221,6 @@ package DB.Gen_BTrees.Gen_Controlled is
       Cursor      : in out Cursor_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
 
    procedure Delete
@@ -270,7 +229,6 @@ package DB.Gen_BTrees.Gen_Controlled is
       Cursor      : in out Cursor_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
 
 private

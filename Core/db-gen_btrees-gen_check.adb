@@ -201,31 +201,8 @@ is
                      Raise_Exception(Tree_Error'Identity,
                                      Message("Parent key not greater", P, N));
                   end if;
-
-                  if Nodes.Count_Sum(N)
-                     /= Nodes.Count(P, Nodes.Child_Position(P, Address)) then
-                     Raise_Exception(Tree_Error'Identity,
-                                     Message("Sum is not synchronized", P, N));
-                  end if;
                end;
             else
-               if Nodes.Is_Inner(N) then
-                  for I in 1 .. Nodes.Degree(N) loop
-                     Block_IO.Read(Tree.File,
-                       Block_IO.Valid_Address_Type(Nodes.Child(N,I)), B);
-                     declare
-                        C : constant Nodes.Node_Type := Nodes.From_Block(B);
-                     begin
-                        if Nodes.Count(N, I) /= Nodes.Count_Sum(C) then
-                           Raise_Exception(Tree_Error'Identity,
-                                    Message("Sum is not synchronized (2):",
-                                            N, C));
-                           return;
-                        end if;
-                     end;
-                  end loop;
-               end if;
-
                Inv_Parent := Inv_Parent + 1;
             end if;
 

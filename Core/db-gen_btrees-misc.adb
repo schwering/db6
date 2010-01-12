@@ -32,10 +32,30 @@ package body Misc is
       pragma Assert (Transaction.Initialized);
       pragma Assert (Transaction.Owning_Tree = Tree.Self);
       pragma Assert (Transaction.Started);
-      R : Nodes.Node_Type;
+
+      N_A : Nodes.Valid_Address_Type;
    begin
-      Read_Node(Tree, Transaction, Transaction.Current_Root_Address, R);
-      Count := Nodes.Count_Sum(R);
+      N_A := Transaction.Current_Root_Address;
+      loop
+         declare
+            N : Nodes.Node_Type;
+         begin
+            Read_Node(Tree, Transaction, N_A, N);
+            exit when Nodes.Is_Leaf(N);
+            N_A := Nodes.Child(N, 1);
+         end;
+      end loop;
+      Count := 0;
+      loop
+         declare
+            N : Nodes.Node_Type;
+         begin
+            Read_Node(Tree, Transaction, N_A, N);
+            Count := Count + Count_Type(Nodes.Degree(N));
+            exit when not Nodes.Is_Valid(Nodes.Right_Neighbor(N));
+            N_A := Nodes.Valid_Right_Neighbor(N);
+         end;
+      end loop;
    end Count;
 
 
@@ -74,7 +94,7 @@ package body Misc is
             N : Nodes.Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
-            exit when Nodes.Degree(N) = 0 or Nodes.Is_Leaf(N);
+            exit when Nodes.Is_Leaf(N);
             N_A := Nodes.Child(N, 1);
             Height := Height + 1;
          end;

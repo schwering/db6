@@ -30,19 +30,16 @@ generic
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    : in     Value_Type;
-           Position :    out Count_Type;
            State    :    out State_Type);
    with procedure P_Delete
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    :    out Value_Type;
-           Position :    out Count_Type;
            State    :    out State_Type);
    with procedure P_Look_Up
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    :    out Value_Type;
-           Position :    out Count_Type;
            State    :    out State_Type);
    with procedure P_Count
           (Object : in out Object_Type;

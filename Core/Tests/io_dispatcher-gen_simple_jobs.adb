@@ -7,11 +7,10 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
    procedure Insert
    is
       KV    : constant Key_Value_Type := Random_Entry;
-      Pos   : Count_Type;
       State : State_Type := Success;
    begin
       Check_Key_Value(KV);
-      P_Insert(Object, Get_Key(KV), Get_Value(KV), Pos, State);
+      P_Insert(Object, Get_Key(KV), Get_Value(KV), State);
       if State /= Success then
          Put_Line("Insertion failed "& State'Img);
          raise Stop_Now;
@@ -24,10 +23,9 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       use type DB.IO.Blocks.Size_Type;
       KV    : constant Key_Value_Type := Random_Entry;
       Val   : Value_Type := Null_Value;
-      Pos   : Count_Type;
       State : State_Type := Success;
    begin
-      P_Delete(Object, Get_Key(KV), Val, Pos, State);
+      P_Delete(Object, Get_Key(KV), Val, State);
       if State /= Success or else Get_Value(KV) /= Val then
          Put_Line("Deletion failed "& State'Img);
          raise Stop_Now;
@@ -40,10 +38,9 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       use type DB.IO.Blocks.Size_Type;
       KV    : constant Key_Value_Type := Random_Entry;
       Val   : Value_Type := Null_Value;
-      Pos   : Count_Type;
       State : State_Type := Success;
    begin
-      P_Look_Up(Object, Get_Key(KV), Val, Pos, State);
+      P_Look_Up(Object, Get_Key(KV), Val, State);
       if State /= Success or else Get_Value(KV) /= Val then
          Put_Line("Look up failed "& State'Img);
          Put_Line("Key   = """& Key_To_String(Get_Key(KV)) &"""");
@@ -60,10 +57,9 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       use type DB.IO.Blocks.Size_Type;
       KV    : constant Key_Value_Type := Random_Entry;
       Val   : Value_Type := Null_Value;
-      Pos   : Count_Type;
       State : State_Type := Failure;
    begin
-      P_Look_Up(Object, Get_Key(KV), Val, Pos, State);
+      P_Look_Up(Object, Get_Key(KV), Val, State);
       if State /= Failure then
          Put_Line("Look up failed "& State'Img);
          raise Stop_Now;
