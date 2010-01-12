@@ -387,42 +387,6 @@ package DB.Tables.Maps is
    -- The next Next operation will need to recalibrate, i.e. find the
    -- key/value-pair that should be visited next.
 
-   generic
-      type Element_Type is private;
-      Neutral_Element : Element_Type;
-      with function Map_Function
-             (Key   : Key_Type;
-              Value : Value_Type'Class)
-              return Element_Type;
-      with procedure Reduce
-             (Left    : in out Element_Type;
-              Right   : in     Element_Type);
-   procedure Gen_Random_Map_Reduce
-     (Map         : in out Map_Type;
-      Transaction : in out Transaction_Type'Class;
-      Cursor      : in out Cursor_Type;
-      Element     :    out Element_Type;
-      Value_Impl  : in     Value_Type'Class;
-      State       :    out State_Type);
-
-   generic
-      type Element_Type is private;
-      Neutral_Element : Element_Type;
-      with function Map_Function
-             (Key   : Key_Type;
-              Value : Value_Type'Class)
-              return Element_Type;
-      with procedure Reduce
-             (Left    : in out Element_Type;
-              Right   : in     Element_Type);
-   procedure Gen_Sequential_Map_Reduce
-     (Map         : in out Map_Type;
-      Transaction : in out Transaction_Type'Class;
-      Cursor      : in out Cursor_Type;
-      Element     :    out Element_Type;
-      Value_Impl  : in     Value_Type'Class;
-      State       :    out State_Type);
-
 private
    package Bounded_Values_IO   renames Types.Values.Bounded.Uncompressed;
    package Unbounded_Values_IO renames Types.Values.Unbounded.Uncompressed;
