@@ -1,4 +1,4 @@
-all: article.pdf btree.pdf poster.pdf presentation.pdf
+all: article.pdf btree.pdf btree2.pdf poster.pdf presentation.pdf
 
 %.pdf: %.tex
 	pdflatex $^

@@ -6,8 +6,6 @@
 \newdef{rem}{Remark}
 \newtheorem{thm}{Theorem}
 
-\newcommand \BTree { B\textsuperscript{+}-Tree}
-\newcommand \BTrees { B\textsuperscript{+}-Trees}
 \newcommand \Beff { B_{\text{eff}} }
 
 \begin{document}
@@ -72,7 +70,7 @@ An entry $e_i$ of a {\em leaf node} consists of
 \item a key value $key(e_i)$, and
 \item a data value $value(e_i)$.
 \end{itemize}
-For inner nodes, we write \mbox{$e = (k, c, a)$} and for leaf nodes 
+For inner nodes, we write \mbox{$e = (k, a)$} and for leaf nodes 
 \mbox{$e = (k, v)$}.
 If the context permits it, we do not distinguish between addresses and nodes,
 i.e. \mbox{$parent(child(e_i)) = N$}, for example.
@@ -143,7 +141,7 @@ out the size of meta data in $size(N) = \sum_{e \in N} size(e)$ because we
 always compare it to $\Beff$.
 For each $e \in N$, the size is determined by
 \[ size(e) = \begin{cases}
-size(k) + size_\text{addr} & \text{if } e = (k,c,a)\\
+size(k) + size_\text{addr} & \text{if } e = (k,a)\\
 size(k) + size(v)          & \text{if } e = (k,v)
 \end{cases}. \]
 
@@ -159,7 +157,7 @@ A node is {\em valid} iff it meets the requirements of figure~\ref{fill}.
 
 \begin{rem}
 Note that req.~\ref{maxsize} refers to a node element $e$ which consists
-of either \mbox{$e = (k, c, a)$} or \mbox{$e = (k, v)$}.
+of either \mbox{$e = (k, a)$} or \mbox{$e = (k, v)$}.
 It follows that the {\em maximum key size} is
 \begin{align*}
 size(k) + size_\text{addr}
@@ -495,6 +493,9 @@ Besides the high IO costs, this raises concurrency issues because of the higher
 number of needed locks.
 However, it should be easy to adopt the concurrency protocol proposed by
 \cite{Lehman} for traditional B\textsuperscript{+}-Trees.
+
+The entries can be compressed when req.~\ref{minsize} is relaxed to
+\mbox{$deg(N) \geq 2$} for all $N$ except the root.
 
 Obviously, the described B\textsuperscript{+}-Tree is only suitable for cases in
 which much more searches than insertion or deletions are performed.
