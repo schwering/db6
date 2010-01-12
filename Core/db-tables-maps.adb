@@ -4,8 +4,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Gen_BTrees.Gen_Sequential_Map_Reduce;
-
 package body DB.Tables.Maps is
 
    function New_RO_Transaction
@@ -227,7 +225,9 @@ package body DB.Tables.Maps is
          begin
             BTrees.Look_Up(Map.Short_Tree, Key, V, S);
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -236,7 +236,9 @@ package body DB.Tables.Maps is
          begin
             Blob_Trees.Look_Up(Map.Long_Tree, Key, V, S);
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Look_Up;
@@ -269,7 +271,9 @@ package body DB.Tables.Maps is
                              Key, V, S);
             end if;
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -286,7 +290,9 @@ package body DB.Tables.Maps is
                              Key, V, S);
             end if;
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Look_Up;
@@ -305,7 +311,9 @@ package body DB.Tables.Maps is
          begin
             BTrees.Minimum(Map.Short_Tree, Key, V, S);
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -314,7 +322,9 @@ package body DB.Tables.Maps is
          begin
             Blob_Trees.Minimum(Map.Long_Tree, Key, V, S);
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Minimum;
@@ -347,7 +357,9 @@ package body DB.Tables.Maps is
                              Key, V, S);
             end if;
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -364,7 +376,9 @@ package body DB.Tables.Maps is
                              Key, V, S);
             end if;
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Minimum;
@@ -383,7 +397,9 @@ package body DB.Tables.Maps is
          begin
             BTrees.Maximum(Map.Short_Tree, Key, V, S);
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -392,7 +408,9 @@ package body DB.Tables.Maps is
          begin
             Blob_Trees.Maximum(Map.Long_Tree, Key, V, S);
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Maximum;
@@ -425,7 +443,9 @@ package body DB.Tables.Maps is
                              Key, V, S);
             end if;
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -442,7 +462,9 @@ package body DB.Tables.Maps is
                              Key, V, S);
             end if;
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Maximum;
@@ -514,7 +536,9 @@ package body DB.Tables.Maps is
          begin
             BTrees.Delete(Map.Short_Tree, Key, V, S);
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -523,7 +547,9 @@ package body DB.Tables.Maps is
          begin
             Blob_Trees.Delete(Map.Long_Tree, Key, V, S);
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Delete;
@@ -546,7 +572,9 @@ package body DB.Tables.Maps is
             BTrees.Delete(Map.Short_Tree, Transaction.Short_Transaction,
                           Key, V, S);
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -556,7 +584,9 @@ package body DB.Tables.Maps is
             Blob_Trees.Delete(Map.Long_Tree, Transaction.Long_Transaction,
                               Key, V, S);
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Delete;
@@ -817,7 +847,9 @@ package body DB.Tables.Maps is
                            Cursor.Short_Cursor, Key, V, S);
             end if;
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -834,7 +866,9 @@ package body DB.Tables.Maps is
                               Cursor.Long_Cursor, Key, V, S);
             end if;
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Next;
@@ -859,7 +893,9 @@ package body DB.Tables.Maps is
             BTrees.Delete(Map.Short_Tree, Transaction.Short_Transaction,
                           Cursor.Short_Cursor, Key, V, S);
             State := To_State(S);
-            Value := From_Bounded(V);
+            if State = Success then
+               Value := From_Bounded(V);
+            end if;
          end;
       else
          declare
@@ -869,7 +905,9 @@ package body DB.Tables.Maps is
             Blob_Trees.Delete(Map.Long_Tree, Transaction.Long_Transaction,
                               Cursor.Long_Cursor, Key, V, S);
             State := To_State(S);
-            Value := From_Unbounded(V);
+            if State = Success then
+               Value := From_Unbounded(V);
+            end if;
          end;
       end if;
    end Delete;
@@ -987,92 +1025,6 @@ package body DB.Tables.Maps is
          end;
       end if;
    end Clusterize;
-
-
-   procedure Gen_Random_Map_Reduce
-     (Map         : in out Map_Type;
-      Transaction : in out Transaction_Type'Class;
-      Cursor      : in out Cursor_Type;
-      Element     :    out Element_Type;
-      Value_Impl  : in     Value_Type'Class;
-      State       :    out State_Type) is
-   begin
-      if Map.Short then
-         declare
-            function Map_Function_Wrapper
-              (Key   : Key_Type;
-               Value : Types.Values.Bounded.String_Type)
-               return Element_Type
-            is
-               V : Value_Type'Class := Value_Impl;
-            begin
-               V := From_Bounded(Value);
-               return Map_Function(Key, V);
-            end Map_Function_Wrapper;
-
-            procedure Map_Reduce is new BTrees.Gen_Sequential_Map_Reduce
-              (Element_Type, Neutral_Element, Map_Function_Wrapper, Reduce);
-
-            S : BTrees.State_Type;
-         begin
-            if Transaction in RO_Transaction_Type'Class then
-               Map_Reduce(Map.Short_Tree,
-                          RO_Transaction_Type(Transaction).Short_Transaction,
-                          Cursor.Short_Cursor, Element, S);
-            else
-               Map_Reduce(Map.Short_Tree,
-                          RW_Transaction_Type(Transaction).Short_Transaction,
-                          Cursor.Short_Cursor, Element, S);
-            end if;
-            State := To_State(S);
-         end;
-      else
-         raise Tree_Error;
-      end if;
-   end Gen_Random_Map_Reduce;
-
-
-   procedure Gen_Sequential_Map_Reduce
-     (Map         : in out Map_Type;
-      Transaction : in out Transaction_Type'Class;
-      Cursor      : in out Cursor_Type;
-      Element     :    out Element_Type;
-      Value_Impl  : in     Value_Type'Class;
-      State       :    out State_Type) is
-   begin
-      if Map.Short then
-         declare
-            function Map_Function_Wrapper
-              (Key   : Key_Type;
-               Value : Types.Values.Bounded.String_Type)
-               return Element_Type
-            is
-               V : Value_Type'Class := Value_Impl;
-            begin
-               V := From_Bounded(Value);
-               return Map_Function(Key, V);
-            end Map_Function_Wrapper;
-
-            procedure Map_Reduce is new BTrees.Gen_Sequential_Map_Reduce
-              (Element_Type, Neutral_Element, Map_Function_Wrapper, Reduce);
-
-            S : BTrees.State_Type;
-         begin
-            if Transaction in RO_Transaction_Type'Class then
-               Map_Reduce(Map.Short_Tree,
-                          RO_Transaction_Type(Transaction).Short_Transaction,
-                          Cursor.Short_Cursor, Element, S);
-            else
-               Map_Reduce(Map.Short_Tree,
-                          RW_Transaction_Type(Transaction).Short_Transaction,
-                          Cursor.Short_Cursor, Element, S);
-            end if;
-            State := To_State(S);
-         end;
-      else
-         raise Tree_Error;
-      end if;
-   end Gen_Sequential_Map_Reduce;
 
 end DB.Tables.Maps;
 
