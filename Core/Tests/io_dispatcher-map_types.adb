@@ -48,6 +48,18 @@ package body IO_Dispatcher.Map_Types is
    end "=";
 
 
+   function Image (V : Value_Type) return String is
+   begin
+      declare
+         Len : constant DB.Types.Values.Length_Type
+             := Values_Impl.Length(Value_Type(V).S);
+      begin
+         return "'"& To_Strings.To_String(Value_Type(V).S) &"' "&
+                "["& Len'Img &"]";
+      end;
+   end Image;
+
+
    function Null_Value return DB.Tables.Value_Type'Class is
    begin
       return From_Bounded(DB.Types.Values.Bounded.Empty_String);
@@ -56,17 +68,7 @@ package body IO_Dispatcher.Map_Types is
 
    function To_String (V : DB.Tables.Value_Type'Class) return String is
    begin
-      if V in Value_Type'Class then
-         declare
-            Len : constant DB.Types.Values.Length_Type
-                := Values_Impl.Length(Value_Type(V).S);
-         begin
-            return "'"& To_Strings.To_String(Value_Type(V).S) &"' "&
-                   "["& Len'Img &"]";
-         end;
-      else
-         return "wrong instance";
-      end if;
+      return V.Image;
    end To_String;
 
 

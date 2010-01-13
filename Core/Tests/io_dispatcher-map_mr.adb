@@ -150,6 +150,8 @@ procedure IO_Dispatcher.Map_MR is
          Intermediate_Value_Context_Type => Intermediate_Values.Context_Type,
          "="                             => Map_Types."=",
          "<="                            => Map_Types."<=",
+         Key_Bound                       => Map_Types.Short_Bound,
+         Key_Delimiter                   => Map_Types.Short_Delimiter,
          Intermediate_Key_Size_Bound     => DB.Types.Keys.Size_Bound,
          Read_Intermediate_Key           => DB.Types.Keys.Read,
          Skip_Intermediate_Key           => DB.Types.Keys.Skip,

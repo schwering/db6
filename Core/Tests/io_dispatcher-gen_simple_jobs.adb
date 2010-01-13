@@ -76,7 +76,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
    end Count;
 
 
-   procedure Make_Stats
+   procedure Stats
    is
       Count                                    : Count_Type;
       Height, Blocks, Free_Blocks, Used_Blocks : Natural;
@@ -84,15 +84,15 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       Waste, Waste_Per_Block, Bytes            : Long_Integer;
       Relative_Waste_Per_Block                 : Float;
    begin
-      P_Make_Stats(Object                 => Object,
-                   Height                 => Height,
-                   Blocks                 => Blocks,
-                   Free_Blocks            => Free_Blocks,
-                   Max_Degree             => Max_Degree,
-                   Min_Degree             => Min_Degree,
-                   Avg_Degree             => Avg_Degree,
-                   Bytes_Wasted_In_Blocks => Waste,
-                   Bytes_In_Blocks        => Bytes);
+      P_Stats(Object                 => Object,
+              Height                 => Height,
+              Blocks                 => Blocks,
+              Free_Blocks            => Free_Blocks,
+              Max_Degree             => Max_Degree,
+              Min_Degree             => Min_Degree,
+              Avg_Degree             => Avg_Degree,
+              Bytes_Wasted_In_Blocks => Waste,
+              Bytes_In_Blocks        => Bytes);
       P_Count(Object, Count);
       Used_Blocks              := Blocks - Free_Blocks;
       if Used_Blocks > 0 then
@@ -119,7 +119,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       Put(Long_Integer'Image(Waste_Per_Block));
       Put(Float'Image(Relative_Waste_Per_Block));
       New_Line;
-   end Make_Stats;
+   end Stats;
 
 
    procedure Check is
