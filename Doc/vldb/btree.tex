@@ -28,23 +28,25 @@ Christoph Schwering\\
 
 \begin{abstract}
 A B-tree is an order-preserving index structure for block oriented storage
-devices.
+devices, because each node of the tree can reside on a single block.
 The B-tree was first described by Bayer and McCreight \cite{Bayer}.
 Several variants of the B-tree appeared in the aftermath, in particular the
-B-tree \cite{Cormen, KnuthBTree}, which differs from the
+B\textsuperscript{+}-tree \cite{Cormen, KnuthBTree}, which differs from the
 B-tree in that it carries the values only in its leaves.
-Knuth also mentions a variant that is capable of storing variable-length
-keys, but does not describe it further \cite{KnuthBTree}.
 
-The B-tree described in this article supports bounded length
-entries and access by the index number of entries (both features are independent
-from another, though).
-Ignoring some rather small internal overhead and the value sizes for the 
-moment, each entry's size is bounded by $\tfrac{1}{4}$ of the node size
-in storage elements, and the usage of each node in the tree is at least
-$\tfrac{3}{8}$ of its size in storage elements.
+This paper proposes a B\textsuperscript{+}-tree (which will be called B-tree for
+short in the following) that is capable of storing bounded-length
+key/value-entries without wasting space and without the need of overflow spaces.
+This is achieved by restricting the entries to a maximum length of
+$\tfrac{1}{4}$ of a block's size and posting the invariant that each node except
+for the root is filled by a degree of at least $\tfrac{3}{8}$ with entries.
+
+This idea has been mentioned shortly by Knuth \cite{KnuthBTree}, but it seems
+to the me that concrete length-bounds and node-invariants have not been
+published.
+The reason for this probably is that it is trivial for smart people, but sadly
+it's not for me.
 \end{abstract}
-
 
 
 \section{Definition} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -70,7 +72,7 @@ An entry $e_i$ of a {\em leaf node} consists of
 \item a key value $key(e_i)$, and
 \item a data value $value(e_i)$.
 \end{itemize}
-For inner nodes, we write \mbox{$e = (k, c, a)$} and for leaf nodes 
+For inner nodes, we write \mbox{$e = (k, a)$} and for leaf nodes 
 \mbox{$e = (k, v)$}.
 If the context permits it, we do not distinguish between addresses and nodes,
 i.e. \mbox{$parent(child(e_i)) = N$}, for example.
@@ -141,7 +143,7 @@ out the size of meta data in $size(N) = \sum_{e \in N} size(e)$ because we
 always compare it to $\Beff$.
 For each $e \in N$, the size is determined by
 \[ size(e) = \begin{cases}
-size(k) + size_\text{addr} & \text{if } e = (k,c,a)\\
+size(k) + size_\text{addr} & \text{if } e = (k,a)\\
 size(k) + size(v)          & \text{if } e = (k,v)
 \end{cases}. \]
 
@@ -157,7 +159,7 @@ A node is {\em valid} iff it meets the requirements of figure~\ref{fill}.
 
 \begin{rem}
 Note that req.~\ref{maxsize} refers to a node element $e$ which consists
-of either \mbox{$e = (k, c, a)$} or \mbox{$e = (k, v)$}.
+of either \mbox{$e = (k, a)$} or \mbox{$e = (k, v)$}.
 It follows that the {\em maximum key size} is
 \begin{align*}
 size(k) + size_\text{addr}
@@ -494,10 +496,11 @@ number of needed locks.
 However, it should be easy to adopt the concurrency protocol proposed by
 \cite{Lehman} for traditional B-trees.
 
+The entries can be compressed when req.~\ref{minsize} is relaxed to
+\mbox{$deg(N) \geq 2$} for all $N$ except the root.
+
 Obviously, the described B-tree is only suitable for cases in
-which much more searches than insertion or deletions are performed.
-The Dingsbums 6 database system uses an Ada 95 implementation of this
-B-tree as its core data structure.
+which much more searches than insertion or deletions occur.
 
 
 \bibliographystyle{abbrv}
