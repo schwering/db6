@@ -6,8 +6,6 @@
 
 with DB.Gen_BTrees.Gen_Stats;
 
-with DB.Utils.Gen_Integer_Image;
-
 procedure DB.Gen_Blob_Trees.Gen_Stats
   (Tree                   : in out Tree_Type;
    Height                 :    out Natural;

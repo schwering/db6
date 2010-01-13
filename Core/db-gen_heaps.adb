@@ -4,7 +4,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Utils.Gen_Minimum;
 with DB.Utils.Print;
 
 package body DB.Gen_Heaps is

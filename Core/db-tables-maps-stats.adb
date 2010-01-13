@@ -7,8 +7,6 @@
 with DB.Gen_BTrees.Gen_Stats;
 with DB.Gen_Blob_Trees.Gen_Stats;
 
-with DB.Utils.Gen_Integer_Image;
-
 procedure DB.Tables.Maps.Stats
   (Map                    : in out Map_Type;
    Height                 :    out Natural;

@@ -6,8 +6,6 @@
 
 with DB.IO.Blocks;
 
-with System.Storage_Elements;
-
 generic
    type P_Number_Type is (<>);
 package DB.Types.Gen_Numbers is

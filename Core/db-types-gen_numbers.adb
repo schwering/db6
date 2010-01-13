@@ -4,8 +4,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Unchecked_Conversion;
-
 package body DB.Types.Gen_Numbers is
 
    function Size_Bound
@@ -66,7 +64,9 @@ package body DB.Types.Gen_Numbers is
    function Short_Delimiter
      (Left  : Number_Type;
       Right : Number_Type)
-      return Number_Type is
+      return Number_Type
+   is
+      pragma Unreferenced (Right);
    begin
       return Left;
    end Short_Delimiter;
