@@ -60,5 +60,10 @@ package DB.Tables is
       return Value_Type
    is abstract;
 
+   function Image
+     (Value : Value_Type)
+      return String
+   is abstract;
+
 end DB.Tables;
 

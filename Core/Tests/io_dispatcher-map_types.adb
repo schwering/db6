@@ -48,8 +48,7 @@ package body IO_Dispatcher.Map_Types is
    end "=";
 
 
-   --overriding
-   function Image (V : Value_Type) return String is
+   overriding function Image (V : Value_Type) return String is
    begin
       declare
          Len : constant DB.Types.Values.Length_Type

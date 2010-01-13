@@ -56,8 +56,7 @@ package IO_Dispatcher.Map_Types is
 
    overriding function "=" (Left, Right : Value_Type) return Boolean;
 
-   --overriding
-   function Image (V : Value_Type) return String;
+   overriding function Image (V : Value_Type) return String;
 
    function Null_Value return DB.Tables.Value_Type'Class;
 
