@@ -40,6 +40,15 @@ package DB.Types.Gen_Numbers is
       Block   : in     IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type);
 
+   function Short_Bound
+     (Left  : Number_Type)
+      return Number_Type;
+
+   function Short_Delimiter
+     (Left  : Number_Type;
+      Right : Number_Type)
+      return Number_Type;
+
 private
    type Context_Type is null record;
 

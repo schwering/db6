@@ -54,5 +54,22 @@ package body DB.Types.Gen_Numbers is
       Read(Context, Block, Cursor, Number);
    end Skip;
 
+
+   function Short_Bound
+     (Left  : Number_Type)
+      return Number_Type is
+   begin
+      return Left;
+   end Short_Bound;
+
+
+   function Short_Delimiter
+     (Left  : Number_Type;
+      Right : Number_Type)
+      return Number_Type is
+   begin
+      return Left;
+   end Short_Delimiter;
+
 end DB.Types.Gen_Numbers;
 

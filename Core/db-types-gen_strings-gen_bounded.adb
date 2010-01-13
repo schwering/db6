@@ -4,6 +4,8 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with DB.Utils.Gen_Minimum;
+
 package body DB.Types.Gen_Strings.Gen_Bounded is
 
    function "<" (Left, Right : String_Type) return Boolean is
@@ -117,6 +119,47 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
    begin
       return S.Buffer(1 .. S.Length);
    end To_Buffer;
+
+
+   function Short_Bound
+     (Left  : String_Type)
+      return String_Type
+   is
+      Buffer : Indefinite_Buffer_Type(1 .. Length(Left));
+   begin
+      for I in 1 .. Length(Left) loop
+         if Element(Left, I) < Item_Type'Last then
+            Buffer(I) := Item_Type'Succ(Element(Left, I));
+            return New_String(Buffer(1 .. I));
+         else
+            Buffer(I) := Element(Left, I);
+         end if;
+      end loop;
+      return Left;
+   end Short_Bound;
+
+
+   function Short_Delimiter
+     (Left  : String_Type;
+      Right : String_Type)
+      return String_Type
+   is
+      function Min is new Utils.Gen_Minimum(Length_Type);
+
+      pragma Assert (Left < Right or Left = Right);
+      Buffer : Indefinite_Buffer_Type(1 .. Length(Left));
+   begin
+      for I in 1 .. Min(Length(Left), Length(Right)) loop
+         if Element(Left, I) < Item_Type'Last and then
+            Item_Type'Succ(Element(Left, I)) < Element(Right, I) then
+            Buffer(I) := Item_Type'Succ(Element(Left, I));
+            return New_String(Buffer(1 .. I));
+         else
+            Buffer(I) := Element(Left, I);
+         end if;
+      end loop;
+      return Left;
+   end Short_Delimiter;
 
 
    package body Uncompressed is separate;
