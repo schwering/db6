@@ -21,6 +21,7 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
    function "<" (Left, Right : String_Type) return Boolean;
    function "=" (Left, Right : String_Type) return Boolean;
+   function "<=" (Left, Right : String_Type) return Boolean;
    function "&" (Left, Right : String_Type) return String_Type;
    function "&"
      (Left  : String_Type;

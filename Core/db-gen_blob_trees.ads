@@ -20,6 +20,13 @@ with DB.IO.Blocks.Gen_IO;
 
 generic
    type Key_Type is private;
+   type Value_Type is private;
+
+   with function "=" (Left, Right : Key_Type) return Boolean is <>;
+   with function "<=" (Left, Right : Key_Type) return Boolean is <>;
+
+   Allow_Duplicates : in Boolean := False;
+
    type Key_Context_Type is limited private;
    with function Key_Size_Bound
           (Key : Key_Type)
@@ -39,10 +46,6 @@ generic
            Cursor  : in out IO.Blocks.Cursor_Type;
            Key     : in     Key_Type);
 
-   with function "=" (Left, Right : Key_Type) return Boolean is <>;
-   with function "<=" (Left, Right : Key_Type) return Boolean is <>;
-
-   type Value_Type is private;
 
    type Value_Context_Type is private;
    with function Value_Size_Bound
@@ -97,9 +100,9 @@ generic
 
    Is_Context_Free_Serialization : in Boolean;
 
-   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
-
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
+
+   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.Gen_Blob_Trees is
    pragma Elaborate_Body;
 
@@ -497,22 +500,23 @@ private
 
    package BTrees is new Gen_BTrees
      (Key_Type                      => Key_Type,
+      Value_Type                    => BTree_Utils.Value_Type,
+      "="                           => "=",
+      "<="                          => "<=",
+      Allow_Duplicates              => Allow_Duplicates,
       Key_Context_Type              => Key_Context_Type,
       Key_Size_Bound                => Key_Size_Bound,
       Read_Key                      => Read_Key,
       Skip_Key                      => Skip_Key,
       Write_Key                     => Write_Key,
-      "="                           => "=",
-      "<="                          => "<=",
-      Value_Type                    => BTree_Utils.Value_Type,
       Value_Context_Type            => BTree_Utils.Context_Type,
       Value_Size_Bound              => BTree_Utils.Value_Size_Bound,
       Read_Value                    => BTree_Utils.Read_Value,
       Skip_Value                    => BTree_Utils.Skip_Value,
       Write_Value                   => BTree_Utils.Write_Value,
       Is_Context_Free_Serialization => Is_Context_Free_Serialization,
-      Storage_Pool                  => Storage_Pool,
-      Block_IO                      => Block_IO);
+      Block_IO                      => Block_IO,
+      Storage_Pool                  => Storage_Pool);
 
    type Tree_Type is limited
       record

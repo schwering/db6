@@ -18,6 +18,16 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
    end "<";
 
 
+   function "<=" (Left, Right : String_Type) return Boolean is
+   begin
+      if Left.Length <= Right.Length then
+         return Left.Buffer(1..Left.Length) <= Right.Buffer(1..Left.Length);
+      else
+         return Left.Buffer(1..Right.Length) < Right.Buffer(1..Right.Length);
+      end if;
+   end "<=";
+
+
    function "=" (Left, Right : String_Type) return Boolean is
    begin
       return Left.Length = Right.Length and then

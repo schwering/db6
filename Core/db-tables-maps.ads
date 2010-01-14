@@ -342,14 +342,15 @@ private
 
    package BTrees is new Gen_BTrees
      (Key_Type           => Types.Keys.Key_Type,
+      Value_Type         => Types.Values.Bounded.String_Type,
+      "="                => Types.Keys."=",
+      "<="               => Types.Keys."<=",
+      Allow_Duplicates   => True,
       Key_Context_Type   => Types.Keys.Context_Type,
       Key_Size_Bound     => Types.Keys.Size_Bound,
       Read_Key           => Types.Keys.Read,
       Skip_Key           => Types.Keys.Skip,
       Write_Key          => Types.Keys.Write,
-      "="                => Types.Keys."=",
-      "<="               => Types.Keys."<=",
-      Value_Type         => Types.Values.Bounded.String_Type,
       Value_Context_Type => Bounded_Values_IO.Context_Type,
       Value_Size_Bound   => Bounded_Values_IO.Size_Bound,
       Read_Value         => Bounded_Values_IO.Read,
@@ -358,8 +359,8 @@ private
       Is_Context_Free_Serialization =>
               Types.Keys.Is_Context_Free_Serialization and
               Types.Values.Bounded.Uncompressed.Is_Context_Free_Serialization,
-      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
-      Block_IO           => Block_IO);
+      Block_IO           => Block_IO,
+      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object));
 
    package Blob_Trees is new Gen_Blob_Trees
      (Key_Type            => Types.Keys.Key_Type,

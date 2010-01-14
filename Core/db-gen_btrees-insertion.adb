@@ -67,11 +67,12 @@ package body Insertion is
                if Nodes.Is_Inner(N) then
                   I := Nodes.Degree(N);
                else
+                  if not Allow_Duplicates then
+                     State := Failure;
+                     return;
+                  end if;
                   I := Nodes.Degree(N) + 1;
                end if;
-            --elsif Key = Nodes.Key(N, I) then
-               --State := Failure;
-               --return;
             end if;
             exit when Nodes.Is_Leaf(N);
             N_A := Nodes.Child(N, I);

@@ -68,6 +68,13 @@ with DB.Locks.Mutexes;
 
 generic
    type Key_Type is private;
+   type Value_Type is private;
+
+   with function "=" (Left, Right : Key_Type) return Boolean is <>;
+   with function "<=" (Left, Right : Key_Type) return Boolean is <>;
+
+   Allow_Duplicates : in Boolean := False;
+
    type Key_Context_Type is limited private;
    with function Key_Size_Bound
           (Key : Key_Type)
@@ -87,10 +94,6 @@ generic
            Cursor  : in out IO.Blocks.Cursor_Type;
            Key     : in     Key_Type);
 
-   with function "=" (Left, Right : Key_Type) return Boolean is <>;
-   with function "<=" (Left, Right : Key_Type) return Boolean is <>;
-
-   type Value_Type is private;
    type Value_Context_Type is limited private;
    with function Value_Size_Bound
           (Value : Value_Type)
@@ -112,9 +115,9 @@ generic
 
    Is_Context_Free_Serialization : in Boolean;
 
-   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
-
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
+
+   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.Gen_BTrees is
    pragma Preelaborate;
    pragma Unreferenced (Skip_Value);
