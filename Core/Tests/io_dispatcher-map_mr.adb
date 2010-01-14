@@ -4,6 +4,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with IO_Dispatcher.Map_Types;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Jobs;
+with IO_Dispatcher.To_Strings;
 
 with DB.Gen_Map_Reduce;
 with DB.IO.Blocks;
@@ -25,8 +26,6 @@ procedure IO_Dispatcher.Map_MR is
 
    procedure Job
    is
-      use type Map_Types.Key_Type;
-      use type Map_Types.Value_Type;
       Lower       : constant Maps.Bound_Type
                   := Maps.Negative_Infinity_Bound(Map);
       Upper       : constant Maps.Bound_Type
@@ -44,13 +43,23 @@ procedure IO_Dispatcher.Map_MR is
       subtype In_Key_Type is Map_Types.Key_Type;
       subtype In_Value_Type is Map_Types.Value_Type;
 
+      package Intermediate_Keys renames DB.Types.Keys.Rows;
+      package Intermediate_Key_IO renames Intermediate_Keys.Uncompressed;
       package Intermediate_Values is new DB.Types.Gen_Numbers(Natural);
-      subtype Intermediate_Key_Type is Map_Types.Key_Type;
+      subtype Intermediate_Key_Type is Intermediate_Keys.String_Type;
       subtype Intermediate_Value_Type is Intermediate_Values.Number_Type;
 
+      package Out_Keys renames Intermediate_Keys;
       package Out_Values is new DB.Types.Gen_Numbers(Natural);
-      subtype Out_Key_Type is Map_Types.Key_Type;
+      subtype Out_Key_Type is Intermediate_Key_Type;
       subtype Out_Value_Type is Out_Values.Number_Type;
+
+      use type In_Key_Type;
+      use type In_Value_Type;
+      use type Intermediate_Key_Type;
+      use type Intermediate_Value_Type;
+      use type Out_Key_Type;
+      use type Out_Value_Type;
 
       procedure Input
         (Key     : out In_Key_Type;
@@ -75,7 +84,7 @@ procedure IO_Dispatcher.Map_MR is
       is
          pragma Unreferenced (Value);
       begin
-         Emit(Key, 1);
+         Emit(Key.Row, 1);
       exception
          when Error : others =>
             Put_Line("Exception: "& Exception_Message(Error));
@@ -119,8 +128,8 @@ procedure IO_Dispatcher.Map_MR is
          if Out_Initialized then
             if not (Last_Out_Key <= Key) then
                Put_Line("Wrong output order: "&
-                        Map_Types.To_String(Last_Out_Key) &
-                        Map_Types.To_String(Key));
+                        To_Strings.To_String(Last_Out_Key) &
+                        To_Strings.To_String(Key));
             end if;
             if Value /= Last_Out_Value then
                Put_Line("Differing output values:"&
@@ -145,15 +154,15 @@ procedure IO_Dispatcher.Map_MR is
          Input              => Input,
 
          Intermediate_Key_Type           => Intermediate_Key_Type,
-         Intermediate_Key_Context_Type   => DB.Types.Keys.Context_Type,
          Intermediate_Value_Type         => Intermediate_Value_Type,
+         "="                             => Intermediate_Keys."=",
+         "<="                            => Intermediate_Keys."<=",
+         Intermediate_Key_Context_Type   => Intermediate_Key_IO.Context_Type,
+         Intermediate_Key_Size_Bound     => Intermediate_Key_IO.Size_Bound,
+         Read_Intermediate_Key           => Intermediate_Key_IO.Read,
+         Skip_Intermediate_Key           => Intermediate_Key_IO.Skip,
+         Write_Intermediate_Key          => Intermediate_Key_IO.Write,
          Intermediate_Value_Context_Type => Intermediate_Values.Context_Type,
-         "="                             => Map_Types."=",
-         "<="                            => Map_Types."<=",
-         Intermediate_Key_Size_Bound     => DB.Types.Keys.Size_Bound,
-         Read_Intermediate_Key           => DB.Types.Keys.Read,
-         Skip_Intermediate_Key           => DB.Types.Keys.Skip,
-         Write_Intermediate_Key          => DB.Types.Keys.Write,
          Intermediate_Value_Size_Bound   => Intermediate_Values.Size_Bound,
          Read_Intermediate_Value         => Intermediate_Values.Read,
          Skip_Intermediate_Value         => Intermediate_Values.Skip,

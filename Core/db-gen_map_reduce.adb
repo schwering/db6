@@ -61,11 +61,10 @@ procedure DB.Gen_Map_Reduce is
             Value   : in Intermediate_Value_Type)
          is
             use type Intermediate_BTrees.State_Type;
-            Position : Intermediate_BTrees.Count_Type;
             State    : Intermediate_BTrees.State_Type;
          begin
             Intermediate_BTrees.Insert(Context.Intermediates, Key, Value,
-                                       Position, State);
+                                       State);
             if State /= Intermediate_BTrees.Success then
                raise Tree_Error;
             end if;

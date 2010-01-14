@@ -9,6 +9,8 @@ with IO_Dispatcher.Map_Types;
 
 with DB.IO.Blocks;
 with DB.Tables.Maps;
+with DB.Tables.Maps.Stats;
+with DB.Tables.Maps.Check;
 with DB.Types.Keys;
 with DB.Types.Strings.Bounded;
 with DB.Types.Values.Bounded;
@@ -45,18 +47,6 @@ procedure IO_Dispatcher.Map is
       null;
    end Check_Key_Value;
 
-   procedure Make_Stats
-     (Tree                   : in out DB.Tables.Maps.Map_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer) is null;
-   procedure Check (Tree : in out DB.Tables.Maps.Map_Type) is null;
-
    Null_Value : DB.Tables.Value_Type'Class := Map_Types.Null_Value;
 
    package Simple_Jobs is new Gen_Simple_Jobs
@@ -77,7 +67,7 @@ procedure IO_Dispatcher.Map is
       Get_Value       => Map_Types.Get_Value,
 
       Count_Type      => DB.Tables.Maps.Count_Type,
-      State_Type     => DB.Tables.Maps.State_Type,
+      State_Type      => DB.Tables.Maps.State_Type,
 
       Object          => Map,
       Null_Value      => Null_Value,
@@ -88,8 +78,8 @@ procedure IO_Dispatcher.Map is
       P_Delete        => DB.Tables.Maps.Delete,
       P_Look_Up       => DB.Tables.Maps.Look_Up,
       P_Count         => DB.Tables.Maps.Count,
-      P_Make_Stats    => Make_Stats,
-      P_Check         => Check);
+      P_Stats         => DB.Tables.Maps.Stats,
+      P_Check         => DB.Tables.Maps.Check);
 
 
    use type DB.Tables.Maps.State_Type;

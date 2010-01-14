@@ -17,16 +17,9 @@ package body Nodes is
    -- 2. If Is_Leaf(N): Degree(N) times Index_Type (end position of entry)
    --                   where an entry is either (Key, Child) or (Key, Value)
    -- 3. If Is_Leaf(N): Key1, Value1, ..., KeyDegree(N), ValueDegree(N)
-   --    Else:          Key1, Child_Type, ..., KeyDegree(N), Child_Type
+   --    Else:          Key1, Child_Addr, ..., KeyDegree(N), Child_Addr
    package Phys is
       pragma Elaborate_Body;
-
-      type Child_Type is
-         record
-            Address : Valid_Address_Type;
-            Count   : Count_Type;
-         end record;
-      pragma Pack (Child_Type);
 
       function Entry_Size
         (Block : IO.Blocks.Long_Block_Type;
@@ -109,7 +102,7 @@ package body Nodes is
         (Key_Context : in out Key_Context_Type;
          Block       : in     IO.Blocks.Long_Block_Type;
          Index       : in     Valid_Index_Type;
-         Child       :    out Child_Type;
+         Child       :    out Valid_Address_Type;
          Success     :    out Boolean);
 
       procedure Read_Value
@@ -125,7 +118,7 @@ package body Nodes is
          Block       : in     IO.Blocks.Long_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Key_Type;
-         Child       :    out Child_Type;
+         Child       :    out Valid_Address_Type;
          Success     :    out Boolean);
 
       procedure Read_Entry
@@ -142,7 +135,7 @@ package body Nodes is
          Block       : in out IO.Blocks.Long_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         : in     Key_Type;
-         Child       : in     Child_Type;
+         Child       : in     Valid_Address_Type;
          Success     :    out Boolean);
 
       procedure Write_Entry
@@ -158,7 +151,7 @@ package body Nodes is
         (Key_Context : in out Key_Context_Type;
          Block       : in out IO.Blocks.Long_Block_Type;
          Index       : in     Valid_Index_Type;
-         Child       : in     Child_Type;
+         Child       : in     Valid_Address_Type;
          Success     :    out Boolean);
 
       private
@@ -191,7 +184,7 @@ package body Nodes is
       function Size_Of is new IO.Blocks.Size_Of(Boolean);
       function Size_Of is new IO.Blocks.Size_Of(Address_Type);
       function Size_Of is new IO.Blocks.Size_Of(IO.Blocks.Position_Type);
-      function Size_Of is new IO.Blocks.Size_Of(Child_Type);
+      function Size_Of is new IO.Blocks.Size_Of(Valid_Address_Type);
 
       Size_Of_Degree    : constant IO.Blocks.Long_Position_Type :=
          IO.Blocks.Long_Position_Type(Size_Of(Degree_Type'(0)));
@@ -207,7 +200,8 @@ package body Nodes is
             (Size_Of(IO.Blocks.Position_Type'Last));
 
       Size_Of_Child     : constant IO.Blocks.Long_Position_Type :=
-         IO.Blocks.Long_Position_Type(Size_Of(Child_Type'(others => <>)));
+         IO.Blocks.Long_Position_Type(Size_Of(Valid_Address_Type
+            (Block_IO.First)));
 
       Size_Of_Meta_Data : constant IO.Blocks.Long_Position_Type :=
          Size_Of_Boolean + Size_Of_Degree +
@@ -655,11 +649,11 @@ package body Nodes is
         (Key_Context : in out Key_Context_Type;
          Block       : in     IO.Blocks.Long_Block_Type;
          Index       : in     Valid_Index_Type;
-         Child       :    out Child_Type;
+         Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
       is
          pragma Assert (not Is_Leaf(Block));
-         procedure Read_Child is new IO.Blocks.Read(Child_Type);
+         procedure Read_Child is new IO.Blocks.Read(Valid_Address_Type);
          Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          Success := IO.Blocks.Is_Valid(Cursor);
@@ -706,11 +700,11 @@ package body Nodes is
          Block       : in     IO.Blocks.Long_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Key_Type;
-         Child       :    out Child_Type;
+         Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
       is
          pragma Assert (not Is_Leaf(Block));
-         procedure Read_Child is new IO.Blocks.Read(Child_Type);
+         procedure Read_Child is new IO.Blocks.Read(Valid_Address_Type);
          Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          Success := IO.Blocks.Is_Valid(Cursor);
@@ -758,11 +752,11 @@ package body Nodes is
          Block       : in out IO.Blocks.Long_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         : in     Key_Type;
-         Child       : in     Child_Type;
+         Child       : in     Valid_Address_Type;
          Success     :    out Boolean)
       is
          pragma Assert (not Is_Leaf(Block));
-         procedure Write_Child is new IO.Blocks.Write(Child_Type);
+         procedure Write_Child is new IO.Blocks.Write(Valid_Address_Type);
          Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          Success := IO.Blocks.Is_Valid(Cursor);
@@ -840,11 +834,11 @@ package body Nodes is
         (Key_Context : in out Key_Context_Type;
          Block       : in out IO.Blocks.Long_Block_Type;
          Index       : in     Valid_Index_Type;
-         Child       : in     Child_Type;
+         Child       : in     Valid_Address_Type;
          Success     :    out Boolean)
       is
          pragma Assert (not Is_Leaf(Block));
-         procedure Write_Child is new IO.Blocks.Write(Child_Type);
+         procedure Write_Child is new IO.Blocks.Write(Valid_Address_Type);
          Cursor : IO.Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          Success := IO.Blocks.Is_Valid(Cursor);
@@ -1136,85 +1130,16 @@ package body Nodes is
       pragma Assert (Index in 1 .. Degree(Node));
 
       Key_Context : Key_Context_Type;
-      Child       : Phys.Child_Type;
+      Child       : Valid_Address_Type;
       Success     : Boolean;
    begin
       Phys.Read_Child(Key_Context, Node.Block, Index, Child, Success);
-      pragma Assert (Is_Valid(Child.Address));
+      pragma Assert (Is_Valid(Child));
       if not Success then
          raise Node_Error;
       end if;
-      return Child.Address;
+      return Child;
    end Child;
-
-
-   function Count
-     (Node  : Node_Type;
-      Index : Valid_Index_Type)
-      return Count_Type
-   is
-      pragma Assert (Node.Ok);
-      pragma Assert (not Is_Free(Node));
-      pragma Assert (Is_Inner(Node));
-      pragma Assert (Index in 1 .. Degree(Node));
-
-      Key_Context : Key_Context_Type;
-      Child       : Phys.Child_Type;
-      Success     : Boolean;
-   begin
-      Phys.Read_Child(Key_Context, Node.Block, Index, Child, Success);
-      pragma Assert (Is_Valid(Child.Address));
-      if not Success then
-         raise Node_Error;
-      end if;
-      return Child.Count;
-   end Count;
-
-
-   function Count_Sum
-     (Node : Node_Type)
-      return Count_Type
-   is
-      pragma Assert (Node.Ok);
-      pragma Assert (not Is_Free(Node));
-   begin
-      if Is_Inner(Node) then
-         declare
-            C : Count_Type := 0;
-         begin
-            for I in 1 .. Degree(Node) loop
-               C := C + Count(Node, I);
-            end loop;
-            return C;
-         end;
-      else
-         return Count_Type(Degree(Node));
-      end if;
-   end Count_Sum;
-
-
-   function Count_Sum
-     (Node     : Node_Type;
-      To_Index : Index_Type)
-      return Count_Type
-   is
-      pragma Assert (Node.Ok);
-      pragma Assert (not Is_Free(Node));
-      pragma Assert (To_Index <= Degree(Node) + 1);
-   begin
-      if Is_Inner(Node) then
-         declare
-            C : Count_Type := 0;
-         begin
-            for I in 1 .. To_Index loop
-               C := C + Count(Node, I);
-            end loop;
-            return C;
-         end;
-      else
-         return Count_Type(To_Index);
-      end if;
-   end Count_Sum;
 
 
    function Value
@@ -1296,32 +1221,6 @@ package body Nodes is
       return Index_Type
    renames Key_Position_Binary;
    pragma Unreferenced (Key_Position_Linear);
-
-
-   function Count_Position
-     (Node      : Node_Type;
-      Count_Sum : Count_Type)
-      return Index_Type
-   is
-      pragma Assert (Node.Ok);
-      pragma Assert (not Is_Free(Node));
-   begin
-      if Is_Inner(Node) then
-         declare
-            Sum : Count_Type := 0;
-         begin
-            for I in 1 .. Degree(Node) loop
-               Sum := Sum + Count(Node, I);
-               if Count_Sum <= Sum then
-                  return I;
-               end if;
-            end loop;
-            return Invalid_Index;
-         end;
-      else
-         return Index_Type(Count_Sum);
-      end if;
-   end Count_Position;
 
 
    function Child_Position
@@ -1431,60 +1330,23 @@ package body Nodes is
    end Is_Valid;
 
 
-   procedure Set_Count
+   procedure Set_Child
      (Node  : in out Node_Type;
       Index : in     Valid_Index_Type;
-      Count : in     Count_Type)
-   is
-      pragma Assert (Node.Ok);
-      pragma Assert (not Is_Free(Node));
-      pragma Assert (Index in 1 .. Degree(Node));
-
-      Old_Child_Addr : constant Valid_Address_Type := Nodes.Child(Node, Index);
-      Child : Phys.Child_Type;
-   begin
-      declare
-         Key_Context : Key_Context_Type;
-         Success     : Boolean;
-      begin
-         Phys.Read_Child(Key_Context, Node.Block, Index, Child, Success);
-         pragma Assert (Is_Valid(Child.Address));
-         if not Success then
-            raise Node_Error;
-         end if;
-      end;
-      Child.Count := Count;
-      declare
-         Key_Context : Key_Context_Type;
-      begin
-         Phys.Write_Child(Key_Context, Node.Block, Index, Child, Node.Ok);
-         if not Node.Ok then
-            raise Node_Error;
-         end if;
-      end;
-      pragma Assert (Old_Child_Addr = Nodes.Child(Node, Index));
-   end Set_Count;
-
-
-   procedure Set_Child_And_Count
-     (Node  : in out Node_Type;
-      Index : in     Valid_Index_Type;
-      Child : in     Valid_Address_Type;
-      Count : in     Count_Type)
+      Child : in     Valid_Address_Type)
    is
       pragma Assert (Node.Ok);
       pragma Assert (not Is_Free(Node));
       pragma Assert (Index in 1 .. Degree(Node));
       pragma Assert (Is_Valid(Child));
 
-      C           : constant Phys.Child_Type := Phys.Child_Type'(Child, Count);
       Key_Context : Key_Context_Type;
    begin
-      Phys.Write_Child(Key_Context, Node.Block, Index, C, Node.Ok);
+      Phys.Write_Child(Key_Context, Node.Block, Index, Child, Node.Ok);
       if not Node.Ok then
          raise Node_Error;
       end if;
-   end Set_Child_And_Count;
+   end Set_Child;
 
 
    procedure Copy_Entry
@@ -1502,7 +1364,7 @@ package body Nodes is
       New_Index : constant Valid_Index_Type
                 := Valid_Index_Type(Integer(Index) + Shift_By);
       Key       : Key_Type;
-      Child     : Phys.Child_Type;
+      Child     : Valid_Address_Type;
       Success   : Boolean;
    begin
       Phys.Read_Entry(Key_Read_Context, Source.Block, Index, Key, Child,
@@ -1510,7 +1372,7 @@ package body Nodes is
       if not Success then
          raise Node_Error;
       end if;
-      pragma Assert (Is_Valid(Child.Address));
+      pragma Assert (Is_Valid(Child));
       Phys.Write_Entry(Key_Write_Context, Node.Block, New_Index, Key, Child,
                        Node.Ok);
    end Copy_Entry;
@@ -1550,8 +1412,7 @@ package body Nodes is
      (Node  : Node_Type;
       Index : Valid_Index_Type;
       Key   : Key_Type;
-      Child : Valid_Address_Type;
-      Count : Count_Type)
+      Child : Valid_Address_Type)
       return Node_Type
    is
       pragma Assert (Node.Ok);
@@ -1575,8 +1436,7 @@ package body Nodes is
          end if;
       end loop;
 
-      Phys.Write_Entry(Key_Write_Context, N.Block, Index, Key,
-                       Phys.Child_Type'(Child, Count), N.Ok);
+      Phys.Write_Entry(Key_Write_Context, N.Block, Index, Key, Child, N.Ok);
       if not N.Ok then
          return N;
       end if;
@@ -1643,8 +1503,7 @@ package body Nodes is
      (Node  : Node_Type;
       Index : Valid_Index_Type;
       Key   : Key_Type;
-      Child : Valid_Address_Type;
-      Count : Count_Type)
+      Child : Valid_Address_Type)
       return Node_Type
    is
       pragma Assert (Node.Ok);
@@ -1669,8 +1528,7 @@ package body Nodes is
          end if;
       end loop;
 
-      Phys.Write_Entry(Key_Write_Context, N.Block, Index, Key,
-                       Phys.Child_Type'(Child, Count), N.Ok);
+      Phys.Write_Entry(Key_Write_Context, N.Block, Index, Key, Child, N.Ok);
       if not N.Ok then
          return N;
       end if;

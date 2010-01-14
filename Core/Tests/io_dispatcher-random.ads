@@ -1,8 +1,27 @@
+with DB.IO.Blocks;
 with DB.BTrees;
 with DB.Types.Keys;
 
 private
 package IO_Dispatcher.Random is
+
+   Block_Size : constant := DB.IO.Blocks.Block_Size;
+   Max_Key_Size : constant := (Block_Size - 16) * 1/4 - 2 - 4 - 4
+   --                                       ^M     ^B  ^P  ^VL ^VB
+                                ;--+ 1; -- to enforce heaped map
+   Max_Value_Size : constant := 4 + 4;
+   --                           ^VL ^VB
+
+   Max_String_Length : constant := Max_Key_Size - 4 - 8;
+   --                                             ^KL ^KT
+
+   -- M = Meta_Data_Size
+   -- B = BTree Req. (1): entries <= 1/4*Block_Size
+   -- P = Long_Position_Type for inner nodes
+   -- KL = Value_Length_Size for key
+   -- KT = Timestamp_Size (part of Key_Type)
+   -- VL = Value_Length_Size for value
+   -- VB = Value_Buffer_Size for value
 
    package Keys    renames DB.BTrees.Keys;
    package Rows    renames DB.BTrees.Keys.Rows;

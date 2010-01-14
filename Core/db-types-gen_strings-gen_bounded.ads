@@ -21,6 +21,7 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
    function "<" (Left, Right : String_Type) return Boolean;
    function "=" (Left, Right : String_Type) return Boolean;
+   function "<=" (Left, Right : String_Type) return Boolean;
    function "&" (Left, Right : String_Type) return String_Type;
    function "&"
      (Left  : String_Type;
@@ -57,6 +58,15 @@ package DB.Types.Gen_Strings.Gen_Bounded is
    function To_Buffer
      (S : String_Type)
       return Indefinite_Buffer_Type;
+
+   function Short_Bound
+     (Left  : String_Type)
+      return String_Type;
+
+   function Short_Delimiter
+     (Left  : String_Type;
+      Right : String_Type)
+      return String_Type;
 
 
    package Uncompressed is

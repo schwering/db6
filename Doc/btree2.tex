@@ -1,27 +1,45 @@
-\documentclass{vldb}
-\usepackage{graphicx}
+% vim:foldmethod=marker:tabstop=4:shiftwidth=4
+\documentclass[a4paper, 8pt]{scrartcl}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{amsthm,amsmath,amssymb}
+\usepackage{typearea}
+\usepackage{multicol}
+\usepackage{natbib}
+\usepackage{times}
 
-\newdef{defi}{Definition}
-\newdef{proc}{Procedure}
-\newdef{rem}{Remark}
-\newtheorem{thm}{Theorem}
+
+\setlength{\columnsep}{9mm}
+%\setlength{\columnseprule}{.1pt}
+\areaset{0.8\paperwidth}{0.8\paperheight}
+
+\theoremstyle{plain}
+
+\theoremstyle{definition}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{algo}[thm]{Algorithm}
+\newtheorem{proc}[thm]{Procedure}
+\newtheorem{defi}[thm]{Definition}
+\newtheorem{notation}[thm]{Notation}
+
+\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remark}
 
 \newcommand \Beff { B_{\text{eff}} }
 
-\begin{document}
+\newcommand \sfrac[2] { {}^{#1}\!\!\!\diagup\!\!_{#2} }
 
-\title{Space-Efficient Bounded-Entry B\textsuperscript{+}-Tree}
-\subtitle{[Extended Abstract]}
+% don't hyphenate so much - default = 200, max (never hyphenate) = 10,000
+%\hyphenpenalty=10000
 
-\numberofauthors{1} %  in this sample file, there are a *total*
-\author{
-\alignauthor
-Christoph Schwering\\
-   \affaddr{Hainbuchenstr. 6}\\
-   \affaddr{52074 Aachen, Germany}\\
-   \email{schwering@gmail.com}
-}
+\title{Space-Efficient B\textsuperscript{+}-Tree for Bounded-Length Entries}
+\author{Christoph Schwering\\{schwering@gmail.com}}
 \date{15 October 2008}
+
+
+\begin{document}
 
 
 \maketitle
@@ -47,6 +65,9 @@ published.
 The reason for this probably is that it is trivial for smart people, but sadly
 it's not for me.
 \end{abstract}
+
+
+\begin{multicols}{2}
 
 
 \section{Definition} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -503,7 +524,11 @@ Obviously, the described B-tree is only suitable for cases in
 which much more searches than insertion or deletions occur.
 
 
+
+%\nocite{*}
 \bibliographystyle{abbrv}
 \bibliography{btree}
+\end{multicols}
 
 \end{document}
+

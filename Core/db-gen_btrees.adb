@@ -24,7 +24,6 @@ package body DB.Gen_BTrees is
         (Tree     : in out Tree_Type;
          Key      : in     Key_Type;
          Value    :    out Value_Type;
-         Position :    out Count_Type;
          State    :    out State_Type);
 
       procedure Look_Up
@@ -32,29 +31,12 @@ package body DB.Gen_BTrees is
          Transaction : in out Transaction_Type'Class;
          Key         : in     Key_Type;
          Value       :    out Value_Type;
-         Position    :    out Count_Type;
-         State       :    out State_Type);
-
-      procedure Look_Up
-        (Tree     : in out Tree_Type;
-         Position : in     Count_Type;
-         Value    :    out Value_Type;
-         Key      :    out Key_Type;
-         State    :    out State_Type);
-
-      procedure Look_Up
-        (Tree        : in out Tree_Type;
-         Transaction : in out Transaction_Type'Class;
-         Position    : in     Count_Type;
-         Value       :    out Value_Type;
-         Key         :    out Key_Type;
          State       :    out State_Type);
 
       procedure Minimum
         (Tree     : in out Tree_Type;
          Key      :    out Key_Type;
          Value    :    out Value_Type;
-         Position :    out Count_Type;
          State    :    out State_Type);
 
       procedure Minimum
@@ -62,14 +44,12 @@ package body DB.Gen_BTrees is
          Transaction : in out Transaction_Type'Class;
          Key         :    out Key_Type;
          Value       :    out Value_Type;
-         Position    :    out Count_Type;
          State       :    out State_Type);
 
       procedure Maximum
         (Tree     : in out Tree_Type;
          Key      :    out Key_Type;
          Value    :    out Value_Type;
-         Position :    out Count_Type;
          State    :    out State_Type);
 
       procedure Maximum
@@ -77,7 +57,6 @@ package body DB.Gen_BTrees is
          Transaction : in out Transaction_Type'Class;
          Key         :    out Key_Type;
          Value       :    out Value_Type;
-         Position    :    out Count_Type;
          State       :    out State_Type);
    end Search;
 
@@ -87,7 +66,6 @@ package body DB.Gen_BTrees is
         (Tree     : in out Tree_Type;
          Key      : in     Key_Type;
          Value    : in     Value_Type;
-         Position :    out Count_Type;
          State    :    out State_Type);
 
       procedure Insert
@@ -95,7 +73,6 @@ package body DB.Gen_BTrees is
          Transaction : in out RW_Transaction_Type'Class;
          Key         : in     Key_Type;
          Value       : in     Value_Type;
-         Position    :    out Count_Type;
          State       :    out State_Type);
 
       procedure Handle_Overflow
@@ -112,7 +89,6 @@ package body DB.Gen_BTrees is
         (Tree     : in out Tree_Type;
          Key      : in     Key_Type;
          Value    :    out Value_Type;
-         Position :    out Count_Type;
          State    :    out State_Type);
 
       procedure Delete
@@ -120,22 +96,6 @@ package body DB.Gen_BTrees is
          Transaction : in out RW_Transaction_Type'Class;
          Key         : in     Key_Type;
          Value       :    out Value_Type;
-         Position    :    out Count_Type;
-         State       :    out State_Type);
-
-      procedure Delete
-        (Tree     : in out Tree_Type;
-         Position : in     Count_Type;
-         Value    :    out Value_Type;
-         Key      :    out Key_Type;
-         State    :    out State_Type);
-
-      procedure Delete
-        (Tree        : in out Tree_Type;
-         Transaction : in out RW_Transaction_Type'Class;
-         Position    : in     Count_Type;
-         Value       :    out Value_Type;
-         Key         :    out Key_Type;
          State       :    out State_Type);
 
       procedure Handle_Underflow
@@ -200,7 +160,6 @@ package body DB.Gen_BTrees is
          Cursor      : in out Cursor_Type;
          Key         :    out Key_Type;
          Value       :    out Value_Type;
-         Position    :    out Count_Type;
          State       :    out State_Type);
 
       procedure Delete
@@ -209,7 +168,6 @@ package body DB.Gen_BTrees is
          Cursor      : in out Cursor_Type;
          Key         :    out Key_Type;
          Value       :    out Value_Type;
-         Position    :    out Count_Type;
          State       :    out State_Type);
    end Cursors;
 
@@ -322,12 +280,10 @@ package body DB.Gen_BTrees is
             declare
                P   : Nodes.Node_Type;
                I   : Nodes.Index_Type;
-               Cnt : Count_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(P_A), P);
-               I   := Nodes.Child_Position(P, Old_N_A);
-               Cnt := Nodes.Count(P, I);
-               Nodes.Set_Child_And_Count(P, I, New_N_A, Cnt);
+               I := Nodes.Child_Position(P, Old_N_A);
+               Nodes.Set_Child(P, I, New_N_A);
                Write_Node(Tree, T, Nodes.To_Valid_Address(P_A), P);
             end;
          end if;
@@ -716,29 +672,23 @@ package body DB.Gen_BTrees is
       if Nodes.Is_Valid(Nodes.Parent(N)) then
          declare
             use type Nodes.Degree_Type;
-            use type Count_Type;
-            P_A       : constant Nodes.Valid_Address_Type
-                      := Nodes.Valid_Parent(N);
-            P         : Nodes.Node_Type;
-            I         : Nodes.Valid_Index_Type;
-            Old_Key   : Key_Type;
-            New_Key   : Key_Type;
-            Old_Count : Count_Type;
-            New_Count : Count_Type;
-            New_P     : Nodes.Node_Type;
+            P_A     : constant Nodes.Valid_Address_Type
+                    := Nodes.Valid_Parent(N);
+            P       : Nodes.Node_Type;
+            I       : Nodes.Valid_Index_Type;
+            Old_Key : Key_Type;
+            New_Key : Key_Type;
+            New_P   : Nodes.Node_Type;
          begin
             Read_Node(Tree, T, P_A, P);
             I := Nodes.Child_Position(P, N_A);
             Old_Key := Nodes.Key(P, I);
             New_Key := Nodes.Key(N, Nodes.Degree(N));
-            Old_Count := Nodes.Count(P, I);
-            New_Count := Nodes.Count_Sum(N);
-            New_P := Nodes.Substitution(P, I, New_Key, N_A, New_Count);
+            New_P := Nodes.Substitution(P, I, New_Key, N_A);
             case Nodes.Validation(New_P) is
                when Nodes.Valid =>
                   Write_Node(Tree, T, P_A, New_P);
-                  if (I = Nodes.Degree(New_P) and Old_Key /= New_Key) or
-                     Old_Count /= New_Count then
+                  if I = Nodes.Degree(New_P) and Old_Key /= New_Key then
                      Synchronize_With_Parent(Tree, T, P_A, New_P, State);
                   end if;
                when Nodes.Too_Small =>
@@ -868,7 +818,6 @@ package body DB.Gen_BTrees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type)
    renames Search.Look_Up;
 
@@ -878,26 +827,6 @@ package body DB.Gen_BTrees is
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
-      State       :    out State_Type)
-   renames Search.Look_Up;
-
-
-   procedure Look_Up
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type)
-   renames Search.Look_Up;
-
-
-   procedure Look_Up
-     (Tree        : in out Tree_Type;
-      Transaction : in out Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
       State       :    out State_Type)
    renames Search.Look_Up;
 
@@ -906,7 +835,6 @@ package body DB.Gen_BTrees is
      (Tree     : in out Tree_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type)
    renames Search.Minimum;
 
@@ -916,7 +844,6 @@ package body DB.Gen_BTrees is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    renames Search.Minimum;
 
@@ -925,7 +852,6 @@ package body DB.Gen_BTrees is
      (Tree     : in out Tree_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type)
    renames Search.Maximum;
 
@@ -935,7 +861,6 @@ package body DB.Gen_BTrees is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    renames Search.Maximum;
 
@@ -944,7 +869,6 @@ package body DB.Gen_BTrees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    : in     Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type)
    renames Insertion.Insert;
 
@@ -954,7 +878,6 @@ package body DB.Gen_BTrees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    renames Insertion.Insert;
 
@@ -963,7 +886,6 @@ package body DB.Gen_BTrees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type)
    renames Deletion.Delete;
 
@@ -973,26 +895,6 @@ package body DB.Gen_BTrees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
-      State       :    out State_Type)
-   renames Deletion.Delete;
-
-
-   procedure Delete
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type)
-   renames Deletion.Delete;
-
-
-   procedure Delete
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
       State       :    out State_Type)
    renames Deletion.Delete;
 
@@ -1067,7 +969,6 @@ package body DB.Gen_BTrees is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    renames Cursors.Delete;
 
@@ -1078,7 +979,6 @@ package body DB.Gen_BTrees is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    renames Cursors.Delete;
 

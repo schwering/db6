@@ -54,6 +54,20 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
    end "<";
 
 
+   function "<=" (Left, Right : String_Type) return Boolean is
+   begin
+      if Left.S = null and Right.S = null then
+         return True;
+      elsif Left.S = null then
+         return True;
+      elsif Right.S = null then
+         return False;
+      else
+         return Left.S.Buffer <= Right.S.Buffer;
+      end if;
+   end "<=";
+
+
    function "=" (Left, Right : String_Type) return Boolean is
    begin
       if Left.S = Right.S then

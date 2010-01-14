@@ -20,16 +20,7 @@ with Ada.Unchecked_Conversion;
 
 package body IO_Dispatcher.Random is
 
-   Mutex             : DB.Locks.Mutexes.Mutex_Type;
-   Max_String_Length : constant := 1020 - 2 - 4 - 8 - 4 - 4
-   --                               ^M    ^P  ^L1 ^T  ^L2 ^V
-                                ;--+ 1; -- to enforce heaped map
-   -- M = (4096 - Meta_Data_Size) * 1 / 4
-   -- P = Long_Position_Type for inner nodes
-   -- T = Timestamp_Size (part of Key_Type)
-   -- L = Value_Length_Size for (1) key and (2) value
-   -- V = Value_Buffer_Size for value
-
+   Mutex : DB.Locks.Mutexes.Mutex_Type;
 
    generic
       with package Strings is new DB.Types.Gen_Strings(Char_Type);

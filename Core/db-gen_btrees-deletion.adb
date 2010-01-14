@@ -11,14 +11,13 @@ package body Deletion is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       Transaction : RW_Transaction_Type := New_RW_Transaction(Tree);
    begin
       Start_Transaction(Tree, Transaction);
-      Delete(Tree, Transaction, Key, Value, Position, State);
+      Delete(Tree, Transaction, Key, Value, State);
       if State = Success then
          Commit_Transaction(Tree, Transaction);
       else
@@ -36,7 +35,6 @@ package body Deletion is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
@@ -49,8 +47,7 @@ package body Deletion is
       State := Success;
 
       -- Search leaf, fill Buffer. Correctly initialize N_A and I.
-      N_A      := Transaction.Current_Root_Address;
-      Position := 0;
+      N_A := Transaction.Current_Root_Address;
       loop
          declare
             use type Nodes.Degree_Type;
@@ -63,12 +60,8 @@ package body Deletion is
                State := Failure;
                return;
             end if;
-            if Nodes.Is_Leaf(N) then
-               Position := Position + Nodes.Count_Sum(N, I);
-               exit;
-            end if;
-            Position := Position + Nodes.Count_Sum(N, I-1);
-            N_A      := Nodes.Child(N, I);
+            exit when Nodes.Is_Leaf(N);
+            N_A := Nodes.Child(N, I);
          end;
       end loop;
 
@@ -80,90 +73,6 @@ package body Deletion is
       begin
          Read_Node(Tree, Transaction, N_A, N_Old);
          N_New := Nodes.Deletion(N_Old, I);
-         Value := Nodes.Value(N_Old, I);
-         Handle_Underflow(Tree, Transaction, N_A, N_New, State);
-      end;
-
-   exception
-      when others =>
-         pragma Warnings (Off);
-         State := Error;
-         pragma Warnings (On);
-         raise;
-   end Delete;
-
-
-   procedure Delete
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type)
-   is
-      pragma Assert (Tree.Initialized);
-      Transaction : RW_Transaction_Type := New_RW_Transaction(Tree);
-   begin
-      Start_Transaction(Tree, Transaction);
-      Delete(Tree, Transaction, Position, Value, Key, State);
-      if State = Success then
-         Commit_Transaction(Tree, Transaction);
-      else
-         Abort_Transaction(Tree, Transaction);
-      end if;
-   exception
-      when others =>
-         Abort_Transaction(Tree, Transaction);
-         raise;
-   end Delete;
-
-
-   procedure Delete
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
-      State       :    out State_Type)
-   is
-      pragma Assert (Tree.Initialized);
-      pragma Assert (Transaction.Initialized);
-      pragma Assert (Transaction.Owning_Tree = Tree.Self);
-      pragma Assert (Transaction.Started);
-      N_A : Nodes.Valid_Address_Type;
-      I   : Nodes.Index_Type;
-      Pos : Count_Type;
-   begin
-      State := Success;
-
-      -- Search leaf, fill Buffer. Correctly initialize N_A and I.
-      N_A := Transaction.Current_Root_Address;
-      Pos := Position;
-      loop
-         declare
-            use type Nodes.Degree_Type;
-            N : Nodes.Node_Type;
-         begin
-            Read_Node(Tree, Transaction, N_A, N);
-            I := Nodes.Count_Position(N, Pos);
-            if not Nodes.Is_Valid(I) then
-               State := Failure;
-               return;
-            end if;
-            exit when Nodes.Is_Leaf(N);
-            Pos := Pos - Nodes.Count_Sum(N, I-1);
-            N_A := Nodes.Child(N, I);
-         end;
-      end loop;
-
-      -- Delete in memory and dispatch to add the node.
-      declare
-         use type Nodes.Degree_Type;
-         N_Old : Nodes.Node_Type;
-         N_New : Nodes.Node_Type;
-      begin
-         Read_Node(Tree, Transaction, N_A, N_Old);
-         N_New := Nodes.Deletion(N_Old, I);
-         Key   := Nodes.Key(N_Old, I);
          Value := Nodes.Value(N_Old, I);
          Handle_Underflow(Tree, Transaction, N_A, N_New, State);
       end;

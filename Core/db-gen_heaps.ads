@@ -74,9 +74,9 @@ generic
           (ID : String)
            return String;
 
-   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
-
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
+
+   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.Gen_Heaps is
    pragma Elaborate_Body;
 
@@ -304,22 +304,23 @@ private
 
    package Info_BTrees is new Gen_BTrees
      (Key_Type                      => Info_BTree_Types.Key_Type,
+      Value_Type                    => Info_BTree_Types.Value_Type,
+      "="                           => Info_BTree_Types."=",
+      "<="                          => Info_BTree_Types."<=",
+      Allow_Duplicates              => False,
       Key_Context_Type              => Info_BTree_Types.Key_Context_Type,
       Key_Size_Bound                => Info_BTree_Types.Key_Size_Bound,
       Write_Key                     => Info_BTree_Types.Write_Key,
       Read_Key                      => Info_BTree_Types.Read_Key,
       Skip_Key                      => Info_BTree_Types.Skip_Key,
-      "="                           => Info_BTree_Types."=",
-      "<="                          => Info_BTree_Types."<=",
-      Value_Type                    => Info_BTree_Types.Value_Type,
       Value_Context_Type            => Info_BTree_Types.Value_Context_Type,
       Value_Size_Bound              => Info_BTree_Types.Value_Size_Bound,
       Write_Value                   => Info_BTree_Types.Write_Value,
       Read_Value                    => Info_BTree_Types.Read_Value,
       Skip_Value                    => Info_BTree_Types.Skip_Value,
       Is_Context_Free_Serialization => True,
-      Storage_Pool                  => Storage_Pool,
-      Block_IO                      => Block_IO);
+      Block_IO                      => Block_IO,
+      Storage_Pool                  => Storage_Pool);
 
 
    package Free_BTree_Types is
@@ -384,22 +385,23 @@ private
 
    package Free_BTrees is new Gen_BTrees
      (Key_Type                      => Free_BTree_Types.Key_Type,
+      Value_Type                    => Free_BTree_Types.Value_Type,
+      "="                           => Free_BTree_Types."=",
+      "<="                          => Free_BTree_Types."<=",
+      Allow_Duplicates              => False,
       Key_Context_Type              => Free_BTree_Types.Key_Context_Type,
       Key_Size_Bound                => Free_BTree_Types.Key_Size_Bound,
       Write_Key                     => Free_BTree_Types.Write_Key,
       Read_Key                      => Free_BTree_Types.Read_Key,
       Skip_Key                      => Free_BTree_Types.Skip_Key,
-      "="                           => Free_BTree_Types."=",
-      "<="                          => Free_BTree_Types."<=",
-      Value_Type                    => Free_BTree_Types.Value_Type,
       Value_Context_Type            => Free_BTree_Types.Value_Context_Type,
       Value_Size_Bound              => Free_BTree_Types.Value_Size_Bound,
       Write_Value                   => Free_BTree_Types.Write_Value,
       Read_Value                    => Free_BTree_Types.Read_Value,
       Skip_Value                    => Free_BTree_Types.Skip_Value,
       Is_Context_Free_Serialization => True,
-      Storage_Pool                  => Storage_Pool,
-      Block_IO                      => Block_IO);
+      Block_IO                      => Block_IO,
+      Storage_Pool                  => Storage_Pool);
 
 
    type Heap_Ref_Type is access all Heap_Type;

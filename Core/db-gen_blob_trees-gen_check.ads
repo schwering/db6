@@ -1,6 +1,6 @@
 -- Abstract:
 --
--- Checks a map's BTree for consistency.
+-- Checks a Blob-Tree for consistency.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 

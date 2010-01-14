@@ -146,7 +146,7 @@ procedure IO_Dispatcher.Gen_BTrees is
       Check_Key_Value => Check_Key_Value,
 
       Count_Type      => BTrees.Count_Type,
-      State_Type     => BTrees.State_Type,
+      State_Type      => BTrees.State_Type,
 
       Object          => Tree,
       Null_Value      => Null_Value,
@@ -157,7 +157,7 @@ procedure IO_Dispatcher.Gen_BTrees is
       P_Delete        => BTrees.Delete,
       P_Look_Up       => BTrees.Look_Up,
       P_Count         => BTrees.Count,
-      P_Make_Stats    => Stats,
+      P_Stats         => Stats,
       P_Check         => Check);
 
 

@@ -30,24 +30,21 @@ generic
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    : in     Value_Type;
-           Position :    out Count_Type;
            State    :    out State_Type);
    with procedure P_Delete
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    :    out Value_Type;
-           Position :    out Count_Type;
            State    :    out State_Type);
    with procedure P_Look_Up
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    :    out Value_Type;
-           Position :    out Count_Type;
            State    :    out State_Type);
    with procedure P_Count
           (Object : in out Object_Type;
            Count  :    out Count_Type);
-   with procedure P_Make_Stats
+   with procedure P_Stats
           (Object                 : in out Object_Type;
            Height                 :    out Natural;
            Blocks                 :    out Natural;
@@ -68,7 +65,7 @@ package IO_Dispatcher.Gen_Simple_Jobs is
    procedure Search;
    procedure Antisearch;
    procedure Count;
-   procedure Make_Stats;
+   procedure Stats;
    procedure Check;
 
    Job_Map : constant Jobs.Map_Type;
@@ -82,7 +79,7 @@ private
    Search_Access     : Short_Job_Type := Search'Access;
    Antisearch_Access : Short_Job_Type := Antisearch'Access;
    Count_Access      : Short_Job_Type := Count'Access;
-   Make_Stats_Access : Short_Job_Type := Make_Stats'Access;
+   Stats_Access      : Short_Job_Type := Stats'Access;
    Check_Access      : Short_Job_Type := Check'Access;
 
    function Convert is new Ada.Unchecked_Conversion
@@ -94,7 +91,7 @@ private
                (Jobs.To_Description("Search"),     Convert(Search_Access)),
                (Jobs.To_Description("Antisearch"), Convert(Antisearch_Access)),
                (Jobs.To_Description("Count"),      Convert(Count_Access)),
-               (Jobs.To_Description("Make_Stats"), Convert(Make_Stats_Access)),
+               (Jobs.To_Description("Stats"),      Convert(Stats_Access)),
                (Jobs.To_Description("Check"),      Convert(Check_Access)));
 
 end IO_Dispatcher.Gen_Simple_Jobs;

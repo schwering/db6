@@ -52,6 +52,15 @@ package DB.Types.Keys is
       Block   : in     IO.Blocks.Base_Block_Type;
       Cursor  : in out IO.Blocks.Cursor_Type);
 
+   function Short_Bound
+     (Left  : Key_Type)
+      return Key_Type;
+
+   function Short_Delimiter
+     (Left  : Key_Type;
+      Right : Key_Type)
+      return Key_Type;
+
 private
    package Row_Serialization renames Rows.Uncompressed;
    package Column_Serialization renames Columns.Uncompressed;

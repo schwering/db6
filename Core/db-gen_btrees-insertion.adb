@@ -11,14 +11,13 @@ package body Insertion is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    : in     Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       Transaction : RW_Transaction_Type := New_RW_Transaction(Tree);
    begin
       Start_Transaction(Tree, Transaction);
-      Insert(Tree, Transaction, Key, Value, Position, State);
+      Insert(Tree, Transaction, Key, Value, State);
       if State = Success then
          Commit_Transaction(Tree, Transaction);
       else
@@ -36,7 +35,6 @@ package body Insertion is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type)
    is
       use type IO.Blocks.Size_Type;
@@ -50,15 +48,13 @@ package body Insertion is
       N_A : Nodes.Valid_Address_Type;
       I   : Nodes.Index_Type;
    begin
-      Position := 0;
       if Key_Size_Bound(Key) > Max_Key_Size(Value_Size_Bound(Value)) then
          State := Failure;
          return;
       end if;
 
       -- Search leaf, fill buffer. Correctly initialize N_A and I to the leaf
-      -- node address and the position at which the (Key, Value) should be
-      -- inserted.
+      -- node address at which the (Key, Value) should be inserted.
       N_A := Transaction.Current_Root_Address;
       loop
          declare
@@ -71,18 +67,15 @@ package body Insertion is
                if Nodes.Is_Inner(N) then
                   I := Nodes.Degree(N);
                else
+                  if not Allow_Duplicates then
+                     State := Failure;
+                     return;
+                  end if;
                   I := Nodes.Degree(N) + 1;
                end if;
-            --elsif Key = Nodes.Key(N, I) then
-               --State := Failure;
-               --return;
             end if;
-            if Nodes.Is_Leaf(N) then
-               Position := Position + Nodes.Count_Sum(N, I);
-               exit;
-            end if;
-            Position := Position + Nodes.Count_Sum(N, I-1);
-            N_A      := Nodes.Child(N, I);
+            exit when Nodes.Is_Leaf(N);
+            N_A := Nodes.Child(N, I);
          end;
       end loop;
 
@@ -228,13 +221,10 @@ package body Insertion is
                                     Node  => Nodes.Root_Node(Is_Leaf => False),
                                     Index => 1,
                                     Key   => Nodes.Key(L, Nodes.Degree(L)),
-                                    Child => L_A,
-                                    Count => Nodes.Count_Sum(L)
-                                 ),
+                                    Child => L_A),
                         Index => 2,
                         Key   => Nodes.Key(R, Nodes.Degree(R)),
-                        Child => R_A,
-                        Count => Nodes.Count_Sum(R));
+                        Child => R_A);
             begin -- Insert_Into_New_Root
                if Nodes.Is_Valid(Root) then
                   Write_Node(Tree, T, T.Current_Root_Address, Root);
@@ -258,18 +248,15 @@ package body Insertion is
             P_Old : Nodes.Node_Type;
             Key   : Key_Type;
             I     : Nodes.Index_Type;
-            Cnt   : Count_Type;
             P_New : Nodes.Node_Type;
          begin -- Insert_Into_Parent
             Read_Node(Tree, T, P_A, P_Old);
             Key   := Nodes.Key(L, Nodes.Degree(L));
             I     := Nodes.Child_Position(P_Old, R_A);
-            Cnt   := Nodes.Count_Sum(L);
             P_New := Nodes.Insertion(Node  => P_Old,
                                      Index => I,
                                      Key   => Key,
-                                     Child => L_A,
-                                     Count => Cnt);
+                                     Child => L_A);
             Handle_Overflow(Tree, T, P_A, P_New, State);
          end Insert_Into_Parent;
 

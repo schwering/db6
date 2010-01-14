@@ -20,6 +20,13 @@ with DB.IO.Blocks.Gen_IO;
 
 generic
    type Key_Type is private;
+   type Value_Type is private;
+
+   with function "=" (Left, Right : Key_Type) return Boolean is <>;
+   with function "<=" (Left, Right : Key_Type) return Boolean is <>;
+
+   Allow_Duplicates : in Boolean := False;
+
    type Key_Context_Type is limited private;
    with function Key_Size_Bound
           (Key : Key_Type)
@@ -39,10 +46,6 @@ generic
            Cursor  : in out IO.Blocks.Cursor_Type;
            Key     : in     Key_Type);
 
-   with function "=" (Left, Right : Key_Type) return Boolean is <>;
-   with function "<=" (Left, Right : Key_Type) return Boolean is <>;
-
-   type Value_Type is private;
 
    type Value_Context_Type is private;
    with function Value_Size_Bound
@@ -97,9 +100,9 @@ generic
 
    Is_Context_Free_Serialization : in Boolean;
 
-   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
-
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
+
+   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.Gen_Blob_Trees is
    pragma Elaborate_Body;
 
@@ -165,13 +168,11 @@ package DB.Gen_Blob_Trees is
    -- Core operations: Look_Up, Insertion, Deletion.
 
    type State_Type is (Success, Failure, Error);
-   type Count_Type is new Natural;
 
    procedure Look_Up
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
@@ -183,37 +184,14 @@ package DB.Gen_Blob_Trees is
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
 
-   procedure Look_Up
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-   -- Searches the Position-th Key / Value pair or sets State = Failure if
-   -- no such key exists.
-   -- This procedure acquires a read-lock and might therefore block due to
-   -- uncommitted transactions.
-
-   procedure Look_Up
-     (Tree        : in out Tree_Type;
-      Transaction : in out Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
-      State       :    out State_Type);
-   -- Searches the Position-th Key / Value pair or sets State = Failure if
-   -- no such key exists.
-
    procedure Minimum
      (Tree     : in out Tree_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -225,7 +203,6 @@ package DB.Gen_Blob_Trees is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -234,7 +211,6 @@ package DB.Gen_Blob_Trees is
      (Tree     : in out Tree_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -246,7 +222,6 @@ package DB.Gen_Blob_Trees is
       Transaction : in out Transaction_Type'Class;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -255,7 +230,6 @@ package DB.Gen_Blob_Trees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    : in     Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -267,7 +241,6 @@ package DB.Gen_Blob_Trees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -276,7 +249,6 @@ package DB.Gen_Blob_Trees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    : in     Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Appends the Value as part to the value stored under Key as long as this
    -- value is stored indirectly, i.e. in the heap. In all other cases,
@@ -288,7 +260,6 @@ package DB.Gen_Blob_Trees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       : in     Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Appends the Value as part to the value stored under Key as long as this
    -- value is stored indirectly, i.e. in the heap. In all other cases,
@@ -299,7 +270,6 @@ package DB.Gen_Blob_Trees is
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
-      Position :    out Count_Type;
       State    :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
@@ -311,36 +281,15 @@ package DB.Gen_Blob_Trees is
       Transaction : in out RW_Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
-
-   procedure Delete
-     (Tree     : in out Tree_Type;
-      Position : in     Count_Type;
-      Value    :    out Value_Type;
-      Key      :    out Key_Type;
-      State    :    out State_Type);
-   -- Deletes the Position-th Key / Value pair or sets State = Failure if no
-   -- such key exists.
-   -- This procedure starts and commits a new transaction and might therefore
-   -- block.
-
-   procedure Delete
-     (Tree        : in out Tree_Type;
-      Transaction : in out RW_Transaction_Type'Class;
-      Position    : in     Count_Type;
-      Value       :    out Value_Type;
-      Key         :    out Key_Type;
-      State       :    out State_Type);
-   -- Deletes the Position-th Key / Value pair or sets State = Failure if no
-   -- such key exists.
 
    ----------
    -- Miscellaneous information procedures.
 
    subtype Height_Type is Positive;
+   subtype Count_Type is Natural;
 
    procedure Count
      (Tree  : in out Tree_Type;
@@ -471,7 +420,6 @@ package DB.Gen_Blob_Trees is
       Cursor      : in out Cursor_Type;
       Key         :    out Key_Type;
       Value       :    out Value_Type;
-      Position    :    out Count_Type;
       State       :    out State_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it
@@ -552,22 +500,23 @@ private
 
    package BTrees is new Gen_BTrees
      (Key_Type                      => Key_Type,
+      Value_Type                    => BTree_Utils.Value_Type,
+      "="                           => "=",
+      "<="                          => "<=",
+      Allow_Duplicates              => Allow_Duplicates,
       Key_Context_Type              => Key_Context_Type,
       Key_Size_Bound                => Key_Size_Bound,
       Read_Key                      => Read_Key,
       Skip_Key                      => Skip_Key,
       Write_Key                     => Write_Key,
-      "="                           => "=",
-      "<="                          => "<=",
-      Value_Type                    => BTree_Utils.Value_Type,
       Value_Context_Type            => BTree_Utils.Context_Type,
       Value_Size_Bound              => BTree_Utils.Value_Size_Bound,
       Read_Value                    => BTree_Utils.Read_Value,
       Skip_Value                    => BTree_Utils.Skip_Value,
       Write_Value                   => BTree_Utils.Write_Value,
       Is_Context_Free_Serialization => Is_Context_Free_Serialization,
-      Storage_Pool                  => Storage_Pool,
-      Block_IO                      => Block_IO);
+      Block_IO                      => Block_IO,
+      Storage_Pool                  => Storage_Pool);
 
    type Tree_Type is limited
       record
