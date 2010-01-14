@@ -36,7 +36,7 @@ private
    protected type Queue_Type is 
       entry Enqueue (Item : in Item_Type);
 
-      entry Dequeue (Success : in out Boolean; Item : out Item_Type);
+      entry Dequeue (Success : out Boolean; Item : out Item_Type);
 
       procedure Mark_Final;
       pragma Inline (Mark_Final);

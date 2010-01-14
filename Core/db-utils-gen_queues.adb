@@ -24,8 +24,8 @@ package body DB.Utils.Gen_Queues is
 
    procedure Dequeue 
      (Q       : in out Queue_Type;
-      Success : out Boolean;
-      Item    : out Item_Type) is
+      Success :    out Boolean;
+      Item    :    out Item_Type) is
    begin
       Q.Dequeue(Success, Item);
    end Dequeue;
@@ -62,7 +62,7 @@ package body DB.Utils.Gen_Queues is
          Tail      := Succ(Tail);
       end Enqueue;
 
-      entry Dequeue (Success : in out Boolean; Item : out Item_Type)
+      entry Dequeue (Success : out Boolean; Item : out Item_Type)
          when Final or not Is_Empty is
       begin
          if not Is_Empty then
