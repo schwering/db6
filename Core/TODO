@@ -1,14 +1,37 @@
-Upcoming: MapReduce
-
-
-Fahrplan:
-
-* Map-Reduce
-  * erstmal nur auf einzelnen Column-Families, also B-Trees, ausfuehrbar
-  * spaeter: Column-Families joinen (sehr wichtig, z. B. wegen Blob-Trees)
-  * Garantie: die Attribute einer ID werden direkt nacheinander reduced
-
 * Management-Schicht
+  * Jede Column-Family c wird von einem regulaeren Ausdruck r beschuetzt
+  * Operationen:
+    * Selektion nach Rowkey (sind Bereichsanfragen der Keys)
+    * Filter Existenz von Attributen
+      jeweils mit eigener Funktion, die z. B. einen Regex matcht
+      Anmerkung 1: Existenz von Attribut heiszt so viel wie: Wert /= NULL
+      Anmerkung 2: Attributfilter schmeiszen Attribute raus
+    * Inner/Left-Outer/Right-Outer/Outer-Join-on-Attribute
+    * Inner/Left-Outer/Right-Outer/Outer-Join-on-Rowkey
+      (den Outer-Join zweier Column-Families nennen wir auch Merge)
+      Vorschlag: alle Outer-Join verbieten, da es sich sowieso um eine
+                 duenn-besetzte Tabelle handelt; es wuerde zwar Sinn machen,
+                 durch Inner-Join oder Left/Right-Outer-Join zu filtern, wenn
+                 der Benutzer weisz, dass jeder Datensatz in einer Column Family
+                 ein bestimmtes Attribut hat
+    * Projektion auf Attributteilmenge A
+      Anmerkung: (1) Ein Datensatz muss nicht Werte zu allen a in A haben, weil
+      die Tabelle duenn-besetzt ist. (2) Ein Datensatz kann Attribute b not in A
+      haben, weil der regulaere Ausdruck auf mehr Attribute matchen kann.
+      Um ungewollte Attribute zu filtern, muss ein Attributfilter angewendet
+      werden (siehe oben).
+  * Optimizer: Query in Baumdarstellung, Blaetter ^= unten ^= erst auswerten
+    Umgekehrte Reihenfolge der Operationen:
+    * Attribut-Joins
+    * Rowkey-Joins
+    * Attributfilter
+    * mergelose Selektion auf Column Families (Cursor)
+    * Projektion (Auswahl der Column Families)
+  * bei Projektion auf Attributmenge A koennen die benoetigten ColFams aus wie
+    der Menge der ColFams C folgt ausgesucht werden:
+    * f.a. c in A: S_c := { a in A : a matches r_c }  =>   S_c Teilmenge von A
+    * suche Set Cover {S_c1, ..., S_cN} von A
+    * dann muessen 
   * Column-Families mit Attribut-Pattern-Matching (= vert. Part.)
   * hier auch direkt Intervalle festlegen?        (= horiz. Part.)
 
