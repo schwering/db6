@@ -1,6 +1,6 @@
 #!/bin/sh
 IO=map
-BIN=bin/debug/./ttree
+BIN=bin/release/./ttree
 FILE=`cat .temp_path`btree
 C1=10k 
 # 1. Simple insertions and check

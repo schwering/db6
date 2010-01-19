@@ -19,14 +19,14 @@ package body DB.Gen_BTrees is
    end Initialization;
 
 
-   package Search is
-      procedure Look_Up
+   package Retrieval is
+      procedure Retrieve
         (Tree     : in out Tree_Type;
          Key      : in     Key_Type;
          Value    :    out Value_Type;
          State    :    out State_Type);
 
-      procedure Look_Up
+      procedure Retrieve
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Key         : in     Key_Type;
@@ -58,7 +58,7 @@ package body DB.Gen_BTrees is
          Key         :    out Key_Type;
          Value       :    out Value_Type;
          State       :    out State_Type);
-   end Search;
+   end Retrieval;
 
 
    package Insertion is
@@ -195,6 +195,28 @@ package body DB.Gen_BTrees is
         (Tree  : in out Tree_Type;
          State :    out State_Type);
    end Misc;
+
+
+   function "<="
+     (Left, Right : Key_Type)
+      return Boolean
+   is
+      use type Utils.Comparison_Result_Type;
+      C : constant Utils.Comparison_Result_Type := Compare(Left, Right);
+   begin
+      return C = Utils.Less or C = Utils.Equal;
+   end "<=";
+
+
+   function "="
+     (Left, Right : Key_Type)
+      return Boolean
+   is
+      use type Utils.Comparison_Result_Type;
+      C : constant Utils.Comparison_Result_Type := Compare(Left, Right);
+   begin
+      return C = Utils.Equal;
+   end "=";
 
 
    procedure Read_Node
@@ -814,21 +836,21 @@ package body DB.Gen_BTrees is
    renames Nodes.Max_Key_Size;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       State    :    out State_Type)
-   renames Search.Look_Up;
+   renames Retrieval.Retrieve;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       State       :    out State_Type)
-   renames Search.Look_Up;
+   renames Retrieval.Retrieve;
 
 
    procedure Minimum
@@ -836,7 +858,7 @@ package body DB.Gen_BTrees is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       State    :    out State_Type)
-   renames Search.Minimum;
+   renames Retrieval.Minimum;
 
 
    procedure Minimum
@@ -845,7 +867,7 @@ package body DB.Gen_BTrees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       State       :    out State_Type)
-   renames Search.Minimum;
+   renames Retrieval.Minimum;
 
 
    procedure Maximum
@@ -853,7 +875,7 @@ package body DB.Gen_BTrees is
       Key      :    out Key_Type;
       Value    :    out Value_Type;
       State    :    out State_Type)
-   renames Search.Maximum;
+   renames Retrieval.Maximum;
 
 
    procedure Maximum
@@ -862,7 +884,7 @@ package body DB.Gen_BTrees is
       Key         :    out Key_Type;
       Value       :    out Value_Type;
       State       :    out State_Type)
-   renames Search.Maximum;
+   renames Retrieval.Maximum;
 
 
    procedure Insert
@@ -1017,7 +1039,7 @@ package body DB.Gen_BTrees is
 
    package body Nodes is separate;
    package body Initialization is separate;
-   package body Search is separate;
+   package body Retrieval is separate;
    package body Insertion is separate;
    package body Deletion is separate;
    package body Cursors is separate;

@@ -212,7 +212,7 @@ package body DB.Tables.Maps is
    end To_State;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Map      : in out Map_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type'Class;
@@ -223,7 +223,7 @@ package body DB.Tables.Maps is
             S : BTrees.State_Type;
             V : Types.Values.Bounded.String_Type;
          begin
-            BTrees.Look_Up(Map.Short_Tree, Key, V, S);
+            BTrees.Retrieve(Map.Short_Tree, Key, V, S);
             State := To_State(S);
             if State = Success then
                Value := From_Bounded(V);
@@ -234,17 +234,17 @@ package body DB.Tables.Maps is
             S : Blob_Trees.State_Type;
             V : Types.Values.Unbounded.String_Type;
          begin
-            Blob_Trees.Look_Up(Map.Long_Tree, Key, V, S);
+            Blob_Trees.Retrieve(Map.Long_Tree, Key, V, S);
             State := To_State(S);
             if State = Success then
                Value := From_Unbounded(V);
             end if;
          end;
       end if;
-   end Look_Up;
+   end Retrieve;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
@@ -262,13 +262,15 @@ package body DB.Tables.Maps is
             V : Types.Values.Bounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
-               BTrees.Look_Up(Map.Short_Tree,
-                             RO_Transaction_Type(Transaction).Short_Transaction,
-                             Key, V, S);
+               BTrees.Retrieve
+                 (Map.Short_Tree,
+                  RO_Transaction_Type(Transaction).Short_Transaction,
+                  Key, V, S);
             else
-               BTrees.Look_Up(Map.Short_Tree,
-                             RW_Transaction_Type(Transaction).Short_Transaction,
-                             Key, V, S);
+               BTrees.Retrieve
+                 (Map.Short_Tree,
+                  RW_Transaction_Type(Transaction).Short_Transaction,
+                  Key, V, S);
             end if;
             State := To_State(S);
             if State = Success then
@@ -281,13 +283,15 @@ package body DB.Tables.Maps is
             V : Types.Values.Unbounded.String_Type;
          begin
             if Transaction in RO_Transaction_Type'Class then
-               Blob_Trees.Look_Up(Map.Long_Tree,
-                             RO_Transaction_Type(Transaction).Long_Transaction,
-                             Key, V, S);
+               Blob_Trees.Retrieve
+                 (Map.Long_Tree,
+                  RO_Transaction_Type(Transaction).Long_Transaction,
+                  Key, V, S);
             else
-               Blob_Trees.Look_Up(Map.Long_Tree,
-                             RW_Transaction_Type(Transaction).Long_Transaction,
-                             Key, V, S);
+               Blob_Trees.Retrieve
+                 (Map.Long_Tree,
+                  RW_Transaction_Type(Transaction).Long_Transaction,
+                  Key, V, S);
             end if;
             State := To_State(S);
             if State = Success then
@@ -295,7 +299,7 @@ package body DB.Tables.Maps is
             end if;
          end;
       end if;
-   end Look_Up;
+   end Retrieve;
 
 
    procedure Minimum

@@ -179,7 +179,7 @@ is
       Pos    : BTrees.Count_Type;
       State  : BTrees.State_Type;
    begin
-      BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
+      BTrees.Retrieve(Tree, KV.Key, Val, Pos, State);
       if State /= BTrees.Success or else KV.Value /= Val then
          Put_Line("Look up failed "& BTrees.State_Type'Image(State));
       end if;
@@ -196,7 +196,7 @@ is
       Pos    : BTrees.Count_Type;
       State  : BTrees.State_Type;
    begin
-      BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
+      BTrees.Retrieve(Tree, KV.Key, Val, Pos, State);
       if State /= BTrees.Failure then
          Put_Line("Look up failed");
       end if;
@@ -284,7 +284,7 @@ is
                BTrees.Unpause(Tree, Trans, Cursor);
 
                Put_Line("Lookup");
-               BTrees.Look_Up(Tree, Trans, Key, Value, Pos, State);
+               BTrees.Retrieve(Tree, Trans, Key, Value, Pos, State);
                case State is
                   when BTrees.Success =>
                      null;--Put_Line("S   Success"& Natural'Image(I));

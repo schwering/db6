@@ -155,7 +155,7 @@ procedure IO_Dispatcher.Gen_BTrees is
 
       P_Insert        => BTrees.Insert,
       P_Delete        => BTrees.Delete,
-      P_Look_Up       => BTrees.Look_Up,
+      P_Retrieve       => BTrees.Retrieve,
       P_Count         => BTrees.Count,
       P_Stats         => Stats,
       P_Check         => Check);

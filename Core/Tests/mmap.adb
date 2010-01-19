@@ -192,7 +192,7 @@ is
 
       P_Insert        => DB.Tables.Maps.Insert,
       P_Delete        => DB.Tables.Maps.Delete,
-      P_Look_Up       => DB.Tables.Maps.Look_Up,
+      P_Retrieve       => DB.Tables.Maps.Retrieve,
       P_Count         => DB.Tables.Maps.Count,
       P_Make_Stats    => Make_Stats,
       P_Check         => Check);

@@ -155,8 +155,7 @@ procedure IO_Dispatcher.Map_MR is
 
          Intermediate_Key_Type           => Intermediate_Key_Type,
          Intermediate_Value_Type         => Intermediate_Value_Type,
-         "="                             => Intermediate_Keys."=",
-         "<="                            => Intermediate_Keys."<=",
+         Compare_Intermediate_Key        => Intermediate_Keys.Compare,
          Intermediate_Key_Context_Type   => Intermediate_Key_IO.Context_Type,
          Intermediate_Key_Size_Bound     => Intermediate_Key_IO.Size_Bound,
          Read_Intermediate_Key           => Intermediate_Key_IO.Read,

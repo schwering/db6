@@ -5,6 +5,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.IO.Blocks;
+with DB.Utils;
 
 generic
    type P_Number_Type is (<>);
@@ -16,6 +17,10 @@ package DB.Types.Gen_Numbers is
    type Context_Type is private;
 
    Is_Context_Free_Serialization : constant Boolean := True;
+
+   function Compare
+     (Left, Right : Number_Type)
+      return Utils.Comparison_Result_Type;
 
    function Size_Bound
      (Number : Number_Type)

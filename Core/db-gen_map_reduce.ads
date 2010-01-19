@@ -34,6 +34,7 @@ with System.Storage_Pools;
 
 with DB.IO.Blocks;
 with DB.IO.Blocks.Gen_IO;
+with DB.Utils;
 
 generic
    type In_Key_Type is private;
@@ -44,12 +45,12 @@ generic
            Success : out Boolean);
 
    type Intermediate_Key_Type is private;
-   type Intermediate_Key_Context_Type is limited private;
    type Intermediate_Value_Type is private;
-   type Intermediate_Value_Context_Type is limited private;
-   with function "=" (Left, Right : Intermediate_Key_Type) return Boolean is <>;
-   with function "<=" (Left, Right : Intermediate_Key_Type)
-           return Boolean is <>;
+   with function Compare_Intermediate_Key
+          (Left, Right : Intermediate_Key_Type)
+           return Utils.Comparison_Result_Type is <>;
+
+   type Intermediate_Key_Context_Type is limited private;
    with function Intermediate_Key_Size_Bound
           (Key : Intermediate_Key_Type)
            return IO.Blocks.Size_Type;
@@ -67,6 +68,8 @@ generic
            Block   : in out IO.Blocks.Base_Block_Type;
            Cursor  : in out IO.Blocks.Cursor_Type;
            Key     : in     Intermediate_Key_Type);
+
+   type Intermediate_Value_Context_Type is limited private;
    with function Intermediate_Value_Size_Bound
           (Value : Intermediate_Value_Type)
            return IO.Blocks.Size_Type;

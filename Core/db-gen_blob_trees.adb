@@ -276,7 +276,7 @@ package body DB.Gen_Blob_Trees is
    end To_State;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
@@ -286,7 +286,7 @@ package body DB.Gen_Blob_Trees is
       B_State : BTrees.State_Type;
       H_State : Heaps.State_Type;
    begin
-      BTrees.Look_Up(Tree.BTree, Key, B_Value, B_State);
+      BTrees.Retrieve(Tree.BTree, Key, B_Value, B_State);
       State := To_State(B_State);
       if State = Success then
          if B_Value.Direct then
@@ -296,10 +296,10 @@ package body DB.Gen_Blob_Trees is
             State := To_State(H_State);
          end if;
       end if;
-   end Look_Up;
+   end Retrieve;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
@@ -311,13 +311,13 @@ package body DB.Gen_Blob_Trees is
       H_State : Heaps.State_Type;
    begin
       if Transaction in RO_Transaction_Type'Class then
-         BTrees.Look_Up(Tree.BTree,
-                        RO_Transaction_Type(Transaction).BTree_Transaction,
-                        Key, B_Value, B_State);
+         BTrees.Retrieve(Tree.BTree,
+                         RO_Transaction_Type(Transaction).BTree_Transaction,
+                         Key, B_Value, B_State);
       else
-         BTrees.Look_Up(Tree.BTree,
-                        RW_Transaction_Type(Transaction).BTree_Transaction,
-                        Key, B_Value, B_State);
+         BTrees.Retrieve(Tree.BTree,
+                         RW_Transaction_Type(Transaction).BTree_Transaction,
+                         Key, B_Value, B_State);
       end if;
       State := To_State(B_State);
       if State = Success then
@@ -336,7 +336,7 @@ package body DB.Gen_Blob_Trees is
             State := To_State(H_State);
          end if;
       end if;
-   end Look_Up;
+   end Retrieve;
 
 
    procedure Minimum
@@ -537,7 +537,7 @@ package body DB.Gen_Blob_Trees is
       B_Value : BTree_Utils.Value_Type;
       B_State : BTrees.State_Type;
    begin
-      BTrees.Look_Up(Tree.BTree, Key, B_Value, B_State);
+      BTrees.Retrieve(Tree.BTree, Key, B_Value, B_State);
       State := To_State(B_State);
       if State = Success then
          if B_Value.Direct then
@@ -564,8 +564,8 @@ package body DB.Gen_Blob_Trees is
       B_Value : BTree_Utils.Value_Type;
       B_State : BTrees.State_Type;
    begin
-      BTrees.Look_Up(Tree.BTree, Transaction.BTree_Transaction,
-                     Key, B_Value, B_State);
+      BTrees.Retrieve(Tree.BTree, Transaction.BTree_Transaction,
+                      Key, B_Value, B_State);
       State := To_State(B_State);
       if State = Success then
          if B_Value.Direct then

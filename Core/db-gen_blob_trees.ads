@@ -17,13 +17,15 @@ with DB.Gen_BTrees;
 with DB.Gen_Heaps;
 with DB.IO.Blocks;
 with DB.IO.Blocks.Gen_IO;
+with DB.Utils;
 
 generic
    type Key_Type is private;
    type Value_Type is private;
 
-   with function "=" (Left, Right : Key_Type) return Boolean is <>;
-   with function "<=" (Left, Right : Key_Type) return Boolean is <>;
+   with function Compare
+          (Left, Right : Key_Type)
+           return Utils.Comparison_Result_Type;
 
    Allow_Duplicates : in Boolean := False;
 
@@ -165,11 +167,11 @@ package DB.Gen_Blob_Trees is
       Transaction : in out RW_Transaction_Type);
 
    ----------
-   -- Core operations: Look_Up, Insertion, Deletion.
+   -- Core operations: Retrieve, Insertion, Deletion.
 
    type State_Type is (Success, Failure, Error);
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
@@ -179,7 +181,7 @@ package DB.Gen_Blob_Trees is
    -- This procedure acquires a read-lock and might therefore block due to
    -- uncommitted transactions.
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
@@ -501,8 +503,7 @@ private
    package BTrees is new Gen_BTrees
      (Key_Type                      => Key_Type,
       Value_Type                    => BTree_Utils.Value_Type,
-      "="                           => "=",
-      "<="                          => "<=",
+      Compare                       => Compare,
       Allow_Duplicates              => Allow_Duplicates,
       Key_Context_Type              => Key_Context_Type,
       Key_Size_Bound                => Key_Size_Bound,

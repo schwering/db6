@@ -32,6 +32,7 @@ with DB.Gen_BTrees;
 with DB.IO.Blocks;
 with DB.IO.Blocks.Gen_Buffers;
 with DB.IO.Blocks.Gen_IO;
+with DB.Utils;
 
 generic
    type Item_Type is private;
@@ -257,7 +258,10 @@ private
 
       function "=" (A, B : Key_Type) return Boolean;
       function "<=" (A, B : Key_Type) return Boolean;
+      function Compare (A, B : Key_Type) return Utils.Comparison_Result_Type;
+      pragma Inline ("=");
       pragma Inline ("<=");
+      pragma Inline (Compare);
 
       function Key_Size_Bound
         (Key : Key_Type)
@@ -305,8 +309,7 @@ private
    package Info_BTrees is new Gen_BTrees
      (Key_Type                      => Info_BTree_Types.Key_Type,
       Value_Type                    => Info_BTree_Types.Value_Type,
-      "="                           => Info_BTree_Types."=",
-      "<="                          => Info_BTree_Types."<=",
+      Compare                       => Info_BTree_Types.Compare,
       Allow_Duplicates              => False,
       Key_Context_Type              => Info_BTree_Types.Key_Context_Type,
       Key_Size_Bound                => Info_BTree_Types.Key_Size_Bound,
@@ -336,8 +339,10 @@ private
       type Value_Context_Type is null record;
 
       function "=" (A, B : Key_Type) return Boolean;
-      pragma Inline ("=");
       function "<=" (A, B : Key_Type) return Boolean;
+      function Compare (A, B : Key_Type) return Utils.Comparison_Result_Type;
+      pragma Inline ("=");
+      pragma Inline ("<=");
       pragma Inline ("<=");
 
       function Key_Size_Bound
@@ -386,8 +391,7 @@ private
    package Free_BTrees is new Gen_BTrees
      (Key_Type                      => Free_BTree_Types.Key_Type,
       Value_Type                    => Free_BTree_Types.Value_Type,
-      "="                           => Free_BTree_Types."=",
-      "<="                          => Free_BTree_Types."<=",
+      Compare                       => Free_BTree_Types.Compare,
       Allow_Duplicates              => False,
       Key_Context_Type              => Free_BTree_Types.Key_Context_Type,
       Key_Size_Bound                => Free_BTree_Types.Key_Size_Bound,

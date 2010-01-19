@@ -190,18 +190,19 @@ package body Cursors is
       return Boolean
    is
       pragma Inline (Key_Matches);
+      use type Utils.Comparison_Result_Type;
    begin
       case Comparison is
          when Less =>
-            return not (Right <= Left);
+            return Compare(Left, Right) = Utils.Less;
          when Less_Or_Equal =>
-            return Left <= Right;
+            return Compare(Left, Right) /= Utils.Greater;
          when Equal =>
-            return Left = Right;
+            return Compare(Left, Right) = Utils.Equal;
          when Greater_Or_Equal =>
-            return Right <= Left;
+            return Compare(Left, Right) /= Utils.Less;
          when Greater =>
-            return not (Left <= Right);
+            return Compare(Left, Right) = Utils.Greater;
       end case;
    end Key_Matches;
 
@@ -382,7 +383,7 @@ package body Cursors is
       end Move_To_Next;
 
 
-      procedure Look_Up_Node
+      procedure Retrieve_Node
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Key         : in     Key_Type;
@@ -426,10 +427,10 @@ package body Cursors is
             State := Error;
             pragma Warnings (On);
             raise;
-      end Look_Up_Node;
+      end Retrieve_Node;
 
 
-      procedure Look_Up_Minimum_Node
+      procedure Retrieve_Minimum_Node
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Node        :    out Nodes.Node_Type;
@@ -467,10 +468,10 @@ package body Cursors is
             State := Error;
             pragma Warnings (On);
             raise;
-      end Look_Up_Minimum_Node;
+      end Retrieve_Minimum_Node;
 
 
-      procedure Look_Up_Maximum_Node
+      procedure Retrieve_Maximum_Node
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Node        :    out Nodes.Node_Type;
@@ -508,7 +509,7 @@ package body Cursors is
             State := Error;
             pragma Warnings (On);
             raise;
-      end Look_Up_Maximum_Node;
+      end Retrieve_Maximum_Node;
 
 
       procedure Recalibrate
@@ -525,7 +526,7 @@ package body Cursors is
          declare
             Key : constant Key_Type := Nodes.Key(Cursor.Node, Cursor.Index);
          begin
-            Look_Up_Node(Tree, Transaction, Key, Cursor.Node, Cursor.Index,
+            Retrieve_Node(Tree, Transaction, Key, Cursor.Node, Cursor.Index,
                          State);
             if State /= Success then
                Cursor.Final := True;
@@ -568,45 +569,45 @@ package body Cursors is
       end Recalibrate;
 
 
-      procedure Look_Up_Abstract_From_Bound
+      procedure Retrieve_Abstract_From_Bound
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
          State       :    out State_Type)
       is
-         pragma Inline (Look_Up_Abstract_From_Bound);
+         pragma Inline (Retrieve_Abstract_From_Bound);
          pragma Assert (not Cursor.Has_Node);
       begin
          case From_Bound(Cursor).Location is
             when Negative_Infinity =>
-               Look_Up_Minimum_Node(Tree, Transaction, Cursor.Node,
+               Retrieve_Minimum_Node(Tree, Transaction, Cursor.Node,
                                     Cursor.Index, State);
                if State /= Success then
                   Cursor.Final := True;
                   return;
                end if;
             when Positive_Infinity =>
-               Look_Up_Maximum_Node(Tree, Transaction, Cursor.Node,
+               Retrieve_Maximum_Node(Tree, Transaction, Cursor.Node,
                                     Cursor.Index, State);
                if State /= Success then
                   Cursor.Final := True;
                   return;
                end if;
          end case;
-      end Look_Up_Abstract_From_Bound;
+      end Retrieve_Abstract_From_Bound;
 
 
-      procedure Look_Up_Concrete_From_Bound
+      procedure Retrieve_Concrete_From_Bound
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Cursor      : in out Cursor_Type;
          State       :    out State_Type)
       is
-         pragma Inline (Look_Up_Concrete_From_Bound);
+         pragma Inline (Retrieve_Concrete_From_Bound);
          pragma Assert (not Cursor.Has_Node);
          FB : constant Bound_Type := From_Bound(Cursor);
       begin
-         Look_Up_Node(Tree, Transaction, FB.Key, Cursor.Node, Cursor.Index,
+         Retrieve_Node(Tree, Transaction, FB.Key, Cursor.Node, Cursor.Index,
                       State);
          if State /= Success then
             Cursor.Final := True;
@@ -673,7 +674,7 @@ package body Cursors is
                      null;
                end case;
          end case;
-      end Look_Up_Concrete_From_Bound;
+      end Retrieve_Concrete_From_Bound;
 
 
       procedure Initialize_Output_If_Successful_And_Bounds_Satisfied
@@ -713,9 +714,9 @@ package body Cursors is
       if not Cursor.Has_Node then
          case From_Bound(Cursor).Kind is
             when Concrete_Bound =>
-               Look_Up_Concrete_From_Bound(Tree, Transaction, Cursor, State);
+               Retrieve_Concrete_From_Bound(Tree, Transaction, Cursor, State);
             when Abstract_Bound =>
-               Look_Up_Abstract_From_Bound(Tree, Transaction, Cursor, State);
+               Retrieve_Abstract_From_Bound(Tree, Transaction, Cursor, State);
          end case;
          Cursor.Has_Node := (State = Success);
       elsif Cursor.Force_Recalibrate then

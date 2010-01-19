@@ -53,7 +53,7 @@ is
             Pos   : BTrees.Count_Type;
             State : BTrees.State_Type;
          begin
-            BTrees.Look_Up(Tree, KV.Key, Val, Pos, State);
+            BTrees.Retrieve(Tree, KV.Key, Val, Pos, State);
             --if State /= BTrees.Success then
                --Put_Line(S &" "& BTrees.State_Type'Image(State));
             --end if;

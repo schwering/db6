@@ -11,6 +11,7 @@ with IO_Dispatcher.Map_MR;
 with DB.BTrees;
 with DB.Blob_Trees;
 
+with DB.Utils.Timers;
 with DB.Utils.Traceback;
 
 package body IO_Dispatcher
@@ -63,44 +64,45 @@ is
       use DB.BTrees;
       use DB.Blob_Trees;
 
-      procedure Async_BTree    is new Gen_BTrees(Async_BTrees, Check, Stats);
-      procedure CFS_BTree      is new Gen_BTrees(CFS_BTrees, Check, Stats);
-      procedure Cmp_Mem_BTree  is new Gen_BTrees(Cmp_Mem_BTrees, Check, Stats);
-      procedure Device_BTree   is new Gen_BTrees(Device_BTrees, Check, Stats);
-      procedure Direct_BTree   is new Gen_BTrees(Direct_BTrees, Check, Stats);
-      procedure File_BTree     is new Gen_BTrees(File_BTrees, Check, Stats);
-      procedure File_SL_BTree  is new Gen_BTrees(File_SL_BTrees, Check, Stats);
-      procedure Memory_BTree   is new Gen_BTrees(Memory_BTrees, Check, Stats);
+      --procedure Async_BTree    is new Gen_BTrees(Async_BTrees, Check, Stats);
+      --procedure CFS_BTree      is new Gen_BTrees(CFS_BTrees, Check, Stats);
+      --procedure Cmp_Mem_BTree  is new Gen_BTrees(Cmp_Mem_BTrees, Check, Stats);
+      --procedure Device_BTree   is new Gen_BTrees(Device_BTrees, Check, Stats);
+      --procedure Direct_BTree   is new Gen_BTrees(Direct_BTrees, Check, Stats);
+      --procedure File_BTree     is new Gen_BTrees(File_BTrees, Check, Stats);
+      --procedure File_SL_BTree  is new Gen_BTrees(File_SL_BTrees, Check, Stats);
+      --procedure Memory_BTree   is new Gen_BTrees(Memory_BTrees, Check, Stats);
 
-      procedure Async_Blob    is new Gen_Blob_Trees(Async_Blob_Trees, Check);
-      procedure CFS_Blob      is new Gen_Blob_Trees(CFS_Blob_Trees, Check);
-      procedure Cmp_Mem_Blob  is new Gen_Blob_Trees(Cmp_Mem_Blob_Trees, Check);
-      procedure Device_Blob   is new Gen_Blob_Trees(Device_Blob_Trees, Check);
-      procedure Direct_Blob   is new Gen_Blob_Trees(Direct_Blob_Trees, Check);
-      procedure File_Blob     is new Gen_Blob_Trees(File_Blob_Trees, Check);
-      procedure File_SL_Blob  is new Gen_Blob_Trees(File_SL_Blob_Trees, Check);
-      procedure Memory_Blob   is new Gen_Blob_Trees(Memory_Blob_Trees, Check);
+      --procedure Async_Blob    is new Gen_Blob_Trees(Async_Blob_Trees, Check);
+      --procedure CFS_Blob      is new Gen_Blob_Trees(CFS_Blob_Trees, Check);
+      --procedure Cmp_Mem_Blob  is new Gen_Blob_Trees(Cmp_Mem_Blob_Trees, Check);
+      --procedure Device_Blob   is new Gen_Blob_Trees(Device_Blob_Trees, Check);
+      --procedure Direct_Blob   is new Gen_Blob_Trees(Direct_Blob_Trees, Check);
+      --procedure File_Blob     is new Gen_Blob_Trees(File_Blob_Trees, Check);
+      --procedure File_SL_Blob  is new Gen_Blob_Trees(File_SL_Blob_Trees, Check);
+      --procedure Memory_Blob   is new Gen_Blob_Trees(Memory_Blob_Trees, Check);
 
       Procs : constant Entries_Type
-            := ((New_String("async"),        Async_BTree'Access),
-                (New_String("cfs"),          CFS_BTree'Access),
-                (New_String("compmem"),      Cmp_Mem_BTree'Access),
-                (New_String("device"),       Device_BTree'Access),
-                (New_String("direct"),       Direct_BTree'Access),
-                (New_String("file"),         File_BTree'Access),
-                (New_String("filesl"),       File_SL_BTree'Access),
-                (New_String("memory"),       Memory_BTree'Access),
+            -- XXX uncomment (or remove)
+            --:= ((New_String("async"),        Async_BTree'Access),
+                --(New_String("cfs"),          CFS_BTree'Access),
+                --(New_String("compmem"),      Cmp_Mem_BTree'Access),
+                --(New_String("device"),       Device_BTree'Access),
+                --(New_String("direct"),       Direct_BTree'Access),
+                --(New_String("file"),         File_BTree'Access),
+                --(New_String("filesl"),       File_SL_BTree'Access),
+                --(New_String("memory"),       Memory_BTree'Access),
+--
+                --(New_String("blob_async"),   Async_Blob'Access),
+                --(New_String("blob_cfs"),     CFS_Blob'Access),
+                --(New_String("blob_compmem"), Cmp_Mem_Blob'Access),
+                --(New_String("blob_device"),  Device_Blob'Access),
+                --(New_String("blob_direct"),  Direct_Blob'Access),
+                --(New_String("blob_file"),    File_Blob'Access),
+                --(New_String("blob_filesl"),  File_SL_Blob'Access),
+                --(New_String("blob_memory"),  Memory_Blob'Access),
 
-                (New_String("blob_async"),   Async_Blob'Access),
-                (New_String("blob_cfs"),     CFS_Blob'Access),
-                (New_String("blob_compmem"), Cmp_Mem_Blob'Access),
-                (New_String("blob_device"),  Device_Blob'Access),
-                (New_String("blob_direct"),  Direct_Blob'Access),
-                (New_String("blob_file"),    File_Blob'Access),
-                (New_String("blob_filesl"),  File_SL_Blob'Access),
-                (New_String("blob_memory"),  Memory_Blob'Access),
-
-                (New_String("map"),          Map'Access),
+            := ((New_String("map"),          Map'Access),
                 (New_String("map_reduce"),   Map_MR'Access),
                 (New_String("map_cursor"),   Map_Cursor'Access));
 
@@ -109,7 +111,14 @@ is
       for I in Procs'Range loop
          if Procs(I).Name = IO_Name then
             Put_Line(To_String(Procs(I).Name));
-            Procs(I).Proc.all;
+            declare
+               Timer : DB.Utils.Timers.Timer_Type;
+            begin
+               DB.Utils.Timers.Start(Timer);
+               Procs(I).Proc.all;
+               DB.Utils.Timers.Stop(Timer);
+               DB.Utils.Timers.Print("Total time for job execution", Timer);
+            end;
             return;
          end if;
       end loop;

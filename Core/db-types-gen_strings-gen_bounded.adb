@@ -4,9 +4,41 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with DB.Utils;
 with DB.Utils.Gen_Minimum;
 
 package body DB.Types.Gen_Strings.Gen_Bounded is
+
+   function Compare
+     (Left, Right : String_Type)
+      return Utils.Comparison_Result_Type
+   is
+      function Min is new Utils.Gen_Minimum(Length_Type);
+   begin
+      for I in 1 .. Min(Left.Length, Right.Length) loop
+         declare
+            CL : constant Item_Type := Left.Buffer(I);
+            CR : constant Item_Type := Right.Buffer(I);
+         begin
+            if CL /= CR then
+               if CL < CR then
+                  return Utils.Less;
+               else
+                  return Utils.Greater;
+               end if;
+            end if;
+         end;
+      end loop;
+
+      if Left.Length = Right.Length then
+         return Utils.Equal;
+      elsif Left.Length < Right.Length then
+         return Utils.Less;
+      else
+         return Utils.Greater;
+      end if;
+   end Compare;
+
 
    function "<" (Left, Right : String_Type) return Boolean is
    begin
@@ -40,8 +72,8 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
       S : String_Type;
    begin
       S.Length := Left.Length + Right.Length;
-      S.Buffer(1 .. S.Length) := Left.Buffer(1 .. Left.Length)
-                               & Right.Buffer(1 .. Right.Length);
+      S.Buffer(1 .. S.Length) := Left.Buffer(1 .. Left.Length) &
+                                 Right.Buffer(1 .. Right.Length);
       return S;
    end "&";
 

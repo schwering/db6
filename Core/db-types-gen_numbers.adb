@@ -6,6 +6,20 @@
 
 package body DB.Types.Gen_Numbers is
 
+   function Compare
+     (Left, Right : Number_Type)
+      return Utils.Comparison_Result_Type is
+   begin
+      if Left < Right then
+         return Utils.Less;
+      elsif Left = Right then
+         return Utils.Equal;
+      else
+         return Utils.Greater;
+      end if;
+   end Compare;
+
+
    function Size_Bound
      (Number : Number_Type)
       return IO.Blocks.Size_Type

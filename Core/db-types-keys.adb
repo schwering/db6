@@ -38,6 +38,30 @@ package body DB.Types.Keys is
    end "=";
 
 
+   function Compare
+     (Left, Right : Key_Type)
+      return Utils.Comparison_Result_Type
+   is
+      use type Utils.Comparison_Result_Type;
+      C : Utils.Comparison_Result_Type;
+   begin
+      C := Rows.Compare(Left.Row, Right.Row);
+      if C /= Utils.Equal then
+         return C;
+      end if;
+      --C := Columns.Compare(Left.Column, Right.Column);
+      --if C /= Utils.Equal then
+         --return C;
+      --end if;
+      C := Times.Compare(Left.Time, Right.Time);
+      case C is
+         when Utils.Less    => return Utils.Greater;
+         when Utils.Equal   => return Utils.Equal;
+         when Utils.Greater => return Utils.Less;
+      end case;
+   end Compare;
+
+
    function Short_Bound
      (Left  : Key_Type)
       return Key_Type is

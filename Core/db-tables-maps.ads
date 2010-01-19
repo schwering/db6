@@ -88,11 +88,11 @@ package DB.Tables.Maps is
       Transaction : in out RW_Transaction_Type);
 
    ----------
-   -- Core operations: Look_Up, Insertion, Deletion.
+   -- Core operations: Retrieve, Insertion, Deletion.
 
    type State_Type is (Success, Failure, Error);
 
-   procedure Look_Up
+   procedure Retrieve
      (Map      : in out Map_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type'Class;
@@ -102,7 +102,7 @@ package DB.Tables.Maps is
    -- This procedure acquires a read-lock and might therefore block due to
    -- uncommitted transactions.
 
-   procedure Look_Up
+   procedure Retrieve
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
@@ -343,8 +343,7 @@ private
    package BTrees is new Gen_BTrees
      (Key_Type           => Types.Keys.Key_Type,
       Value_Type         => Types.Values.Bounded.String_Type,
-      "="                => Types.Keys."=",
-      "<="               => Types.Keys."<=",
+      Compare            => Types.Keys.Compare,
       Allow_Duplicates   => True,
       Key_Context_Type   => Types.Keys.Context_Type,
       Key_Size_Bound     => Types.Keys.Size_Bound,
@@ -364,14 +363,13 @@ private
 
    package Blob_Trees is new Gen_Blob_Trees
      (Key_Type            => Types.Keys.Key_Type,
+      Value_Type          => Types.Values.Unbounded.String_Type,
+      Compare             => Types.Keys.Compare,
       Key_Context_Type    => Types.Keys.Context_Type,
       Key_Size_Bound      => Types.Keys.Size_Bound,
       Read_Key            => Types.Keys.Read,
       Skip_Key            => Types.Keys.Skip,
       Write_Key           => Types.Keys.Write,
-      "="                 => Types.Keys."=",
-      "<="                => Types.Keys."<=",
-      Value_Type          => Types.Values.Unbounded.String_Type,
       Value_Context_Type  => Types.Values.Unbounded.Uncompressed.Context_Type,
       Value_Size_Bound    => Types.Values.Unbounded.Uncompressed.Size_Bound,
       Read_Value          => Types.Values.Unbounded.Uncompressed.Read,

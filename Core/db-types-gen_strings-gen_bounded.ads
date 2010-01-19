@@ -6,6 +6,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.IO.Blocks;
+with DB.Utils;
 
 generic
    Max_Length : in Positive := 1024;
@@ -19,6 +20,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
    Empty_String : constant String_Type;
 
+   function Compare
+     (Left, Right : String_Type)
+      return Utils.Comparison_Result_Type;
    function "<" (Left, Right : String_Type) return Boolean;
    function "=" (Left, Right : String_Type) return Boolean;
    function "<=" (Left, Right : String_Type) return Boolean;

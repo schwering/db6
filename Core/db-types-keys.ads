@@ -10,6 +10,7 @@ with DB.Types.Strings.Bounded;
 with DB.Types.Strings.Unbounded;
 pragma Warnings (On);
 with DB.Types.Times;
+with DB.Utils;
 
 package DB.Types.Keys is
    pragma Elaborate_Body;
@@ -30,6 +31,9 @@ package DB.Types.Keys is
 
    function "<=" (Left, Right : Key_Type) return Boolean;
    function "="  (Left, Right : Key_Type) return Boolean;
+   function Compare
+     (Left, Right : Key_Type)
+      return Utils.Comparison_Result_Type;
 
    function Size_Bound
      (Key : Key_Type)

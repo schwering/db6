@@ -59,19 +59,21 @@ package DB.BTrees is
 
       package BTrees is new Gen_BTrees
         (Key_Type           => Keys.Key_Type,
+         Value_Type         => Values.String_Type,
+         Compare            => Keys.Compare,
+
          Key_Context_Type   => Keys.Context_Type,
          Key_Size_Bound     => Keys.Size_Bound,
          Read_Key           => Keys.Read,
          Skip_Key           => Keys.Skip,
          Write_Key          => Keys.Write,
-         "="                => Keys."=",
-         "<="               => Keys."<=",
-         Value_Type         => Values.String_Type,
+
          Value_Context_Type => Value_IO.Context_Type,
          Value_Size_Bound   => Value_IO.Size_Bound,
          Read_Value         => Value_IO.Read,
          Skip_Value         => Value_IO.Skip,
          Write_Value        => Value_IO.Write,
+
          Is_Context_Free_Serialization => 
                                Keys.Is_Context_Free_Serialization and
                                Value_IO.Is_Context_Free_Serialization,
@@ -130,133 +132,134 @@ package DB.BTrees is
    end Gen_Wrappers;
 
 
-   package Async_BTree_W    is new Gen_Wrappers(Async_IO);
-   package Async_BTrees     renames Async_BTree_W.BTrees;
-   procedure Check (T : in out Async_BTrees.Tree_Type)
-   renames Async_BTree_W.Check;
-   procedure Stats
-     (Tree                   : in out Async_BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   renames Async_BTree_W.Stats;
+   -- XXX uncomment (or remove)
+   --package Async_BTree_W    is new Gen_Wrappers(Async_IO);
+   --package Async_BTrees     renames Async_BTree_W.BTrees;
+   --procedure Check (T : in out Async_BTrees.Tree_Type)
+   --renames Async_BTree_W.Check;
+   --procedure Stats
+     --(Tree                   : in out Async_BTrees.Tree_Type;
+      --Height                 :    out Natural;
+      --Blocks                 :    out Natural;
+      --Free_Blocks            :    out Natural;
+      --Max_Degree             :    out Natural;
+      --Avg_Degree             :    out Natural;
+      --Min_Degree             :    out Natural;
+      --Bytes_Wasted_In_Blocks :    out Long_Integer;
+      --Bytes_In_Blocks        :    out Long_Integer)
+   --renames Async_BTree_W.Stats;
 
-   package CFS_BTree_W      is new Gen_Wrappers(CFS_IO);
-   package CFS_BTrees       renames CFS_BTree_W.BTrees;
-   procedure Check (T : in out CFS_BTrees.Tree_Type)
-   renames CFS_BTree_W.Check;
-   procedure Stats
-     (Tree                   : in out CFS_BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   renames CFS_BTree_W.Stats;
+   --package CFS_BTree_W      is new Gen_Wrappers(CFS_IO);
+   --package CFS_BTrees       renames CFS_BTree_W.BTrees;
+   --procedure Check (T : in out CFS_BTrees.Tree_Type)
+   --renames CFS_BTree_W.Check;
+   --procedure Stats
+     --(Tree                   : in out CFS_BTrees.Tree_Type;
+      --Height                 :    out Natural;
+      --Blocks                 :    out Natural;
+      --Free_Blocks            :    out Natural;
+      --Max_Degree             :    out Natural;
+      --Avg_Degree             :    out Natural;
+      --Min_Degree             :    out Natural;
+      --Bytes_Wasted_In_Blocks :    out Long_Integer;
+      --Bytes_In_Blocks        :    out Long_Integer)
+   --renames CFS_BTree_W.Stats;
 
-   package Device_BTree_W   is new Gen_Wrappers(Device_IO);
-   package Device_BTrees    renames Device_BTree_W.BTrees;
-   procedure Check (T : in out Device_BTrees.Tree_Type)
-   renames Device_BTree_W.Check;
-   procedure Stats
-     (Tree                   : in out Device_BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   renames Device_BTree_W.Stats;
+   --package Device_BTree_W   is new Gen_Wrappers(Device_IO);
+   --package Device_BTrees    renames Device_BTree_W.BTrees;
+   --procedure Check (T : in out Device_BTrees.Tree_Type)
+   --renames Device_BTree_W.Check;
+   --procedure Stats
+     --(Tree                   : in out Device_BTrees.Tree_Type;
+      --Height                 :    out Natural;
+      --Blocks                 :    out Natural;
+      --Free_Blocks            :    out Natural;
+      --Max_Degree             :    out Natural;
+      --Avg_Degree             :    out Natural;
+      --Min_Degree             :    out Natural;
+      --Bytes_Wasted_In_Blocks :    out Long_Integer;
+      --Bytes_In_Blocks        :    out Long_Integer)
+   --renames Device_BTree_W.Stats;
 
-   package Direct_BTree_W   is new Gen_Wrappers(Direct_IO);
-   package Direct_BTrees    renames Direct_BTree_W.BTrees;
-   procedure Check (T : in out Direct_BTrees.Tree_Type)
-   renames Direct_BTree_W.Check;
-   procedure Stats
-     (Tree                   : in out Direct_BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   renames Direct_BTree_W.Stats;
+   --package Direct_BTree_W   is new Gen_Wrappers(Direct_IO);
+   --package Direct_BTrees    renames Direct_BTree_W.BTrees;
+   --procedure Check (T : in out Direct_BTrees.Tree_Type)
+   --renames Direct_BTree_W.Check;
+   --procedure Stats
+     --(Tree                   : in out Direct_BTrees.Tree_Type;
+      --Height                 :    out Natural;
+      --Blocks                 :    out Natural;
+      --Free_Blocks            :    out Natural;
+      --Max_Degree             :    out Natural;
+      --Avg_Degree             :    out Natural;
+      --Min_Degree             :    out Natural;
+      --Bytes_Wasted_In_Blocks :    out Long_Integer;
+      --Bytes_In_Blocks        :    out Long_Integer)
+   --renames Direct_BTree_W.Stats;
 
-   package File_BTree_W     is new Gen_Wrappers(File_IO);
-   package File_BTrees      renames File_BTree_W.BTrees;
-   procedure Check (T : in out File_BTrees.Tree_Type)
-   renames File_BTree_W.Check;
-   procedure Stats
-     (Tree                   : in out File_BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   renames File_BTree_W.Stats;
+   --package File_BTree_W     is new Gen_Wrappers(File_IO);
+   --package File_BTrees      renames File_BTree_W.BTrees;
+   --procedure Check (T : in out File_BTrees.Tree_Type)
+   --renames File_BTree_W.Check;
+   --procedure Stats
+     --(Tree                   : in out File_BTrees.Tree_Type;
+      --Height                 :    out Natural;
+      --Blocks                 :    out Natural;
+      --Free_Blocks            :    out Natural;
+      --Max_Degree             :    out Natural;
+      --Avg_Degree             :    out Natural;
+      --Min_Degree             :    out Natural;
+      --Bytes_Wasted_In_Blocks :    out Long_Integer;
+      --Bytes_In_Blocks        :    out Long_Integer)
+   --renames File_BTree_W.Stats;
 
-   package File_SL_BTree_W  is new Gen_Wrappers(File_SL_IO);
-   package File_SL_BTrees   renames File_SL_BTree_W.BTrees;
-   procedure Check (T : in out File_SL_BTrees.Tree_Type)
-   renames File_SL_BTree_W.Check;
-   procedure Stats
-     (Tree                   : in out File_SL_BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   renames File_SL_BTree_W.Stats;
+   --package File_SL_BTree_W  is new Gen_Wrappers(File_SL_IO);
+   --package File_SL_BTrees   renames File_SL_BTree_W.BTrees;
+   --procedure Check (T : in out File_SL_BTrees.Tree_Type)
+   --renames File_SL_BTree_W.Check;
+   --procedure Stats
+     --(Tree                   : in out File_SL_BTrees.Tree_Type;
+      --Height                 :    out Natural;
+      --Blocks                 :    out Natural;
+      --Free_Blocks            :    out Natural;
+      --Max_Degree             :    out Natural;
+      --Avg_Degree             :    out Natural;
+      --Min_Degree             :    out Natural;
+      --Bytes_Wasted_In_Blocks :    out Long_Integer;
+      --Bytes_In_Blocks        :    out Long_Integer)
+   --renames File_SL_BTree_W.Stats;
 
-   package Memory_BTree_W   is new Gen_Wrappers(Memory_IO);
-   package Memory_BTrees    renames Memory_BTree_W.BTrees;
-   procedure Check (T : in out Memory_BTrees.Tree_Type)
-   renames Memory_BTree_W.Check;
-   procedure Stats
-     (Tree                   : in out Memory_BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   renames Memory_BTree_W.Stats;
+   --package Memory_BTree_W   is new Gen_Wrappers(Memory_IO);
+   --package Memory_BTrees    renames Memory_BTree_W.BTrees;
+   --procedure Check (T : in out Memory_BTrees.Tree_Type)
+   --renames Memory_BTree_W.Check;
+   --procedure Stats
+     --(Tree                   : in out Memory_BTrees.Tree_Type;
+      --Height                 :    out Natural;
+      --Blocks                 :    out Natural;
+      --Free_Blocks            :    out Natural;
+      --Max_Degree             :    out Natural;
+      --Avg_Degree             :    out Natural;
+      --Min_Degree             :    out Natural;
+      --Bytes_Wasted_In_Blocks :    out Long_Integer;
+      --Bytes_In_Blocks        :    out Long_Integer)
+   --renames Memory_BTree_W.Stats;
 
-   package Cmp_Mem_BTree_W  is new Gen_Wrappers(Cmp_Mem_IO);
-   package Cmp_Mem_BTrees   renames Cmp_Mem_BTree_W.BTrees;
-   procedure Check (T : in out Cmp_Mem_BTrees.Tree_Type)
-   renames Cmp_Mem_BTree_W.Check;
-   procedure Stats
-     (Tree                   : in out Cmp_Mem_BTrees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   renames Cmp_Mem_BTree_W.Stats;
+   --package Cmp_Mem_BTree_W  is new Gen_Wrappers(Cmp_Mem_IO);
+   --package Cmp_Mem_BTrees   renames Cmp_Mem_BTree_W.BTrees;
+   --procedure Check (T : in out Cmp_Mem_BTrees.Tree_Type)
+   --renames Cmp_Mem_BTree_W.Check;
+   --procedure Stats
+     --(Tree                   : in out Cmp_Mem_BTrees.Tree_Type;
+      --Height                 :    out Natural;
+      --Blocks                 :    out Natural;
+      --Free_Blocks            :    out Natural;
+      --Max_Degree             :    out Natural;
+      --Avg_Degree             :    out Natural;
+      --Min_Degree             :    out Natural;
+      --Bytes_Wasted_In_Blocks :    out Long_Integer;
+      --Bytes_In_Blocks        :    out Long_Integer)
+   --renames Cmp_Mem_BTree_W.Stats;
 
 end DB.BTrees;
 

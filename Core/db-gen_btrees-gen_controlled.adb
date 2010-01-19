@@ -146,26 +146,26 @@ package body DB.Gen_BTrees.Gen_Controlled is
    end Commit_Transaction;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree     : in out Tree_Type'Class;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       State    :    out State_Type) is
    begin
-      Gen_BTrees.Look_Up(Tree.Tree, Key, Value, Gen_BTrees.State_Type(State));
-   end Look_Up;
+      Gen_BTrees.Retrieve(Tree.Tree, Key, Value, Gen_BTrees.State_Type(State));
+   end Retrieve;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree        : in out Tree_Type'Class;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
       Value       :    out Value_Type;
       State       :    out State_Type) is
    begin
-      Gen_BTrees.Look_Up(Tree.Tree, Transaction_Impl(Transaction).all,
-                         Key, Value, Gen_BTrees.State_Type(State));
-   end Look_Up;
+      Gen_BTrees.Retrieve(Tree.Tree, Transaction_Impl(Transaction).all,
+                          Key, Value, Gen_BTrees.State_Type(State));
+   end Retrieve;
 
 
    procedure Minimum

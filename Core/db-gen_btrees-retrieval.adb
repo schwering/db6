@@ -5,9 +5,9 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 separate (DB.Gen_BTrees)
-package body Search is
+package body Retrieval is
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
@@ -16,13 +16,13 @@ package body Search is
       T : RO_Transaction_Type := New_RO_Transaction(Tree);
    begin
       Start_Transaction(Tree, T);
-      Look_Up(Tree, T, Key, Value, State);
+      Retrieve(Tree, T, Key, Value, State);
       Finish_Transaction(Tree, T);
    exception
       when others =>
          Finish_Transaction(Tree, T);
          raise;
-   end Look_Up;
+   end Retrieve;
 
 
    procedure Minimum
@@ -61,7 +61,7 @@ package body Search is
    end Maximum;
 
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
@@ -103,7 +103,7 @@ package body Search is
          State := Error;
          pragma Warnings (On);
          raise;
-   end Look_Up;
+   end Retrieve;
 
 
    procedure Minimum
@@ -193,5 +193,5 @@ package body Search is
          raise;
    end Maximum;
 
-end Search;
+end Retrieval;
 

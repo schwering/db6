@@ -18,14 +18,15 @@ procedure DB.Gen_Map_Reduce is
 
    package Intermediate_BTrees is new Gen_BTrees
      (Key_Type                      => Intermediate_Key_Type,
+      Value_Type                    => Intermediate_Value_Type,
+      Compare                       => Compare_Intermediate_Key,
+
       Key_Context_Type              => Intermediate_Key_Context_Type,
       Key_Size_Bound                => Intermediate_Key_Size_Bound,
       Read_Key                      => Read_Intermediate_Key,
       Skip_Key                      => Skip_Intermediate_Key,
       Write_Key                     => Write_Intermediate_Key,
-      "="                           => "=",
-      "<="                          => "<=",
-      Value_Type                    => Intermediate_Value_Type,
+
       Value_Context_Type            => Intermediate_Value_Context_Type,
       Value_Size_Bound              => Intermediate_Value_Size_Bound,
       Read_Value                    => Read_Intermediate_Value,

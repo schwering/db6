@@ -59,14 +59,14 @@ package DB.Blob_Trees is
 
       package Blob_Trees is new Gen_Blob_Trees
         (Key_Type                => Keys.Key_Type,
+         Value_Type              => Values.String_Type,
+         Compare                 => Keys.Compare,
+
          Key_Context_Type        => Keys.Context_Type,
          Key_Size_Bound          => Keys.Size_Bound,
          Read_Key                => Keys.Read,
          Skip_Key                => Keys.Skip,
          Write_Key               => Keys.Write,
-         "="                     => Keys."=",
-         "<="                    => Keys."<=",
-         Value_Type              => Values.String_Type,
 
          Value_Context_Type      => Direct_Value_IO.Context_Type,
          Value_Size_Bound        => Direct_Value_IO.Size_Bound,
@@ -82,6 +82,7 @@ package DB.Blob_Trees is
          Write_Value_Context       => Value_IO.Write_Context,
          Read_Part_Of_Value        => Value_IO.Read_Part_Of_String,
          Write_Part_Of_Value       => Value_IO.Write_Part_Of_String,
+
          Is_Context_Free_Serialization => Keys.Is_Context_Free_Serialization,
          Storage_Pool            => Root_Storage_Pool'Class(Global_Pool_Object),
          Block_IO                => Block_IO);
@@ -131,45 +132,46 @@ package DB.Blob_Trees is
    end Gen_Wrappers;
 
 
-   package Async_Blob_Tree_W    is new Gen_Wrappers(Async_IO);
-   package Async_Blob_Trees     renames Async_Blob_Tree_W.Blob_Trees;
-   procedure Check (T : in out Async_Blob_Trees.Tree_Type)
-   renames Async_Blob_Tree_W.Check;
+   -- XXX uncomment (or remove)
+   --package Async_Blob_Tree_W    is new Gen_Wrappers(Async_IO);
+   --package Async_Blob_Trees     renames Async_Blob_Tree_W.Blob_Trees;
+   --procedure Check (T : in out Async_Blob_Trees.Tree_Type)
+   --renames Async_Blob_Tree_W.Check;
 
-   package CFS_Blob_Tree_W      is new Gen_Wrappers(CFS_IO);
-   package CFS_Blob_Trees       renames CFS_Blob_Tree_W.Blob_Trees;
-   procedure Check (T : in out CFS_Blob_Trees.Tree_Type)
-   renames CFS_Blob_Tree_W.Check;
+   --package CFS_Blob_Tree_W      is new Gen_Wrappers(CFS_IO);
+   --package CFS_Blob_Trees       renames CFS_Blob_Tree_W.Blob_Trees;
+   --procedure Check (T : in out CFS_Blob_Trees.Tree_Type)
+   --renames CFS_Blob_Tree_W.Check;
 
-   package Device_Blob_Tree_W   is new Gen_Wrappers(Device_IO);
-   package Device_Blob_Trees    renames Device_Blob_Tree_W.Blob_Trees;
-   procedure Check (T : in out Device_Blob_Trees.Tree_Type)
-   renames Device_Blob_Tree_W.Check;
+   --package Device_Blob_Tree_W   is new Gen_Wrappers(Device_IO);
+   --package Device_Blob_Trees    renames Device_Blob_Tree_W.Blob_Trees;
+   --procedure Check (T : in out Device_Blob_Trees.Tree_Type)
+   --renames Device_Blob_Tree_W.Check;
 
-   package Direct_Blob_Tree_W   is new Gen_Wrappers(Direct_IO);
-   package Direct_Blob_Trees    renames Direct_Blob_Tree_W.Blob_Trees;
-   procedure Check (T : in out Direct_Blob_Trees.Tree_Type)
-   renames Direct_Blob_Tree_W.Check;
+   --package Direct_Blob_Tree_W   is new Gen_Wrappers(Direct_IO);
+   --package Direct_Blob_Trees    renames Direct_Blob_Tree_W.Blob_Trees;
+   --procedure Check (T : in out Direct_Blob_Trees.Tree_Type)
+   --renames Direct_Blob_Tree_W.Check;
 
-   package File_Blob_Tree_W     is new Gen_Wrappers(File_IO);
-   package File_Blob_Trees      renames File_Blob_Tree_W.Blob_Trees;
-   procedure Check (T : in out File_Blob_Trees.Tree_Type)
-   renames File_Blob_Tree_W.Check;
+   --package File_Blob_Tree_W     is new Gen_Wrappers(File_IO);
+   --package File_Blob_Trees      renames File_Blob_Tree_W.Blob_Trees;
+   --procedure Check (T : in out File_Blob_Trees.Tree_Type)
+   --renames File_Blob_Tree_W.Check;
 
-   package File_SL_Blob_Tree_W  is new Gen_Wrappers(File_SL_IO);
-   package File_SL_Blob_Trees   renames File_SL_Blob_Tree_W.Blob_Trees;
-   procedure Check (T : in out File_SL_Blob_Trees.Tree_Type)
-   renames File_SL_Blob_Tree_W.Check;
+   --package File_SL_Blob_Tree_W  is new Gen_Wrappers(File_SL_IO);
+   --package File_SL_Blob_Trees   renames File_SL_Blob_Tree_W.Blob_Trees;
+   --procedure Check (T : in out File_SL_Blob_Trees.Tree_Type)
+   --renames File_SL_Blob_Tree_W.Check;
 
-   package Memory_Blob_Tree_W   is new Gen_Wrappers(Memory_IO);
-   package Memory_Blob_Trees    renames Memory_Blob_Tree_W.Blob_Trees;
-   procedure Check (T : in out Memory_Blob_Trees.Tree_Type)
-   renames Memory_Blob_Tree_W.Check;
+   --package Memory_Blob_Tree_W   is new Gen_Wrappers(Memory_IO);
+   --package Memory_Blob_Trees    renames Memory_Blob_Tree_W.Blob_Trees;
+   --procedure Check (T : in out Memory_Blob_Trees.Tree_Type)
+   --renames Memory_Blob_Tree_W.Check;
 
-   package Cmp_Mem_Blob_Tree_W  is new Gen_Wrappers(Cmp_Mem_IO);
-   package Cmp_Mem_Blob_Trees   renames Cmp_Mem_Blob_Tree_W.Blob_Trees;
-   procedure Check (T : in out Cmp_Mem_Blob_Trees.Tree_Type)
-   renames Cmp_Mem_Blob_Tree_W.Check;
+   --package Cmp_Mem_Blob_Tree_W  is new Gen_Wrappers(Cmp_Mem_IO);
+   --package Cmp_Mem_Blob_Trees   renames Cmp_Mem_Blob_Tree_W.Blob_Trees;
+   --procedure Check (T : in out Cmp_Mem_Blob_Trees.Tree_Type)
+   --renames Cmp_Mem_Blob_Tree_W.Check;
 
 end DB.Blob_Trees;
 

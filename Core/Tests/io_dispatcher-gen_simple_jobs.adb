@@ -40,7 +40,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       Val   : Value_Type := Null_Value;
       State : State_Type := Success;
    begin
-      P_Look_Up(Object, Get_Key(KV), Val, State);
+      P_Retrieve(Object, Get_Key(KV), Val, State);
       if State /= Success or else Get_Value(KV) /= Val then
          Put_Line("Look up failed "& State'Img);
          Put_Line("Key   = """& Key_To_String(Get_Key(KV)) &"""");
@@ -59,7 +59,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       Val   : Value_Type := Null_Value;
       State : State_Type := Failure;
    begin
-      P_Look_Up(Object, Get_Key(KV), Val, State);
+      P_Retrieve(Object, Get_Key(KV), Val, State);
       if State /= Failure then
          Put_Line("Look up failed "& State'Img);
          raise Stop_Now;

@@ -59,7 +59,7 @@ package body IO_Dispatcher.Args is
    is
       function New_Job (S : String) return Jobs.Job_Type
       is
-         function Look_Up (D : Jobs.Description_Type) return Jobs.Short_Job_Type
+         function Retrieve (D : Jobs.Description_Type) return Jobs.Short_Job_Type
          is
             use type Jobs.Description_Type;
          begin
@@ -70,7 +70,7 @@ package body IO_Dispatcher.Args is
             end loop;
             Put_Line("Couldn't look up "& Jobs.To_String(D));
             raise Parse_Error;
-         end Look_Up;
+         end Retrieve;
 
          From                      : Natural := S'First;
          To                        : Natural := 0;
@@ -88,11 +88,11 @@ package body IO_Dispatcher.Args is
          end loop;
          if To = 0 then
             Description := Jobs.To_Description(S);
-            return Jobs.New_Job(Description, Look_Up(Description), 1, 1, True);
+            return Jobs.New_Job(Description, Retrieve(Description), 1, 1, True);
          end if;
 
          Description := Jobs.To_Description(S(From .. To - 1));
-         Short_Job   := Look_Up(Description);
+         Short_Job   := Retrieve(Description);
 
          From := To + 1;
          To   := 0;

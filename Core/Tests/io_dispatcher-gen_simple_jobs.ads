@@ -36,7 +36,7 @@ generic
            Key      : in     Key_Type;
            Value    :    out Value_Type;
            State    :    out State_Type);
-   with procedure P_Look_Up
+   with procedure P_Retrieve
           (Object   : in out Object_Type; 
            Key      : in     Key_Type;
            Value    :    out Value_Type;

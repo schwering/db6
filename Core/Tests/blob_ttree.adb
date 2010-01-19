@@ -102,7 +102,7 @@ is
    package Simple_Jobs is new Gen_Simple_Jobs
      (BTrees.Tree_Type, BTrees.Count_Type, BTrees.State_Type,
       Tree, BTrees.Success, BTrees.Failure,
-      BTrees.Insert, BTrees.Delete, BTrees.Look_Up);
+      BTrees.Insert, BTrees.Delete, BTrees.Retrieve);
 
    use type BTrees.State_Type;
    Long_Job : constant Jobs.Long_Job_Type

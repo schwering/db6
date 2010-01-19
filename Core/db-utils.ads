@@ -10,5 +10,7 @@ package DB.Utils is
    subtype Size_Type is Natural;
    type Hash_Type is mod 2**32;
 
+   type Comparison_Result_Type is (Less, Equal, Greater);
+
 end DB.Utils;
 

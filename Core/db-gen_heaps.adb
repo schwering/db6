@@ -165,6 +165,18 @@ package body DB.Gen_Heaps is
          pragma Warnings (On);
       end "<=";
 
+
+      function Compare (A, B : Key_Type) return Utils.Comparison_Result_Type is
+      begin
+         if Block_IO."="(A, B) then
+            return Utils.Equal;
+         elsif Block_IO."<"(A, B) then
+            return Utils.Less;
+         else
+            return Utils.Greater;
+         end if;
+      end Compare;
+
    end Info_BTree_Types;
 
 
@@ -281,6 +293,17 @@ package body DB.Gen_Heaps is
          return A.Length < B.Length or else
                (A.Length = B.Length and then not (B.Address < A.Address));
       end "<=";
+
+      function Compare (A, B : Key_Type) return Utils.Comparison_Result_Type is
+      begin
+         if A = B then
+            return Utils.Equal;
+         elsif A <= B then
+            return Utils.Less;
+         else
+            return Utils.Greater;
+         end if;
+      end Compare;
 
    end Free_BTree_Types;
 
@@ -675,13 +698,15 @@ package body DB.Gen_Heaps is
          St   : Info_BTrees.State_Type;
       begin
          if Transaction in RW_Transaction_Type'Class then
-            Info_BTrees.Look_Up(Heap.Info_Tree,
-                              RW_Transaction_Type(Transaction).Info_Transaction,
-                              Address, Info, St);
+            Info_BTrees.Retrieve
+              (Heap.Info_Tree,
+               RW_Transaction_Type(Transaction).Info_Transaction,
+               Address, Info, St);
          else
-            Info_BTrees.Look_Up(Heap.Info_Tree,
-                              RO_Transaction_Type(Transaction).Info_Transaction,
-                              Address, Info, St);
+            Info_BTrees.Retrieve
+              (Heap.Info_Tree,
+               RO_Transaction_Type(Transaction).Info_Transaction,
+               Address, Info, St);
          end if;
          if St = Info_BTrees.Success and then Info.State = Free then
             State := Failure;
@@ -1270,8 +1295,8 @@ package body DB.Gen_Heaps is
          St         : Info_BTrees.State_Type;
          Last_Chunk : Address_Type;
       begin
-         Info_BTrees.Look_Up(Heap.Info_Tree, Transaction.Info_Transaction,
-                             Address, Info, St);
+         Info_BTrees.Retrieve(Heap.Info_Tree, Transaction.Info_Transaction,
+                              Address, Info, St);
          if St /= Info_BTrees.Success then
             State := Result(St);
             pragma Warnings (Off);
@@ -1281,8 +1306,8 @@ package body DB.Gen_Heaps is
          Last_Chunk := Info.Last;
          Context    := Info.Context;
          if Last_Chunk /= Address then
-            Info_BTrees.Look_Up(Heap.Info_Tree, Transaction.Info_Transaction,
-                                Last_Chunk, Info, St);
+            Info_BTrees.Retrieve(Heap.Info_Tree, Transaction.Info_Transaction,
+                                 Last_Chunk, Info, St);
             if St /= Info_BTrees.Success then
                State := Result(St);
                pragma Warnings (Off);

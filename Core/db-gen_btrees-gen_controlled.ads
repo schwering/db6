@@ -86,13 +86,13 @@ package DB.Gen_BTrees.Gen_Controlled is
      (Tree        : in out Tree_Type'Class;
       Transaction : in out RW_Transaction_Type);
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree     : in out Tree_Type'Class;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
       State    :    out State_Type);
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree        : in out Tree_Type'Class;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;

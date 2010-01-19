@@ -1,6 +1,6 @@
 #!/bin/sh
 IO=memory
-BIN=bin/release/./ttree
+BIN=bin/debug/./ttree
 FILE=`cat .temp_path`btree
 C1=1k 
 # 1. Simple insertions and check

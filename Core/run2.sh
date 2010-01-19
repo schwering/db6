@@ -1,6 +1,6 @@
 #!/bin/sh
-IO=map
-BIN=bin/debug/./ttree
+IO=memory
+BIN=bin/release/./ttree
 FILE=`cat .temp_path`btree
 C1=1k 
 # 1. Simple insertions and check
@@ -28,9 +28,12 @@ C="$BIN $IO $FILE 0\
 	Search,$C1,Cont\
         \
         Delete,$C1,Reset\
-        Search,$C1,Cont\
-	Search,$C1,Cont\
 	Antisearch,$C1,Reset\
+	Search,$C1,Cont\
+	Search,$C1,Cont\
+        \
+	Insert,$C1,Reset\
+	Search,$C1,Reset\
 	Search,$C1,Cont\
 	Search,$C1,Cont"
 echo $C

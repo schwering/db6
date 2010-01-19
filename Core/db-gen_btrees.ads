@@ -65,13 +65,15 @@ with DB.IO.Blocks;
 with DB.IO.Blocks.Gen_Buffers;
 with DB.IO.Blocks.Gen_IO;
 with DB.Locks.Mutexes;
+with DB.Utils;
 
 generic
    type Key_Type is private;
    type Value_Type is private;
 
-   with function "=" (Left, Right : Key_Type) return Boolean is <>;
-   with function "<=" (Left, Right : Key_Type) return Boolean is <>;
+   with function Compare
+          (Left, Right : Key_Type)
+           return Utils.Comparison_Result_Type;
 
    Allow_Duplicates : in Boolean := False;
 
@@ -185,11 +187,11 @@ package DB.Gen_BTrees is
 
 
    ----------
-   -- Core operations: Look_Up, Insertion, Deletion.
+   -- Core operations: Retrieve, Insertion, Deletion.
 
    type State_Type is (Success, Failure, Error);
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
@@ -199,7 +201,7 @@ package DB.Gen_BTrees is
    -- This procedure acquires a read-lock and might therefore block due to
    -- uncommitted transactions.
 
-   procedure Look_Up
+   procedure Retrieve
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
       Key         : in     Key_Type;
@@ -487,12 +489,6 @@ private
       -- Indicates whether the given node is a free one (which does not contain
       -- any valuable information) or an active one.
 
-      function Degree
-        (Node : Node_Type)
-         return Degree_Type;
-      -- Returns the degree of the node. The degree is the count of keys,
-      -- children, counts and/or values.
-
       function Is_Leaf
         (Node : Node_Type)
          return Boolean;
@@ -504,6 +500,12 @@ private
          return Boolean;
       -- Indicates whether the given node is a leaf. Leaves have
       -- (Key, Child, Count) entries.
+
+      function Degree
+        (Node : Node_Type)
+         return Degree_Type;
+      -- Returns the degree of the node. The degree is the count of keys,
+      -- children, counts and/or values.
 
       procedure Set_Parent
         (Node   : in out Node_Type;
@@ -769,15 +771,15 @@ private
    private
       type Node_Type is
          record
-            Block     : IO.Blocks.Long_Block_Type;
-            Ok        : Boolean;
+            Block : IO.Blocks.Long_Block_Type;
          end record;
 
       pragma Inline (Root_Node);
+      pragma Inline (Is_Valid);
       pragma Inline (Is_Free);
-      pragma Inline (Degree);
       pragma Inline (Is_Leaf);
       pragma Inline (Is_Inner);
+      pragma Inline (Degree);
       pragma Inline (Set_Parent);
       pragma Inline (Parent);
       pragma Inline (Is_Root);
@@ -798,6 +800,11 @@ private
       pragma Inline (To_Block);
       pragma Inline (From_Block);
    end Nodes;
+
+   function "<=" (Left, Right : Key_Type) return Boolean;
+   function "=" (Left, Right : Key_Type) return Boolean;
+   pragma Inline ("<=");
+   pragma Inline ("=");
 
    ----------
    -- Tree type.

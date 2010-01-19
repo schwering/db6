@@ -187,7 +187,7 @@ begin
             --Put_Line("Deletion failed -2");
          --end if;
 
-         --BTrees.Look_Up(Tree, KV.Key, Value2, Pos2, State);
+         --BTrees.Retrieve(Tree, KV.Key, Value2, Pos2, State);
          --if State = BTrees.Success then
             --Put_Line("Deletion must have failed -1");
          --end if;
@@ -206,7 +206,7 @@ begin
          --end if;
 
 
-         --BTrees.Look_Up(Tree, KV.Key, Value2, Pos2, State);
+         --BTrees.Retrieve(Tree, KV.Key, Value2, Pos2, State);
          --if State /= BTrees.Success
             --or else 23 /= Value2
             --or else Pos /= Pos2 then
@@ -223,7 +223,7 @@ begin
          --end if;
 
 
-         --BTrees.Look_Up(Tree, Pos, Value2, Key2, State);
+         --BTrees.Retrieve(Tree, Pos, Value2, Key2, State);
          --if State /= BTrees.Success
             --or else KV.Value /= Value2
             --or else KV.Key /= Key2 then
@@ -261,7 +261,7 @@ begin
          State : BTrees.State_Type;
       begin
          Start(Tree_Timer);
-         BTrees.Look_Up(Tree, KV.Key, Value, Pos, State);
+         BTrees.Retrieve(Tree, KV.Key, Value, Pos, State);
          Stop(Tree_Timer);
          if State /= BTrees.Success then
             Put_Line("Failed"& BTrees.State_Type'Image(State)
@@ -349,7 +349,7 @@ begin
          --State     : BTrees.State_Type;
          --use type DB.IO.Blocks.Direct_IO.Valid_Address_Type;
       --begin
-         --BTrees.Look_Up(Tree, KV.Key, Value, Pos, State);
+         --BTrees.Retrieve(Tree, KV.Key, Value, Pos, State);
          --if State /= BTrees.Failure then
             --Put_Line("Failed"& BTrees.State_Type'Image(State)
                     --&" at"& Integer'Image(I));
@@ -382,7 +382,7 @@ begin
          --Pos       : BTrees.Count_Type;
          --State     : BTrees.State_Type;
       --begin
-         --BTrees.Look_Up(Tree, KV.Key, Value, Pos, State);
+         --BTrees.Retrieve(Tree, KV.Key, Value, Pos, State);
          --if State /= BTrees.Success then
             --Put_Line("Failed"& BTrees.State_Type'Image(State)
                     --&" at"& Integer'Image(I));
@@ -405,7 +405,7 @@ begin
          --if Old_Value /= Value then
             --Put_Line("Old_Value /= Value at"& Integer'Image(I));
          --end if;
-         --BTrees.Look_Up(Tree, KV.Key, Value, Pos, State);
+         --BTrees.Retrieve(Tree, KV.Key, Value, Pos, State);
          --if New_Value /= Value then
             --Put_Line("New_Value /= Value at"& Integer'Image(I));
          --end if;
@@ -429,7 +429,7 @@ begin
          Pos   : BTrees.Count_Type;
          State : BTrees.State_Type;
       begin
-         BTrees.Look_Up(Tree, KV.Key, Value, Pos, State);
+         BTrees.Retrieve(Tree, KV.Key, Value, Pos, State);
          if State /= BTrees.Failure then
             Put_Line("False Positive"& BTrees.State_Type'Image(State)
                     &" at"& Integer'Image(I));
@@ -484,7 +484,7 @@ begin
          State   : BTrees.State_Type;
       begin
          Start(Tree_Timer);
-         BTrees.Look_Up(Tree, KV.Key, Value, Pos, State);
+         BTrees.Retrieve(Tree, KV.Key, Value, Pos, State);
          Stop(Tree_Timer);
          if State /= BTrees.Success then
             Put_Line("Failed"& BTrees.State_Type'Image(State)

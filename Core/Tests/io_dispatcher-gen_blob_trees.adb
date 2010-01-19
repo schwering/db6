@@ -164,7 +164,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
 
       P_Insert        => Blob_Trees.Insert,
       P_Delete        => Blob_Trees.Delete,
-      P_Look_Up       => Blob_Trees.Look_Up,
+      P_Retrieve       => Blob_Trees.Retrieve,
       P_Count         => Blob_Trees.Count,
       P_Stats         => Stats,
       P_Check         => Check);
