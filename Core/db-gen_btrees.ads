@@ -472,6 +472,29 @@ private
                       := Address_Type(Block_IO.Invalid_Address);
 
       ----------
+      -- Address functions.
+
+      function Is_Valid
+        (Address : Address_Type)
+         return Boolean;
+      -- Returns true if the address is valid.
+
+      function To_Address
+        (Address : Valid_Address_Type)
+         return Address_Type;
+      -- Converts the given valid address to a general one.
+
+      function To_Valid_Address
+        (Address : Address_Type)
+         return Valid_Address_Type;
+      -- Converts the given address to a valid one.
+
+      function Is_Valid
+        (Index : Index_Type)
+         return Boolean;
+      -- Returns true if the given index is inside Valid_Index_Type range.
+
+      ----------
       -- General and accessor subprograms.
 
       function Root_Node
@@ -577,21 +600,6 @@ private
          return Valid_Address_Type;
       -- Returns the address of the right neighbor of the node.
 
-      function Is_Valid
-        (Address : Address_Type)
-         return Boolean;
-      -- Returns true if the address is valid.
-
-      function To_Address
-        (Address : Valid_Address_Type)
-         return Address_Type;
-      -- Converts the given valid address to a general one.
-
-      function To_Valid_Address
-        (Address : Address_Type)
-         return Valid_Address_Type;
-      -- Converts the given address to a valid one.
-
       function Key
         (Node  : Node_Type;
          Index : Valid_Index_Type)
@@ -612,9 +620,6 @@ private
          return Value_Type;
       -- Returns the Index-th value. This function is determined for leaves.
 
-      ----------
-      -- Node operations.
-
       function Key_Position
         (Node : Node_Type;
          Key  : Key_Type)
@@ -627,6 +632,9 @@ private
          return Valid_Index_Type;
       -- Returns the position of the given child. If the child is not contained
       -- in the node, a Node_Error is raised.
+
+      ----------
+      -- Node operations.
 
       function Split_Position
         (Node : Node_Type)
@@ -645,11 +653,6 @@ private
       -- denotes an element of Left_Node, if the index is in
       -- Degree(Left_Node) + 1 .. Degree(Left_Node) + Degree(Right_Node), it
       -- denotes an element of Right_Node.
-
-      -- Returns true if the given index is inside Valid_Index_Type range.
-      function Is_Valid
-        (Index : Index_Type)
-         return Boolean;
 
       function Insertion
         (Node  : Node_Type;

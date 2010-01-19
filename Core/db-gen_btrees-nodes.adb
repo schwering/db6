@@ -888,6 +888,54 @@ package body Nodes is
    end Phys;
 
 
+   ----------
+   -- Address functions.
+
+   function Is_Valid
+     (Address : Address_Type)
+      return Boolean is
+   begin
+      return Block_IO.Is_Valid_Address(Block_IO.Address_Type(Address));
+   end Is_Valid;
+
+
+   function Is_Valid
+     (Address : Valid_Address_Type)
+      return Boolean is
+   begin
+      return Is_Valid(To_Address(Address));
+   end Is_Valid;
+
+
+   function To_Valid_Address
+     (Address : Address_Type)
+      return Valid_Address_Type is
+   begin
+      return Valid_Address_Type(
+         Block_IO.To_Valid_Address(Block_IO.Address_Type(Address)));
+   end To_Valid_Address;
+
+
+   function To_Address
+     (Address : Valid_Address_Type)
+      return Address_Type is
+   begin
+      return Address_Type(
+         Block_IO.To_Address(Block_IO.Valid_Address_Type(Address)));
+   end To_Address;
+
+
+   function Is_Valid
+     (Index : Index_Type)
+      return Boolean is
+   begin
+      return Index /= Invalid_Index;
+   end Is_Valid;
+
+
+   ----------
+   -- General and accessor subprograms.
+
    function Invalid_Node
      return Node_Type is
    begin
@@ -917,8 +965,7 @@ package body Nodes is
 
 
    function Free_Node
-      return Node_Type
-   is
+      return Node_Type is
    begin
       return Node_Type'(Block => Phys.New_Block(Is_Ok   => True,
                                                 Is_Free => True,
@@ -1117,40 +1164,6 @@ package body Nodes is
    end Valid_Right_Neighbor;
 
 
-   function Is_Valid
-     (Address : Address_Type)
-      return Boolean is
-   begin
-      return Block_IO.Is_Valid_Address(Block_IO.Address_Type(Address));
-   end Is_Valid;
-
-
-   function Is_Valid
-     (Address : Valid_Address_Type)
-      return Boolean is
-   begin
-      return Is_Valid(To_Address(Address));
-   end Is_Valid;
-
-
-   function To_Valid_Address
-     (Address : Address_Type)
-      return Valid_Address_Type is
-   begin
-      return Valid_Address_Type(
-         Block_IO.To_Valid_Address(Block_IO.Address_Type(Address)));
-   end To_Valid_Address;
-
-
-   function To_Address
-     (Address : Valid_Address_Type)
-      return Address_Type is
-   begin
-      return Address_Type(
-         Block_IO.To_Address(Block_IO.Valid_Address_Type(Address)));
-   end To_Address;
-
-
    function Key
      (Node  : Node_Type;
       Index : Valid_Index_Type)
@@ -1219,118 +1232,128 @@ package body Nodes is
    end Value;
 
 
-   function Key_Position_Uniform_Binary
-     (Node : Node_Type;
-      Key  : Key_Type)
-      return Index_Type
-   is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (not Is_Free(Node));
-   begin
-      if Degree(Node) > 0 then
-         declare
-            function Get_Key (N : Node_Type; I : Index_Type) return Key_Type is
-            begin
-               pragma Assert (Is_Valid(I));
-               return Nodes.Key(N, Valid_Index_Type(I));
-            end Get_Key;
-
-            procedure Find is
-               new Utils.Binary_Search.Uniform_Find_Best_In_Container
-                     (Container_Type      => Node_Type,
-                      Extended_Index_Type => Index_Type,
-                      Invalid_Index       => Invalid_Index,
-                      Item_Type           => Key_Type,
-                      Get                 => Get_Key,
-                      Compare             => Compare);
-            Index : Index_Type;
-         begin
-            Find(Node, 1, Degree(Node), Key, Index);
-            if Nodes.Is_Valid(Index) then
-               return Index;
-            else
-               return Invalid_Index;
-            end if;
-         end;
-      else
-         return Invalid_Index;
-      end if;
-   end Key_Position_Uniform_Binary;
-
-
-   function Key_Position_Binary
-     (Node : Node_Type;
-      Key  : Key_Type)
-      return Index_Type
-   is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (not Is_Free(Node));
-   begin
-      if Degree(Node) > 0 then
-         declare
-            function Get_Key (N : Node_Type; I : Index_Type) return Key_Type is
-            begin
-               pragma Assert (Is_Valid(I));
-               return Nodes.Key(N, Valid_Index_Type(I));
-            end Get_Key;
-
-            procedure Find is
-               new Utils.Binary_Search.Find_Best_In_Container
-                     (Container_Type => Node_Type,
-                      Index_Type     => Valid_Index_Type,
-                      Item_Type      => Key_Type,
-                      Get            => Get_Key,
-                      "<="           => "<=");
-            Index : Index_Type;
-            Found : Boolean;
-         begin
-            Find(Node, 1, Degree(Node), Key, Found, Index);
-            if Found then
-               return Index;
-            else
-               return Invalid_Index;
-            end if;
-         end;
-      else
-         return Invalid_Index;
-      end if;
-   end Key_Position_Binary;
-
-
-   function Key_Position_Linear
-     (Node : Node_Type;
-      Key  : Key_Type)
-      return Index_Type
-   is
-      function "<="
-        (Left, Right : Key_Type)
-         return Boolean
-      is
-         pragma Inline ("<=");
-         use type Utils.Comparison_Result_Type;
-      begin
-         return Compare(Left, Right) in Utils.Less .. Utils.Equal;
-      end "<=";
-
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (not Is_Free(Node));
-   begin
-      for I in 1 .. Degree(Node) loop
-         if Key <= Nodes.Key(Node, I) then
-            return I;
-         end if;
-      end loop;
-      return Invalid_Index;
-   end Key_Position_Linear;
-
-
    function Key_Position
      (Node : Node_Type;
       Key  : Key_Type)
       return Index_Type
-   renames Key_Position_Uniform_Binary;
-   pragma Unreferenced (Key_Position_Binary);
-   pragma Unreferenced (Key_Position_Linear);
+   is
+      function Key_Position_Uniform_Binary
+        (Node : Node_Type;
+         Key  : Key_Type)
+         return Index_Type
+      is
+         pragma Inline (Key_Position_Uniform_Binary);
+         pragma Assert (Is_Ok(Node));
+         pragma Assert (not Is_Free(Node));
+      begin
+         if Degree(Node) > 0 then
+            declare
+               function Get_Key
+                 (N : Node_Type; I : Index_Type)
+                  return Key_Type is
+               begin
+                  pragma Assert (Is_Valid(I));
+                  return Nodes.Key(N, Valid_Index_Type(I));
+               end Get_Key;
+
+               procedure Find is
+                  new Utils.Binary_Search.Uniform_Find_Best_In_Container
+                        (Container_Type      => Node_Type,
+                         Extended_Index_Type => Index_Type,
+                         Invalid_Index       => Invalid_Index,
+                         Item_Type           => Key_Type,
+                         Get                 => Get_Key,
+                         Compare             => Compare);
+               Index : Index_Type;
+            begin
+               Find(Node, 1, Degree(Node), Key, Index);
+               if Nodes.Is_Valid(Index) then
+                  return Index;
+               else
+                  return Invalid_Index;
+               end if;
+            end;
+         else
+            return Invalid_Index;
+         end if;
+      end Key_Position_Uniform_Binary;
+
+
+      function Key_Position_Binary
+        (Node : Node_Type;
+         Key  : Key_Type)
+         return Index_Type
+      is
+         pragma Inline (Key_Position_Binary);
+         pragma Assert (Is_Ok(Node));
+         pragma Assert (not Is_Free(Node));
+      begin
+         if Degree(Node) > 0 then
+            declare
+               function Get_Key
+                 (N : Node_Type; I : Index_Type)
+                  return Key_Type is
+               begin
+                  pragma Assert (Is_Valid(I));
+                  return Nodes.Key(N, Valid_Index_Type(I));
+               end Get_Key;
+
+               procedure Find is
+                  new Utils.Binary_Search.Find_Best_In_Container
+                        (Container_Type => Node_Type,
+                         Index_Type     => Valid_Index_Type,
+                         Item_Type      => Key_Type,
+                         Get            => Get_Key,
+                         "<="           => "<=");
+               Index : Index_Type;
+               Found : Boolean;
+            begin
+               Find(Node, 1, Degree(Node), Key, Found, Index);
+               if Found then
+                  return Index;
+               else
+                  return Invalid_Index;
+               end if;
+            end;
+         else
+            return Invalid_Index;
+         end if;
+      end Key_Position_Binary;
+
+
+      function Key_Position_Linear
+        (Node : Node_Type;
+         Key  : Key_Type)
+         return Index_Type
+      is
+         pragma Inline (Key_Position_Linear);
+
+         function "<="
+           (Left, Right : Key_Type)
+            return Boolean
+         is
+            pragma Inline ("<=");
+            use type Utils.Comparison_Result_Type;
+         begin
+            return Compare(Left, Right) in Utils.Less .. Utils.Equal;
+         end "<=";
+
+         pragma Assert (Is_Ok(Node));
+         pragma Assert (not Is_Free(Node));
+      begin
+         for I in 1 .. Degree(Node) loop
+            if Key <= Nodes.Key(Node, I) then
+               return I;
+            end if;
+         end loop;
+         return Invalid_Index;
+      end Key_Position_Linear;
+
+      pragma Unreferenced (Key_Position_Binary);
+      pragma Unreferenced (Key_Position_Linear);
+   begin
+      return Key_Position_Uniform_Binary(Node, Key);
+   end Key_Position;
 
 
    function Child_Position
@@ -1349,6 +1372,9 @@ package body Nodes is
       raise Node_Error;
    end Child_Position;
 
+
+   ----------
+   -- Node operations.
 
    function Split_Position
      (Node : Node_Type)
@@ -1430,14 +1456,6 @@ package body Nodes is
       end loop;
       raise Tree_Error; -- never reached
    end Combi_Split_Position;
-
-
-   function Is_Valid
-     (Index : Index_Type)
-      return Boolean is
-   begin
-      return Index /= Invalid_Index;
-   end Is_Valid;
 
 
    procedure Set_Child
@@ -2021,6 +2039,9 @@ package body Nodes is
    end Combination;
 
 
+   ----------
+   -- Block-related subprograms.
+
    function Size_Of
      (Node : Node_Type)
       return IO.Blocks.Size_Type
@@ -2119,8 +2140,7 @@ package body Nodes is
      (Block : IO.Blocks.Block_Type)
       return Node_Type
    is
-      Node : constant Node_Type
-           := (Block => IO.Blocks.To_Long_Block(Block));
+      Node : constant Node_Type := (Block => IO.Blocks.To_Long_Block(Block));
       use type IO.Blocks.Base_Position_Type;
    begin
       pragma Assert (Phys.Total_Size(Node.Block) <= IO.Blocks.Block_Size);
