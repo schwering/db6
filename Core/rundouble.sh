@@ -2,7 +2,7 @@
 IO=map
 BIN=bin/release/./ttree
 FILE=`cat .temp_path`btree
-C1=1k
+C1=100
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
 # 3. Some mor insertions and check for all three
@@ -105,7 +105,8 @@ C="$BIN $IO $FILE 0\
 	Insert,$C1,Reset\
 	Insert,$C1,Reset\
 	Insert,$C1,Reset\
-	Insert,$C1,Reset\
+	Insert,$C1,Reset
+        Stats,1,Reset\
 	"
 echo $C
 $C

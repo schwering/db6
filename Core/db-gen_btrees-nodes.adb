@@ -1237,6 +1237,24 @@ package body Nodes is
       Key  : Key_Type)
       return Index_Type
    is
+      Key_Context : Key_Context_Type;
+
+      function Get_Key
+        (Node  : Node_Type;
+         Index : Index_Type)
+         return Key_Type
+      is
+         Key     : Key_Type;
+         Success : Boolean;
+      begin
+         pragma Assert (Is_Valid(Index));
+         Phys.Read_Key(Key_Context, Node.Block, Index, Key, Success);
+         if not Success then
+            raise Node_Error;
+         end if;
+         return Key;
+      end Get_Key;
+
       function Key_Position_Uniform_Binary
         (Node : Node_Type;
          Key  : Key_Type)
@@ -1248,14 +1266,6 @@ package body Nodes is
       begin
          if Degree(Node) > 0 then
             declare
-               function Get_Key
-                 (N : Node_Type; I : Index_Type)
-                  return Key_Type is
-               begin
-                  pragma Assert (Is_Valid(I));
-                  return Nodes.Key(N, Valid_Index_Type(I));
-               end Get_Key;
-
                procedure Find is
                   new Utils.Binary_Search.Uniform_Find_Best_In_Container
                         (Container_Type      => Node_Type,
@@ -1290,14 +1300,6 @@ package body Nodes is
       begin
          if Degree(Node) > 0 then
             declare
-               function Get_Key
-                 (N : Node_Type; I : Index_Type)
-                  return Key_Type is
-               begin
-                  pragma Assert (Is_Valid(I));
-                  return Nodes.Key(N, Valid_Index_Type(I));
-               end Get_Key;
-
                procedure Find is
                   new Utils.Binary_Search.Find_Best_In_Container
                         (Container_Type => Node_Type,
@@ -1327,17 +1329,6 @@ package body Nodes is
          return Index_Type
       is
          pragma Inline (Key_Position_Linear);
-
-         function "<="
-           (Left, Right : Key_Type)
-            return Boolean
-         is
-            pragma Inline ("<=");
-            use type Utils.Comparison_Result_Type;
-         begin
-            return Compare(Left, Right) in Utils.Less .. Utils.Equal;
-         end "<=";
-
          pragma Assert (Is_Ok(Node));
          pragma Assert (not Is_Free(Node));
       begin

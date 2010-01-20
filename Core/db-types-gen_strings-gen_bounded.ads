@@ -44,6 +44,13 @@ package DB.Types.Gen_Strings.Gen_Bounded is
      (Arr : Indefinite_Buffer_Type)
       return String_Type;
 
+   function New_String
+     (S        : String_Type;
+      S_From   : Index_Type;
+      S_Length : Length_Type;
+      T        : String_Type)
+      return String_Type;
+
    function Length
      (S : String_Type)
       return Length_Type;
@@ -114,22 +121,22 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          array (Positive range <>) of Item_Type;
       pragma Pack (Indefinite_Packed_Buffer_Type);
       subtype Packed_Buffer_Type is Indefinite_Packed_Buffer_Type(Index_Type);
-
-      pragma Inline (Uncompressed.Size_Bound);
-      pragma Inline (Uncompressed.Write);
-      pragma Inline (Uncompressed.Read);
-      pragma Inline (Uncompressed.Skip);
    end Uncompressed;
 
 
    package Prefix_Compressed is
       type Context_Type is
          record
-            Initialized : Boolean := False;
-            Previous    : String_Type;
+            Initialized             : Boolean := False;
+            Previous                : String_Type;
+            Previous_Block_Position : IO.Blocks.Long_Position_Type;
          end record;
 
       Is_Context_Free_Serialization : constant Boolean := False;
+
+      function Size_Bound
+        (S : String_Type)
+         return IO.Blocks.Size_Type;
 
       procedure Write
         (Context : in out Context_Type;
@@ -142,10 +149,6 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       :    out String_Type);
-
-   private
-      pragma Inline (Prefix_Compressed.Write);
-      pragma Inline (Prefix_Compressed.Read);
    end Prefix_Compressed;
 
 
@@ -169,10 +172,6 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       :    out String_Type);
-
-   private
-      pragma Inline (Delta_Compressed.Write);
-      pragma Inline (Delta_Compressed.Read);
    end Delta_Compressed;
 
 
@@ -232,9 +231,6 @@ private
    Empty_String : constant String_Type
                 := String_Type'(Length => 0, others => <>);
 
-   pragma Inline ("<");
-   pragma Inline ("=");
-   pragma Inline ("&");
    pragma Inline (New_String);
    pragma Inline (To_Index);
    pragma Inline (Length);

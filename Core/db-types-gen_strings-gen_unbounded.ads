@@ -46,6 +46,13 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
      (Length : Length_Type)
       return String_Type;
 
+   function New_String
+     (S        : String_Type;
+      S_From   : Index_Type;
+      S_Length : Length_Type;
+      T        : String_Type)
+      return String_Type;
+
    function Length
      (S : String_Type)
       return Length_Type;

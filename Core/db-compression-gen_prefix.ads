@@ -5,7 +5,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 generic
-   type Item_Type is private;
+   type Item_Type is (<>);
    type String_Type is private;
    type Index_Type is range <>;
    type Length_Type is range <>;
@@ -25,10 +25,15 @@ generic
            From   : Index_Type;
            Length : Length_Type)
            return String_Type;
+   with function New_String
+          (S        : String_Type;
+           S_From   : Index_Type;
+           S_Length : Length_Type;
+           T        : String_Type)
+           return String_Type;
    with function "=" (A, B : Item_Type) return Boolean;
-   with function "&" (A, B : String_Type) return String_Type;
 package DB.Compression.Gen_Prefix is
-   pragma Pure;
+   pragma Preelaborate;
 
    type Delta_Type is
       record

@@ -66,8 +66,8 @@ package DB.Types.Keys is
       return Key_Type;
 
 private
-   package Row_Serialization renames Rows.Uncompressed;
-   package Column_Serialization renames Columns.Uncompressed;
+   package Row_Serialization renames Rows.Prefix_Compressed;
+   package Column_Serialization renames Columns.Prefix_Compressed;
 
    Is_Context_Free_Serialization : constant Boolean
       := Row_Serialization.Is_Context_Free_Serialization and
@@ -80,13 +80,6 @@ private
          Column_Context : Column_Serialization.Context_Type;
          Time_Context   : Times.Context_Type;
       end record;
-
-   pragma Inline ("<=");
-   pragma Inline ("=");
-   pragma Inline (Size_Bound);
-   pragma Inline (Write);
-   pragma Inline (Read);
-   pragma Inline (Skip);
 
 end DB.Types.Keys;
 

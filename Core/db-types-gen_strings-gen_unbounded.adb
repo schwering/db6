@@ -158,6 +158,24 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
    end New_String;
 
 
+   function New_String
+     (S        : String_Type;
+      S_From   : Index_Type;
+      S_Length : Length_Type;
+      T        : String_Type)
+      return String_Type
+   is
+      SF : Index_Type renames S_From;
+      SL : Length_Type renames S_Length;
+      TL : Length_Type renames T.Length;
+      R  : String_Type := New_String(SL + TL);
+   begin
+      R.S.Buffer(1 .. SL)         := S.S.Buffer(SF .. SF+SL-1);
+      R.S.Buffer(SL+1 .. SL+TL-1) := T.S.Buffer(1 .. TL);
+      return R;
+   end New_String;
+
+
    function Length
      (S : String_Type)
       return Length_Type is

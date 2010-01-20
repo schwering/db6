@@ -14,16 +14,19 @@ package body DB.Compression.Gen_Prefix is
    is
       function Min is new Utils.Gen_Minimum(Length_Type);
 
-      Prefix_Length : Length_Type := 0;
+      Prefix_Length : Length_Type := Min(Length(S), Length(T));
    begin
-      for I in 1 .. Min(Length(S), Length(T)) loop
-         exit when Element(S, To_Index(I)) /= Element(T, To_Index(I));
-         Prefix_Length := I;
+      for I in 1 .. Prefix_Length loop
+         if Element(S, To_Index(I)) /= Element(T, To_Index(I)) then
+            Prefix_Length := I - 1;
+            exit;
+         end if;
       end loop;
       if Prefix_Length /= Length(T) then
          declare
             From : constant Index_Type  := To_Index(Prefix_Length + 1);
             Len  : constant Length_Type := Length(T) - Prefix_Length;
+            PL : Length_Type renames Prefix_Length;
          begin
             return (Prefix_Length => Prefix_Length,
                     Postfix       => Substring(T, From, Len));
@@ -40,7 +43,7 @@ package body DB.Compression.Gen_Prefix is
       D : Delta_Type)
       return String_Type is
    begin
-      return Substring(S, 1, D.Prefix_Length) & D.Postfix;
+      return New_String(S, 1, D.Prefix_Length, D.Postfix);
    end Decode;
 
 end DB.Compression.Gen_Prefix;

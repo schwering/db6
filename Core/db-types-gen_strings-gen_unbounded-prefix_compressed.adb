@@ -16,12 +16,12 @@ package body Prefix_Compressed is
       Index_Type      => Index_Type,
       Length_Type     => Length_Type,
       Empty_String    => Empty_String,
+      New_String      => New_String,
       To_Index        => To_Index,
       Length          => Length,
       Element         => Element,
       Substring       => Substring,
-      "="             => "=",
-      "&"             => "&");
+      "="             => "=");
 
 
    procedure Write
