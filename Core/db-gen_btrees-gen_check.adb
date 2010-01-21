@@ -356,16 +356,17 @@ end;
    begin -- Tree_Check
       Check_Subtree(Root_Address, 1);
       Get_Height(Tree, Tree_Height);
+      if Tree_Height = 0 then
+         Tree_Height := 1;
+      end if;
       if Height /= Tree_Height then
          Raise_Exception(Tree_Error'Identity,
                          "Height ="& Natural'Image(Height) &", but "&
                          "Tree.Height ="& Natural'Image(Tree_Height));
-         return;
       elsif Inv_Left /= Tree_Height then
          Raise_Exception(Tree_Error'Identity,
                          "Inv_Left ="& Natural'Image(Inv_Left) &", but "&
                          "Tree.Height ="& Natural'Image(Tree_Height));
-         return;
       elsif Inv_Right /= Tree_Height then
          Raise_Exception(Tree_Error'Identity,
                          "Inv_Left ="& Natural'Image(Inv_Right) &", but "&
@@ -375,7 +376,6 @@ end;
          Raise_Exception(Tree_Error'Identity,
                         "Inv_Parent ="& Natural'Image(Inv_Parent) &", but "&
                         "Tree.Height ="& Natural'Image(Tree_Height));
-         return;
       end if;
    end Check_Tree;
 

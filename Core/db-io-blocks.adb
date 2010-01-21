@@ -158,15 +158,18 @@ package body DB.IO.Blocks is
           := Base_Position_Type(Bits_To_Units(Item'Size));
       subtype Raw_Type is Base_Block_Type(1 .. Len);
       function Convert is new Ada.Unchecked_Conversion(Item_Type, Raw_Type);
-      subtype Block_Range is
-         Integer range Integer(Block'First) ..  Integer(Block'Last);
    begin
-      if Integer(Cursor.Pos) not in Block_Range or
-         Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
-         Cursor.Pos := Invalid_Position;
-         pragma Assert (Cursor.Pos not in Block'Range);
-         return;
-      end if;
+      declare
+         subtype Block_Range is
+            Integer range Integer(Block'First) ..  Integer(Block'Last);
+      begin
+         if Integer(Cursor.Pos) not in Block_Range or
+            Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
+            Cursor.Pos := Invalid_Position;
+            pragma Assert (Cursor.Pos not in Block'Range);
+            return;
+         end if;
+      end;
       Block(Cursor.Pos .. Cursor.Pos + Len - 1) := Convert(Item);
       Cursor.Pos := Cursor.Pos + Len;
    end Write;
@@ -181,15 +184,18 @@ package body DB.IO.Blocks is
           := Base_Position_Type(Bits_To_Units(Item'Size));
       subtype Raw_Type is Base_Block_Type(1 .. Len);
       function Convert is new Ada.Unchecked_Conversion(Raw_Type, Item_Type);
-      subtype Block_Range is
-         Integer range Integer(Block'First) ..  Integer(Block'Last);
    begin
-      if Integer(Cursor.Pos) not in Block_Range or
-         Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
-         Cursor.Pos := Invalid_Position;
-         pragma Assert (Cursor.Pos not in Block'Range);
-         return;
-      end if;
+      declare
+         subtype Block_Range is
+            Integer range Integer(Block'First) ..  Integer(Block'Last);
+      begin
+         if Integer(Cursor.Pos) not in Block_Range or
+            Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
+            Cursor.Pos := Invalid_Position;
+            pragma Assert (Cursor.Pos not in Block'Range);
+            return;
+         end if;
+      end;
       Item := Convert(Block(Cursor.Pos .. Cursor.Pos + Len - 1));
       Cursor.Pos := Cursor.Pos + Len;
    end Read;

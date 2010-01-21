@@ -66,8 +66,8 @@ package DB.Types.Keys is
       return Key_Type;
 
 private
-   package Row_Serialization renames Rows.Prefix_Compressed;
-   package Column_Serialization renames Columns.Prefix_Compressed;
+   package Row_Serialization renames Rows.Uncompressed;
+   package Column_Serialization renames Columns.Uncompressed;
 
    Is_Context_Free_Serialization : constant Boolean
       := Row_Serialization.Is_Context_Free_Serialization and

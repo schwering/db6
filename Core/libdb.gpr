@@ -6,11 +6,13 @@ with "attributes";
 --library
 project LibDB is
 
-   for Object_Dir  use "libdb/"& Attributes.Build &"/"& Attributes.Object_Dir;
-   for Library_Dir use "libdb/"& Attributes.Build;
+   for Object_Dir  use "lib/"& Attributes.Build &"/"& Attributes.Kind &"/"&
+                                                      Attributes.Object_Dir;
+   for Library_Dir use "lib/"& Attributes.Build &"/"& Attributes.Kind;
    for Library_Name use "db";
+   for Library_Kind use Attributes.Kind;
    --for Library_Kind use "relocatable";
-   for Library_Kind use "static";
+   --for Library_Kind use "static";
 
    for Languages use ("Ada", "C");
    for Source_Dirs use (".");

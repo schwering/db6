@@ -26,7 +26,7 @@ package DB.IO.Blocks is
    subtype Long_Index_Type is Base_Index_Type;
 
    type Base_Block_Type is
-      array (Base_Index_Type range <>) of Storage_Element_Type;
+      array (Base_Index_Type range <>) of aliased Storage_Element_Type;
    subtype Block_Type      is Base_Block_Type(Index_Type);
    subtype Long_Block_Type is Base_Block_Type(Long_Index_Type);
 

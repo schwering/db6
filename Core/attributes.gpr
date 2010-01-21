@@ -13,6 +13,9 @@ project Attributes is
    type Build_Type is ("release", "debug");
    Build : Build_Type := External("BUILD", "debug");
 
+   type Kind_Type is ("static", "relocatable");
+   Kind : Kind_Type := External("KIND", "static");
+
    package Compiler is
       Ada_Sw := ();
       case Build is

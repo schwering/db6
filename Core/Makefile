@@ -7,20 +7,28 @@ else # older Gnat
 	GPRCLEAN=
 endif
 
-all: release debug
+all: tests_debug tests_release
 
-debug:
-	$(GPRBUILD) -p -Pdb -XBUILD=debug
+libdb_debug:
+	$(GPRBUILD) -p -Plibdb -XBUILD=debug -XKIND=static
+	$(GPRBUILD) -p -Plibdb -XBUILD=debug -XKIND=relocatable
 
-release:
-	$(GPRBUILD) -p -Pdb -XBUILD=release
+libdb_release:
+	$(GPRBUILD) -p -Plibdb -XBUILD=release -XKIND=static
+	$(GPRBUILD) -p -Plibdb -XBUILD=release -XKIND=relocatable
+
+tests_debug:
+	$(GPRBUILD) -p -Ptests -XBUILD=debug -XKIND=static
+
+tests_release:
+	$(GPRBUILD) -p -Ptests -XBUILD=release -XKIND=static
 
 gcov_release:
-	gcov -o libdb/release/objects libdb/release/objects/*.gcno
+	gcov -o libdb/release/static/objects libdb/release/static/objects/*.gcno
 	#gcov -o bin/release bin/release/*.gcno
 
 gcov_debug:
-	gcov -o libdb/debug/objects libdb/debug/objects/*.gcno
+	gcov -o libdb/debug/static/objects libdb/debug/static/objects/*.gcno
 
 gcov_clean:
 	find . -name \*.gcda | xargs rm
@@ -44,8 +52,10 @@ statsbl:
 	@cat *.adb | grep -c ";"
 
 clean:
-	$(GPRCLEAN) -f -q db.gpr -XBUILD=debug || true
-	$(GPRCLEAN) -f -q db.gpr -XBUILD=release || true
-	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=debug || true
-	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=release || true
+	$(GPRCLEAN) -f -q tests.gpr -XBUILD=debug || true
+	$(GPRCLEAN) -f -q tests.gpr -XBUILD=release || true
+	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=debug -XKIND=static || true
+	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=debug -XKIND=relocatable || true
+	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=release -XKIND=static || true
+	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=release -XKIND=relocatable || true
 

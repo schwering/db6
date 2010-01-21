@@ -151,10 +151,8 @@ package body DB.Tables.Maps is
    procedure Initialize
      (Map : out Map_Type;
       ID  : in  String) is
-      procedure Raise_E is begin raise Tree_Error; end;
    begin
       if Map.Short then
-         Raise_E;
          BTrees.Initialize(Map.Short_Tree, ID);
       else
          Blob_Trees.Initialize(Map.Long_Tree, ID);
