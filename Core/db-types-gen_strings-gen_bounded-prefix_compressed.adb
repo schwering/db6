@@ -27,14 +27,14 @@ package body Prefix_Compressed is
    type String_Info_Type is
       record
          Compressed : Boolean;
-         Length     : IO.Blocks.Long_Position_Type;
+         Length     : IO.Blocks.Base_Position_Type;
       end record;
    pragma Pack (String_Info_Type);
 
    type Prefix_Info_Type is
       record
-         Block_Position : IO.Blocks.Long_Position_Type;
-         Length         : IO.Blocks.Long_Position_Type;
+         Block_Position : IO.Blocks.Base_Position_Type;
+         Length         : IO.Blocks.Base_Position_Type;
       end record;
    pragma Pack (Prefix_Info_Type);
 
@@ -61,7 +61,7 @@ package body Prefix_Compressed is
    is
       use type IO.Blocks.Size_Type;
       use type IO.Blocks.Base_Position_Type;
-      subtype LPos_Type is IO.Blocks.Long_Position_Type;
+      subtype LPos_Type is IO.Blocks.Base_Position_Type;
 
       procedure Write_Uncompressed
         (Context : in out Context_Type;

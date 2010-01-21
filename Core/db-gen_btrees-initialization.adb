@@ -13,8 +13,8 @@ package body Initialization is
      (ID : in String)
    is
       File : Block_IO.File_Type;
-      Root : constant Nodes.Node_Type := Nodes.Root_Node(Is_Leaf => True);
-      Free : constant Nodes.Node_Type := Nodes.Free_Node;
+      Root : constant Nodes.RW_Node_Type := Nodes.Root_Node(Is_Leaf => True);
+      Free : constant Nodes.RW_Node_Type := Nodes.Free_Node;
    begin
       Block_IO.Create(ID, File);
       declare
@@ -65,14 +65,14 @@ package body Initialization is
                loop
                   Increment(Count, Init);
                   declare
-                     N : Nodes.Node_Type;
+                     N : Nodes.RO_Node_Type;
                   begin
                      Read_Node(Tree, N_A, N);
                      if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
                         N_A := Nodes.To_Valid_Address(Nodes.Right_Neighbor(N));
                      elsif Nodes.Is_Inner(N) then
                         declare
-                           F : Nodes.Node_Type;
+                           F : Nodes.RO_Node_Type;
                         begin
                            Read_Node(Tree, F_A, F);
                            F_A := Nodes.Child(F, 1);
@@ -94,7 +94,7 @@ package body Initialization is
                while Nodes.Is_Valid(N_A) loop
                   Increment(Count, Init);
                   declare
-                     N : Nodes.Node_Type;
+                     N : Nodes.RO_Node_Type;
                   begin
                      Read_Node(Tree, Nodes.To_Valid_Address(N_A), N);
                      N_A := Nodes.Right_Neighbor(N);

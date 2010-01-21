@@ -129,7 +129,7 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          record
             Initialized             : Boolean := False;
             Previous                : String_Type;
-            Previous_Block_Position : IO.Blocks.Long_Position_Type;
+            Previous_Block_Position : IO.Blocks.Base_Position_Type;
          end record;
 
       Is_Context_Free_Serialization : constant Boolean := False;

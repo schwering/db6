@@ -454,13 +454,19 @@ package DB.Gen_BTrees is
 
 private
    package Nodes is
+      RO_Node_Size : constant := IO.Blocks.Block_Size;
+      RW_Node_Size : constant := RO_Node_Size * 5 / 4;
+
       type Degree_Type is range 0 .. IO.Blocks.Block_Size;
       subtype Index_Type is Degree_Type range 0 .. Degree_Type'Last;
       subtype Valid_Index_Type is Index_Type range 1 .. Index_Type'Last;
+
       type Address_Type is new Block_IO.Address_Type;
       type Valid_Address_Type is new Block_IO.Valid_Address_Type;
 
-      type Node_Type is private;
+      type Node_Type is new IO.Blocks.Base_Block_Type;
+      subtype RO_Node_Type is Node_Type(1 .. RO_Node_Size);
+      subtype RW_Node_Type is Node_Type(1 .. RW_Node_Size);
 
       type State_Type is (Valid, Too_Small, Too_Large);
       subtype Validation_State_Type is State_Type;
@@ -498,11 +504,11 @@ private
 
       function Root_Node
         (Is_Leaf : Boolean)
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns a simple root node of degree 0.
 
       function Free_Node
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns a free node.
 
       function Is_Free
@@ -528,18 +534,6 @@ private
          return Degree_Type;
       -- Returns the degree of the node. The degree is the count of keys,
       -- children, counts and/or values.
-
-      procedure Set_Parent
-        (Node   : in out Node_Type;
-         Parent : in     Address_Type);
-      -- Sets the address of the parent of the node. To mark the node as root
-      -- the address should be Invalid_Address.
-
-      procedure Set_Parent
-        (Node   : in out Node_Type;
-         Parent : in     Valid_Address_Type);
-      -- Sets the address of the parent of the node. To mark the node as root
-      -- the address should be Invalid_Address.
 
       function Parent
         (Node : Node_Type)
@@ -578,16 +572,6 @@ private
         (Node : Node_Type)
          return Valid_Address_Type;
       -- Returns the address of the left neighbor of the node.
-
-      procedure Set_Right_Neighbor
-        (Node     : in out Node_Type;
-         Neighbor : in     Address_Type);
-      -- Sets the address of the right neighbor of the node.
-
-      procedure Set_Right_Neighbor
-        (Node     : in out Node_Type;
-         Neighbor : in     Valid_Address_Type);
-      -- Sets the address of the right neighbor of the node.
 
       function Right_Neighbor
         (Node : Node_Type)
@@ -632,19 +616,41 @@ private
       -- Returns the position of the given child. If the child is not contained
       -- in the node, a Node_Error is raised.
 
-      ----------
+      --------- -
       -- Node operations.
 
+      procedure Set_Parent
+        (Node   : in out RW_Node_Type;
+         Parent : in     Address_Type);
+      -- Sets the address of the parent of the node. To mark the node as root
+      -- the address should be Invalid_Address.
+
+      procedure Set_Parent
+        (Node   : in out RW_Node_Type;
+         Parent : in     Valid_Address_Type);
+      -- Sets the address of the parent of the node. To mark the node as root
+      -- the address should be Invalid_Address.
+
+      procedure Set_Right_Neighbor
+        (Node     : in out RW_Node_Type;
+         Neighbor : in     Address_Type);
+      -- Sets the address of the right neighbor of the node.
+
+      procedure Set_Right_Neighbor
+        (Node     : in out RW_Node_Type;
+         Neighbor : in     Valid_Address_Type);
+      -- Sets the address of the right neighbor of the node.
+
       function Split_Position
-        (Node : Node_Type)
+        (Node : RW_Node_Type)
          return Valid_Index_Type;
       -- Returns the position for a split. This position is the index of the
       -- first entry which should be (the first) member of the right node after
       -- the split.
 
       function Combi_Split_Position
-        (Left_Node  : Node_Type;
-         Right_Node : Node_Type)
+        (Left_Node  : RW_Node_Type;
+         Right_Node : RW_Node_Type)
          return Valid_Index_Type;
       -- Returns the position for a split. This position is the index of the
       -- first entry which should be (the first) member of the right node after
@@ -654,69 +660,69 @@ private
       -- denotes an element of Right_Node.
 
       function Insertion
-        (Node  : Node_Type;
+        (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
          Key   : Key_Type;
          Child : Valid_Address_Type)
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns the node that results from the insertion of (Key, Child,
       -- Count) at position Index. This function is determined for inner nodes.
 
       function Insertion
-        (Node  : Node_Type;
+        (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
          Key   : Key_Type;
          Value : Value_Type)
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns the node that results from the substitution of (Key, Value) at
       -- position Index. This function is determined for leaves.
 
       function Substitution
-        (Node  : Node_Type;
+        (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
          Key   : Key_Type;
          Child : Valid_Address_Type)
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns the node that results from the substitution of (Key, Child,
       -- Count) at position Index. This function is determined for inner nodes.
 
       function Substitution
-        (Node  : Node_Type;
+        (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
          Key   : Key_Type;
          Value : Value_Type)
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns the node that results from the insertion of (Key, Value) at
       -- position Index. This function is determined for leaves.
 
       procedure Set_Child
-        (Node  : in out Node_Type;
+        (Node  : in out RW_Node_Type;
          Index : in     Valid_Index_Type;
          Child : in     Valid_Address_Type);
       -- Updates the child address at position Index. This function works for
       -- inner nodes.
 
       function Deletion
-        (Node  : Node_Type;
+        (Node  : RW_Node_Type;
          Index : Valid_Index_Type)
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns the node that results from the deletion of the Index-th child.
       -- This function works for both, leaves and inner nodes.
 
       function Copy
-        (Node : Node_Type;
+        (Node : RW_Node_Type;
          From : Valid_Index_Type;
          To   : Index_Type)
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns a copy of the node which is trimmed to the entries From .. To.
       -- This function works for both, leaves and inner nodes.
 
       function Combi_Copy
-        (Left_Node  : Node_Type;
-         Right_Node : Node_Type;
+        (Left_Node  : RW_Node_Type;
+         Right_Node : RW_Node_Type;
          From       : Valid_Index_Type;
          To         : Index_Type)
-         return Node_Type;
+         return RW_Node_Type;
       -- Returns a copy of the nodes which is trimmed to the entries From .. To.
       -- For both indexes it holds that the index refers to Left_Node if it is
       -- 1 .. Degree(Left_Node) and to Right_Node if it is in
@@ -724,9 +730,9 @@ private
       -- This function works for both, leaves and inner nodes.
 
       function Combination
-        (Left_Node  : Node_Type;
-         Right_Node : Node_Type)
-         return Node_Type;
+        (Left_Node  : RW_Node_Type;
+         Right_Node : RW_Node_Type)
+         return RW_Node_Type;
       -- Returns a combination of Left_Node and Right_Node. The degree is the
       -- sum of both, the left neighbor is Left_Node's and the right neighbor is
       -- Right_Node's one. The parent is Right_Node's parent, because in most
@@ -765,17 +771,7 @@ private
          return IO.Blocks.Block_Type;
       -- Converts a node to a block.
 
-      function From_Block
-        (Block : IO.Blocks.Block_Type)
-         return Node_Type;
-      -- Converts a block to a node.
-
    private
-      type Node_Type is
-         record
-            Block : IO.Blocks.Long_Block_Type;
-         end record;
-
       pragma Inline (Root_Node);
       pragma Inline (Is_Valid);
       pragma Inline (Is_Free);
@@ -800,7 +796,6 @@ private
       pragma Inline (To_Valid_Address);
       pragma Inline (To_Address);
       pragma Inline (To_Block);
-      pragma Inline (From_Block);
    end Nodes;
 
    function "<=" (Left, Right : Key_Type) return Boolean;
@@ -869,12 +864,9 @@ private
    for RW_Transaction_Ref_Type'Storage_Size use 0;
 
    package IO_Buffers is new IO.Blocks.Gen_Buffers
-     (Block_IO          => Block_IO,
-      Item_Type         => Nodes.Node_Type,
-      To_Block          => Nodes.To_Block,
-      From_Block        => Nodes.From_Block,
-      Item_Storage_Pool => Storage_Pool,
-      Node_Storage_Pool => Storage_Pool);
+     (Block_IO           => Block_IO,
+      Block_Storage_Pool => Storage_Pool,
+      Node_Storage_Pool  => Storage_Pool);
 
    type RW_Transaction_Type is new Transaction_Type with
       record
@@ -894,7 +886,7 @@ private
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type;
       N_A         : in     Nodes.Valid_Address_Type;
-      N           : in     Nodes.Node_Type);
+      N           : in     Nodes.RW_Node_Type);
 
 
    type Sub_RW_Transaction_Type is new RW_Transaction_Type with
@@ -959,7 +951,7 @@ private
          Upper_Bound        : Bound_Type;
          Direction          : Direction_Type;
          Has_Node           : Boolean                       := False;
-         Node               : Nodes.Node_Type;
+         Node               : Nodes.RO_Node_Type;
          Index              : Nodes.Valid_Index_Type;
          Force_Recalibrate  : Boolean                       := False;
          Owning_Tree        : Tree_Ref_Type;

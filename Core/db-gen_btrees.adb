@@ -79,7 +79,7 @@ package body DB.Gen_BTrees is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type);
    end Insertion;
 
@@ -102,7 +102,7 @@ package body DB.Gen_BTrees is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type);
    end Deletion;
 
@@ -225,10 +225,9 @@ package body DB.Gen_BTrees is
       N    :    out Nodes.Node_Type)
    is
       pragma Inline (Read_Node);
-      Block : IO.Blocks.Block_Type;
    begin
-      Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(N_A), Block);
-      N := Nodes.From_Block(Block);
+      Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(N_A),
+                    IO.Blocks.Base_Block_Type(N(Nodes.RO_Node_Type'Range)));
    end Read_Node;
 
 
@@ -264,7 +263,8 @@ package body DB.Gen_BTrees is
       pragma Inline (Read_Node);
    begin
       IO_Buffers.Read(Tree.File, Transaction.Buffer,
-                      Block_IO.Valid_Address_Type(N_A), N);
+                      Block_IO.Valid_Address_Type(N_A),
+                      IO.Blocks.Base_Block_Type(N(Nodes.RO_Node_Type'Range)));
    end Read_Node;
 
 
@@ -272,12 +272,15 @@ package body DB.Gen_BTrees is
      (Tree        : in out Tree_Type;
       Transaction : in out RW_Transaction_Type;
       N_A         : in     Nodes.Valid_Address_Type;
-      N           : in     Nodes.Node_Type)
+      N           : in     Nodes.RW_Node_Type)
    is
       pragma Inline (Write_Node);
+      use type Nodes.Validation_State_Type;
+      pragma Assert (Nodes.Validation(N) = Nodes.Valid);
    begin
       IO_Buffers.Write(Tree.File, Transaction.Buffer,
-                       Block_IO.Valid_Address_Type(N_A), N);
+                       Block_IO.Valid_Address_Type(N_A),
+                       Nodes.To_Block(N));
    end Write_Node;
 
 
@@ -290,7 +293,7 @@ package body DB.Gen_BTrees is
       procedure Prepare_References
         (Tree    : in out Tree_Type;
          T       : in out RW_Transaction_Type'Class;
-         N       : in     Nodes.Node_Type;
+         N       : in     Nodes.RW_Node_Type;
          Old_N_A : in     Nodes.Valid_Address_Type;
          New_N_A : in     Nodes.Valid_Address_Type)
       is
@@ -300,7 +303,7 @@ package body DB.Gen_BTrees is
       begin
          if Nodes.Is_Valid(P_A) then
             declare
-               P   : Nodes.Node_Type;
+               P   : Nodes.RW_Node_Type;
                I   : Nodes.Index_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(P_A), P);
@@ -311,7 +314,7 @@ package body DB.Gen_BTrees is
          end if;
          if Nodes.Is_Valid(L_A) then
             declare
-               L : Nodes.Node_Type;
+               L : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(L_A), L);
                Nodes.Set_Right_Neighbor(L, New_N_A);
@@ -320,7 +323,7 @@ package body DB.Gen_BTrees is
          end if;
          if Nodes.Is_Valid(R_A) then
             declare
-               R : Nodes.Node_Type;
+               R : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(R_A), R);
                Nodes.Set_Left_Neighbor(R, New_N_A);
@@ -331,7 +334,7 @@ package body DB.Gen_BTrees is
             for I in 1 .. Nodes.Degree(N) loop
                declare
                   C_A : constant Nodes.Valid_Address_Type := Nodes.Child(N, I);
-                  C   : Nodes.Node_Type;
+                  C   : Nodes.RW_Node_Type;
                begin
                   Read_Node(Tree, T, C_A, C);
                   Nodes.Set_Parent(C, New_N_A);
@@ -344,7 +347,7 @@ package body DB.Gen_BTrees is
       procedure Prepare_Free_References
         (Tree    : in out Tree_Type;
          T       : in out RW_Transaction_Type'Class;
-         N       : in     Nodes.Node_Type;
+         N       : in     Nodes.RW_Node_Type;
          New_N_A : in     Nodes.Valid_Address_Type)
       is
          L_A : constant Nodes.Address_Type := Nodes.Left_Neighbor(N);
@@ -352,7 +355,7 @@ package body DB.Gen_BTrees is
       begin
          if Nodes.Is_Valid(L_A) then
             declare
-               L : Nodes.Node_Type;
+               L : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(L_A), L);
                Nodes.Set_Right_Neighbor(L, New_N_A);
@@ -361,7 +364,7 @@ package body DB.Gen_BTrees is
          end if;
          if Nodes.Is_Valid(R_A) then
             declare
-               R : Nodes.Node_Type;
+               R : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, Nodes.To_Valid_Address(R_A), R);
                Nodes.Set_Left_Neighbor(R, New_N_A);
@@ -377,8 +380,8 @@ package body DB.Gen_BTrees is
       end if;
 
       declare
-         M : Nodes.Node_Type;
-         N : Nodes.Node_Type;
+         M : Nodes.RW_Node_Type;
+         N : Nodes.RW_Node_Type;
       begin
          Read_Node(Tree, T, M_A, M);
          Read_Node(Tree, T, N_A, N);
@@ -395,8 +398,8 @@ package body DB.Gen_BTrees is
       end;
       -- Nodes have to be re-read before being written to their destination.
       declare
-         M : Nodes.Node_Type;
-         N : Nodes.Node_Type;
+         M : Nodes.RW_Node_Type;
+         N : Nodes.RW_Node_Type;
       begin
          Read_Node(Tree, T, M_A, M);
          Read_Node(Tree, T, N_A, N);
@@ -616,14 +619,14 @@ package body DB.Gen_BTrees is
       Address :    out Nodes.Valid_Address_Type)
    is
       F_A : Nodes.Valid_Address_Type renames Free_Address;
-      F   : Nodes.Node_Type;
+      F   : Nodes.RW_Node_Type;
    begin
       Read_Node(Tree, T, F_A, F);
       if Nodes.Is_Valid(Nodes.Right_Neighbor(F)) then
          declare
             N_A : constant Nodes.Valid_Address_Type
                 := Nodes.To_Valid_Address(Nodes.Right_Neighbor(F));
-            N   : Nodes.Node_Type;
+            N   : Nodes.RW_Node_Type;
             R_A : Nodes.Address_Type;
          begin
             Read_Node(Tree, T, N_A, N);
@@ -632,7 +635,7 @@ package body DB.Gen_BTrees is
             Write_Node(Tree, T, F_A, F);
             if Nodes.Is_Valid(R_A) then
                declare
-                  R : Nodes.Node_Type;
+                  R : Nodes.RW_Node_Type;
                begin
                   Read_Node(Tree, T, Nodes.To_Valid_Address(R_A), R);
                   Nodes.Set_Left_Neighbor(R, F_A);
@@ -656,9 +659,9 @@ package body DB.Gen_BTrees is
       Address : in     Nodes.Valid_Address_Type)
    is
       F_A : Nodes.Valid_Address_Type renames Free_Address;
-      F   : Nodes.Node_Type;
+      F   : Nodes.RW_Node_Type;
       N_A : Nodes.Valid_Address_Type renames Address;
-      N   : Nodes.Node_Type := Nodes.Free_Node;
+      N   : Nodes.RW_Node_Type := Nodes.Free_Node;
       R_A : Nodes.Address_Type;
    begin
       Read_Node(Tree, T, F_A, F);
@@ -670,7 +673,7 @@ package body DB.Gen_BTrees is
       Write_Node(Tree, T, N_A, N);
       if Nodes.Is_Valid(R_A) then
          declare
-            R : Nodes.Node_Type;
+            R : Nodes.RW_Node_Type;
          begin
             Read_Node(Tree, T, Nodes.To_Valid_Address(R_A), R);
             Nodes.Set_Left_Neighbor(R, N_A);
@@ -688,7 +691,7 @@ package body DB.Gen_BTrees is
      (Tree  : in out Tree_Type;
       T     : in out RW_Transaction_Type'Class;
       N_A   : in     Nodes.Valid_Address_Type;
-      N     : in     Nodes.Node_Type;
+      N     : in     Nodes.RW_Node_Type;
       State : in out State_Type) is
    begin
       if Nodes.Is_Valid(Nodes.Parent(N)) then
@@ -696,11 +699,11 @@ package body DB.Gen_BTrees is
             use type Nodes.Degree_Type;
             P_A     : constant Nodes.Valid_Address_Type
                     := Nodes.Valid_Parent(N);
-            P       : Nodes.Node_Type;
+            P       : Nodes.RW_Node_Type;
             I       : Nodes.Valid_Index_Type;
             Old_Key : Key_Type;
             New_Key : Key_Type;
-            New_P   : Nodes.Node_Type;
+            New_P   : Nodes.RW_Node_Type;
          begin
             Read_Node(Tree, T, P_A, P);
             I := Nodes.Child_Position(P, N_A);
@@ -733,14 +736,14 @@ package body DB.Gen_BTrees is
      (Tree  : in out Tree_Type;
       T     : in out RW_Transaction_Type'Class;
       L_A   : in     Nodes.Valid_Address_Type;
-      L     : in     Nodes.Node_Type;
+      L     : in     Nodes.RW_Node_Type;
       R_A   : in     Nodes.Valid_Address_Type;
-      R     : in     Nodes.Node_Type;
+      R     : in     Nodes.RW_Node_Type;
       State : in out State_Type)
    is
       function Combi_Child
-        (Left_Node  : Nodes.Node_Type;
-         Right_Node : Nodes.Node_Type;
+        (Left_Node  : Nodes.RW_Node_Type;
+         Right_Node : Nodes.RW_Node_Type;
          Index      : Nodes.Valid_Index_Type)
          return Nodes.Valid_Address_Type
       is
@@ -755,12 +758,12 @@ package body DB.Gen_BTrees is
 
       use type Nodes.Degree_Type;
       use type Nodes.Valid_Address_Type;
-      --N : constant Nodes.Node_Type := Nodes.Combination(L, R);
+      --N : constant Nodes.RW_Node_Type := Nodes.Combination(L, R);
       I     : constant Nodes.Valid_Index_Type
             := Nodes.Combi_Split_Position(L, R);
-      L_New : Nodes.Node_Type
+      L_New : Nodes.RW_Node_Type
             := Nodes.Combi_Copy(L, R, 1, I-1);
-      R_New : Nodes.Node_Type
+      R_New : Nodes.RW_Node_Type
             := Nodes.Combi_Copy(L, R, I, Nodes.Degree(L) + Nodes.Degree(R));
    begin
       if Nodes.Is_Valid(L_New, Force_Non_Root => True) and
@@ -781,7 +784,7 @@ package body DB.Gen_BTrees is
                declare
                   C_A : constant Nodes.Valid_Address_Type
                       := Combi_Child(L, R, K);
-                  C   : Nodes.Node_Type;
+                  C   : Nodes.RW_Node_Type;
                begin
                   Read_Node(Tree, T, C_A, C);
                   Nodes.Set_Parent(C, R_A);
@@ -793,7 +796,7 @@ package body DB.Gen_BTrees is
                declare
                   C_A : constant Nodes.Valid_Address_Type
                       := Combi_Child(L, R, K);
-                  C   : Nodes.Node_Type;
+                  C   : Nodes.RW_Node_Type;
                begin
                   Read_Node(Tree, T, C_A, C);
                   Nodes.Set_Parent(C, L_A);

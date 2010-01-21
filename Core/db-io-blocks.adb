@@ -35,17 +35,6 @@ package body DB.IO.Blocks is
    end To_Block;
 
 
-   function To_Long_Block
-     (Block : Block_Type)
-      return Long_Block_Type
-   is
-      Long_Block : Long_Block_Type;
-   begin
-      Long_Block(Block'Range) := Block;
-      return Long_Block;
-   end To_Long_Block;
-
-
    function New_Cursor
      (Start : Base_Position_Type)
       return Cursor_Type is

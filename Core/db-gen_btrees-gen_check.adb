@@ -12,6 +12,25 @@ with DB.IO.Blocks;
 procedure DB.Gen_BTrees.Gen_Check
   (Tree : in out Tree_Type)
 is
+   Transaction : RO_Transaction_Type := New_RO_Transaction(Tree);
+
+   procedure Read_Node
+     (Tree        : in out Tree_Type;
+      N_A         : in     Nodes.Valid_Address_Type;
+      N           :    out Nodes.Node_Type) is
+   begin
+      Read_Node(Tree, Transaction, N_A, N);
+   end Read_Node;
+
+   procedure Read_Node
+     (Tree        : in out Tree_Type;
+      N_A         : in     Nodes.Address_Type;
+      N           :    out Nodes.Node_Type) is
+   begin
+      Read_Node(Tree, Transaction, Nodes.To_Valid_Address(N_A), N);
+   end Read_Node;
+
+
    function Image (N_A : Nodes.Valid_Address_Type) return String is
    begin
       return Block_IO.Image(Block_IO.Valid_Address_Type(N_A));
@@ -142,7 +161,7 @@ is
         (Address : in Nodes.Valid_Address_Type;
          Level   : in Natural)
       is
-         B : IO.Blocks.Block_Type;
+         N : Nodes.RO_Node_Type;
       begin
          if Counter mod Interval = 0 then
             null;
@@ -154,11 +173,10 @@ is
             Height := Level;
          end if;
 
-         Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(Address), B);
+         Read_Node(Tree, Address, N);
          declare
             use type Nodes.Address_Type;
             use type Nodes.Index_Type;
-            N : constant Nodes.Node_Type := Nodes.From_Block(B);
          begin
             if not Nodes.Is_Valid(N) then
                Raise_Exception(Tree_Error'Identity,
@@ -175,15 +193,12 @@ is
 
             -- Check parent
             if Nodes.Is_Valid(Nodes.Parent(N)) then
-               Block_IO.Read(Tree.File,
-                             Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
-                                (Nodes.Parent(N))),
-                             B);
                declare
                   use type Nodes.Valid_Address_Type;
-                  P : constant Nodes.Node_Type := Nodes.From_Block(B);
+                  P : Nodes.RO_Node_Type;
                   Found : Boolean := False;
                begin
+                  Read_Node(Tree, Nodes.Parent(N), P);
                   for I in 1 .. Nodes.Degree(P) loop
                      if Nodes.Child(P, I) = Address then
                         Found := True;
@@ -217,10 +232,10 @@ declare
 
    function R(A : Nodes.Valid_Address_Type) return Nodes.Node_Type
    is
-      B : DB.IO.Blocks.Block_Type;
+      N : Nodes.RO_Node_Type;
    begin
-      Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(A), B);
-      return Nodes.From_Block(B);
+      Read_Node(Tree, A, N);
+      return N;
    end R;
 
    function R(A : Nodes.Address_Type) return Nodes.Node_Type is
@@ -253,14 +268,11 @@ end;
 
             -- Check left neighbor
             if Nodes.Is_Valid(Nodes.Left_Neighbor(N)) then
-               Block_IO.Read(Tree.File,
-                             Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
-                              (Nodes.Left_Neighbor(N))),
-                             B);
                declare
                   use type Nodes.Valid_Address_Type;
-                  L : constant Nodes.Node_Type := Nodes.From_Block(B);
+                  L : Nodes.RO_Node_Type;
                begin
+                  Read_Node(Tree, Nodes.Left_Neighbor(N), L);
                   if Nodes.Valid_Right_Neighbor(L) /= Address then
                      Raise_Exception(Tree_Error'Identity,
                              Message("Left neighbor doesn't point back", L, N));
@@ -277,10 +289,10 @@ declare
 
    function R(A : Nodes.Valid_Address_Type) return Nodes.Node_Type
    is
-      B : DB.IO.Blocks.Block_Type;
+      N : Nodes.RO_Node_Type;
    begin
-      Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(A), B);
-      return Nodes.From_Block(B);
+      Read_Node(Tree, A, N);
+      return N;
    end R;
 
    function R(A : Nodes.Address_Type) return Nodes.Node_Type is
@@ -313,14 +325,11 @@ end;
 
             -- Check right neighbor
             if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
-               Block_IO.Read(Tree.File,
-                             Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
-                                (Nodes.Right_Neighbor(N))),
-                             B);
                declare
                   use type Nodes.Valid_Address_Type;
-                  R : constant Nodes.Node_Type := Nodes.From_Block(B);
+                  R : Nodes.RO_Node_Type;
                begin
+                  Read_Node(Tree, Nodes.Right_Neighbor(N), R);
                   if Nodes.Valid_Left_Neighbor(R) /= Address then
                      Raise_Exception(Tree_Error'Identity,
                                   Message("Right neighbor doesn't point back",
@@ -390,13 +399,10 @@ end;
    begin
       Address := Nodes.To_Address(Free_Address);
       while Nodes.Is_Valid(Address) loop
-         Block_IO.Read(Tree.File,
-                       Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
-                          (Address)),
-                       Block);
          declare
-            N : constant Nodes.Node_Type := Nodes.From_Block(Block);
+            N : Nodes.RO_Node_Type;
          begin
+            Read_Node(Tree, Address, N);
             if not Nodes.Is_Free(N) then
                Raise_Exception(Tree_Error'Identity,
                                "Node is not free but in list "& Image(Address));
@@ -410,20 +416,17 @@ end;
       loop
          declare
          begin
-            Block_IO.Read(Tree.File,
-                          Block_IO.Valid_Address_Type(Nodes.To_Valid_Address
-                             (Address)),
-                          Block);
-            Address := Nodes.To_Address(Nodes.Valid_Address_Type(Block_IO.Succ
-                        (Block_IO.Valid_Address_Type
-                           (Nodes.To_Valid_Address(Address)))));
             declare
-               N : constant Nodes.Node_Type := Nodes.From_Block(Block);
+               N : Nodes.RO_Node_Type;
             begin
+               Read_Node(Tree, Address, N);
                if Nodes.Is_Free(N) then
                   Count2 := Count2 + 1;
                end if;
             end;
+            Address := Nodes.To_Address(Nodes.Valid_Address_Type(Block_IO.Succ
+                        (Block_IO.Valid_Address_Type
+                           (Nodes.To_Valid_Address(Address)))));
          exception
             when IO_Error =>
                exit;
@@ -439,11 +442,13 @@ end;
 
    Ticket : Block_IO.Ticket_Type;
 begin -- Gen_Check
-   Block_IO.Acquire_Ticket(Tree.File, Ticket);
-   Block_IO.Read_Lock(Tree.File, Ticket);
+   Start_Transaction(Tree, Transaction);
    Check_Tree(Tree);
    Check_Free_Nodes(Tree);
-   Block_IO.Unlock(Tree.File, Ticket);
-   Block_IO.Release_Ticket(Tree.File, Ticket);
+   Finish_Transaction(Tree, Transaction);
+exception
+   when others =>
+      Finish_Transaction(Tree, Transaction);
+      raise;
 end DB.Gen_BTrees.Gen_Check;
 

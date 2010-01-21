@@ -59,7 +59,7 @@ package body Insertion is
       loop
          declare
             use type Nodes.Degree_Type;
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
             I := Nodes.Key_Position(N, Key);
@@ -81,8 +81,8 @@ package body Insertion is
 
       -- Insert in memory and then dispatch to add the node.
       declare
-         N_Old : Nodes.Node_Type;
-         N_New : Nodes.Node_Type;
+         N_Old : Nodes.RW_Node_Type;
+         N_New : Nodes.RW_Node_Type;
       begin
          Read_Node(Tree, Transaction, N_A, N_Old);
          N_New := Nodes.Insertion(N_Old, I, Key, Value);
@@ -108,7 +108,7 @@ package body Insertion is
      (Tree  : in out Tree_Type;
       T     : in out RW_Transaction_Type'Class;
       N_A   : in     Nodes.Valid_Address_Type;
-      N     : in     Nodes.Node_Type;
+      N     : in     Nodes.RW_Node_Type;
       State : in out State_Type)
    is
 
@@ -119,7 +119,7 @@ package body Insertion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type) is
       begin
          if Nodes.Is_Valid(N) then
@@ -140,14 +140,14 @@ package body Insertion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type) is
       begin
          if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
             declare
                R_A : constant Nodes.Valid_Address_Type
                    := Nodes.Valid_Right_Neighbor(N);
-               R   : Nodes.Node_Type;
+               R   : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, R_A, R);
                Redistribute(Tree, T, N_A, N, R_A, R, State);
@@ -167,14 +167,14 @@ package body Insertion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type) is
       begin
          if Nodes.Is_Valid(Nodes.Left_Neighbor(N)) then
             declare
                L_A : constant Nodes.Valid_Address_Type
                    := Nodes.Valid_Left_Neighbor(N);
-               L   : Nodes.Node_Type;
+               L   : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, L_A, L);
                Redistribute(Tree, T, L_A, L, N_A, N, State);
@@ -197,7 +197,7 @@ package body Insertion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type)
       is
 
@@ -205,9 +205,9 @@ package body Insertion is
            (Tree  : in out Tree_Type;
             T     : in out RW_Transaction_Type'Class;
             L_A   : in     Nodes.Valid_Address_Type;
-            L     : in out Nodes.Node_Type;
+            L     : in out Nodes.RW_Node_Type;
             R_A   : in     Nodes.Valid_Address_Type;
-            R     : in out Nodes.Node_Type;
+            R     : in out Nodes.RW_Node_Type;
             State : in out State_Type) is
          begin
             Allocate_Node(Tree, T, T.Current_Root_Address);
@@ -216,7 +216,7 @@ package body Insertion is
             Write_Node(Tree, T, L_A, L);
             Write_Node(Tree, T, R_A, R);
             declare
-               Root : constant Nodes.Node_Type := Nodes.Insertion(
+               Root : constant Nodes.RW_Node_Type := Nodes.Insertion(
                         Node  => Nodes.Insertion(
                                     Node  => Nodes.Root_Node(Is_Leaf => False),
                                     Index => 1,
@@ -238,17 +238,17 @@ package body Insertion is
            (Tree  : in out Tree_Type;
             T     : in out RW_Transaction_Type'Class;
             L_A   : in     Nodes.Valid_Address_Type;
-            L     : in     Nodes.Node_Type;
+            L     : in     Nodes.RW_Node_Type;
             State : in out State_Type)
          is
             P_A   : constant Nodes.Valid_Address_Type
                   := Nodes.Valid_Parent(L);
             R_A   : constant Nodes.Valid_Address_Type
                   := Nodes.Valid_Right_Neighbor(L);
-            P_Old : Nodes.Node_Type;
+            P_Old : Nodes.RW_Node_Type;
             Key   : Key_Type;
             I     : Nodes.Index_Type;
-            P_New : Nodes.Node_Type;
+            P_New : Nodes.RW_Node_Type;
          begin -- Insert_Into_Parent
             Read_Node(Tree, T, P_A, P_Old);
             Key   := Nodes.Key(L, Nodes.Degree(L));
@@ -262,8 +262,8 @@ package body Insertion is
 
          use type Nodes.Degree_Type;
          I   : constant Nodes.Valid_Index_Type := Nodes.Split_Position(N);
-         L   : Nodes.Node_Type := Nodes.Copy(N, 1, I - 1);
-         R   : Nodes.Node_Type := Nodes.Copy(N, I, Nodes.Degree(N));
+         L   : Nodes.RW_Node_Type := Nodes.Copy(N, 1, I - 1);
+         R   : Nodes.RW_Node_Type := Nodes.Copy(N, I, Nodes.Degree(N));
          L_A : Nodes.Valid_Address_Type;
          R_A : Nodes.Valid_Address_Type renames N_A;
       begin -- Split
@@ -277,7 +277,7 @@ package body Insertion is
                   declare
                      C_A : constant Nodes.Valid_Address_Type
                          := Nodes.Child(L, I);
-                     C   : Nodes.Node_Type;
+                     C   : Nodes.RW_Node_Type;
                   begin
                      Read_Node(Tree, T, C_A, C);
                      Nodes.Set_Parent(C, L_A);
@@ -291,7 +291,7 @@ package body Insertion is
                declare
                   LL_A : constant Nodes.Valid_Address_Type
                        := Nodes.Valid_Left_Neighbor(L);
-                  LL   : Nodes.Node_Type;
+                  LL   : Nodes.RW_Node_Type;
                begin
                   Read_Node(Tree, T, LL_A, LL);
                   Nodes.Set_Right_Neighbor(LL, L_A);

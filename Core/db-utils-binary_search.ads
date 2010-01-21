@@ -46,7 +46,7 @@ package DB.Utils.Binary_Search is
       Index : out Index_Type);
 
    generic
-      type Container_Type is limited private;
+      type Container_Type (<>) is limited private;
       type Index_Type is range <>;
       type Item_Type is limited private;
       with function Get (C : Container_Type; I : Index_Type) return Item_Type;
@@ -60,7 +60,7 @@ package DB.Utils.Binary_Search is
       Index       : out Index_Type);
 
    generic
-      type Container_Type is limited private;
+      type Container_Type (<>) is limited private;
       type Extended_Index_Type is range <>;
       Invalid_Index : in Extended_Index_Type;
       type Item_Type is limited private;
@@ -79,7 +79,7 @@ package DB.Utils.Binary_Search is
       Index       : out Extended_Index_Type);
 
    generic
-      type Container_Type is limited private;
+      type Container_Type (<>) is limited private;
       type Extended_Index_Type is range <>;
       Invalid_Index : in Extended_Index_Type;
       type Item_Type is limited private;

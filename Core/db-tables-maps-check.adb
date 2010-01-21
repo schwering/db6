@@ -25,14 +25,18 @@ is
 
    function Value_To_String
      (Value : Types.Values.Bounded.String_Type)
-      return String is
+      return String
+   is
+      pragma Unreferenced (Value);
    begin
       return "(BoundedString)";
    end Value_To_String;
 
    function Value_To_String
      (Value : Types.Values.Unbounded.String_Type)
-      return String is
+      return String
+   is
+      pragma Unreferenced (Value);
    begin
       return "(UnboundedString)";
    end Value_To_String;

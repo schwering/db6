@@ -425,21 +425,13 @@ private
       end record;
 
 
-   function Block_Identity
-     (Block : IO.Blocks.Block_Type)
-      return IO.Blocks.Block_Type;
-   pragma Inline (Block_Identity);
-
    -- All output operations use this buffer instead of direct IO so that they
    -- can commit *all* changes at the end to avoid an inconsistent heap.
    package IO_Buffers is new IO.Blocks.Gen_Buffers
-     (Block_IO          => Block_IO,
-      Item_Type         => IO.Blocks.Block_Type,
-      To_Block          => Block_Identity,
-      From_Block        => Block_Identity,
-      Item_Storage_Pool => Storage_Pool,
-      Node_Storage_Pool => Storage_Pool);
-   subtype Block_Constant_Ref is IO_Buffers.Item_Constant_Ref_Type;
+     (Block_IO           => Block_IO,
+      Block_Storage_Pool => Storage_Pool,
+      Node_Storage_Pool  => Storage_Pool);
+   subtype Block_Constant_Ref is IO_Buffers.Block_Constant_Ref_Type;
 
    type Transaction_Type is abstract tagged limited
       record

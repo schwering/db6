@@ -13,22 +13,28 @@ package DB.IO.Blocks is
    subtype Size_Type is System.Storage_Elements.Storage_Offset;
    use type Size_Type;
 
-   Block_Size      : constant := 4 * 1024;
-   Long_Block_Size : constant := Block_Size * 5 / 4;
+   Block_Size : constant := 4 * 1024;
 
-   type    Base_Position_Type is range 0 .. Long_Block_Size + 1;
-   for     Base_Position_Type'Size use 16;
-   subtype Position_Type      is Base_Position_Type range 0 .. Block_Size + 1;
-   subtype Long_Position_Type is Base_Position_Type;
+   Last_Position : constant := 2**14 - 1;
+   type Base_Position_Type is range 0 .. Last_Position;
+   for Base_Position_Type'Size use 15;
+   -- Base_Position_Type is intended to have some overflow space, for example
+   -- for applications that use Base_BlocK_Type greater than disk Block_Types
+   -- that are truncated to Block_Types before being written to disk. It's
+   -- limited to 15 bits because this allows Base_Block_Types of 16383 bytes,
+   -- hence almost 4 times the size of a normal Block_Size. However, there is
+   -- still one bit free if someone wants to store an additional boolean in a
+   -- packed record together with a Base_Position_Type.
 
-   subtype Base_Index_Type is Base_Position_Type range 1 .. Long_Block_Size;
-   subtype Index_Type      is Base_Index_Type range 1 .. Block_Size;
-   subtype Long_Index_Type is Base_Index_Type;
+   subtype Position_Type is Base_Position_Type range 0 .. Block_Size + 1;
+
+   subtype Base_Index_Type is Base_Position_Type range 1 .. Last_Position;
+
+   subtype Index_Type is Base_Index_Type range 1 .. Block_Size;
 
    type Base_Block_Type is
       array (Base_Index_Type range <>) of aliased Storage_Element_Type;
-   subtype Block_Type      is Base_Block_Type(Index_Type);
-   subtype Long_Block_Type is Base_Block_Type(Long_Index_Type);
+   subtype Block_Type is Base_Block_Type(Index_Type);
 
    type Cursor_Type (<>) is limited private;
 
@@ -48,10 +54,6 @@ package DB.IO.Blocks is
    -- Truncates the base block to a short one and sets the remaining free
    -- storage elements to zero. The latter is done because the block will
    -- probably be written to disk.
-
-   function To_Long_Block
-     (Block : Block_Type)
-      return Long_Block_Type;
 
    function New_Cursor
      (Start : Base_Position_Type)
@@ -170,7 +172,6 @@ private
       end record;
 
    pragma Inline (To_Block);
-   pragma Inline (To_Long_Block);
    pragma Inline (New_Cursor);
    pragma Inline (Is_Valid);
    pragma Inline (Position);

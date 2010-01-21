@@ -22,94 +22,94 @@ package body Nodes is
       pragma Elaborate_Body;
 
       function Entry_Size
-        (Block : IO.Blocks.Long_Block_Type;
+        (Block : IO.Blocks.Base_Block_Type;
          Index : Valid_Index_Type)
-         return IO.Blocks.Long_Position_Type;
+         return IO.Blocks.Base_Position_Type;
 
       function Entries_Size
-        (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Position_Type;
+        (Block : IO.Blocks.Base_Block_Type)
+         return IO.Blocks.Base_Position_Type;
 
       function Total_Size
-        (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Position_Type;
+        (Block : IO.Blocks.Base_Block_Type)
+         return IO.Blocks.Base_Position_Type;
 
       function Effective_Block_Space
-        return IO.Blocks.Long_Position_Type;
+        return IO.Blocks.Base_Position_Type;
 
       function Max_Key_Size
-        (Max_Entry_Size : IO.Blocks.Long_Position_Type;
-         Max_Value_Size : IO.Blocks.Long_Position_Type)
-         return IO.Blocks.Long_Position_Type;
+        (Max_Entry_Size : IO.Blocks.Base_Position_Type;
+         Max_Value_Size : IO.Blocks.Base_Position_Type)
+         return IO.Blocks.Base_Position_Type;
 
       function Last_Used_Index
-        (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Index_Type;
+        (Block : IO.Blocks.Base_Block_Type)
+         return IO.Blocks.Base_Index_Type;
 
-      function New_Block
-        (Is_Ok   : Boolean;
-         Is_Free : Boolean;
-         Is_Leaf : Boolean;
-         Degree  : Degree_Type;
-         Parent  : Address_Type;
-         Left    : Address_Type;
-         Right   : Address_Type)
-         return IO.Blocks.Long_Block_Type;
+      procedure Init_Block
+        (Block   : in out IO.Blocks.Base_Block_Type;
+         Is_Ok   : in     Boolean;
+         Is_Free : in     Boolean;
+         Is_Leaf : in     Boolean;
+         Degree  : in     Degree_Type;
+         Parent  : in     Address_Type;
+         Left    : in     Address_Type;
+         Right   : in     Address_Type);
 
       function Is_Ok
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Boolean;
 
       procedure Set_Ok
-        (Block : in out IO.Blocks.Long_Block_Type;
+        (Block : in out IO.Blocks.Base_Block_Type;
          Is_Ok : in     Boolean);
 
       function Is_Free
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Boolean;
 
       function Is_Leaf
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Boolean;
 
       function Degree
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Degree_Type;
 
       function Parent
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Address_Type;
 
       procedure Set_Parent
-        (Block   : in out IO.Blocks.Long_Block_Type;
+        (Block   : in out IO.Blocks.Base_Block_Type;
          Address : in     Address_Type);
 
       function Left
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Address_Type;
 
       procedure Set_Left
-        (Block   : in out IO.Blocks.Long_Block_Type;
+        (Block   : in out IO.Blocks.Base_Block_Type;
          Address : in     Address_Type);
 
       function Right
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Address_Type;
 
       procedure Set_Right
-        (Block   : in out IO.Blocks.Long_Block_Type;
+        (Block   : in out IO.Blocks.Base_Block_Type;
          Address : in     Address_Type);
 
       procedure Read_Key
         (Key_Context : in out Key_Context_Type;
-         Block       : in     IO.Blocks.Long_Block_Type;
+         Block       : in     IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Key_Type;
          Success     :    out Boolean);
 
       procedure Read_Child
         (Key_Context : in out Key_Context_Type;
-         Block       : in     IO.Blocks.Long_Block_Type;
+         Block       : in     IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean);
@@ -117,14 +117,14 @@ package body Nodes is
       procedure Read_Value
         (Key_Context   : in out Key_Context_Type;
          Value_Context : in out Value_Context_Type;
-         Block         : in     IO.Blocks.Long_Block_Type;
+         Block         : in     IO.Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Value         :    out Value_Type;
          Success       :    out Boolean);
 
       procedure Read_Entry
         (Key_Context : in out Key_Context_Type;
-         Block       : in     IO.Blocks.Long_Block_Type;
+         Block       : in     IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Key_Type;
          Child       :    out Valid_Address_Type;
@@ -133,7 +133,7 @@ package body Nodes is
       procedure Read_Entry
         (Key_Context   : in out Key_Context_Type;
          Value_Context : in out Value_Context_Type;
-         Block         : in     IO.Blocks.Long_Block_Type;
+         Block         : in     IO.Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Key           :    out Key_Type;
          Value         :    out Value_Type;
@@ -141,7 +141,7 @@ package body Nodes is
 
       procedure Write_Entry
         (Key_Context : in out Key_Context_Type;
-         Block       : in out IO.Blocks.Long_Block_Type;
+         Block       : in out IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         : in     Key_Type;
          Child       : in     Valid_Address_Type);
@@ -149,14 +149,14 @@ package body Nodes is
       procedure Write_Entry
         (Key_Context   : in out Key_Context_Type;
          Value_Context : in out Value_Context_Type;
-         Block         : in out IO.Blocks.Long_Block_Type;
+         Block         : in out IO.Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Key           : in     Key_Type;
          Value         : in     Value_Type);
 
       procedure Write_Child
         (Key_Context : in out Key_Context_Type;
-         Block       : in out IO.Blocks.Long_Block_Type;
+         Block       : in out IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Child       : in     Valid_Address_Type);
 
@@ -166,7 +166,7 @@ package body Nodes is
          pragma Inline (Total_Size);
          pragma Inline (Effective_Block_Space);
          pragma Inline (Last_Used_Index);
-         pragma Inline (New_Block);
+         pragma Inline (Init_Block);
          pragma Inline (Is_Ok);
          pragma Inline (Is_Free);
          pragma Inline (Degree);
@@ -185,7 +185,7 @@ package body Nodes is
 
 
    package body Phys is
-      use type IO.Blocks.Long_Position_Type;
+      use type IO.Blocks.Base_Position_Type;
 
       type Booleans_Type is
          record
@@ -201,24 +201,24 @@ package body Nodes is
       function Size_Of is new IO.Blocks.Size_Of(IO.Blocks.Position_Type);
       function Size_Of is new IO.Blocks.Size_Of(Valid_Address_Type);
 
-      Size_Of_Degree    : constant IO.Blocks.Long_Position_Type :=
-         IO.Blocks.Long_Position_Type(Size_Of(Degree_Type'(0)));
+      Size_Of_Degree    : constant IO.Blocks.Base_Position_Type :=
+         IO.Blocks.Base_Position_Type(Size_Of(Degree_Type'(0)));
 
-      Size_Of_Booleans  : constant IO.Blocks.Long_Position_Type :=
-         IO.Blocks.Long_Position_Type(Size_Of(Booleans_Type'(others => <>)));
+      Size_Of_Booleans  : constant IO.Blocks.Base_Position_Type :=
+         IO.Blocks.Base_Position_Type(Size_Of(Booleans_Type'(others => <>)));
 
-      Size_Of_Address   : constant IO.Blocks.Long_Position_Type :=
-         IO.Blocks.Long_Position_Type(Size_Of(Invalid_Address));
+      Size_Of_Address   : constant IO.Blocks.Base_Position_Type :=
+         IO.Blocks.Base_Position_Type(Size_Of(Invalid_Address));
 
-      Size_Of_Position  : constant  IO.Blocks.Long_Position_Type :=
-         IO.Blocks.Long_Position_Type
+      Size_Of_Position  : constant  IO.Blocks.Base_Position_Type :=
+         IO.Blocks.Base_Position_Type
             (Size_Of(IO.Blocks.Position_Type'Last));
 
-      Size_Of_Child     : constant IO.Blocks.Long_Position_Type :=
-         IO.Blocks.Long_Position_Type(Size_Of(Valid_Address_Type
+      Size_Of_Child     : constant IO.Blocks.Base_Position_Type :=
+         IO.Blocks.Base_Position_Type(Size_Of(Valid_Address_Type
             (Block_IO.First)));
 
-      Size_Of_Meta_Data : constant IO.Blocks.Long_Position_Type :=
+      Size_Of_Meta_Data : constant IO.Blocks.Base_Position_Type :=
          Size_Of_Degree + Size_Of_Booleans +
          Size_Of_Address + Size_Of_Address + Size_Of_Address;
 
@@ -237,18 +237,18 @@ package body Nodes is
 
       function "*"
         (I : Valid_Index_Type;
-         J : IO.Blocks.Long_Index_Type)
-         return IO.Blocks.Long_Index_Type
+         J : IO.Blocks.Base_Index_Type)
+         return IO.Blocks.Base_Index_Type
       is
          pragma Inline ("*");
       begin
-         return IO.Blocks.Long_Index_Type(I) * J;
+         return IO.Blocks.Base_Index_Type(I) * J;
       end "*";
 
 
       function Pos_From_Pos
         (Entry_Index : Valid_Index_Type)
-         return IO.Blocks.Long_Index_Type
+         return IO.Blocks.Base_Index_Type
       is
          pragma Inline (Pos_From_Pos);
       begin
@@ -262,7 +262,7 @@ package body Nodes is
 
       function Pos_To_Pos
         (Entry_Index : Valid_Index_Type)
-         return IO.Blocks.Long_Index_Type
+         return IO.Blocks.Base_Index_Type
       is
          pragma Inline (Pos_To_Pos);
       begin
@@ -271,15 +271,15 @@ package body Nodes is
 
 
       function Entry_To_Pos
-        (Block       : IO.Blocks.Long_Block_Type;
+        (Block       : IO.Blocks.Base_Block_Type;
          Entry_Index : Valid_Index_Type)
-         return IO.Blocks.Long_Index_Type
+         return IO.Blocks.Base_Index_Type
       is
          pragma Inline (Entry_To_Pos);
          pragma Assert (not Is_Free(Block));
          pragma Assert (Entry_Index in 1 .. Degree(Block));
-         procedure Read is new IO.Blocks.Read_At(IO.Blocks.Long_Index_Type);
-         Index : IO.Blocks.Long_Index_Type;
+         procedure Read is new IO.Blocks.Read_At(IO.Blocks.Base_Index_Type);
+         Index : IO.Blocks.Base_Index_Type;
       begin
          Read(Block, Pos_From_Pos(Entry_Index), Pos_To_Pos(Entry_Index),
               Index);
@@ -289,9 +289,9 @@ package body Nodes is
 
 
       function Entry_From_Pos
-        (Block       : IO.Blocks.Long_Block_Type;
+        (Block       : IO.Blocks.Base_Block_Type;
          Entry_Index : Valid_Index_Type)
-         return IO.Blocks.Long_Position_Type
+         return IO.Blocks.Base_Position_Type
       is
          pragma Inline (Entry_From_Pos);
          pragma Assert (not Is_Free(Block));
@@ -306,7 +306,7 @@ package body Nodes is
 
 
       function New_Cursor_From
-        (Block : IO.Blocks.Long_Block_Type;
+        (Block : IO.Blocks.Base_Block_Type;
          Index : Valid_Index_Type)
          return IO.Blocks.Cursor_Type
       is
@@ -317,17 +317,17 @@ package body Nodes is
 
 
       procedure Set_Entry_Size
-        (Block         : in out IO.Blocks.Long_Block_Type;
+        (Block         : in out IO.Blocks.Base_Block_Type;
          Entry_Index   : in     Valid_Index_Type;
-         Raw_Data_Size : in     IO.Blocks.Long_Position_Type)
+         Raw_Data_Size : in     IO.Blocks.Base_Position_Type)
       is
          pragma Inline (Set_Entry_Size);
          pragma Assert (not Is_Free(Block));
          pragma Assert (Entry_Index in 1 .. Degree(Block));
-         procedure Write is new IO.Blocks.Write_At(IO.Blocks.Long_Index_Type);
-         From : constant IO.Blocks.Long_Index_Type
+         procedure Write is new IO.Blocks.Write_At(IO.Blocks.Base_Index_Type);
+         From : constant IO.Blocks.Base_Index_Type
               := Entry_From_Pos(Block, Entry_Index);
-         To   : constant IO.Blocks.Long_Index_Type
+         To   : constant IO.Blocks.Base_Index_Type
               := From + Raw_Data_Size - 1;
       begin
          pragma Assert (From'Valid);
@@ -341,9 +341,9 @@ package body Nodes is
 
 
       function Entry_Size
-        (Block : IO.Blocks.Long_Block_Type;
+        (Block : IO.Blocks.Base_Block_Type;
          Index : Valid_Index_Type)
-         return IO.Blocks.Long_Position_Type is
+         return IO.Blocks.Base_Position_Type is
       begin
          return Entry_To_Pos(Block, Index) - Entry_From_Pos(Block, Index) + 1 +
                 Size_Of_Position;
@@ -351,8 +351,8 @@ package body Nodes is
 
 
       function Entries_Size
-        (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Position_Type is
+        (Block : IO.Blocks.Base_Block_Type)
+         return IO.Blocks.Base_Position_Type is
       begin
          if Degree(Block) = 0 then
             return 0;
@@ -364,8 +364,8 @@ package body Nodes is
 
 
       function Total_Size
-        (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Position_Type is
+        (Block : IO.Blocks.Base_Block_Type)
+         return IO.Blocks.Base_Position_Type is
       begin
          if Is_Free(Block) then
             return Size_Of_Meta_Data;
@@ -376,16 +376,16 @@ package body Nodes is
 
 
       function Effective_Block_Space
-        return IO.Blocks.Long_Position_Type is
+        return IO.Blocks.Base_Position_Type is
       begin
          return IO.Blocks.Index_Type'Last - Size_Of_Meta_Data;
       end Effective_Block_Space;
 
 
       function Max_Key_Size
-        (Max_Entry_Size : IO.Blocks.Long_Position_Type;
-         Max_Value_Size : IO.Blocks.Long_Position_Type)
-         return IO.Blocks.Long_Position_Type is
+        (Max_Entry_Size : IO.Blocks.Base_Position_Type;
+         Max_Value_Size : IO.Blocks.Base_Position_Type)
+         return IO.Blocks.Base_Position_Type is
       begin
          if Size_Of_Child > Max_Value_Size then
             return Max_Entry_Size - Size_Of_Child - Size_Of_Position;
@@ -396,11 +396,11 @@ package body Nodes is
 
 
       function Last_Used_Index
-        (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Index_Type is
+        (Block : IO.Blocks.Base_Block_Type)
+         return IO.Blocks.Base_Index_Type is
       begin
          if Degree(Block) = 0 then
-            return IO.Blocks.Long_Index_Type(Size_Of_Meta_Data);
+            return IO.Blocks.Base_Index_Type(Size_Of_Meta_Data);
          else
             return Entry_To_Pos(Block, Degree(Block));
          end if;
@@ -408,24 +408,24 @@ package body Nodes is
 
 
       function Free_Space
-        (Block : IO.Blocks.Long_Block_Type)
-         return IO.Blocks.Long_Position_Type
+        (Block : IO.Blocks.Base_Block_Type)
+         return IO.Blocks.Base_Position_Type
       is
          pragma Inline (Free_Space);
       begin
-         return IO.Blocks.Long_Index_Type'Last - Last_Used_Index(Block);
+         return IO.Blocks.Base_Index_Type'Last - Last_Used_Index(Block);
       end Free_Space;
       pragma Unreferenced (Free_Space);
 
 
       function Is_Ok
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Boolean
       is
          procedure Read is new IO.Blocks.Read_At(Booleans_Type);
-         Offset   : constant IO.Blocks.Long_Position_Type := 0;
-         From     : constant IO.Blocks.Long_Index_Type
-                  := IO.Blocks.Long_Index_Type'First + Offset;
+         Offset   : constant IO.Blocks.Base_Position_Type := 0;
+         From     : constant IO.Blocks.Base_Index_Type
+                  := IO.Blocks.Base_Index_Type'First + Offset;
          Booleans : Booleans_Type;
       begin
          Read(Block, From, From + Size_Of_Booleans - 1, Booleans);
@@ -434,14 +434,14 @@ package body Nodes is
 
 
       procedure Set_Ok
-        (Block : in out IO.Blocks.Long_Block_Type;
+        (Block : in out IO.Blocks.Base_Block_Type;
          Is_Ok : in     Boolean)
       is
          procedure Read is new IO.Blocks.Read_At(Booleans_Type);
          procedure Write is new IO.Blocks.Write_At(Booleans_Type);
-         Offset   : constant IO.Blocks.Long_Position_Type := 0;
-         From     : constant IO.Blocks.Long_Index_Type
-                  := IO.Blocks.Long_Index_Type'First + Offset;
+         Offset   : constant IO.Blocks.Base_Position_Type := 0;
+         From     : constant IO.Blocks.Base_Index_Type
+                  := IO.Blocks.Base_Index_Type'First + Offset;
          Booleans : Booleans_Type;
       begin
          Read(Block, From, From + Size_Of_Booleans - 1, Booleans);
@@ -451,13 +451,13 @@ package body Nodes is
 
 
       function Is_Free
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Boolean
       is
          procedure Read is new IO.Blocks.Read_At(Booleans_Type);
-         Offset   : constant IO.Blocks.Long_Position_Type := 0;
-         From     : constant IO.Blocks.Long_Index_Type
-                  := IO.Blocks.Long_Index_Type'First + Offset;
+         Offset   : constant IO.Blocks.Base_Position_Type := 0;
+         From     : constant IO.Blocks.Base_Index_Type
+                  := IO.Blocks.Base_Index_Type'First + Offset;
          Booleans : Booleans_Type;
       begin
          Read(Block, From, From + Size_Of_Booleans - 1, Booleans);
@@ -466,13 +466,13 @@ package body Nodes is
 
 
       function Is_Leaf
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Boolean
       is
          procedure Read is new IO.Blocks.Read_At(Booleans_Type);
-         Offset   : constant IO.Blocks.Long_Position_Type := 0;
-         From     : constant IO.Blocks.Long_Index_Type
-                  := IO.Blocks.Long_Index_Type'First + Offset;
+         Offset   : constant IO.Blocks.Base_Position_Type := 0;
+         From     : constant IO.Blocks.Base_Index_Type
+                  := IO.Blocks.Base_Index_Type'First + Offset;
          Booleans : Booleans_Type;
       begin
          Read(Block, From, From + Size_Of_Booleans - 1, Booleans);
@@ -481,14 +481,14 @@ package body Nodes is
 
 
       function Degree
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Degree_Type
       is
          pragma Assert (not Is_Free(Block));
          procedure Read is new IO.Blocks.Read_At(Degree_Type);
-         Offset : constant IO.Blocks.Long_Position_Type := Size_Of_Booleans;
-         From   : constant IO.Blocks.Long_Index_Type
-                := IO.Blocks.Long_Index_Type'First + Offset;
+         Offset : constant IO.Blocks.Base_Position_Type := Size_Of_Booleans;
+         From   : constant IO.Blocks.Base_Index_Type
+                := IO.Blocks.Base_Index_Type'First + Offset;
          Degree : Degree_Type;
       begin
          Read(Block, From, From + Size_Of_Degree - 1, Degree);
@@ -498,14 +498,14 @@ package body Nodes is
 
 
       procedure Set_Degree
-        (Block  : in out IO.Blocks.Long_Block_Type;
+        (Block  : in out IO.Blocks.Base_Block_Type;
          Degree : in     Degree_Type)
       is
          pragma Assert (not Is_Free(Block));
          procedure Write is new IO.Blocks.Write_At(Degree_Type);
-         Offset : constant IO.Blocks.Long_Position_Type := Size_Of_Booleans;
-         From   : constant IO.Blocks.Long_Index_Type
-                := IO.Blocks.Long_Index_Type'First + Offset;
+         Offset : constant IO.Blocks.Base_Position_Type := Size_Of_Booleans;
+         From   : constant IO.Blocks.Base_Index_Type
+                := IO.Blocks.Base_Index_Type'First + Offset;
       begin
          Write(Block, From, From + Size_Of_Degree - 1, Degree);
          pragma Assert (Degree = Phys.Degree(Block));
@@ -513,15 +513,15 @@ package body Nodes is
 
 
       function Parent
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Address_Type
       is
          pragma Assert (not Is_Free(Block));
          procedure Read is new IO.Blocks.Read_At(Address_Type);
-         Offset  : constant IO.Blocks.Long_Position_Type
+         Offset  : constant IO.Blocks.Base_Position_Type
                  := Size_Of_Booleans + Size_Of_Degree;
-         From    : constant IO.Blocks.Long_Index_Type
-                 := IO.Blocks.Long_Index_Type'First + Offset;
+         From    : constant IO.Blocks.Base_Index_Type
+                 := IO.Blocks.Base_Index_Type'First + Offset;
          Address : Address_Type;
       begin
          Read(Block, From, From + Size_Of_Address - 1, Address);
@@ -530,15 +530,15 @@ package body Nodes is
 
 
       procedure Set_Parent
-        (Block   : in out IO.Blocks.Long_Block_Type;
+        (Block   : in out IO.Blocks.Base_Block_Type;
          Address : in     Address_Type)
       is
          pragma Assert (not Is_Free(Block));
          procedure Write is new IO.Blocks.Write_At(Address_Type);
-         Offset : constant IO.Blocks.Long_Position_Type
+         Offset : constant IO.Blocks.Base_Position_Type
                 := Size_Of_Booleans + Size_Of_Degree;
-         From   : constant IO.Blocks.Long_Index_Type
-                := IO.Blocks.Long_Index_Type'First + Offset;
+         From   : constant IO.Blocks.Base_Index_Type
+                := IO.Blocks.Base_Index_Type'First + Offset;
       begin
          Write(Block, From, From + Size_Of_Address - 1, Address);
          pragma Assert (Parent(Block) = Address);
@@ -546,14 +546,14 @@ package body Nodes is
 
 
       function Left
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Address_Type
       is
          procedure Read is new IO.Blocks.Read_At(Address_Type);
-         Offset  : constant IO.Blocks.Long_Position_Type
+         Offset  : constant IO.Blocks.Base_Position_Type
                  := Size_Of_Booleans + Size_Of_Degree + Size_Of_Address;
-         From    : constant IO.Blocks.Long_Index_Type
-                 := IO.Blocks.Long_Index_Type'First + Offset;
+         From    : constant IO.Blocks.Base_Index_Type
+                 := IO.Blocks.Base_Index_Type'First + Offset;
          Address : Address_Type;
       begin
          Read(Block, From, From + Size_Of_Address - 1, Address);
@@ -562,14 +562,14 @@ package body Nodes is
 
 
       procedure Set_Left
-        (Block   : in out IO.Blocks.Long_Block_Type;
+        (Block   : in out IO.Blocks.Base_Block_Type;
          Address : in     Address_Type)
       is
          procedure Write is new IO.Blocks.Write_At(Address_Type);
-         Offset : constant IO.Blocks.Long_Position_Type
+         Offset : constant IO.Blocks.Base_Position_Type
                 := Size_Of_Booleans + Size_Of_Degree + Size_Of_Address;
-         From   : constant IO.Blocks.Long_Index_Type
-                := IO.Blocks.Long_Index_Type'First + Offset;
+         From   : constant IO.Blocks.Base_Index_Type
+                := IO.Blocks.Base_Index_Type'First + Offset;
       begin
          Write(Block, From, From + Size_Of_Address - 1, Address);
          pragma Assert (Left(Block) = Address);
@@ -577,15 +577,15 @@ package body Nodes is
 
 
       function Right
-        (Block : IO.Blocks.Long_Block_Type)
+        (Block : IO.Blocks.Base_Block_Type)
          return Address_Type
       is
          procedure Read is new IO.Blocks.Read_At(Address_Type);
-         Offset  : constant IO.Blocks.Long_Position_Type
+         Offset  : constant IO.Blocks.Base_Position_Type
                  := Size_Of_Booleans + Size_Of_Degree + Size_Of_Address +
                     Size_Of_Address;
-         From    : constant IO.Blocks.Long_Index_Type
-                 := IO.Blocks.Long_Index_Type'First + Offset;
+         From    : constant IO.Blocks.Base_Index_Type
+                 := IO.Blocks.Base_Index_Type'First + Offset;
          Address : Address_Type;
       begin
          Read(Block, From, From + Size_Of_Address - 1, Address);
@@ -594,39 +594,39 @@ package body Nodes is
 
 
       procedure Set_Right
-        (Block   : in out IO.Blocks.Long_Block_Type;
+        (Block   : in out IO.Blocks.Base_Block_Type;
          Address : in     Address_Type)
       is
          procedure Write is new IO.Blocks.Write_At(Address_Type);
-         Offset : constant IO.Blocks.Long_Position_Type
+         Offset : constant IO.Blocks.Base_Position_Type
                 := Size_Of_Booleans + Size_Of_Degree + Size_Of_Address +
                    Size_Of_Address;
-         From   : constant IO.Blocks.Long_Index_Type
-                := IO.Blocks.Long_Index_Type'First + Offset;
+         From   : constant IO.Blocks.Base_Index_Type
+                := IO.Blocks.Base_Index_Type'First + Offset;
       begin
          Write(Block, From, From + Size_Of_Address - 1, Address);
          pragma Assert (Right(Block) = Address);
       end Set_Right;
 
 
-      function New_Block
-        (Is_Ok   : Boolean;
-         Is_Free : Boolean;
-         Is_Leaf : Boolean;
-         Degree  : Degree_Type;
-         Parent  : Address_Type;
-         Left    : Address_Type;
-         Right   : Address_Type)
-         return IO.Blocks.Long_Block_Type
+      procedure Init_Block
+        (Block   : in out IO.Blocks.Base_Block_Type;
+         Is_Ok   : in     Boolean;
+         Is_Free : in     Boolean;
+         Is_Leaf : in     Boolean;
+         Degree  : in     Degree_Type;
+         Parent  : in     Address_Type;
+         Left    : in     Address_Type;
+         Right   : in     Address_Type)
       is
          procedure Set_Booleans
-           (Block    : in out IO.Blocks.Long_Block_Type;
+           (Block    : in out IO.Blocks.Base_Block_Type;
             Booleans : in     Booleans_Type)
          is
             procedure Write is new IO.Blocks.Write_At(Booleans_Type);
-            Offset : constant IO.Blocks.Long_Position_Type := 0;
-            From   : constant IO.Blocks.Long_Index_Type
-                   := IO.Blocks.Long_Index_Type'First + Offset;
+            Offset : constant IO.Blocks.Base_Position_Type := 0;
+            From   : constant IO.Blocks.Base_Index_Type
+                   := IO.Blocks.Base_Index_Type'First + Offset;
          begin
             Write(Block, From, From + Size_Of_Booleans - 1, Booleans);
             pragma Assert (Phys.Is_Ok(Block) = Booleans.Is_Ok);
@@ -639,7 +639,6 @@ package body Nodes is
                   := Booleans_Type'(Is_Ok   => Is_Ok,
                                     Is_Free => Is_Free,
                                     Is_Leaf => Is_Leaf);
-         Block    : IO.Blocks.Long_Block_Type;
       begin
          Set_Booleans(Block, Booleans);
          if not Is_Free then
@@ -654,13 +653,12 @@ package body Nodes is
          pragma Assert (Phys.Is_Free(Block) = Is_Free);
          pragma Assert (Phys.Left(Block) = Left);
          pragma Assert (Phys.Right(Block) = Right);
-         return Block;
-      end New_Block;
+      end Init_Block;
 
 
       procedure Read_Key
         (Key_Context : in out Key_Context_Type;
-         Block       : in     IO.Blocks.Long_Block_Type;
+         Block       : in     IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Key_Type;
          Success     :    out Boolean)
@@ -678,7 +676,7 @@ package body Nodes is
 
       procedure Read_Child
         (Key_Context : in out Key_Context_Type;
-         Block       : in     IO.Blocks.Long_Block_Type;
+         Block       : in     IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
@@ -704,7 +702,7 @@ package body Nodes is
       procedure Read_Value
         (Key_Context   : in out Key_Context_Type;
          Value_Context : in out Value_Context_Type;
-         Block         : in     IO.Blocks.Long_Block_Type;
+         Block         : in     IO.Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Value         :    out Value_Type;
          Success       :    out Boolean)
@@ -728,7 +726,7 @@ package body Nodes is
 
       procedure Read_Entry
         (Key_Context : in out Key_Context_Type;
-         Block       : in     IO.Blocks.Long_Block_Type;
+         Block       : in     IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Key_Type;
          Child       :    out Valid_Address_Type;
@@ -755,7 +753,7 @@ package body Nodes is
       procedure Read_Entry
         (Key_Context   : in out Key_Context_Type;
          Value_Context : in out Value_Context_Type;
-         Block         : in     IO.Blocks.Long_Block_Type;
+         Block         : in     IO.Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Key           :    out Key_Type;
          Value         :    out Value_Type;
@@ -780,7 +778,7 @@ package body Nodes is
 
       procedure Write_Entry
         (Key_Context : in out Key_Context_Type;
-         Block       : in out IO.Blocks.Long_Block_Type;
+         Block       : in out IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         : in     Key_Type;
          Child       : in     Valid_Address_Type)
@@ -804,7 +802,7 @@ package body Nodes is
             return;
          end if;
          declare
-            Size : constant IO.Blocks.Long_Position_Type
+            Size : constant IO.Blocks.Base_Position_Type
                  := IO.Blocks.Position(Cursor) - Entry_From_Pos(Block, Index);
          begin
             Set_Entry_Size(Block, Index, Size);
@@ -815,7 +813,7 @@ package body Nodes is
       procedure Write_Entry
         (Key_Context   : in out Key_Context_Type;
          Value_Context : in out Value_Context_Type;
-         Block         : in out IO.Blocks.Long_Block_Type;
+         Block         : in out IO.Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Key           : in     Key_Type;
          Value         : in     Value_Type)
@@ -838,7 +836,7 @@ package body Nodes is
             return;
          end if;
          declare
-            Size : constant IO.Blocks.Long_Position_Type
+            Size : constant IO.Blocks.Base_Position_Type
                  := IO.Blocks.Position(Cursor) - Entry_From_Pos(Block, Index);
          begin
             Set_Entry_Size(Block, Index, Size);
@@ -861,7 +859,7 @@ package body Nodes is
 
       procedure Write_Child
         (Key_Context : in out Key_Context_Type;
-         Block       : in out IO.Blocks.Long_Block_Type;
+         Block       : in out IO.Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Child       : in     Valid_Address_Type)
       is
@@ -936,44 +934,67 @@ package body Nodes is
    ----------
    -- General and accessor subprograms.
 
-   function Invalid_Node
-     return Node_Type is
+   function New_RW_Node
+        (Is_Ok   : Boolean;
+         Is_Free : Boolean;
+         Is_Leaf : Boolean;
+         Degree  : Degree_Type;
+         Parent  : Address_Type;
+         Left    : Address_Type;
+         Right   : Address_Type)
+         return RW_Node_Type
+   is
+      Node : RW_Node_Type;
    begin
-      return (Block => Phys.New_Block
-                          (Is_Ok   => False,
-                           Is_Free => True,
-                           Is_Leaf => True,
-                           Degree  => 0,
-                           Parent  => Address_Type(Block_IO.Invalid_Address),
-                           Left    => Address_Type(Block_IO.Invalid_Address),
-                           Right   => Address_Type(Block_IO.Invalid_Address)));
+      Phys.Init_Block(Block   => IO.Blocks.Base_Block_Type(Node),
+                      Is_Ok   => Is_Ok,
+                      Is_Free => Is_Free,
+                      Is_Leaf => Is_Leaf,
+                      Degree  => Degree,
+                      Parent  => Parent,
+                      Left    => Left,
+                      Right   => Right);
+      return Node;
+   end New_RW_Node;
+
+
+   function Invalid_Node
+     return RW_Node_Type is
+   begin
+      return New_RW_Node(Is_Ok   => False,
+                         Is_Free => True,
+                         Is_Leaf => True,
+                         Degree  => 0,
+                         Parent  => Invalid_Address,
+                         Left    => Invalid_Address,
+                         Right   => Invalid_Address);
    end Invalid_Node;
 
 
    function Root_Node
      (Is_Leaf : Boolean)
-      return Node_Type is
+      return RW_Node_Type is
    begin
-      return Node_Type'(Block => Phys.New_Block(Is_Ok   => True,
-                                                Is_Free => False,
-                                                Is_Leaf => Is_Leaf,
-                                                Degree  => 0,
-                                                Parent  => Invalid_Address,
-                                                Left    => Invalid_Address,
-                                                Right   => Invalid_Address));
+      return New_RW_Node(Is_Ok   => True,
+                         Is_Free => False,
+                         Is_Leaf => Is_Leaf,
+                         Degree  => 0,
+                         Parent  => Invalid_Address,
+                         Left    => Invalid_Address,
+                         Right   => Invalid_Address);
    end Root_Node;
 
 
    function Free_Node
-      return Node_Type is
+      return RW_Node_Type is
    begin
-      return Node_Type'(Block => Phys.New_Block(Is_Ok   => True,
-                                                Is_Free => True,
-                                                Is_Leaf => False,
-                                                Degree  => 0,
-                                                Parent  => Invalid_Address,
-                                                Left    => Invalid_Address,
-                                                Right   => Invalid_Address));
+      return New_RW_Node(Is_Ok   => True,
+                         Is_Free => True,
+                         Is_Leaf => False,
+                         Degree  => 0,
+                         Parent  => Invalid_Address,
+                         Left    => Invalid_Address,
+                         Right   => Invalid_Address);
    end Free_Node;
 
 
@@ -981,7 +1002,7 @@ package body Nodes is
      (Node : Node_Type)
       return Boolean is
    begin
-      return Phys.Is_Ok(Node.Block);
+      return Phys.Is_Ok(IO.Blocks.Base_Block_Type(Node));
    end Is_Ok;
 
 
@@ -991,7 +1012,7 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
    begin
-      return Phys.Is_Free(Node.Block);
+      return Phys.Is_Free(IO.Blocks.Base_Block_Type(Node));
    end Is_Free;
 
 
@@ -1002,7 +1023,7 @@ package body Nodes is
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
    begin
-      return Phys.Degree(Node.Block);
+      return Phys.Degree(IO.Blocks.Base_Block_Type(Node));
    end Degree;
 
 
@@ -1013,7 +1034,7 @@ package body Nodes is
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
    begin
-      return Phys.Is_Leaf(Node.Block);
+      return Phys.Is_Leaf(IO.Blocks.Base_Block_Type(Node));
    end Is_Leaf;
 
 
@@ -1028,28 +1049,6 @@ package body Nodes is
    end Is_Inner;
 
 
-   procedure Set_Parent
-     (Node   : in out Node_Type;
-      Parent : in     Address_Type)
-   is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (not Is_Free(Node));
-   begin
-      Phys.Set_Parent(Node.Block, Parent);
-   end Set_Parent;
-
-
-   procedure Set_Parent
-     (Node   : in out Node_Type;
-      Parent : in     Valid_Address_Type)
-   is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (not Is_Free(Node));
-   begin
-      Phys.Set_Parent(Node.Block, To_Address(Parent));
-   end Set_Parent;
-
-
    function Parent
      (Node : Node_Type)
       return Address_Type
@@ -1057,7 +1056,7 @@ package body Nodes is
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
    begin
-      return Phys.Parent(Node.Block);
+      return Phys.Parent(IO.Blocks.Base_Block_Type(Node));
    end Parent;
 
 
@@ -1090,7 +1089,7 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
    begin
-      Phys.Set_Left(Node.Block, Neighbor);
+      Phys.Set_Left(IO.Blocks.Base_Block_Type(Node), Neighbor);
    end Set_Left_Neighbor;
 
 
@@ -1100,7 +1099,7 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
    begin
-      Phys.Set_Left(Node.Block, To_Address(Neighbor));
+      Phys.Set_Left(IO.Blocks.Base_Block_Type(Node), To_Address(Neighbor));
    end Set_Left_Neighbor;
 
 
@@ -1110,7 +1109,7 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
    begin
-      return Phys.Left(Node.Block);
+      return Phys.Left(IO.Blocks.Base_Block_Type(Node));
    end Left_Neighbor;
 
 
@@ -1120,28 +1119,8 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
    begin
-      return To_Valid_Address(Phys.Left(Node.Block));
+      return To_Valid_Address(Phys.Left(IO.Blocks.Base_Block_Type(Node)));
    end Valid_Left_Neighbor;
-
-
-   procedure Set_Right_Neighbor
-     (Node     : in out Node_Type;
-      Neighbor : in     Address_Type)
-   is
-      pragma Assert (Is_Ok(Node));
-   begin
-      Phys.Set_Right(Node.Block, Neighbor);
-   end Set_Right_Neighbor;
-
-
-   procedure Set_Right_Neighbor
-     (Node     : in out Node_Type;
-      Neighbor : in     Valid_Address_Type)
-   is
-      pragma Assert (Is_Ok(Node));
-   begin
-      Phys.Set_Right(Node.Block, To_Address(Neighbor));
-   end Set_Right_Neighbor;
 
 
    function Right_Neighbor
@@ -1150,7 +1129,7 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
    begin
-      return Phys.Right(Node.Block);
+      return Phys.Right(IO.Blocks.Base_Block_Type(Node));
    end Right_Neighbor;
 
 
@@ -1160,7 +1139,7 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
    begin
-      return To_Valid_Address(Phys.Right(Node.Block));
+      return To_Valid_Address(Phys.Right(IO.Blocks.Base_Block_Type(Node)));
    end Valid_Right_Neighbor;
 
 
@@ -1177,7 +1156,8 @@ package body Nodes is
       Key         : Key_Type;
       Success     : Boolean;
    begin
-      Phys.Read_Key(Key_Context, Node.Block, Index, Key, Success);
+      Phys.Read_Key(Key_Context, IO.Blocks.Base_Block_Type(Node), Index, Key,
+                    Success);
       if not Success then
          raise Node_Error;
       end if;
@@ -1199,7 +1179,8 @@ package body Nodes is
       Child       : Valid_Address_Type;
       Success     : Boolean;
    begin
-      Phys.Read_Child(Key_Context, Node.Block, Index, Child, Success);
+      Phys.Read_Child(Key_Context, IO.Blocks.Base_Block_Type(Node), Index,
+                      Child, Success);
       pragma Assert (Is_Valid(Child));
       if not Success then
          raise Node_Error;
@@ -1223,8 +1204,8 @@ package body Nodes is
       Value         : Value_Type;
       Success       : Boolean;
    begin
-      Phys.Read_Value(Key_Context, Value_Context, Node.Block, Index,
-                      Value, Success);
+      Phys.Read_Value(Key_Context, Value_Context,
+                      IO.Blocks.Base_Block_Type(Node), Index, Value, Success);
       if not Success then
          raise Node_Error;
       end if;
@@ -1248,7 +1229,8 @@ package body Nodes is
          Success : Boolean;
       begin
          pragma Assert (Is_Valid(Index));
-         Phys.Read_Key(Key_Context, Node.Block, Index, Key, Success);
+         Phys.Read_Key(Key_Context, IO.Blocks.Base_Block_Type(Node), Index,
+                       Key, Success);
          if not Success then
             raise Node_Error;
          end if;
@@ -1367,27 +1349,69 @@ package body Nodes is
    ----------
    -- Node operations.
 
+   procedure Set_Parent
+     (Node   : in out RW_Node_Type;
+      Parent : in     Address_Type)
+   is
+      pragma Assert (Is_Ok(Node));
+      pragma Assert (not Is_Free(Node));
+   begin
+      Phys.Set_Parent(IO.Blocks.Base_Block_Type(Node), Parent);
+   end Set_Parent;
+
+
+   procedure Set_Parent
+     (Node   : in out RW_Node_Type;
+      Parent : in     Valid_Address_Type)
+   is
+      pragma Assert (Is_Ok(Node));
+      pragma Assert (not Is_Free(Node));
+   begin
+      Phys.Set_Parent(IO.Blocks.Base_Block_Type(Node), To_Address(Parent));
+   end Set_Parent;
+
+
+   procedure Set_Right_Neighbor
+     (Node     : in out RW_Node_Type;
+      Neighbor : in     Address_Type)
+   is
+      pragma Assert (Is_Ok(Node));
+   begin
+      Phys.Set_Right(IO.Blocks.Base_Block_Type(Node), Neighbor);
+   end Set_Right_Neighbor;
+
+
+   procedure Set_Right_Neighbor
+     (Node     : in out RW_Node_Type;
+      Neighbor : in     Valid_Address_Type)
+   is
+      pragma Assert (Is_Ok(Node));
+   begin
+      Phys.Set_Right(IO.Blocks.Base_Block_Type(Node), To_Address(Neighbor));
+   end Set_Right_Neighbor;
+
+
    function Split_Position
-     (Node : Node_Type)
+     (Node : RW_Node_Type)
       return Valid_Index_Type
    is
-      use type IO.Blocks.Long_Position_Type;
+      use type IO.Blocks.Base_Position_Type;
 
-      function Min is new Utils.Gen_Minimum(IO.Blocks.Long_Position_Type);
+      function Min is new Utils.Gen_Minimum(IO.Blocks.Base_Position_Type);
       pragma Inline (Min);
 
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
 
-      Total    : constant IO.Blocks.Long_Position_Type
-               := Phys.Entries_Size(Node.Block);
-      Sum      : IO.Blocks.Long_Position_Type := 0;
-      Prev_Min : IO.Blocks.Long_Position_Type := 0;
+      Total    : constant IO.Blocks.Base_Position_Type
+               := Phys.Entries_Size(IO.Blocks.Base_Block_Type(Node));
+      Sum      : IO.Blocks.Base_Position_Type := 0;
+      Prev_Min : IO.Blocks.Base_Position_Type := 0;
    begin
       for I in 1 .. Degree(Node) loop
-         Sum := Sum + Phys.Entry_Size(Node.Block, I);
+         Sum := Sum + Phys.Entry_Size(IO.Blocks.Base_Block_Type(Node), I);
          declare
-            This_Min : constant IO.Blocks.Long_Position_Type
+            This_Min : constant IO.Blocks.Base_Position_Type
                      := Min(Sum, Total - Sum);
          begin
             if Prev_Min > This_Min then
@@ -1401,8 +1425,8 @@ package body Nodes is
 
 
    function Combi_Split_Position
-     (Left_Node  : Node_Type;
-      Right_Node : Node_Type)
+     (Left_Node  : RW_Node_Type;
+      Right_Node : RW_Node_Type)
       return Valid_Index_Type
    is
       use type IO.Blocks.Size_Type;
@@ -1416,13 +1440,16 @@ package body Nodes is
       pragma Assert (not Is_Free(Right_Node));
 
       Total    : constant IO.Blocks.Size_Type
-               := IO.Blocks.Size_Type(Phys.Entries_Size(Left_Node.Block)) +
-                  IO.Blocks.Size_Type(Phys.Entries_Size(Right_Node.Block));
+               := IO.Blocks.Size_Type(Phys.Entries_Size
+                                       (IO.Blocks.Base_Block_Type(Left_Node))) +
+                  IO.Blocks.Size_Type(Phys.Entries_Size
+                                       (IO.Blocks.Base_Block_Type(Right_Node)));
       Sum      : IO.Blocks.Size_Type := 0;
       Prev_Min : IO.Blocks.Size_Type := 0;
    begin
       for I in 1 .. Degree(Left_Node) loop
-         Sum := Sum + IO.Blocks.Size_Type(Phys.Entry_Size(Left_Node.Block, I));
+         Sum := Sum + IO.Blocks.Size_Type(Phys.Entry_Size
+                                    (IO.Blocks.Base_Block_Type(Left_Node), I));
          declare
             This_Min : constant IO.Blocks.Size_Type
                      := Min(Sum, Total - Sum);
@@ -1434,7 +1461,8 @@ package body Nodes is
          end;
       end loop;
       for I in 1 .. Degree(Right_Node) loop
-         Sum := Sum + IO.Blocks.Size_Type(Phys.Entry_Size(Right_Node.Block, I));
+         Sum := Sum + IO.Blocks.Size_Type(Phys.Entry_Size
+                                    (IO.Blocks.Base_Block_Type(Right_Node), I));
          declare
             This_Min : constant IO.Blocks.Size_Type
                      := Min(Sum, Total - Sum);
@@ -1450,7 +1478,7 @@ package body Nodes is
 
 
    procedure Set_Child
-     (Node  : in out Node_Type;
+     (Node  : in out RW_Node_Type;
       Index : in     Valid_Index_Type;
       Child : in     Valid_Address_Type)
    is
@@ -1461,7 +1489,8 @@ package body Nodes is
 
       Key_Context : Key_Context_Type;
    begin
-      Phys.Write_Child(Key_Context, Node.Block, Index, Child);
+      Phys.Write_Child(Key_Context, IO.Blocks.Base_Block_Type(Node), Index,
+                       Child);
       if not Nodes.Is_Ok(Node) then
          raise Node_Error;
       end if;
@@ -1469,8 +1498,8 @@ package body Nodes is
 
 
    procedure Copy_Entry
-     (Node              : in out Node_Type;
-      Source            : in     Node_Type;
+     (Node              : in out RW_Node_Type;
+      Source            : in     RW_Node_Type;
       Index             : in     Valid_Index_Type;
       Key_Read_Context  : in out Key_Context_Type;
       Key_Write_Context : in out Key_Context_Type;
@@ -1486,19 +1515,20 @@ package body Nodes is
       Child     : Valid_Address_Type;
       Success   : Boolean;
    begin
-      Phys.Read_Entry(Key_Read_Context, Source.Block, Index, Key, Child,
-                      Success);
+      Phys.Read_Entry(Key_Read_Context, IO.Blocks.Base_Block_Type(Source),
+                      Index, Key, Child, Success);
       if not Success then
          raise Node_Error;
       end if;
       pragma Assert (Is_Valid(Child));
-      Phys.Write_Entry(Key_Write_Context, Node.Block, New_Index, Key, Child);
+      Phys.Write_Entry(Key_Write_Context, IO.Blocks.Base_Block_Type(Node),
+                       New_Index, Key, Child);
    end Copy_Entry;
 
 
    procedure Copy_Entry
-     (Node                : in out Node_Type;
-      Source              : in     Node_Type;
+     (Node                : in out RW_Node_Type;
+      Source              : in     RW_Node_Type;
       Index               : in     Valid_Index_Type;
       Key_Read_Context    : in out Key_Context_Type;
       Key_Write_Context   : in out Key_Context_Type;
@@ -1516,35 +1546,35 @@ package body Nodes is
       Value     : Value_Type;
       Success   : Boolean;
    begin
-      Phys.Read_Entry(Key_Read_Context, Value_Read_Context, Source.Block, Index,
-                      Key, Value, Success);
+      Phys.Read_Entry(Key_Read_Context, Value_Read_Context,
+                      IO.Blocks.Base_Block_Type(Source), Index, Key, Value,
+                      Success);
       if not Success then
          raise Node_Error;
       end if;
       Phys.Write_Entry(Key_Write_Context, Value_Write_Context,
-                       Node.Block, New_Index, Key, Value);
+                       IO.Blocks.Base_Block_Type(Node), New_Index, Key, Value);
    end Copy_Entry;
 
 
    function Insertion
-     (Node  : Node_Type;
+     (Node  : RW_Node_Type;
       Index : Valid_Index_Type;
       Key   : Key_Type;
       Child : Valid_Address_Type)
-      return Node_Type
+      return RW_Node_Type
    is
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
       pragma Assert (Is_Inner(Node));
 
-      N : Node_Type := (Block => Phys.New_Block
-                                    (Is_Ok   => True,
-                                     Is_Free => Is_Free(Node),
-                                     Is_Leaf => Is_Leaf(Node),
-                                     Degree  => Degree(Node) + 1,
-                                     Parent  => Parent(Node),
-                                     Left    => Left_Neighbor(Node),
-                                     Right   => Right_Neighbor(Node)));
+      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
+                                      Is_Free => Is_Free(Node),
+                                      Is_Leaf => Is_Leaf(Node),
+                                      Degree  => Degree(Node) + 1,
+                                      Parent  => Parent(Node),
+                                      Left    => Left_Neighbor(Node),
+                                      Right   => Right_Neighbor(Node));
       Key_Read_Context  : Key_Context_Type;
       Key_Write_Context : Key_Context_Type;
    begin
@@ -1555,7 +1585,8 @@ package body Nodes is
          end if;
       end loop;
 
-      Phys.Write_Entry(Key_Write_Context, N.Block, Index, Key, Child);
+      Phys.Write_Entry(Key_Write_Context, IO.Blocks.Base_Block_Type(N), Index,
+                       Key, Child);
       if not Is_Ok(N) then
          return N;
       end if;
@@ -1571,24 +1602,23 @@ package body Nodes is
 
 
    function Insertion
-     (Node  : Node_Type;
+     (Node  : RW_Node_Type;
       Index : Valid_Index_Type;
       Key   : Key_Type;
       Value : Value_Type)
-      return Node_Type
+      return RW_Node_Type
    is
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
       pragma Assert (Is_Leaf(Node));
 
-      N : Node_Type := (Block => Phys.New_Block
-                                    (Is_Ok   => True,
-                                     Is_Free => Is_Free(Node),
-                                     Is_Leaf => Is_Leaf(Node),
-                                     Degree  => Degree(Node) + 1,
-                                     Parent  => Parent(Node),
-                                     Left    => Left_Neighbor(Node),
-                                     Right   => Right_Neighbor(Node)));
+      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
+                                      Is_Free => Is_Free(Node),
+                                      Is_Leaf => Is_Leaf(Node),
+                                      Degree  => Degree(Node) + 1,
+                                      Parent  => Parent(Node),
+                                      Left    => Left_Neighbor(Node),
+                                      Right   => Right_Neighbor(Node));
       Key_Read_Context    : Key_Context_Type;
       Key_Write_Context   : Key_Context_Type;
       Value_Read_Context  : Value_Context_Type;
@@ -1602,8 +1632,8 @@ package body Nodes is
          end if;
       end loop;
 
-      Phys.Write_Entry(Key_Write_Context, Value_Write_Context, N.Block,
-                       Index, Key, Value);
+      Phys.Write_Entry(Key_Write_Context, Value_Write_Context,
+                       IO.Blocks.Base_Block_Type(N), Index, Key, Value);
       if not Is_Ok(N) then
          return N;
       end if;
@@ -1620,25 +1650,24 @@ package body Nodes is
 
 
    function Substitution
-     (Node  : Node_Type;
+     (Node  : RW_Node_Type;
       Index : Valid_Index_Type;
       Key   : Key_Type;
       Child : Valid_Address_Type)
-      return Node_Type
+      return RW_Node_Type
    is
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
       pragma Assert (Is_Inner(Node));
       pragma Assert (Is_Valid(Child));
 
-      N : Node_Type := (Block => Phys.New_Block
-                                    (Is_Ok   => True,
-                                     Is_Free => Is_Free(Node),
-                                     Is_Leaf => Is_Leaf(Node),
-                                     Degree  => Degree(Node),
-                                     Parent  => Parent(Node),
-                                     Left    => Left_Neighbor(Node),
-                                     Right   => Right_Neighbor(Node)));
+      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
+                                      Is_Free => Is_Free(Node),
+                                      Is_Leaf => Is_Leaf(Node),
+                                      Degree  => Degree(Node),
+                                      Parent  => Parent(Node),
+                                      Left    => Left_Neighbor(Node),
+                                      Right   => Right_Neighbor(Node));
       Key_Read_Context  : Key_Context_Type;
       Key_Write_Context : Key_Context_Type;
    begin
@@ -1649,7 +1678,8 @@ package body Nodes is
          end if;
       end loop;
 
-      Phys.Write_Entry(Key_Write_Context, N.Block, Index, Key, Child);
+      Phys.Write_Entry(Key_Write_Context, IO.Blocks.Base_Block_Type(N), Index,
+                       Key, Child);
       if not Is_Ok(N) then
          return N;
       end if;
@@ -1665,24 +1695,23 @@ package body Nodes is
 
 
    function Substitution
-     (Node  : Node_Type;
+     (Node  : RW_Node_Type;
       Index : Valid_Index_Type;
       Key   : Key_Type;
       Value : Value_Type)
-      return Node_Type
+      return RW_Node_Type
    is
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
       pragma Assert (Is_Leaf(Node));
 
-      N : Node_Type := (Block => Phys.New_Block
-                                   (Is_Ok   => True,
-                                    Is_Free => Is_Free(Node),
-                                    Is_Leaf => Is_Leaf(Node),
-                                    Degree  => Degree(Node),
-                                    Parent  => Parent(Node),
-                                    Left    => Left_Neighbor(Node),
-                                    Right   => Right_Neighbor(Node)));
+      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
+                                      Is_Free => Is_Free(Node),
+                                      Is_Leaf => Is_Leaf(Node),
+                                      Degree  => Degree(Node),
+                                      Parent  => Parent(Node),
+                                      Left    => Left_Neighbor(Node),
+                                      Right   => Right_Neighbor(Node));
       Key_Read_Context    : Key_Context_Type;
       Key_Write_Context   : Key_Context_Type;
       Value_Read_Context  : Value_Context_Type;
@@ -1696,8 +1725,8 @@ package body Nodes is
          end if;
       end loop;
 
-      Phys.Write_Entry(Key_Write_Context, Value_Write_Context, N.Block, Index,
-                       Key, Value);
+      Phys.Write_Entry(Key_Write_Context, Value_Write_Context,
+                       IO.Blocks.Base_Block_Type(N), Index, Key, Value);
       if not Is_Ok(N) then
          return N;
       end if;
@@ -1714,21 +1743,20 @@ package body Nodes is
 
 
    function Deletion
-     (Node  : Node_Type;
+     (Node  : RW_Node_Type;
       Index : Valid_Index_Type)
-      return Node_Type
+      return RW_Node_Type
    is
       pragma Assert (Is_Ok(Node));
       pragma Assert (not Is_Free(Node));
 
-      N : Node_Type := (Block => Phys.New_Block
-                                    (Is_Ok   => True,
-                                     Is_Free => Is_Free(Node),
-                                     Is_Leaf => Is_Leaf(Node),
-                                     Degree  => Degree(Node) - 1,
-                                     Parent  => Parent(Node),
-                                     Left    => Left_Neighbor(Node),
-                                     Right   => Right_Neighbor(Node)));
+      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
+                                      Is_Free => Is_Free(Node),
+                                      Is_Leaf => Is_Leaf(Node),
+                                      Degree  => Degree(Node) - 1,
+                                      Parent  => Parent(Node),
+                                      Left    => Left_Neighbor(Node),
+                                      Right   => Right_Neighbor(Node));
    begin
       if Is_Inner(Node) then
          declare
@@ -1770,10 +1798,10 @@ package body Nodes is
 
 
    function Copy
-     (Node : Node_Type;
+     (Node : RW_Node_Type;
       From : Valid_Index_Type;
       To   : Index_Type)
-      return Node_Type is
+      return RW_Node_Type is
    begin
       if not Nodes.Is_Ok(Node) then
          return Invalid_Node;
@@ -1781,14 +1809,13 @@ package body Nodes is
 
       declare
          pragma Assert (not Is_Free(Node));
-         N : Node_Type := (Block => Phys.New_Block
-                                       (Is_Ok   => True,
-                                        Is_Free => Is_Free(Node),
-                                        Is_Leaf => Is_Leaf(Node),
-                                        Degree  => To - From + 1,
-                                        Parent  => Parent(Node),
-                                        Left    => Left_Neighbor(Node),
-                                        Right   => Right_Neighbor(Node)));
+         N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
+                                         Is_Free => Is_Free(Node),
+                                         Is_Leaf => Is_Leaf(Node),
+                                         Degree  => To - From + 1,
+                                         Parent  => Parent(Node),
+                                         Left    => Left_Neighbor(Node),
+                                         Right   => Right_Neighbor(Node));
          Shift_By : constant Integer := -1 * Integer(From) + 1;
       begin
          if Is_Inner(Node) then
@@ -1826,11 +1853,11 @@ package body Nodes is
 
 
    function Combi_Copy
-     (Left_Node  : Node_Type;
-      Right_Node : Node_Type;
+     (Left_Node  : RW_Node_Type;
+      Right_Node : RW_Node_Type;
       From       : Valid_Index_Type;
       To         : Index_Type)
-      return Node_Type is
+      return RW_Node_Type is
    begin
       if not Is_Ok(Left_Node) or not Is_Ok(Right_Node) then
          return Invalid_Node;
@@ -1846,8 +1873,8 @@ package body Nodes is
          pragma Inline (Max);
 
          function Combi_Parent
-           (Left_Node  : Node_Type;
-            Right_Node : Node_Type;
+           (Left_Node  : RW_Node_Type;
+            Right_Node : RW_Node_Type;
             To         : Index_Type)
             return Address_Type is
          begin
@@ -1859,8 +1886,8 @@ package body Nodes is
          end Combi_Parent;
 
          function Combi_Left_Neighbor
-           (Left_Node  : Node_Type;
-            Right_Node : Node_Type;
+           (Left_Node  : RW_Node_Type;
+            Right_Node : RW_Node_Type;
             From       : Index_Type)
             return Address_Type is
          begin
@@ -1872,8 +1899,8 @@ package body Nodes is
          end Combi_Left_Neighbor;
 
          function Combi_Right_Neighbor
-           (Left_Node  : Node_Type;
-            Right_Node : Node_Type;
+           (Left_Node  : RW_Node_Type;
+            Right_Node : RW_Node_Type;
             To         : Index_Type)
             return Address_Type is
          begin
@@ -1884,15 +1911,14 @@ package body Nodes is
             end if;
          end Combi_Right_Neighbor;
 
-         N : Node_Type
-           := (Block => Phys.New_Block
+         N : RW_Node_Type := New_RW_Node
                  (Is_Ok   => True,
                   Is_Free => Is_Free(Left_Node),
                   Is_Leaf => Is_Leaf(Left_Node),
                   Degree  => To - From + 1,
                   Parent  => Combi_Parent(Left_Node, Right_Node, To),
                   Left    => Combi_Left_Neighbor(Left_Node, Right_Node, From),
-                  Right   => Combi_Right_Neighbor(Left_Node, Right_Node, To)));
+                  Right   => Combi_Right_Neighbor(Left_Node, Right_Node, To));
          Left_Shift_By  : constant Integer
                         := -1 * Integer(From) + 1;
          Right_Shift_By : constant Integer
@@ -1951,9 +1977,9 @@ package body Nodes is
 
 
    function Combination
-     (Left_Node  : Node_Type;
-      Right_Node : Node_Type)
-      return Node_Type is
+     (Left_Node  : RW_Node_Type;
+      Right_Node : RW_Node_Type)
+      return RW_Node_Type is
    begin
       if not Is_Ok(Left_Node) or not Is_Ok(Right_Node) then
          return Invalid_Node;
@@ -1971,14 +1997,14 @@ package body Nodes is
          Left_Degree  : constant Degree_Type := Degree(Left_Node);
          Right_Degree : constant Degree_Type := Degree(Right_Node);
          Degree       : constant Degree_Type := Left_Degree + Right_Degree;
-         N : Node_Type := (Block => Phys.New_Block
-                                      (Is_Ok   => True,
-                                       Is_Free => Is_Free(Right_Node),
-                                       Is_Leaf => Is_Leaf(Right_Node),
-                                       Degree  => Degree,
-                                       Parent  => Parent(Right_Node),
-                                       Left    => Left_Neighbor(Left_Node),
-                                       Right   => Right_Neighbor(Right_Node)));
+         N : RW_Node_Type
+           := New_RW_Node(Is_Ok   => True,
+                          Is_Free => Is_Free(Right_Node),
+                          Is_Leaf => Is_Leaf(Right_Node),
+                          Degree  => Degree,
+                          Parent  => Parent(Right_Node),
+                          Left    => Left_Neighbor(Left_Node),
+                          Right   => Right_Neighbor(Right_Node));
       begin
          if Is_Inner(Right_Node) then
             declare
@@ -2038,8 +2064,10 @@ package body Nodes is
       return IO.Blocks.Size_Type
    is
       pragma Assert (Nodes.Is_Ok(Node));
+      Last_Used : constant IO.Blocks.Base_Position_Type
+                := Phys.Total_Size(IO.Blocks.Base_Block_Type(Node));
    begin
-      return IO.Blocks.Size_Type(Phys.Total_Size(Node.Block));
+      return IO.Blocks.Size_Type(Last_Used);
    end Size_Of;
 
 
@@ -2073,8 +2101,8 @@ package body Nodes is
          Min_Space  : IO.Blocks.Position_Type;
          Max_Space  : constant IO.Blocks.Position_Type
                     := Phys.Effective_Block_Space;
-         Needed     : constant IO.Blocks.Long_Position_Type
-                    := Phys.Entries_Size(Node.Block);
+         Needed     : constant IO.Blocks.Base_Position_Type
+                    := Phys.Entries_Size(IO.Blocks.Base_Block_Type(Node));
       begin
          if Is_Root(Node) and not Force_Non_Root then
             Min_Degree := 0;
@@ -2102,11 +2130,11 @@ package body Nodes is
      (Max_Value_Size : IO.Blocks.Size_Type)
       return IO.Blocks.Size_Type
    is
-      use type IO.Blocks.Long_Position_Type;
-      Max_Entry_Size        : constant IO.Blocks.Long_Position_Type
+      use type IO.Blocks.Base_Position_Type;
+      Max_Entry_Size        : constant IO.Blocks.Base_Position_Type
                             := Phys.Effective_Block_Space * 1 / 4;
       Max_Value_Size_As_Pos : constant IO.Blocks.Position_Type
-                            := IO.Blocks.Long_Position_Type(Max_Value_Size);
+                            := IO.Blocks.Base_Position_Type(Max_Value_Size);
    begin
       return IO.Blocks.Size_Type
                (Phys.Max_Key_Size(Max_Entry_Size => Max_Entry_Size,
@@ -2121,23 +2149,13 @@ package body Nodes is
       pragma Assert (Nodes.Is_Ok(Node));
       use type IO.Blocks.Base_Position_Type;
    begin
-      pragma Assert (Phys.Total_Size(Node.Block) <= IO.Blocks.Block_Size);
+      pragma Assert (Phys.Total_Size(IO.Blocks.Base_Block_Type(Node)) <=
+                     IO.Blocks.Block_Size);
       pragma Assert (Validation(Node) = Valid);
-      return IO.Blocks.To_Block(Node.Block, Phys.Total_Size(Node.Block));
+      return IO.Blocks.To_Block
+               (Block     => IO.Blocks.Base_Block_Type(Node),
+                Last_Used => Phys.Total_Size(IO.Blocks.Base_Block_Type(Node)));
    end To_Block;
-
-
-   function From_Block
-     (Block : IO.Blocks.Block_Type)
-      return Node_Type
-   is
-      Node : constant Node_Type := (Block => IO.Blocks.To_Long_Block(Block));
-      use type IO.Blocks.Base_Position_Type;
-   begin
-      pragma Assert (Phys.Total_Size(Node.Block) <= IO.Blocks.Block_Size);
-      pragma Assert (Validation(Node) = Valid);
-      return Node;
-   end From_Block;
 
 end Nodes;
 

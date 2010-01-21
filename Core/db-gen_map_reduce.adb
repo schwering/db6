@@ -21,6 +21,8 @@ procedure DB.Gen_Map_Reduce is
       Value_Type                    => Intermediate_Value_Type,
       Compare                       => Compare_Intermediate_Key,
 
+      Allow_Duplicates              => True,
+
       Key_Context_Type              => Intermediate_Key_Context_Type,
       Key_Size_Bound                => Intermediate_Key_Size_Bound,
       Read_Key                      => Read_Intermediate_Key,
@@ -32,9 +34,11 @@ procedure DB.Gen_Map_Reduce is
       Read_Value                    => Read_Intermediate_Value,
       Skip_Value                    => Skip_Intermediate_Value,
       Write_Value                   => Write_Intermediate_Value,
+
       Is_Context_Free_Serialization => False,
-      Storage_Pool                  => Utils.Global_Pool.Global'Storage_Pool,
-      Block_IO                      => Intermediate_Block_IO);
+
+      Block_IO                      => Intermediate_Block_IO,
+      Storage_Pool                  => Utils.Global_Pool.Global'Storage_Pool);
 
    type Context_Type is
       record

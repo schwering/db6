@@ -38,7 +38,7 @@ package body Misc is
       N_A := Transaction.Current_Root_Address;
       loop
          declare
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
             exit when Nodes.Is_Leaf(N);
@@ -48,7 +48,7 @@ package body Misc is
       Count := 0;
       loop
          declare
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
             Count := Count + Count_Type(Nodes.Degree(N));
@@ -91,7 +91,7 @@ package body Misc is
       loop
          declare
             use type Nodes.Degree_Type;
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
             if Height = 0 and Nodes.Degree(N) > 0 then
@@ -127,7 +127,7 @@ package body Misc is
             loop
                declare
                   use type Nodes.Degree_Type;
-                  N : Nodes.Node_Type;
+                  N : Nodes.RO_Node_Type;
                begin
                   Read_Node(Tree, T, N_A, N);
                   if not Nodes.Is_Valid(N) or else
@@ -159,7 +159,7 @@ package body Misc is
       begin
          declare
             use type Nodes.Degree_Type;
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, T, Root_Address, N);
             if Nodes.Degree(N) = 0 or Nodes.Is_Leaf(N) then
@@ -197,13 +197,13 @@ package body Misc is
                end Swap;
 
                use type Nodes.Degree_Type;
-               N : Nodes.Node_Type;
+               N : Nodes.RO_Node_Type;
             begin
                Read_Node(Tree, T, N_A, N);
                Swap(Tree, T, N_A, NN_A);
                if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
                   declare
-                     NN : Nodes.Node_Type;
+                     NN : Nodes.RO_Node_Type;
                   begin
                      Read_Node(Tree, T, NN_A, NN);
                      N_A := Nodes.To_Valid_Address(Nodes.Right_Neighbor(NN));

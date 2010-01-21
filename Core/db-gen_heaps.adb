@@ -311,14 +311,6 @@ package body DB.Gen_Heaps is
    ----------
    -- Some small helpers.
 
-   function Block_Identity
-     (Block : IO.Blocks.Block_Type)
-      return IO.Blocks.Block_Type is
-   begin
-      return Block;
-   end Block_Identity;
-
-
    function Chunk_Length
      (Size : Length_Type)
       return Length_Type

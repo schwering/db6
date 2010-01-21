@@ -79,7 +79,7 @@ package body Retrieval is
       N_A := Transaction.Current_Root_Address;
       loop
          declare
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
             I := Nodes.Key_Position(N, Key);
@@ -124,7 +124,7 @@ package body Retrieval is
       loop
          declare
             use type Nodes.Degree_Type;
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
             if Nodes.Degree(N) = 0 then
@@ -168,7 +168,7 @@ package body Retrieval is
       loop
          declare
             use type Nodes.Degree_Type;
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
             if Nodes.Degree(N) = 0 then

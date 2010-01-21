@@ -51,7 +51,7 @@ package body Deletion is
       loop
          declare
             use type Nodes.Degree_Type;
-            N : Nodes.Node_Type;
+            N : Nodes.RO_Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
             I := Nodes.Key_Position(N, Key);
@@ -68,8 +68,8 @@ package body Deletion is
       -- Delete in memory and dispatch to add the Nodes.
       declare
          use type Nodes.Degree_Type;
-         N_Old : Nodes.Node_Type;
-         N_New : Nodes.Node_Type;
+         N_Old : Nodes.RW_Node_Type;
+         N_New : Nodes.RW_Node_Type;
       begin
          Read_Node(Tree, Transaction, N_A, N_Old);
          N_New := Nodes.Deletion(N_Old, I);
@@ -97,7 +97,7 @@ package body Deletion is
      (Tree  : in out Tree_Type;
       T     : in out RW_Transaction_Type'Class;
       N_A   : in     Nodes.Valid_Address_Type;
-      N     : in     Nodes.Node_Type;
+      N     : in     Nodes.RW_Node_Type;
       State : in out State_Type)
    is
 
@@ -105,7 +105,7 @@ package body Deletion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type)
       is
          use type Nodes.Degree_Type;
@@ -115,7 +115,7 @@ package body Deletion is
          elsif Nodes.Is_Root(N) and Nodes.Is_Inner(N) and
             Nodes.Degree(N) = 1 then
             declare
-               C : Nodes.Node_Type;
+               C : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, Nodes.Child(N, 1), C);
                Nodes.Set_Parent(C, Nodes.Invalid_Address);
@@ -136,7 +136,7 @@ package body Deletion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type) is
       begin
          if Nodes.Is_Valid(N) then
@@ -157,14 +157,14 @@ package body Deletion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type) is
       begin
          if Nodes.Is_Valid(Nodes.Right_Neighbor(N)) then
             declare
                R_A : constant Nodes.Valid_Address_Type
                    := Nodes.Valid_Right_Neighbor(N);
-               R   : Nodes.Node_Type;
+               R   : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, R_A, R);
                Redistribute(Tree, T, N_A, N, R_A, R, State);
@@ -184,14 +184,14 @@ package body Deletion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          N_A   : in     Nodes.Valid_Address_Type;
-         N     : in     Nodes.Node_Type;
+         N     : in     Nodes.RW_Node_Type;
          State : in out State_Type) is
       begin
          if Nodes.Is_Valid(Nodes.Left_Neighbor(N)) then
             declare
                L_A : constant Nodes.Valid_Address_Type
                    := Nodes.Valid_Left_Neighbor(N);
-               L   : Nodes.Node_Type;
+               L   : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, L_A, L);
                Redistribute(Tree, T, L_A, L, N_A, N, State);
@@ -211,9 +211,9 @@ package body Deletion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          L_A   : in     Nodes.Valid_Address_Type;
-         L     : in     Nodes.Node_Type;
+         L     : in     Nodes.RW_Node_Type;
          R_A   : in     Nodes.Valid_Address_Type;
-         R     : in     Nodes.Node_Type;
+         R     : in     Nodes.RW_Node_Type;
          State : in out State_Type)
       is
 
@@ -221,16 +221,16 @@ package body Deletion is
            (Tree  : in out Tree_Type;
             T     : in out RW_Transaction_Type'Class;
             N_A   : in     Nodes.Valid_Address_Type;
-            N     : in     Nodes.Node_Type;
+            N     : in     Nodes.RW_Node_Type;
             State : in out State_Type) is
          begin -- Delete_From_Parent
             if Nodes.Is_Valid(Nodes.Parent(N)) then
                declare
                   P_A   : constant Nodes.Valid_Address_Type
                         := Nodes.Valid_Parent(N);
-                  P_Old : Nodes.Node_Type;
+                  P_Old : Nodes.RW_Node_Type;
                   I     : Nodes.Index_Type;
-                  P_New : Nodes.Node_Type;
+                  P_New : Nodes.RW_Node_Type;
                begin
                   Read_Node(Tree, T, P_A, P_Old);
                   I     := Nodes.Child_Position(P_Old, N_A);
@@ -240,14 +240,14 @@ package body Deletion is
             end if;
          end Delete_From_Parent;
 
-         N : constant Nodes.Node_Type := Nodes.Combination(L, R);
+         N : constant Nodes.RW_Node_Type := Nodes.Combination(L, R);
       begin -- Merge
          if Nodes.Is_Valid(N) then
             if Nodes.Is_Valid(Nodes.Left_Neighbor(L)) then
                declare
                   LL_A : constant Nodes.Valid_Address_Type
                        := Nodes.Valid_Left_Neighbor(L);
-                  LL   : Nodes.Node_Type;
+                  LL   : Nodes.RW_Node_Type;
                begin
                   Read_Node(Tree, T, LL_A, LL);
                   Nodes.Set_Right_Neighbor(LL, R_A);
@@ -259,7 +259,7 @@ package body Deletion is
                   declare
                      C_A : constant Nodes.Valid_Address_Type
                          := Nodes.Child(L, I);
-                     C   : Nodes.Node_Type;
+                     C   : Nodes.RW_Node_Type;
                   begin
                      Read_Node(Tree, T, C_A, C);
                      Nodes.Set_Parent(C, R_A);
@@ -271,7 +271,7 @@ package body Deletion is
             Synchronize_With_Parent(Tree, T, R_A, N, State);
             -- previous synchronization might have modified L's parent
             declare
-               LL : Nodes.Node_Type;
+               LL : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, L_A, LL);
                Delete_From_Parent(Tree, T, L_A, LL, State);
@@ -289,14 +289,14 @@ package body Deletion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          R_A   : in     Nodes.Valid_Address_Type;
-         R     : in     Nodes.Node_Type;
+         R     : in     Nodes.RW_Node_Type;
          State : in out State_Type) is
       begin -- Merge_With_Left
          if Nodes.Is_Valid(Nodes.Left_Neighbor(R)) then
             declare
                L_A : constant Nodes.Valid_Address_Type
                    := Nodes.Valid_Left_Neighbor(R);
-               L   : Nodes.Node_Type;
+               L   : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, L_A, L);
                Merge(Tree, T, L_A, L, R_A, R, State);
@@ -313,14 +313,14 @@ package body Deletion is
         (Tree  : in out Tree_Type;
          T     : in out RW_Transaction_Type'Class;
          L_A   : in     Nodes.Valid_Address_Type;
-         L     : in     Nodes.Node_Type;
+         L     : in     Nodes.RW_Node_Type;
          State : in out State_Type) is
       begin -- Merge_With_Right
          if Nodes.Is_Valid(Nodes.Right_Neighbor(L)) then
             declare
                R_A : constant Nodes.Valid_Address_Type
                    := Nodes.Valid_Right_Neighbor(L);
-               R   : Nodes.Node_Type;
+               R   : Nodes.RW_Node_Type;
             begin
                Read_Node(Tree, T, R_A, R);
                Merge(Tree, T, L_A, L, R_A, R, State);

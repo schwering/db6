@@ -287,10 +287,10 @@ package body Cursors is
          if Cursor.Index = 1 then
             if Nodes.Is_Valid(Nodes.Left_Neighbor(Cursor.Node)) then
                declare
-                  N   : Nodes.Node_Type renames Cursor.Node;
+                  N   : Nodes.RO_Node_Type renames Cursor.Node;
                   L_A : constant Nodes.Valid_Address_Type
                       := Nodes.To_Valid_Address(Nodes.Left_Neighbor(N));
-                  L   : Nodes.Node_Type;
+                  L   : Nodes.RO_Node_Type;
                begin
                   Read_Node(Tree, Transaction, L_A, L);
                   Cursor.Node  := L;
@@ -339,10 +339,10 @@ package body Cursors is
          if Cursor.Index = Nodes.Degree(Cursor.Node) then
             if Nodes.Is_Valid(Nodes.Right_Neighbor(Cursor.Node)) then
                declare
-                  N   : Nodes.Node_Type renames Cursor.Node;
+                  N   : Nodes.RO_Node_Type renames Cursor.Node;
                   R_A : constant Nodes.Valid_Address_Type
                       := Nodes.To_Valid_Address(Nodes.Right_Neighbor(N));
-                  R   : Nodes.Node_Type;
+                  R   : Nodes.RO_Node_Type;
                begin
                   Read_Node(Tree, Transaction, R_A, R);
                   Cursor.Node  := R;
@@ -387,7 +387,7 @@ package body Cursors is
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
          Key         : in     Key_Type;
-         Node        :    out Nodes.Node_Type;
+         Node        :    out Nodes.RO_Node_Type;
          Index       :    out Nodes.Valid_Index_Type;
          State       :    out State_Type)
       is
@@ -398,7 +398,7 @@ package body Cursors is
          loop
             declare
                use type Nodes.Degree_Type;
-               N : Nodes.Node_Type;
+               N : Nodes.RO_Node_Type;
             begin
                Read_Node(Tree, Transaction, N_A, N);
                if Nodes.Degree(N) = 0 then
@@ -433,7 +433,7 @@ package body Cursors is
       procedure Retrieve_Minimum_Node
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
-         Node        :    out Nodes.Node_Type;
+         Node        :    out Nodes.RO_Node_Type;
          Index       :    out Nodes.Valid_Index_Type;
          State       :    out State_Type)
       is
@@ -443,7 +443,7 @@ package body Cursors is
          loop
             declare
                use type Nodes.Degree_Type;
-               N : Nodes.Node_Type;
+               N : Nodes.RO_Node_Type;
             begin
                Read_Node(Tree, Transaction, N_A, N);
                if Nodes.Degree(N) = 0 then
@@ -474,7 +474,7 @@ package body Cursors is
       procedure Retrieve_Maximum_Node
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
-         Node        :    out Nodes.Node_Type;
+         Node        :    out Nodes.RO_Node_Type;
          Index       :    out Nodes.Valid_Index_Type;
          State       :    out State_Type)
       is
@@ -484,7 +484,7 @@ package body Cursors is
          loop
             declare
                use type Nodes.Degree_Type;
-               N : Nodes.Node_Type;
+               N : Nodes.RO_Node_Type;
             begin
                Read_Node(Tree, Transaction, N_A, N);
                if Nodes.Degree(N) = 0 then

@@ -4,11 +4,6 @@
 -- This is used by writing transactions: they work on a buffer which is
 -- materialized on a commit and simply forgotten on an abort.
 --
--- Design Notes:
---
--- Currently, Item_Type objects are stored. Possibly, it is a good idea to store
--- Block_Type objects directly (TODO investigate).
---
 -- Uses the dynamic memory allocation, of course.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
@@ -19,23 +14,20 @@ with DB.IO.Blocks.Gen_IO;
 
 generic
    with package Block_IO is new Gen_IO (<>);
-   type Item_Type (<>) is private;
-   with function To_Block (I : Item_Type) return Block_Type;
-   with function From_Block (B : Block_Type) return Item_Type;
-   Item_Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
+   Block_Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
    Node_Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.IO.Blocks.Gen_Buffers is
    pragma Preelaborate;
 
    type Buffer_Type is private;
 
-   type Item_Ref_Type is access Item_Type;
-   for Item_Ref_Type'Storage_Pool use Item_Storage_Pool;
-   pragma Controlled (Item_Ref_Type);
+   type Block_Ref_Type is access Block_Type;
+   for Block_Ref_Type'Storage_Pool use Block_Storage_Pool;
+   pragma Controlled (Block_Ref_Type);
 
-   type Item_Constant_Ref_Type is access constant Item_Type;
-   for Item_Constant_Ref_Type'Storage_Size use 0;
-   pragma Controlled (Item_Constant_Ref_Type);
+   type Block_Constant_Ref_Type is access constant Block_Type;
+   for Block_Constant_Ref_Type'Storage_Size use 0;
+   pragma Controlled (Block_Constant_Ref_Type);
 
    function New_Buffer
       return Buffer_Type;
@@ -48,57 +40,45 @@ package DB.IO.Blocks.Gen_Buffers is
    procedure Commit
      (File   : in out Block_IO.File_Type;
       Buffer : in     Buffer_Type);
-   -- Flushes all dirty items in the buffer. See Write and Read.
+   -- Flushes all dirty blocks in the buffer. See Write and Read.
 
    procedure Seek_New
      (File    : in out Block_IO.File_Type;
       Buffer  : in out Buffer_Type;
       Address :    out Block_IO.Valid_Address_Type);
    -- Sets Address to the value it would be set to by Block_IO.Seek_New if
-   -- those items that are currently in the Buffer were written to file
+   -- those blocks that are currently in the Buffer were written to file
    -- directly.
 
    function "<="
      (A, B : Block_IO.Valid_Address_Type)
       return Boolean;
 
-   generic
-      File   : in out Block_IO.File_Type;
-      Buffer : in out Buffer_Type;
-   function Gen_Read
-     (Address : Block_IO.Valid_Address_Type)
-      return Item_Type;
-   -- Reads an item from the Buffer or from file if no item corresponding 
-   -- with Address is present in the Buffer. The read item is not stored
-   -- in the Buffer.
-   -- Hence, this function has side effects, of course.
-   -- It should be used for indefinite item types.
-
    procedure Read
      (File    : in out Block_IO.File_Type;
       Buffer  : in out Buffer_Type;
       Address : in     Block_IO.Valid_Address_Type;
-      Item    :    out Item_Type);
-   -- Reads an item from the Buffer or from file if no item corresponding 
-   -- with Address is present in the Buffer. The read item is not stored
+      Block   :    out Block_Type);
+   -- Reads an Block from the Buffer or from file if no Block corresponding 
+   -- with Address is present in the Buffer. The read Block is not stored
    -- in the Buffer.
 
    procedure Read
+     (File      : in out Block_IO.File_Type;
+      Buffer    : in out Buffer_Type;
+      Address   : in     Block_IO.Valid_Address_Type;
+      Block_Ref :    out Block_Constant_Ref_Type);
+   -- Reads an Block from the Buffer or from file if no Block corresponding 
+   -- with Address is present in the Buffer. In contrast to the other two
+   -- Read subprograms, this function stores the read Block in the Buffer. 
+   -- (This is necessary so that the Block will be freed later.)
+
+   procedure Write
      (File     : in out Block_IO.File_Type;
       Buffer   : in out Buffer_Type;
       Address  : in     Block_IO.Valid_Address_Type;
-      Item_Ref :    out Item_Constant_Ref_Type);
-   -- Reads an item from the Buffer or from file if no item corresponding 
-   -- with Address is present in the Buffer. In contrast to the other two
-   -- Read subprograms, this function stores the read item in the Buffer. 
-   -- (This is necessary so that the item will be freed later.)
-
-   procedure Write
-     (File    : in out Block_IO.File_Type;
-      Buffer  : in out Buffer_Type;
-      Address : in     Block_IO.Valid_Address_Type;
-      Item    : in     Item_Type);
-   -- Writes an item to the Buffer, not to the file itself.
+      Block    : in     Block_Type);
+   -- Writes an Block to the Buffer, not to the file itself.
 
 private
    type Entry_Type;
@@ -109,7 +89,7 @@ private
       record
          Next    : Entry_Ref_Type;
          Address : Block_IO.Valid_Address_Type;
-         Item    : Item_Ref_Type;
+         Block   : Block_Ref_Type;
          Changed : Boolean := False;
       end record;
 
