@@ -275,19 +275,19 @@ package body DB.Gen_BTrees.Gen_Controlled is
 
    procedure Get_Height
      (Tree   : in out Tree_Type'Class;
-      Height :    out Height_Type) is
+      Height :    out Natural) is
    begin
-      Gen_BTrees.Get_Height(Tree.Tree, Gen_BTrees.Height_Type(Height));
+      Gen_BTrees.Get_Height(Tree.Tree, Height);
    end Get_Height;
 
 
    procedure Get_Height
      (Tree        : in out Tree_Type'Class;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type) is
+      Height      :    out Natural) is
    begin
       Gen_BTrees.Get_Height(Tree.Tree, Transaction_Impl(Transaction).all,
-                            Gen_BTrees.Height_Type(Height));
+                            Height);
    end Get_Height;
 
 

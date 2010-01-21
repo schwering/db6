@@ -18,8 +18,6 @@ with DB.Types.Values;
 with DB.Types.Values.Bounded;
 with DB.Types.Values.Unbounded;
 
-with DB.Utils.Traceback;
-
 procedure IO_Dispatcher.Gen_Blob_Trees is
    package Keys     renames DB.Blob_Trees.Keys;
    package Rows     renames Keys.Rows;
@@ -198,10 +196,5 @@ begin
    Jobs.Execute_Jobs(Long_Job);
 
    Blob_Trees.Finalize(Tree);
-exception
-   when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback(Error);
 end IO_Dispatcher.Gen_Blob_Trees;
 

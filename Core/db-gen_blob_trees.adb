@@ -873,25 +873,25 @@ package body DB.Gen_Blob_Trees is
 
    procedure Get_Height
      (Tree   : in out Tree_Type;
-      Height :    out Height_Type) is
+      Height :    out Natural) is
    begin
-      BTrees.Get_Height(Tree.BTree, BTrees.Height_Type(Height));
+      BTrees.Get_Height(Tree.BTree, Height);
    end Get_Height;
 
 
    procedure Get_Height
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type) is
+      Height      :    out Natural) is
    begin
       if Transaction in RO_Transaction_Type'Class then
          BTrees.Get_Height(Tree.BTree,
                            RO_Transaction_Type(Transaction).BTree_Transaction,
-                           BTrees.Height_Type(Height));
+                           Height);
       else
          BTrees.Get_Height(Tree.BTree,
                            RW_Transaction_Type(Transaction).BTree_Transaction,
-                           BTrees.Height_Type(Height));
+                           Height);
       end if;
    end Get_Height;
 

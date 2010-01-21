@@ -18,8 +18,6 @@ with DB.Types;
 with DB.Types.Keys;
 with DB.Types.Values;
 
-with DB.Utils.Traceback;
-
 with System.Storage_Elements;
 
 procedure Blob_TTree
@@ -135,8 +133,6 @@ begin
 
 exception
    when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback(Error);
+      Put_Line(Exception_Information(Error));
 end Blob_TTree;
 

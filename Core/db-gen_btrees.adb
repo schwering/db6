@@ -184,12 +184,12 @@ package body DB.Gen_BTrees is
 
       procedure Get_Height
         (Tree   : in out Tree_Type;
-         Height :    out Height_Type);
+         Height :    out Natural);
 
       procedure Get_Height
         (Tree        : in out Tree_Type;
          Transaction : in out Transaction_Type'Class;
-         Height      :    out Height_Type);
+         Height      :    out Natural);
 
       procedure Clusterize
         (Tree  : in out Tree_Type;
@@ -1020,14 +1020,14 @@ package body DB.Gen_BTrees is
 
    procedure Get_Height
      (Tree   : in out Tree_Type;
-      Height :    out Height_Type)
+      Height :    out Natural)
    renames Misc.Get_Height;
 
 
    procedure Get_Height
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type)
+      Height      :    out Natural)
    renames Misc.Get_Height;
 
 

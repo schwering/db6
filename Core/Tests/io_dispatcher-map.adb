@@ -15,7 +15,6 @@ with DB.Types.Keys;
 with DB.Types.Strings.Bounded;
 with DB.Types.Values.Bounded;
 with DB.Types.Times;
-with DB.Utils.Traceback;
 
 procedure IO_Dispatcher.Map is
 
@@ -113,10 +112,5 @@ begin
    Jobs.Execute_Jobs(Long_Job);
 
    DB.Tables.Maps.Finalize(Map);
-exception
-   when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback(Error);
 end IO_Dispatcher.Map;
 

@@ -18,8 +18,6 @@ with DB.Types.Values;
 with DB.Types.Values.Bounded;
 with DB.Types.Values.Unbounded;
 
-with DB.Utils.Traceback;
-
 procedure IO_Dispatcher.Gen_BTrees is
    package Keys     renames DB.BTrees.Keys;
    package Rows     renames Keys.Rows;
@@ -189,10 +187,5 @@ begin
    Jobs.Execute_Jobs(Long_Job);
 
    BTrees.Finalize(Tree);
-exception
-   when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback(Error);
 end IO_Dispatcher.Gen_BTrees;
 

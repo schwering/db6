@@ -15,7 +15,6 @@ with DB.Types.Gen_Numbers;
 
 with DB.Locks.Mutexes;
 
-with DB.Utils.Traceback;
 with DB.Utils.Global_Pool;
 
 procedure IO_Dispatcher.Map_MR is
@@ -87,9 +86,7 @@ procedure IO_Dispatcher.Map_MR is
          Emit(Key.Row, 1);
       exception
          when Error : others =>
-            Put_Line("Exception: "& Exception_Message(Error));
             Put_Line("Exception: "& Exception_Information(Error));
-            DB.Utils.Traceback.Print_Traceback(Error);
             raise;
       end Map_Proc;
 
@@ -209,10 +206,5 @@ begin
                     Reset                   => False);
 
    DB.Tables.Maps.Finalize(Map);
-exception
-   when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback(Error);
 end IO_Dispatcher.Map_MR;
 

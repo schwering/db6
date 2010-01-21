@@ -133,14 +133,14 @@ is
 
       procedure Check_Subtree
         (Address : in Nodes.Valid_Address_Type;
-         Level   : in Height_Type);
+         Level   : in Natural);
 
       Counter  : Positive := 1;
       Interval : constant Positive := 1024;
 
       procedure Check_Subtree
         (Address : in Nodes.Valid_Address_Type;
-         Level   : in Height_Type)
+         Level   : in Natural)
       is
          B : IO.Blocks.Block_Type;
       begin
@@ -352,29 +352,29 @@ end;
          end;
       end Check_Subtree;
 
-      Tree_Height : Height_Type;
+      Tree_Height : Natural;
    begin -- Tree_Check
       Check_Subtree(Root_Address, 1);
       Get_Height(Tree, Tree_Height);
       if Height /= Tree_Height then
          Raise_Exception(Tree_Error'Identity,
-                         "Height ="& Height_Type'Image(Height) &", but "&
-                         "Tree.Height ="& Height_Type'Image(Tree_Height));
+                         "Height ="& Natural'Image(Height) &", but "&
+                         "Tree.Height ="& Natural'Image(Tree_Height));
          return;
       elsif Inv_Left /= Tree_Height then
          Raise_Exception(Tree_Error'Identity,
-                         "Inv_Left ="& Height_Type'Image(Inv_Left) &", but "&
-                         "Tree.Height ="& Height_Type'Image(Tree_Height));
+                         "Inv_Left ="& Natural'Image(Inv_Left) &", but "&
+                         "Tree.Height ="& Natural'Image(Tree_Height));
          return;
       elsif Inv_Right /= Tree_Height then
          Raise_Exception(Tree_Error'Identity,
-                         "Inv_Left ="& Height_Type'Image(Inv_Right) &", but "&
-                         "Tree.Height ="& Height_Type'Image(Tree_Height));
+                         "Inv_Left ="& Natural'Image(Inv_Right) &", but "&
+                         "Tree.Height ="& Natural'Image(Tree_Height));
       elsif (Tree_Height = 0 and Inv_Parent /= 0) or
          (Tree_Height > 0 and Inv_Parent /= 1) then
          Raise_Exception(Tree_Error'Identity,
-                        "Inv_Parent ="& Height_Type'Image(Inv_Parent) &", but "&
-                        "Tree.Height ="& Height_Type'Image(Tree_Height));
+                        "Inv_Parent ="& Natural'Image(Inv_Parent) &", but "&
+                        "Tree.Height ="& Natural'Image(Tree_Height));
          return;
       end if;
    end Check_Tree;

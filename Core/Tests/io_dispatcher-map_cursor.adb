@@ -8,8 +8,6 @@ with IO_Dispatcher.Jobs;
 
 with DB.Tables.Maps;
 
-with DB.Utils.Traceback;
-
 procedure IO_Dispatcher.Map_Cursor is
 
    package Maps renames DB.Tables.Maps;
@@ -127,10 +125,5 @@ begin
    Ada.Text_IO.Put_Line("Total:"& Count_Container.Total_Count'Img);
 
    DB.Tables.Maps.Finalize(Map);
-exception
-   when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback(Error);
 end IO_Dispatcher.Map_Cursor;
 

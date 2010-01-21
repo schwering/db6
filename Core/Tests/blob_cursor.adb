@@ -21,7 +21,6 @@ with DB.Types.Keys;
 with DB.Types.Values;
 
 with DB.Utils.Timers;
-with DB.Utils.Traceback;
 
 with System.Storage_Elements;
 
@@ -102,10 +101,7 @@ is
             Proc(Tree);
          exception
             when Error : others =>
-               Put_Line("Exception: "& Exception_Message(Error));
-               Put_Line("Exception: "& Exception_Information(Error));
-               DB.Utils.Traceback.Print_Traceback;
-               DB.Utils.Traceback.Print_Traceback(Error);
+               Put_Line(Exception_Information(Error));
          end;
       end loop;
       DB.Utils.Timers.Stop(Total_Timer);
@@ -348,12 +344,6 @@ begin
 
 exception
    when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback;
-      Put_Line("Traceback");
-      DB.Utils.Traceback.Print_Traceback(Error);
-      Put_Line("Traceback");
-
+      Put_Line(Exception_Information(Error));
 end Blob_Cursor;
 

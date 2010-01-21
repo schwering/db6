@@ -190,7 +190,6 @@ package DB.Tables.Maps is
    ----------
    -- Miscellaneous information procedures.
 
-   subtype Height_Type is Positive;
    subtype Count_Type is Natural;
 
    procedure Count
@@ -208,7 +207,7 @@ package DB.Tables.Maps is
 
    procedure Get_Height
      (Map    : in out Map_Type;
-      Height :    out Height_Type);
+      Height :    out Natural);
    -- Determines the Height of the map.
    -- This procedure acquires a read-lock and might therefore block due to
    -- uncommitted transactions.
@@ -216,7 +215,7 @@ package DB.Tables.Maps is
    procedure Get_Height
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type);
+      Height      :    out Natural);
    -- Determines the Height of the map.
 
    procedure Clusterize

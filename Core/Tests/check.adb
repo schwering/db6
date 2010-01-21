@@ -8,9 +8,6 @@ with To_Strings; use To_Strings;
 with DB.BTrees;
 with DB.Gen_BTrees.Gen_Check;
 
-with DB.Utils.Traceback;
-
-
 procedure Check
 is
    package BTrees renames DB.BTrees;
@@ -35,12 +32,6 @@ begin
 
 exception
    when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback;
-      Put_Line("Traceback");
-      DB.Utils.Traceback.Print_Traceback(Error);
-      Put_Line("Traceback");
-
+      Put_Line(Exception_Information(Error));
 end Check;
 

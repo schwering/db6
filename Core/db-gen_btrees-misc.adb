@@ -61,7 +61,7 @@ package body Misc is
 
    procedure Get_Height
      (Tree   : in out Tree_Type;
-      Height :    out Height_Type)
+      Height :    out Natural)
    is
       Transaction : RO_Transaction_Type := New_RO_Transaction(Tree);
    begin
@@ -78,7 +78,7 @@ package body Misc is
    procedure Get_Height
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type)
+      Height      :    out Natural)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Transaction.Initialized);
@@ -87,13 +87,16 @@ package body Misc is
 
       N_A : Nodes.Valid_Address_Type := Transaction.Current_Root_Address;
    begin
-      Height := 1;
+      Height := 0;
       loop
          declare
             use type Nodes.Degree_Type;
             N : Nodes.Node_Type;
          begin
             Read_Node(Tree, Transaction, N_A, N);
+            if Height = 0 and Nodes.Degree(N) > 0 then
+               Height := 1;
+            end if;
             exit when Nodes.Is_Leaf(N);
             N_A := Nodes.Child(N, 1);
             Height := Height + 1;
@@ -114,11 +117,11 @@ package body Misc is
          procedure Find_Outermost_Left_In_Level
            (Tree   : in out Tree_Type;
             T      : in out RO_Transaction_Type'Class;
-            Level  : in     Height_Type;
+            Level  : in     Natural;
             N_A    :    out Nodes.Valid_Address_Type;
             State  :    out State_Type)
          is
-            Current_Level : Height_Type := 1;
+            Current_Level : Natural := 1;
          begin
             N_A := Root_Address;
             loop
@@ -150,7 +153,7 @@ package body Misc is
                        (Block_IO.Valid_Address_Type(N_A)));
          end Increment;
 
-         Level : Height_Type := 1;
+         Level : Natural := 1;
          N_A   : Nodes.Valid_Address_Type;
          NN_A  : Nodes.Valid_Address_Type;
       begin

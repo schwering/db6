@@ -19,8 +19,6 @@ with DB.Types.Values.Bounded;
 with DB.Types.Values.Unbounded;
 with DB.Types.Times;
 
-with DB.Utils.Traceback;
-
 procedure MMap
 is
    Max_Key_Size   : constant := 2 + 1000 + 8 
@@ -228,8 +226,6 @@ begin
    DB.Tables.Maps.Finalize(Map);
 exception
    when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback(Error);
+      Put_Line(Exception_Information(Error));
 end MMap;
 

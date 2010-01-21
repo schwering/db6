@@ -2,17 +2,16 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 
 with IO_Dispatcher.Args;
-with IO_Dispatcher.Gen_BTrees;
-with IO_Dispatcher.Gen_Blob_Trees;
+--with IO_Dispatcher.Gen_BTrees;
+--with IO_Dispatcher.Gen_Blob_Trees;
 with IO_Dispatcher.Map;
 with IO_Dispatcher.Map_Cursor;
 with IO_Dispatcher.Map_MR;
 
-with DB.BTrees;
-with DB.Blob_Trees;
+--with DB.BTrees;
+--with DB.Blob_Trees;
 
 with DB.Utils.Timers;
-with DB.Utils.Traceback;
 
 package body IO_Dispatcher
 is
@@ -61,8 +60,8 @@ is
       ----------
       -- Available procedures and their map.
 
-      use DB.BTrees;
-      use DB.Blob_Trees;
+      --use DB.BTrees;
+      --use DB.Blob_Trees;
 
       --procedure Async_BTree    is new Gen_BTrees(Async_BTrees, Check, Stats);
       --procedure CFS_BTree      is new Gen_BTrees(CFS_BTrees, Check, Stats);
@@ -126,9 +125,7 @@ is
       Put_Line("No valid IO for "& IO_Name &" found");
    exception
       when Error : others =>
-         Put_Line("Exception: "& Exception_Message(Error));
-         Put_Line("Exception: "& Exception_Information(Error));
-         DB.Utils.Traceback.Print_Traceback(Error);
+         Put_Line(Exception_Information(Error));
    end Dispatch;
 
 end IO_Dispatcher;

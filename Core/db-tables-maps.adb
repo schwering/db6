@@ -151,8 +151,10 @@ package body DB.Tables.Maps is
    procedure Initialize
      (Map : out Map_Type;
       ID  : in  String) is
+      procedure Raise_E is begin raise Tree_Error; end;
    begin
       if Map.Short then
+         Raise_E;
          BTrees.Initialize(Map.Short_Tree, ID);
       else
          Blob_Trees.Initialize(Map.Long_Tree, ID);
@@ -965,12 +967,12 @@ package body DB.Tables.Maps is
 
    procedure Get_Height
      (Map    : in out Map_Type;
-      Height :    out Height_Type) is
+      Height :    out Natural) is
    begin
       if Map.Short then
-         BTrees.Get_Height(Map.Short_Tree, BTrees.Height_Type(Height));
+         BTrees.Get_Height(Map.Short_Tree, Height);
       else
-         Blob_Trees.Get_Height(Map.Long_Tree, Blob_Trees.Height_Type(Height));
+         Blob_Trees.Get_Height(Map.Long_Tree, Height);
       end if;
    end Get_Height;
 
@@ -978,7 +980,7 @@ package body DB.Tables.Maps is
    procedure Get_Height
      (Map         : in out Map_Type;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type)
+      Height      :    out Natural)
    is
       pragma Assert ((Transaction not in RO_Transaction_Type'Class or else
                       Map.Short = RO_Transaction_Type(Transaction).Short) and
@@ -989,21 +991,21 @@ package body DB.Tables.Maps is
          if Transaction in RO_Transaction_Type'Class then
             BTrees.Get_Height(Map.Short_Tree,
                              RO_Transaction_Type(Transaction).Short_Transaction,
-                             BTrees.Height_Type(Height));
+                             Height);
          else
             BTrees.Get_Height(Map.Short_Tree,
                              RW_Transaction_Type(Transaction).Short_Transaction,
-                             BTrees.Height_Type(Height));
+                             Height);
          end if;
       else
          if Transaction in RO_Transaction_Type'Class then
             Blob_Trees.Get_Height(Map.Long_Tree,
                               RO_Transaction_Type(Transaction).Long_Transaction,
-                              Blob_Trees.Height_Type(Height));
+                              Height);
          else
             Blob_Trees.Get_Height(Map.Long_Tree,
                               RW_Transaction_Type(Transaction).Long_Transaction,
-                              Blob_Trees.Height_Type(Height));
+                              Height);
          end if;
       end if;
    end Get_Height;

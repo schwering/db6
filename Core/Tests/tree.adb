@@ -17,7 +17,6 @@ with DB.Types.Keys;
 with DB.Types.Values;
 
 with DB.Utils.Timers; use DB.Utils.Timers;
-with DB.Utils.Traceback;
 
 
 procedure Tree
@@ -54,7 +53,7 @@ is
    exception
       when Error : others =>
          Put_Line("Check failed");
-         Put_Line("Exception: "& Exception_Message(Error));
+         Put_Line(Exception_Information(Error));
          raise Stop_Now;
    end Check;
 
@@ -516,12 +515,6 @@ exception
    when Stop_Now =>
       null;
    when Error : others =>
-      Put_Line("Exception: "& Exception_Message(Error));
-      Put_Line("Exception: "& Exception_Information(Error));
-      DB.Utils.Traceback.Print_Traceback;
-      Put_Line("Traceback");
-      DB.Utils.Traceback.Print_Traceback(Error);
-      Put_Line("Traceback");
-
+      Put_Line(Exception_Information(Error));
 end Tree;
 

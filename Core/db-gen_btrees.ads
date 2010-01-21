@@ -289,7 +289,6 @@ package DB.Gen_BTrees is
    ----------
    -- Miscellaneous information procedures.
 
-   subtype Height_Type is Positive;
    subtype Count_Type is Natural;
 
    procedure Count
@@ -307,7 +306,7 @@ package DB.Gen_BTrees is
 
    procedure Get_Height
      (Tree   : in out Tree_Type;
-      Height :    out Height_Type);
+      Height :    out Natural);
    -- Determines the Height of the tree.
    -- This procedure acquires a read-lock and might therefore block due to
    -- uncommitted transactions.
@@ -315,7 +314,7 @@ package DB.Gen_BTrees is
    procedure Get_Height
      (Tree        : in out Tree_Type;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type);
+      Height      :    out Natural);
    -- Determines the Height of the tree.
 
    procedure Clusterize

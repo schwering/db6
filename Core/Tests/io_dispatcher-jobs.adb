@@ -2,7 +2,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 
 with DB.Utils.Timers;
-with DB.Utils.Traceback;
 
 package body IO_Dispatcher.Jobs is
 
@@ -114,9 +113,7 @@ package body IO_Dispatcher.Jobs is
                   Short_Job.all;
                exception
                   when Error : others =>
-                     Put_Line("Exception: "& Exception_Message(Error));
                      Put_Line("Exception: "& Exception_Information(Error));
-                     DB.Utils.Traceback.Print_Traceback(Error);
                      declare
                         procedure Kill_Program (Exit_Value : in Integer);
                         pragma Import (C, Kill_Program, "exit");
@@ -128,9 +125,7 @@ package body IO_Dispatcher.Jobs is
             end loop;
          exception
             when Error : others =>
-               Put_Line("Exception: "& Exception_Message(Error));
                Put_Line("Exception: "& Exception_Information(Error));
-               DB.Utils.Traceback.Print_Traceback(Error);
          end Task_Type;
 
          Tasks : array (1 .. Concurrency_Degree) of Task_Type;

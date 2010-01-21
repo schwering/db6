@@ -34,7 +34,7 @@ is
    exception
       when Error : others =>
          Put_Line("Check failed");
-         Put_Line("Exception: "& Exception_Message(Error));
+         Put_Line(Exception_Information(Error));
          raise;
    end Check;
 
@@ -81,8 +81,7 @@ is
             end if;
          exception
             when Error : others =>
-               Put_Line("Exception: "& Exception_Message(Error));
-               Put_Line("Exception: "& Exception_Information(Error));
+               Put_Line(Exception_Information(Error));
          end;
       end loop;
    end Insertions;

@@ -1,4 +1,5 @@
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Exceptions; use Ada.Exceptions;
 with System;
 with System.Pool_Global; use System.Pool_Global;
 with System.Storage_Elements;
@@ -12,7 +13,6 @@ with DB.IO.Blocks.Direct_IO;
 with DB.Types.Strings;
 with DB.Types.Strings.Unbounded;
 with DB.Utils.Global_Pool;
-with DB.Utils.Traceback;
 
 procedure Heap
 is
@@ -94,7 +94,7 @@ begin
       Put_Line("Successful");
    exception
       when Error : others =>
-         DB.Utils.Traceback.Print_Traceback(Error);
+         Put_Line("Exception: "& Exception_Information(Error));
          Put_Line("Failed");
    end;
 
@@ -391,8 +391,7 @@ begin
 
 exception
    when Error : others =>
-      Put_Line("Traceback");
-      DB.Utils.Traceback.Print_Traceback(Error);
+      Put_Line("Exception: "& Exception_Information(Error));
       raise;
 end Heap;
 

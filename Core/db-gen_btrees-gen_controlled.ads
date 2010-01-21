@@ -35,7 +35,6 @@ package DB.Gen_BTrees.Gen_Controlled is
 
    type State_Type is new Gen_BTrees.State_Type;
    subtype Count_Type is Gen_BTrees.Count_Type;
-   subtype Height_Type is Gen_BTrees.Height_Type;
 
    type Comparison_Type is new Gen_BTrees.Comparison_Type;
    type Bound_Type is new Gen_BTrees.Bound_Type;
@@ -162,12 +161,12 @@ package DB.Gen_BTrees.Gen_Controlled is
 
    procedure Get_Height
      (Tree   : in out Tree_Type'Class;
-      Height :    out Height_Type);
+      Height :    out Natural);
 
    procedure Get_Height
      (Tree        : in out Tree_Type'Class;
       Transaction : in out Transaction_Type'Class;
-      Height      :    out Height_Type);
+      Height      :    out Natural);
 
    procedure Clusterize
      (Tree  : in out Tree_Type'Class;

@@ -1,3 +1,31 @@
+* Idee: [Key|Value]_Context_Type in [Read|Write]_[Key|Value]_Context_Type
+  aufteilen, dazu eine New_[Read|Write]_[Key|Value]_Context Funktion, die
+  Daten ueber den Knoten bekommt, zumindest den Grad. Dann koennen die
+  Write-Prozeduren daraus einen Binaerbaum in einem Array (Heap) aufbauen und
+  dabei "positive" und "negative" Diffs bei der Praefixkomprimierung speichern.
+  Das Dekodieren muesste dann viel schneller gehen, weil in einem Knoten mit
+  Grad N nicht im Schnitt N/2 Dinge dekodiert werden muessen, sondern:
+  Wir brauchen einen Baum mit Hoehe H := ceil(log_2(N)) + 1 (wobei Hoehe die
+  Anzahl der Knoten ist), weil wir dann ceil(log_2(N)) Ebenen haben und so
+  2^{ceil(log_2(N))+1} - 1 = 2^H - 1 Eintraege speichern koennen. Wir speichern
+  in der Wurzel den ganzen Eintrag und in der Folge immer nur ein Diff zum
+  Vater. Erwartungswert an Dekodierungen:
+           2^{-H} * \sum_{i=0}^{H-1} 2^i * i
+           \sum_{i=0}^{H-1} 2^{i-H} * i
+    (\h -> 1.0/(2**(h)-1) * (sum $ map (\i -> 2**i * i) [0.0 .. h-1.0])) H
+  Fuer einen Knoten mit 31 Eintraegen brauchen wir, weil 2^5 - 1 = 31,
+  einen Baum der Hoehe 5, also mit 4 Etagen. Fuer jeden Knoten der i-ten Etage
+  brauchen wir i Dekodierungen. Da auf der i-ten Etage 2^i Eintraege sind,
+  braeuchte man i * 2^i Dekodierungen insgesamt fuer die Etage, fuer den
+  Erwartungswert muss man das dann noch durch 2^5 - 1 = 2^H - 1 teilen.
+   8 Eintraege => 1.4 Dekodierungen
+  15 Eintraege => 2.3 Dekodierungen
+  31 Eintraege => 3.2 Dekodierungen
+  63 Eintraege => 4.1 Dekodierungen
+   1
+ 2   2
+3 3 3 3
+
 * Management-Schicht
   * Jede Column-Family c wird von einem regulaeren Ausdruck r beschuetzt
   * Operationen:
