@@ -55,6 +55,13 @@ package DB.IO.Blocks is
    -- storage elements to zero. The latter is done because the block will
    -- probably be written to disk.
 
+   procedure Reset_Free_Space_Of_Block
+     (Block     : in out Base_Block_Type;
+      Last_Used : in     Base_Position_Type);
+   -- Resets the bytes behind Last_Used until the Block_Size-th byte. Similarly
+   -- to the To_Block functions, this is done to prepare the block for being
+   -- written to disk.
+
    function New_Cursor
      (Start : Base_Position_Type)
       return Cursor_Type;

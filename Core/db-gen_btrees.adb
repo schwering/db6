@@ -264,7 +264,7 @@ package body DB.Gen_BTrees is
    begin
       IO_Buffers.Read(Tree.File, Transaction.Buffer,
                       Block_IO.Valid_Address_Type(N_A),
-                      IO.Blocks.Base_Block_Type(N(Nodes.RO_Node_Type'Range)));
+                      IO.Blocks.Base_Block_Type(N(IO.Blocks.Block_Type'Range)));
    end Read_Node;
 
 

@@ -64,12 +64,10 @@ package body Prefix_Compressed is
       subtype LPos_Type is IO.Blocks.Base_Position_Type;
 
       procedure Write_Uncompressed
-        (Context : in out Context_Type;
-         Block   : in out IO.Blocks.Base_Block_Type;
+        (Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       : in     String_Type)
       is
-         pragma Unreferenced (Context);
          type String_Buffer_Type is
             new Indefinite_Buffer_Type(1 .. Length(S));
          procedure Write is new IO.Blocks.Write(String_Info_Type);
@@ -84,7 +82,7 @@ package body Prefix_Compressed is
       end Write_Uncompressed;
 
       procedure Write_Compressed
-        (Context : in out Context_Type;
+        (Context : in     Context_Type;
          Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S_Delta : in     Compression.Delta_Type)
@@ -113,7 +111,7 @@ package body Prefix_Compressed is
                         := IO.Blocks.Position(Cursor);
    begin
       if not Context.Initialized then
-         Write_Uncompressed(Context, Block, Cursor, S);
+         Write_Uncompressed(Block, Cursor, S);
          Context.Initialized             := True;
          Context.Previous                := S;
          Context.Previous_Block_Position := Previous_Position;
@@ -129,7 +127,7 @@ package body Prefix_Compressed is
          begin
             if Size_Of(Prefix_Info_Type'(others => <>)) >
                Size_Of(Prefix_Buffer_Type'(others => <>)) then
-               Write_Uncompressed(Context, Block, Cursor, S);
+               Write_Uncompressed(Block, Cursor, S);
             else
                Write_Compressed(Context, Block, Cursor, S_Delta);
             end if;

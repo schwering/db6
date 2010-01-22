@@ -10,6 +10,18 @@ with System;
 package body DB.IO.Blocks is
 
    function To_Block
+     (Block     : Base_Block_Type;
+      Last_Used : Base_Position_Type)
+      return Block_Type
+   is
+      B : Block_Type := Block(Index_Type);
+   begin
+      B(Last_Used + 1 .. B'Last) := (others => 0);
+      return B;
+   end To_Block;
+
+
+   function To_Block
      (Block  : Base_Block_Type;
       Cursor : Cursor_Type)
       return Block_Type
@@ -23,16 +35,12 @@ package body DB.IO.Blocks is
    end To_Block;
 
 
-   function To_Block
-     (Block     : Base_Block_Type;
-      Last_Used : Base_Position_Type)
-      return Block_Type
-   is
-      B : Block_Type := Block(Index_Type);
+   procedure Reset_Free_Space_Of_Block
+     (Block     : in out Base_Block_Type;
+      Last_Used : in     Base_Position_Type) is
    begin
-      B(Last_Used + 1 .. B'Last) := (others => 0);
-      return B;
-   end To_Block;
+      Block(Last_Used + 1 .. Block_Type'Last) := (others => 0);
+   end Reset_Free_Space_Of_Block;
 
 
    function New_Cursor
