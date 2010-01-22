@@ -2,8 +2,6 @@
 
 with "libdb";
 with "attributes";
-with "aws";
-with "aunit";
 
 project Tests is
 
