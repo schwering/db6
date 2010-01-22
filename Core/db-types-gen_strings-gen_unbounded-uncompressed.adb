@@ -9,6 +9,13 @@ with DB.IO.Blocks;
 separate (DB.Types.Gen_Strings.Gen_Unbounded)
 package body Uncompressed is
 
+   function New_Context
+      return Context_Type is
+   begin
+      return Context_Type'(others => <>);
+   end New_Context;
+
+
    function Size_Bound
      (S : String_Type)
       return IO.Blocks.Size_Type

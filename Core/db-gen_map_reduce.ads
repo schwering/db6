@@ -50,7 +50,9 @@ generic
           (Left, Right : Intermediate_Key_Type)
            return Utils.Comparison_Result_Type is <>;
 
-   type Intermediate_Key_Context_Type is limited private;
+   type Intermediate_Key_Context_Type is private;
+   with function New_Intermediate_Key_Context
+           return Intermediate_Key_Context_Type;
    with function Intermediate_Key_Size_Bound
           (Key : Intermediate_Key_Type)
            return IO.Blocks.Size_Type;
@@ -69,7 +71,9 @@ generic
            Cursor  : in out IO.Blocks.Cursor_Type;
            Key     : in     Intermediate_Key_Type);
 
-   type Intermediate_Value_Context_Type is limited private;
+   type Intermediate_Value_Context_Type is private;
+   with function New_Intermediate_Value_Context
+           return Intermediate_Value_Context_Type;
    with function Intermediate_Value_Size_Bound
           (Value : Intermediate_Value_Type)
            return IO.Blocks.Size_Type;

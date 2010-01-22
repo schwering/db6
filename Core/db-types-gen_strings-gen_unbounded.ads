@@ -78,6 +78,9 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
 
       Is_Context_Free_Serialization : constant Boolean := True;
 
+      function New_Context
+         return Context_Type;
+
       function Size_Bound
         (S : String_Type)
          return IO.Blocks.Size_Type;
@@ -110,10 +113,12 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
          Cursor  : in out IO.Blocks.Cursor_Type);
 
    private
-      pragma Inline (Uncompressed.Size_Bound);
-      pragma Inline (Uncompressed.Write);
-      pragma Inline (Uncompressed.Read);
-      pragma Inline (Uncompressed.Skip);
+      pragma Inline (New_Context);
+      pragma Inline (Size_Bound);
+      pragma Inline (Size_Bound);
+      pragma Inline (Write);
+      pragma Inline (Read);
+      pragma Inline (Skip);
    end Uncompressed;
 
 
@@ -125,6 +130,9 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
          end record;
 
       Is_Context_Free_Serialization : constant Boolean := False;
+
+      function New_Context
+         return Context_Type;
 
       procedure Write
         (Context : in out Context_Type;
@@ -139,8 +147,9 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
          S       :    out String_Type);
 
    private
-      pragma Inline (Prefix_Compressed.Write);
-      pragma Inline (Prefix_Compressed.Read);
+      pragma Inline (New_Context);
+      pragma Inline (Write);
+      pragma Inline (Read);
    end Prefix_Compressed;
 
 
@@ -150,6 +159,9 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
             Length : Length_Type := 0;
             First  : Boolean     := True;
          end record;
+
+      function New_Context
+         return Context_Type;
 
       function Size_Bound
         (S : String_Type)
@@ -187,6 +199,11 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       : in     String_Type;
          Done    :    out Boolean);
+
+   private
+      pragma Inline (New_Context);
+      pragma Inline (Size_Bound);
+
    end Parted;
 
 private

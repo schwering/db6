@@ -24,12 +24,14 @@ procedure DB.Gen_Map_Reduce is
       Allow_Duplicates              => True,
 
       Key_Context_Type              => Intermediate_Key_Context_Type,
+      New_Key_Context               => New_Intermediate_Key_Context,
       Key_Size_Bound                => Intermediate_Key_Size_Bound,
       Read_Key                      => Read_Intermediate_Key,
       Skip_Key                      => Skip_Intermediate_Key,
       Write_Key                     => Write_Intermediate_Key,
 
       Value_Context_Type            => Intermediate_Value_Context_Type,
+      New_Value_Context             => New_Intermediate_Value_Context,
       Value_Size_Bound              => Intermediate_Value_Size_Bound,
       Read_Value                    => Read_Intermediate_Value,
       Skip_Value                    => Skip_Intermediate_Value,

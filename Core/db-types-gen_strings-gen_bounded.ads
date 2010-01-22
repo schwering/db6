@@ -85,6 +85,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
       Is_Context_Free_Serialization : constant Boolean := True;
 
+      function New_Context
+         return Context_Type;
+
       function Size_Bound
         (S : String_Type)
          return IO.Blocks.Size_Type;
@@ -121,6 +124,8 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          array (Positive range <>) of Item_Type;
       pragma Pack (Indefinite_Packed_Buffer_Type);
       subtype Packed_Buffer_Type is Indefinite_Packed_Buffer_Type(Index_Type);
+
+      pragma Inline (New_Context);
    end Uncompressed;
 
 
@@ -133,6 +138,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          end record;
 
       Is_Context_Free_Serialization : constant Boolean := False;
+
+      function New_Context
+         return Context_Type;
 
       function Size_Bound
         (S : String_Type)
@@ -149,6 +157,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       :    out String_Type);
+
+   private
+      pragma Inline (New_Context);
    end Prefix_Compressed;
 
 
@@ -161,6 +172,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
       Is_Context_Free_Serialization : constant Boolean := False;
 
+      function New_Context
+         return Context_Type;
+
       procedure Write
         (Context : in out Context_Type;
          Block   : in out IO.Blocks.Base_Block_Type;
@@ -172,6 +186,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          Block   : in     IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       :    out String_Type);
+
+   private
+      pragma Inline (New_Context);
    end Delta_Compressed;
 
 
@@ -181,6 +198,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
             Length : Length_Type := 0;
             First  : Boolean     := True;
          end record;
+
+      function New_Context
+         return Context_Type;
 
       function Size_Bound
         (S : String_Type)
@@ -218,6 +238,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          Cursor  : in out IO.Blocks.Cursor_Type;
          S       : in     String_Type;
          Done    :    out Boolean);
+
+   private
+      pragma Inline (New_Context);
    end Parted;
 
 private

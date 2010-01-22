@@ -35,6 +35,9 @@ package DB.Types.Keys is
      (Left, Right : Key_Type)
       return Utils.Comparison_Result_Type;
 
+   function New_Context
+      return Context_Type;
+
    function Size_Bound
      (Key : Key_Type)
       return IO.Blocks.Size_Type;
@@ -80,6 +83,8 @@ private
          Column_Context : Column_Serialization.Context_Type;
          Time_Context   : Times.Context_Type;
       end record;
+
+   pragma Inline (New_Context);
 
 end DB.Types.Keys;
 

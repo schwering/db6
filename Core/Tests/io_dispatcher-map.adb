@@ -1,5 +1,4 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Exceptions; use Ada.Exceptions;
 
 with IO_Dispatcher.Random; use IO_Dispatcher.Random;
 with IO_Dispatcher.Args;
@@ -11,7 +10,6 @@ with DB.IO.Blocks;
 with DB.Tables.Maps;
 with DB.Tables.Maps.Stats;
 with DB.Tables.Maps.Check;
-with DB.Types.Keys;
 with DB.Types.Strings.Bounded;
 with DB.Types.Values.Bounded;
 with DB.Types.Times;

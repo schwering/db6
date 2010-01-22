@@ -13,6 +13,13 @@ package body DB.Gen_Heaps is
 
    package body Info_BTree_Types is
 
+      function New_Key_Context
+         return Key_Context_Type is
+      begin
+         return (null record);
+      end New_Key_Context;
+
+
       function Key_Size_Bound
         (Key : Key_Type)
          return IO.Blocks.Size_Type
@@ -58,6 +65,13 @@ package body DB.Gen_Heaps is
       begin
          Write(Block, Cursor, Key);
       end Write_Key;
+
+
+      function New_Value_Context
+         return Value_Context_Type is
+      begin
+         return (null record);
+      end New_Value_Context;
 
 
       function Value_Size_Bound
@@ -182,6 +196,13 @@ package body DB.Gen_Heaps is
 
    package body Free_BTree_Types is
 
+      function New_Key_Context
+         return Key_Context_Type is
+      begin
+         return (null record);
+      end New_Key_Context;
+
+
       function Key_Size_Bound
         (Key : Key_Type)
          return IO.Blocks.Size_Type
@@ -227,6 +248,13 @@ package body DB.Gen_Heaps is
       begin
          Write(Block, Cursor, Key);
       end Write_Key;
+
+
+      function New_Value_Context
+         return Value_Context_Type is
+      begin
+         return (null record);
+      end New_Value_Context;
 
 
       function Value_Size_Bound
@@ -758,8 +786,8 @@ package body DB.Gen_Heaps is
          end loop;
       end Read_Item_From_Chunk;
 
-      Current_Address : Address_Type := Address;
-      Context         : Item_Context_Type;
+      Current_Address : Address_Type      := Address;
+      Context         : Item_Context_Type := New_Item_Context;
    begin
       loop
          declare
@@ -1250,7 +1278,7 @@ package body DB.Gen_Heaps is
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
       Item_Size : constant IO.Blocks.Size_Type
                 := Gen_Heaps.Item_Size_Bound(Item);
-      Context   : Item_Context_Type;
+      Context   : Item_Context_Type := New_Item_Context;
    begin
       Put_Helper(Heap, Transaction, Context, Item, Item_Size, Used_First,
                  Address, State);
@@ -1472,7 +1500,7 @@ package body DB.Gen_Heaps is
       pragma Assert (Heap.Initialized);
       pragma Assert (Transaction.Owning_Heap = Heap.Self);
       use type IO.Blocks.Size_Type;
-      Context                  : Item_Context_Type;
+      Context                  : Item_Context_Type := New_Item_Context;
       Item_Size_Bound          : IO.Blocks.Size_Type;
       Size_Added_To_Last_Chunk : IO.Blocks.Size_Type;
       Done                     : Boolean;

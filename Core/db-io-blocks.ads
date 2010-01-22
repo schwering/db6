@@ -133,6 +133,12 @@ package DB.IO.Blocks is
       Item   :    out Item_Type);
 
    generic
+      type Item_Type is private;
+   procedure Skip
+     (Block  : in     Base_Block_Type;
+      Cursor : in out Cursor_Type);
+
+   generic
       type Index_Type is (<>);
       type Item_Type is private;
       type Array_Type is array (Index_Type) of Item_Type;
@@ -163,6 +169,15 @@ package DB.IO.Blocks is
       Arr    : in out Array_Type;
       From   : in     Index_Type;
       To     :    out Index_Type'Base);
+
+   generic
+      type Index_Type is (<>);
+      type Item_Type is private;
+      type Array_Type is array (Index_Type) of Item_Type;
+   procedure Skip_Array
+     (Block  : in     Base_Block_Type;
+      Cursor : in out Cursor_Type;
+      From   : in     Index_Type);
 
 
 private

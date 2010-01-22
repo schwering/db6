@@ -198,6 +198,28 @@ package body DB.IO.Blocks is
    end Read;
 
 
+   procedure Skip
+     (Block  : in     Base_Block_Type;
+      Cursor : in out Cursor_Type)
+   is
+      Len : constant Base_Position_Type
+          := Base_Position_Type(Bits_To_Units(Item_Type'Size));
+   begin
+      declare
+         subtype Block_Range is
+            Integer range Integer(Block'First) ..  Integer(Block'Last);
+      begin
+         if Integer(Cursor.Pos) not in Block_Range or
+            Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
+            Cursor.Pos := Invalid_Position;
+            pragma Assert (Cursor.Pos not in Block'Range);
+            return;
+         end if;
+      end;
+      Cursor.Pos := Cursor.Pos + Len;
+   end Skip;
+
+
    function Size_Of_Array
      (Arr : Array_Type;
       From : Index_Type;
@@ -249,6 +271,26 @@ package body DB.IO.Blocks is
          end;
       end if;
    end Read_Array;
+
+
+   procedure Skip_Array
+     (Block  : in     Base_Block_Type;
+      Cursor : in out Cursor_Type;
+      From   : in     Index_Type)
+   is
+      procedure Read_Index is new Read(Index_Type'Base);
+      To : Index_Type'Base;
+   begin
+      Read_Index(Block, Cursor, To);
+      if Is_Valid(Cursor) then
+         declare
+            type Array_Sub_Type is array (From .. To) of Item_Type;
+            procedure Skip_Data is new Skip(Array_Sub_Type);
+         begin
+            Skip_Data(Block, Cursor);
+         end;
+      end if;
+   end Skip_Array;
 
 end DB.IO.Blocks;
 

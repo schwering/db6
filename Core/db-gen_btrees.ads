@@ -77,7 +77,9 @@ generic
 
    Allow_Duplicates : in Boolean := False;
 
-   type Key_Context_Type is limited private;
+   type Key_Context_Type is private;
+   with function New_Key_Context
+          return Key_Context_Type;
    with function Key_Size_Bound
           (Key : Key_Type)
            return IO.Blocks.Size_Type;
@@ -96,7 +98,9 @@ generic
            Cursor  : in out IO.Blocks.Cursor_Type;
            Key     : in     Key_Type);
 
-   type Value_Context_Type is limited private;
+   type Value_Context_Type is private;
+   with function New_Value_Context
+          return Value_Context_Type;
    with function Value_Size_Bound
           (Value : Value_Type)
            return IO.Blocks.Size_Type;
@@ -583,19 +587,43 @@ private
          return Valid_Address_Type;
       -- Returns the address of the right neighbor of the node.
 
+      procedure Get_Key
+        (Node        : in     Node_Type;
+         Index       : in     Valid_Index_Type;
+         Key         :    out Key_Type;
+         Key_Context : in out Key_Context_Type);
+      -- Gets the Index-th key. This function is determined for both,
+      -- leaves and inner nodes.
+
       function Key
         (Node  : Node_Type;
          Index : Valid_Index_Type)
          return Key_Type;
-      -- Returns the Index-th value. This function is determined for both,
+      -- Returns the Index-th key. This function is determined for both,
       -- leaves and inner nodes.
+
+      procedure Get_Child
+        (Node        : in     Node_Type;
+         Index       : in     Valid_Index_Type;
+         Child       :    out Valid_Address_Type;
+         Key_Context : in out Key_Context_Type);
+      -- Gets the Index-th child address. This function is determined for
+      -- inner nodes only.
 
       function Child
         (Node  : Node_Type;
          Index : Valid_Index_Type)
          return Valid_Address_Type;
-      -- Returns the Index-th value. This function is determined for inner nodes
-      -- only.
+      -- Returns the Index-th child address. This function is determined for
+      -- inner nodes only.
+
+      procedure Get_Value
+        (Node          : in     Node_Type;
+         Index         : in     Valid_Index_Type;
+         Value         :    out Value_Type;
+         Key_Context   : in out Key_Context_Type;
+         Value_Context : in out Value_Context_Type);
+      -- Returns the Index-th value. This function is determined for leaves.
 
       function Value
         (Node  : Node_Type;
@@ -952,7 +980,10 @@ private
          Direction          : Direction_Type;
          Has_Node           : Boolean                       := False;
          Node               : Nodes.RO_Node_Type;
+         Key_Context        : Key_Context_Type;
+         Value_Context      : Value_Context_Type;
          Index              : Nodes.Valid_Index_Type;
+         Key                : Key_Type;
          Force_Recalibrate  : Boolean                       := False;
          Owning_Tree        : Tree_Ref_Type;
          Initialized        : Boolean                       := False;

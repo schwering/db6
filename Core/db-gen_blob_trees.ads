@@ -28,7 +28,9 @@ generic
 
    Allow_Duplicates : in Boolean := False;
 
-   type Key_Context_Type is limited private;
+   type Key_Context_Type is private;
+   with function New_Key_Context
+          return Key_Context_Type;
    with function Key_Size_Bound
           (Key : Key_Type)
            return IO.Blocks.Size_Type;
@@ -49,6 +51,8 @@ generic
 
 
    type Value_Context_Type is private;
+   with function New_Value_Context
+          return Value_Context_Type;
    with function Value_Size_Bound
           (Value : Value_Type)
            return IO.Blocks.Size_Type;
@@ -68,6 +72,8 @@ generic
            Value   : in     Value_Type);
 
    type Parted_Value_Context_Type is private;
+   with function New_Parted_Value_Context
+          return Parted_Value_Context_Type;
    with function Parted_Value_Size_Bound
           (Value : Value_Type)
            return IO.Blocks.Size_Type;
@@ -441,6 +447,7 @@ private
 
    package Heaps is new Gen_Heaps
      (Item_Type          => Value_Type,
+      New_Item_Context   => New_Parted_Value_Context,
       Item_Context_Type  => Parted_Value_Context_Type,
       Item_Size_Bound    => Parted_Value_Size_Bound,
       Fold_Contexts      => Fold_Value_Contexts,
@@ -476,6 +483,9 @@ private
          Value : Gen_Blob_Trees.Value_Type)
          return Boolean;
 
+      function New_Value_Context
+         return Context_Type;
+
       function Value_Size_Bound
         (Value : Value_Type)
          return IO.Blocks.Size_Type;
@@ -504,11 +514,13 @@ private
       Compare                       => Compare,
       Allow_Duplicates              => Allow_Duplicates,
       Key_Context_Type              => Key_Context_Type,
+      New_Key_Context               => New_Key_Context,
       Key_Size_Bound                => Key_Size_Bound,
       Read_Key                      => Read_Key,
       Skip_Key                      => Skip_Key,
       Write_Key                     => Write_Key,
       Value_Context_Type            => BTree_Utils.Context_Type,
+      New_Value_Context             => BTree_Utils.New_Value_Context,
       Value_Size_Bound              => BTree_Utils.Value_Size_Bound,
       Read_Value                    => BTree_Utils.Read_Value,
       Skip_Value                    => BTree_Utils.Skip_Value,

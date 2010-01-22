@@ -246,9 +246,7 @@ package body Cursors is
    begin
       case Bound.Kind is
          when Concrete_Bound =>
-            return Key_Matches(Nodes.Key(Cursor.Node, Cursor.Index),
-                               Bound.Comparison,
-                               Bound.Key);
+            return Key_Matches(Cursor.Key, Bound.Comparison, Bound.Key);
          when Abstract_Bound =>
             return True;
       end case;
@@ -293,9 +291,13 @@ package body Cursors is
                   L   : Nodes.RO_Node_Type;
                begin
                   Read_Node(Tree, Transaction, L_A, L);
-                  Cursor.Node  := L;
-                  Cursor.Index := Nodes.Degree(L);
-                  State        := Success;
+                  Cursor.Node          := L;
+                  Cursor.Key_Context   := New_Key_Context;
+                  Cursor.Value_Context := New_Value_Context;
+                  Cursor.Index         := Nodes.Degree(L);
+                  Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
+                                Cursor.Key_Context);
+                  State := Success;
                end;
             else
                Cursor.Final := True;
@@ -303,7 +305,9 @@ package body Cursors is
             end if;
          else
             Cursor.Index := Cursor.Index - 1;
-            State        := Success;
+            Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
+                          Cursor.Key_Context);
+            State := Success;
          end if;
 
       exception
@@ -345,9 +349,13 @@ package body Cursors is
                   R   : Nodes.RO_Node_Type;
                begin
                   Read_Node(Tree, Transaction, R_A, R);
-                  Cursor.Node  := R;
-                  Cursor.Index := 1;
-                  State        := Success;
+                  Cursor.Node          := R;
+                  Cursor.Key_Context   := New_Key_Context;
+                  Cursor.Value_Context := New_Value_Context;
+                  Cursor.Index         := 1;
+                  Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
+                                Cursor.Key_Context);
+                  State := Success;
                end;
             else
                Cursor.Final := True;
@@ -355,7 +363,9 @@ package body Cursors is
             end if;
          else
             Cursor.Index := Cursor.Index + 1;
-            State        := Success;
+            Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
+                          Cursor.Key_Context);
+            State := Success;
          end if;
 
       exception
@@ -524,26 +534,30 @@ package body Cursors is
          end if;
 
          declare
-            Key : constant Key_Type := Nodes.Key(Cursor.Node, Cursor.Index);
+            Old_Key : constant Key_Type := Cursor.Key;
          begin
-            Retrieve_Node(Tree, Transaction, Key, Cursor.Node, Cursor.Index,
-                         State);
+            Retrieve_Node(Tree, Transaction, Old_Key, Cursor.Node,
+                          Cursor.Index, State);
             if State /= Success then
                Cursor.Final := True;
                return;
             end if;
+            Cursor.Key_Context   := New_Key_Context;
+            Cursor.Value_Context := New_Value_Context;
+            Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
+                          Cursor.Key_Context);
 
             -- Move to next key since we don't what to visit one twice.
             case Cursor.Direction is
                when From_Lower_To_Upper =>
-                  if Nodes.Key(Cursor.Node, Cursor.Index) <= Key then
+                  if Cursor.Key <= Old_Key then
                      Move_To_Next(Tree, Transaction, Cursor, State);
                      if Cursor.Final then
                         return;
                      end if;
                   end if;
                when From_Upper_To_Lower =>
-                  if Key <= Nodes.Key(Cursor.Node, Cursor.Index) then
+                  if Old_Key <= Cursor.Key then
                      Move_To_Next(Tree, Transaction, Cursor, State);
                      if Cursor.Final then
                         return;
@@ -621,16 +635,11 @@ package body Cursors is
                      pragma Assert (False);
                      null;
                   when Equal | Greater =>
-                     declare
-                        K : constant Key_Type
-                          := Nodes.Key(Cursor.Node, Cursor.Index);
-                     begin
-                        if not Key_Matches(K, FB.Comparison, FB.Key) then
-                           Move_To_Upper(Tree, Transaction, Cursor, State);
-                        else
-                           State := Success;
-                        end if;
-                     end;
+                     if not Key_Matches(Cursor.Key, FB.Comparison, FB.Key) then
+                        Move_To_Upper(Tree, Transaction, Cursor, State);
+                     else
+                        State := Success;
+                     end if;
                   when Greater_Or_Equal =>
                      State := Success;
                end case;
@@ -639,8 +648,7 @@ package body Cursors is
                case FB.Comparison is
                   when Less =>
                      declare
-                        K : constant Key_Type
-                          := Nodes.Key(Cursor.Node, Cursor.Index);
+                        K : Key_Type renames Cursor.Key;
                      begin
                         if not Key_Matches(K, FB.Comparison, FB.Key) then
                            Move_To_Lower(Tree, Transaction, Cursor, State);
@@ -650,25 +658,17 @@ package body Cursors is
                      end;
                   when Less_Or_Equal | Equal =>
                      loop
-                        declare
-                           K : constant Key_Type
-                             := Nodes.Key(Cursor.Node, Cursor.Index);
-                        begin
-                           exit when not Has_Upper(Cursor) or
-                                     not Key_Matches(K, FB.Comparison, FB.Key);
-                           Move_To_Upper(Tree, Transaction, Cursor, State);
-                        end;
+                        exit when not Has_Upper(Cursor) or
+                                  not Key_Matches(Cursor.Key,
+                                                  FB.Comparison,
+                                                  FB.Key);
+                        Move_To_Upper(Tree, Transaction, Cursor, State);
                      end loop;
-                     declare
-                        K : constant Key_Type
-                          := Nodes.Key(Cursor.Node, Cursor.Index);
-                     begin
-                        if not Key_Matches(K, FB.Comparison, FB.Key) then
-                           Move_To_Lower(Tree, Transaction, Cursor, State);
-                        else
-                           State := Success;
-                        end if;
-                     end;
+                     if not Key_Matches(Cursor.Key, FB.Comparison, FB.Key) then
+                        Move_To_Lower(Tree, Transaction, Cursor, State);
+                     else
+                        State := Success;
+                     end if;
                   when Greater_Or_Equal | Greater =>
                      pragma Assert (False);
                      null;
@@ -678,7 +678,7 @@ package body Cursors is
 
 
       procedure Initialize_Output_If_Successful_And_Bounds_Satisfied
-        (Cursor : in     Cursor_Type;
+        (Cursor : in out Cursor_Type;
          State  : in out State_Type;
          Key    :    out Key_Type;
          Value  :    out Value_Type)
@@ -688,8 +688,9 @@ package body Cursors is
          if (not Cursor.Final and State = Success) and then
             Has_Satisfied_Bounds(Cursor) then
             State := Success;
-            Key   := Nodes.Key(Cursor.Node, Cursor.Index);
-            Value := Nodes.Value(Cursor.Node, Cursor.Index);
+            Key   := Cursor.Key;
+            Nodes.Get_Value(Cursor.Node, Cursor.Index, Value,
+                            Cursor.Key_Context, Cursor.Value_Context);
          elsif State = Success then
             State := Failure;
          end if;
@@ -756,7 +757,9 @@ package body Cursors is
          Unlock_Mutex(Cursor);
          return;
       end if;
-      Key := Nodes.Key(Cursor.Node, Cursor.Index);
+      Key := Cursor.Key;
+      Nodes.Get_Value(Cursor.Node, Cursor.Index, Value, Cursor.Key_Context,
+                      Cursor.Value_Context);
       declare
       begin
          Start_Transaction(Tree, Sub_Transaction);
@@ -804,7 +807,9 @@ package body Cursors is
          Unlock_Mutex(Cursor);
          return;
       end if;
-      Key := Nodes.Key(Cursor.Node, Cursor.Index);
+      Key := Cursor.Key;
+      Nodes.Get_Value(Cursor.Node, Cursor.Index, Value, Cursor.Key_Context,
+                      Cursor.Value_Context);
       Delete(Tree, Transaction, Key, Value, State);
       Cursor.Force_Recalibrate := True;
       Unlock_Mutex(Cursor);

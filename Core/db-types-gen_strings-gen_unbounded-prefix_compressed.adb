@@ -24,6 +24,13 @@ package body Prefix_Compressed is
       "="             => "=");
 
 
+   function New_Context
+      return Context_Type is
+   begin
+      return Context_Type'(others => <>);
+   end New_Context;
+
+
    procedure Write
      (Context : in out Context_Type;
       Block   : in out IO.Blocks.Base_Block_Type;

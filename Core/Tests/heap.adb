@@ -46,6 +46,7 @@ is
    package Heaps is new DB.Gen_Heaps
      (Item_Type          => Item_Type,
       Item_Context_Type  => Item_IO.Context_Type,
+      New_Item_Context   => Item_IO.New_Context,
       Item_Size_Bound    => Item_IO.Size_Bound,
       Fold_Contexts      => Item_IO.Fold_Contexts,
       Context_Size_Bound => Item_IO.Context_Size_Bound,

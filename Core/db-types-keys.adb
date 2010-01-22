@@ -114,6 +114,15 @@ package body DB.Types.Keys is
    end Short_Delimiter;
 
 
+   function New_Context
+      return Context_Type is
+   begin
+      return Context_Type'(Row_Serialization.New_Context,
+                           Column_Serialization.New_Context,
+                           Times.New_Context);
+   end New_Context;
+
+
    function Size_Bound
      (Key : Key_Type)
       return IO.Blocks.Size_Type

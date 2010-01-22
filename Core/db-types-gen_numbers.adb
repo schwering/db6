@@ -20,6 +20,13 @@ package body DB.Types.Gen_Numbers is
    end Compare;
 
 
+   function New_Context
+      return Context_Type is
+   begin
+      return (null record);
+   end New_Context;
+
+
    function Size_Bound
      (Number : Number_Type)
       return IO.Blocks.Size_Type

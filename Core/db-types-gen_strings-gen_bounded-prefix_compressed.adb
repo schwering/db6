@@ -39,6 +39,13 @@ package body Prefix_Compressed is
    pragma Pack (Prefix_Info_Type);
 
 
+   function New_Context
+      return Context_Type is
+   begin
+      return Context_Type'(others => <>);
+   end New_Context;
+
+
    function Size_Bound
      (S : String_Type)
       return IO.Blocks.Size_Type

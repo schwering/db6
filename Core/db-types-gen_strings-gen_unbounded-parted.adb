@@ -12,6 +12,13 @@ package body Parted is
    Item_Size : constant IO.Blocks.Size_Type
              := IO.Blocks.Bits_To_Units(Item_Type'Size);
 
+   function New_Context
+      return Context_Type is
+   begin
+      return Context_Type'(others => <>);
+   end New_Context;
+
+
    function Size_Bound
      (S : String_Type)
       return IO.Blocks.Size_Type

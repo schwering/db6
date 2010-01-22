@@ -77,7 +77,7 @@ procedure IO_Dispatcher.Map_Cursor is
             case State is
                when Maps.Success =>
                   pragma Assert (Key = This_Key);
-                  --pragma Assert (Value = This_Value);
+                  pragma Assert (Value = This_Value);
                   Count := Count + 1;
                when Maps.Failure =>
                   exit;

@@ -9,6 +9,14 @@ with Ada.Unchecked_Conversion;
 package body DB.Gen_Blob_Trees is
 
    package body BTree_Utils is
+
+      function New_Value_Context
+         return Context_Type is
+      begin
+         return (Value_Context => Gen_Blob_Trees.New_Value_Context);
+      end New_Value_Context;
+
+
       function Max_Key_Size
          return IO.Blocks.Size_Type
       is

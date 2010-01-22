@@ -63,12 +63,14 @@ package DB.BTrees is
          Compare            => Keys.Compare,
 
          Key_Context_Type   => Keys.Context_Type,
+         New_Key_Context    => Keys.New_Context,
          Key_Size_Bound     => Keys.Size_Bound,
          Read_Key           => Keys.Read,
          Skip_Key           => Keys.Skip,
          Write_Key          => Keys.Write,
 
          Value_Context_Type => Value_IO.Context_Type,
+         New_Value_Context  => Value_IO.New_Context,
          Value_Size_Bound   => Value_IO.Size_Bound,
          Read_Value         => Value_IO.Read,
          Skip_Value         => Value_IO.Skip,

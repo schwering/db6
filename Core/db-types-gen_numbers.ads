@@ -22,6 +22,9 @@ package DB.Types.Gen_Numbers is
      (Left, Right : Number_Type)
       return Utils.Comparison_Result_Type;
 
+   function New_Context
+      return Context_Type;
+
    function Size_Bound
      (Number : Number_Type)
       return IO.Blocks.Size_Type;
@@ -55,6 +58,7 @@ package DB.Types.Gen_Numbers is
 private
    type Context_Type is null record;
 
+   pragma Inline (New_Context);
    pragma Inline (Size_Bound);
    pragma Inline (Write);
    pragma Inline (Read);

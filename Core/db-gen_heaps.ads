@@ -37,6 +37,8 @@ with DB.Utils;
 generic
    type Item_Type is private;
    type Item_Context_Type is private;
+   with function New_Item_Context
+           return Item_Context_Type;
    with function Item_Size_Bound
           (Item : Item_Type)
            return IO.Blocks.Size_Type;
@@ -263,6 +265,9 @@ private
       pragma Inline ("<=");
       pragma Inline (Compare);
 
+      function New_Key_Context
+         return Key_Context_Type;
+
       function Key_Size_Bound
         (Key : Key_Type)
          return IO.Blocks.Size_Type;
@@ -283,6 +288,9 @@ private
          Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          Key     : in     Key_Type);
+
+      function New_Value_Context
+         return Value_Context_Type;
 
       function Value_Size_Bound
         (Value : Value_Type)
@@ -312,11 +320,13 @@ private
       Compare                       => Info_BTree_Types.Compare,
       Allow_Duplicates              => False,
       Key_Context_Type              => Info_BTree_Types.Key_Context_Type,
+      New_Key_Context               => Info_BTree_Types.New_Key_Context,
       Key_Size_Bound                => Info_BTree_Types.Key_Size_Bound,
       Write_Key                     => Info_BTree_Types.Write_Key,
       Read_Key                      => Info_BTree_Types.Read_Key,
       Skip_Key                      => Info_BTree_Types.Skip_Key,
       Value_Context_Type            => Info_BTree_Types.Value_Context_Type,
+      New_Value_Context             => Info_BTree_Types.New_Value_Context,
       Value_Size_Bound              => Info_BTree_Types.Value_Size_Bound,
       Write_Value                   => Info_BTree_Types.Write_Value,
       Read_Value                    => Info_BTree_Types.Read_Value,
@@ -345,6 +355,9 @@ private
       pragma Inline ("<=");
       pragma Inline ("<=");
 
+      function New_Key_Context
+         return Key_Context_Type;
+
       function Key_Size_Bound
         (Key : Key_Type)
          return IO.Blocks.Size_Type;
@@ -365,6 +378,9 @@ private
          Block   : in out IO.Blocks.Base_Block_Type;
          Cursor  : in out IO.Blocks.Cursor_Type;
          Key     : in     Key_Type);
+
+      function New_Value_Context
+         return Value_Context_Type;
 
       function Value_Size_Bound
         (Value : Value_Type)
@@ -394,11 +410,13 @@ private
       Compare                       => Free_BTree_Types.Compare,
       Allow_Duplicates              => False,
       Key_Context_Type              => Free_BTree_Types.Key_Context_Type,
+      New_Key_Context               => Free_BTree_Types.New_Key_Context,
       Key_Size_Bound                => Free_BTree_Types.Key_Size_Bound,
       Write_Key                     => Free_BTree_Types.Write_Key,
       Read_Key                      => Free_BTree_Types.Read_Key,
       Skip_Key                      => Free_BTree_Types.Skip_Key,
       Value_Context_Type            => Free_BTree_Types.Value_Context_Type,
+      New_Value_Context             => Free_BTree_Types.New_Value_Context,
       Value_Size_Bound              => Free_BTree_Types.Value_Size_Bound,
       Write_Value                   => Free_BTree_Types.Write_Value,
       Read_Value                    => Free_BTree_Types.Read_Value,
