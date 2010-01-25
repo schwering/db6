@@ -94,6 +94,61 @@
 
 
 
+* Shadowing, 2ter Versuch:
+  Datenstruktur LOG -> PHYS Adressen, eine pro Kopie (dabei muss irgendwie
+  ein Vorgaengermechanismus implementiert werden, damit das Ding nicht bei
+  jeder Kopie kopiert werden muss).
+  Wir benutzen eine weitere Datenstruktur PHYS -> REFCOUNT, die die Anzahl der
+  Kopien zaehlt, die eine physikalische Adresse benutzen, und eine Datenstruktur
+  PHYS -> INCCOUNT (gespeichert als B-Baum mit Duplikaten, wobei A eine
+  IncCount von X hat gdw. A X-mal in dem Baum gespeichert ist).
+  
+     Kopie erzeugen durch INCCOUNT[PHYS[Wurzel]]++.
+     Invariante ist: vor dem Schreiben eines Knotens muss seine Refcount
+     korrekt sein.
+     Wir verschieben die Refcount lazy nach unten, und zwar nur bei Schreib-
+     operationen. Bei einer Einfuegung/Loeschung wird eine Menge von Knoten
+     geschrieben. Jeder Knoten liegt auf einem Pfad von der Wurzel bis zu
+     dem Knoten. (Ein Knoten kann z.B. durch Verschiebung geschrieben werden,
+     ohne dass seine Kinder oder Vorfahren geschrieben werden.)
+     Wir suchen fuer jeden Knoten P_K den Pfad (P_1, ..., P_K) fuer
+     P_1 = Wurzel in dem *alten* Baum (also vor jeglichen Schreiboperationen;
+     deswegen sollte man vielleicht die Vater-Adressen nochmal separat
+     speichern) und arbeiten die INCCOUNTs ab; sei A_I die Adresse von P_I:
+       for I in 1 .. K loop
+          REFCOUNT[PHYS[A_I]] +:= INCCOUNT[PHYS[A_I]] 
+          for C_J in Children(P_I) loop
+             INCCOUNT[PHYS[C_J]] +:= INCCOUNT[PHYS[A_I]]
+          end loop;
+          INCCOUNT[PHYS[A_I]] := 0
+       end loop;
+     Damit ist nun REFCOUNT[PHYS[A_K]] korrekt. Wir unterscheiden zwei Faelle:
+       if REFCOUNT[PHYS[A_K]] = 1 then
+          Write(PHYS[A_K], P_K)
+       else
+          REFCOUNT[PHYS[A_K]] +:= -1
+          Relocate_Logical_Address_In_Copy(A_K, PHYS[A_K])
+          REFCOUNT[PHYS[A_K]] = 1
+          Write(PHYS[A_K], P_K)
+       end if
+
+  Fragwuerdig an dem Algorithmus ist der Umstand, dass von jedem Knoten nochmal
+  bis zur Wurzel hochgelaufen werden muss. Dabei kann man aber optimieren:
+  * Die Vater-Adresse jedes Knotens beim Weg von der Wurzel zum Blatt merken.
+    Das deckt natuerlich noch nicht die Nachbarn dieser Knoten ab, die durch
+    Unter-/Ueberlaeufe geschrieben werden koennen.
+  * Natuerlich muss nicht fuer jeden Knoten der Pfad zur Wurzel (P_1, ..., P_K)
+    neu aufgebaut werden, sondern wenn (P_1, ..., P_I) bereits abgearbeitet
+    wurde, reicht es, den Pfad (P_{I+1}, ..., P_K) abzuarbeiten.
+  * Die Vater-Adresse fuer jeden Knoten separat in einem Baum abspeichern
+    Damit ist das Aufbauen des Pfades zur Wurzel bei Knoten, die nicht auf dem
+    Weg zum Blatt gelesen wurden, viel billiger.
+  * Die Kinder-Adressen werden nur benoetigt, wenn INCCOUNT[PHYS[A_I]] > 0 ist,
+    ueberhaupt muss der ganze Rumpf der Schleife nur ausgefuehrt werden, wenn
+    das der Fall ist. Da INCCOUNT sich nur beim Erstellern einer Kopie erhoeht,
+    ist das eher selten der Fall.
+
+
 
 
 * Shadowing:

@@ -79,7 +79,7 @@ generic
 
    type Key_Context_Type is private;
    with function New_Key_Context
-          return Key_Context_Type;
+           return Key_Context_Type;
    with function Key_Size_Bound
           (Key : Key_Type)
            return IO.Blocks.Size_Type;
@@ -100,7 +100,7 @@ generic
 
    type Value_Context_Type is private;
    with function New_Value_Context
-          return Value_Context_Type;
+           return Value_Context_Type;
    with function Value_Size_Bound
           (Value : Value_Type)
            return IO.Blocks.Size_Type;
