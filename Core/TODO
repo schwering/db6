@@ -123,14 +123,25 @@
           INCCOUNT[PHYS[A_I]] := 0
        end loop;
      Damit ist nun REFCOUNT[PHYS[A_K]] korrekt. Wir unterscheiden zwei Faelle:
-       if REFCOUNT[PHYS[A_K]] = 1 then
+       if REFCOUNT[PHYS[A_K]] = 1 then                          -- (1)
           Write(PHYS[A_K], P_K)
-       else
+       else                                                     -- (2)
           REFCOUNT[PHYS[A_K]] +:= -1
           Relocate_Logical_Address_In_Copy(A_K, PHYS[A_K])
           REFCOUNT[PHYS[A_K]] = 1
           Write(PHYS[A_K], P_K)
        end if
+
+  Als Sonderfall verbleiben noch neu-allokierte Bloecke und freigebene Bloecke:
+  Freigegebene Bloecke muessen in Fall (1) noch REFCOUNT[PHYS[A_K]] := 0
+  bekommen und die Adresse PHYS[A_K] braucht nicht mehr dem Block zugeordnet
+  zu werden; in Fall (2) fallen das Relocate und Refcount-inkrementieren weg.
+  Neu-allokierte Bloecke haben genau die Eigenschaft, dass die Refcount bisher 0
+  ist; es reicht, sie wie in Fall (2) zu schreiben und das
+  Refcount-dekrementieren wegzulassen.
+  Da freigegebene Bloecke diese Information in sich tragen und neu-allokierte
+  Bloecke an REFCOUNT[PHYS[A_K] = 0 zu erkennen sind, fallen fuer diese beiden
+  Sonderfaelle keine IO-Operationen an.
 
   Fragwuerdig an dem Algorithmus ist der Umstand, dass von jedem Knoten nochmal
   bis zur Wurzel hochgelaufen werden muss. Dabei kann man aber optimieren:

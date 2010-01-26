@@ -46,6 +46,9 @@ sstats:
 stats:
 	ls *.ads *.adb *.[hc] | xargs wc | sort -n
 
+statsbt:
+	find . | grep -E db-gen_btrees.\*\.ad\(s\|b\) | grep -v gen_btrees-gen | xargs wc | sort -n
+
 statsbl:
 	@grep -c ";" *.adb | sort -t \: -k 2 -n
 	@echo -n "Sum: "
