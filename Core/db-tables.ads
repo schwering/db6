@@ -65,5 +65,37 @@ package DB.Tables is
       return String
    is abstract;
 
+
+--   type Table_Type is private;
+
+--with DB.Tables.Column_Families;
+--with DB.Tables.Maps;
+--with DB.Utils.Gen_Linked_Lists;
+--with DB.Utils.Gen_Smart_Pointers;
+--with DB.Utils.Global_Pool;
+--private
+   --subtype CF_Type is Column_Families.Column_Family_Type;
+   --type CF_Ref_Type is access CF_Type;
+
+   --package CF_Pointers is new Utils.Gen_Smart_Pointers
+     --(CF_Type, CF_Ref_Type);
+
+   --function "=" (A, B : CF_Pointers.Smart_Pointer_Type) return Boolean;
+
+   --package CF_Lists is new Utils.Gen_Linked_List
+     --(CF_Pointers.Smart_Pointer_Type, "=",
+      --Utils.Global_Pool.Global'Storage_Pool);
+
+   --type Table_Type is
+      --record
+         --Families : CF_Lists.List_Type;
+      --end record;
+
+   --function "=" (A, B : CF_Pointers.Smart_Pointer_Type) return Boolean is
+   --begin
+      --return CF_Pointers.Ref(A).Guard = CF_Pointers.Ref(B).Guard;
+   --end "=";
+
+
 end DB.Tables;
 

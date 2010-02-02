@@ -48,6 +48,9 @@ package DB is
    Hash_Table_Error : exception;
    -- An error in the fixed hash table.
 
+   List_Error : exception;
+   -- An error in the linked list.
+
    Map_Reduce_Error : exception;
    -- An error occurred during map/reduce.
 
