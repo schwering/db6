@@ -11,7 +11,7 @@ with DB.IO.Low_Level;
 generic
    with package P_IO is new Gen_IO (<>);
    with function FD (File : P_IO.File_Type)
-           return Low_Level.File_Descriptor_Type;
+      return Low_Level.File_Descriptor_Type;
 package DB.IO.Blocks.Gen_System_Locking_IO is
    pragma Preelaborate;
 

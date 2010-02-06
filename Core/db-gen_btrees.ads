@@ -70,52 +70,52 @@ generic
    type Value_Type is private;
 
    with function Compare
-          (Left, Right : Key_Type)
-           return Utils.Comparison_Result_Type;
+     (Left, Right : Key_Type)
+      return Utils.Comparison_Result_Type;
 
    Allow_Duplicates : in Boolean := False;
 
    type Key_Context_Type is private;
    with function New_Key_Context
-           return Key_Context_Type;
+      return Key_Context_Type;
    with function Key_Size_Bound
-          (Key : Key_Type)
-           return IO.Blocks.Size_Type;
+     (Key : Key_Type)
+      return IO.Blocks.Size_Type;
    with procedure Read_Key
-          (Context : in out Key_Context_Type;
-           Block   : in     IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type;
-           Key     :    out Key_Type);
+     (Context : in out Key_Context_Type;
+      Block   : in     IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type;
+      Key     :    out Key_Type);
    with procedure Skip_Key
-          (Context : in out Key_Context_Type;
-           Block   : in     IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type);
+     (Context : in out Key_Context_Type;
+      Block   : in     IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type);
    with procedure Write_Key
-          (Context : in out Key_Context_Type;
-           Block   : in out IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type;
-           Key     : in     Key_Type);
+     (Context : in out Key_Context_Type;
+      Block   : in out IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type;
+      Key     : in     Key_Type);
 
    type Value_Context_Type is private;
    with function New_Value_Context
-           return Value_Context_Type;
+      return Value_Context_Type;
    with function Value_Size_Bound
-          (Value : Value_Type)
-           return IO.Blocks.Size_Type;
+     (Value : Value_Type)
+      return IO.Blocks.Size_Type;
    with procedure Read_Value
-          (Context : in out Value_Context_Type;
-           Block   : in     IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type;
-           Value   :    out Value_Type);
+     (Context : in out Value_Context_Type;
+      Block   : in     IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type;
+      Value   :    out Value_Type);
    with procedure Skip_Value
-          (Context : in out Value_Context_Type;
-           Block   : in     IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type);
+     (Context : in out Value_Context_Type;
+      Block   : in     IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type);
    with procedure Write_Value
-          (Context : in out Value_Context_Type;
-           Block   : in out IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type;
-           Value   : in     Value_Type);
+     (Context : in out Value_Context_Type;
+      Block   : in out IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type;
+      Value   : in     Value_Type);
 
    Is_Context_Free_Serialization : in Boolean;
 

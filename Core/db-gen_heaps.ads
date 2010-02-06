@@ -36,44 +36,44 @@ generic
    type Item_Type is private;
    type Item_Context_Type is private;
    with function New_Item_Context
-           return Item_Context_Type;
+      return Item_Context_Type;
    with function Item_Size_Bound
-          (Item : Item_Type)
-           return IO.Blocks.Size_Type;
+     (Item : Item_Type)
+      return IO.Blocks.Size_Type;
    with function Fold_Contexts
-          (Left     : Item_Context_Type;
-           Appended : Item_Context_Type)
-           return Item_Context_Type;
+     (Left     : Item_Context_Type;
+      Appended : Item_Context_Type)
+      return Item_Context_Type;
    with function Context_Size_Bound
-          (Context : Item_Context_Type)
-           return IO.Blocks.Size_Type;
+     (Context : Item_Context_Type)
+      return IO.Blocks.Size_Type;
    with procedure Read_Context
-          (Block   : in     IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type;
-           Context :    out Item_Context_Type);
+     (Block   : in     IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type;
+      Context :    out Item_Context_Type);
    with procedure Write_Context
-          (Block   : in out IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type;
-           Context : in     Item_Context_Type);
+     (Block   : in out IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type;
+      Context : in     Item_Context_Type);
    with procedure Read_Part_Of_Item
-          (Context : in out Item_Context_Type;
-           Block   : in     IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type;
-           Item    : in out Item_Type;
-           Done    :    out Boolean);
+     (Context : in out Item_Context_Type;
+      Block   : in     IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type;
+      Item    : in out Item_Type;
+      Done    :    out Boolean);
    with procedure Write_Part_Of_Item
-          (Context : in out Item_Context_Type;
-           Block   : in out IO.Blocks.Base_Block_Type;
-           Cursor  : in out IO.Blocks.Cursor_Type;
-           Item    : in     Item_Type;
-           Done    :    out Boolean);
+     (Context : in out Item_Context_Type;
+      Block   : in out IO.Blocks.Base_Block_Type;
+      Cursor  : in out IO.Blocks.Cursor_Type;
+      Item    : in     Item_Type;
+      Done    :    out Boolean);
 
    with function Info_Index_ID
-          (ID : String)
-           return String;
+     (ID : String)
+      return String;
    with function Free_Index_ID
-          (ID : String)
-           return String;
+     (ID : String)
+      return String;
 
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
    with package IO_Buffers is new Block_IO.Gen_Buffers (<>);
