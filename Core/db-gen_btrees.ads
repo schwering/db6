@@ -892,9 +892,8 @@ private
    for RW_Transaction_Ref_Type'Storage_Size use 0;
 
    package IO_Buffers is new IO.Blocks.Gen_Buffers
-     (Block_IO           => Block_IO,
-      Block_Storage_Pool => Storage_Pool,
-      Node_Storage_Pool  => Storage_Pool);
+     (Block_IO          => Block_IO,
+      Node_Storage_Pool => Storage_Pool);
 
    type RW_Transaction_Type is new Transaction_Type with
       record

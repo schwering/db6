@@ -14,20 +14,11 @@ with DB.IO.Blocks.Gen_IO;
 
 generic
    with package Block_IO is new Gen_IO (<>);
-   Block_Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
    Node_Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.IO.Blocks.Gen_Buffers is
    pragma Preelaborate;
 
    type Buffer_Type is private;
-
-   type Block_Ref_Type is access Block_Type;
-   for Block_Ref_Type'Storage_Pool use Block_Storage_Pool;
-   pragma Controlled (Block_Ref_Type);
-
-   type Block_Constant_Ref_Type is access constant Block_Type;
-   for Block_Constant_Ref_Type'Storage_Size use 0;
-   pragma Controlled (Block_Constant_Ref_Type);
 
    function New_Buffer
       return Buffer_Type;
@@ -63,16 +54,6 @@ package DB.IO.Blocks.Gen_Buffers is
    -- with Address is present in the Buffer. The read Block is not stored
    -- in the Buffer.
 
-   procedure Read
-     (File      : in out Block_IO.File_Type;
-      Buffer    : in out Buffer_Type;
-      Address   : in     Block_IO.Valid_Address_Type;
-      Block_Ref :    out Block_Constant_Ref_Type);
-   -- Reads an Block from the Buffer or from file if no Block corresponding 
-   -- with Address is present in the Buffer. In contrast to the other two
-   -- Read subprograms, this function stores the read Block in the Buffer. 
-   -- (This is necessary so that the Block will be freed later.)
-
    procedure Write
      (File     : in out Block_IO.File_Type;
       Buffer   : in out Buffer_Type;
@@ -89,7 +70,7 @@ private
       record
          Next    : Entry_Ref_Type;
          Address : Block_IO.Valid_Address_Type;
-         Block   : Block_Ref_Type;
+         Block   : Block_Type;
          Changed : Boolean := False;
       end record;
 

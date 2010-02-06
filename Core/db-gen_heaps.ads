@@ -446,10 +446,8 @@ private
    -- All output operations use this buffer instead of direct IO so that they
    -- can commit *all* changes at the end to avoid an inconsistent heap.
    package IO_Buffers is new IO.Blocks.Gen_Buffers
-     (Block_IO           => Block_IO,
-      Block_Storage_Pool => Storage_Pool,
-      Node_Storage_Pool  => Storage_Pool);
-   subtype Block_Constant_Ref is IO_Buffers.Block_Constant_Ref_Type;
+     (Block_IO          => Block_IO,
+      Node_Storage_Pool => Storage_Pool);
 
    type Transaction_Type is abstract tagged limited
       record
