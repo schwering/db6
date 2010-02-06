@@ -1,9 +1,5 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
-with System;
-with System.Pool_Global; use System.Pool_Global;
-with System.Storage_Elements;
-with System.Storage_Pools; use System.Storage_Pools;
 
 with This_Computer;
 
@@ -12,7 +8,6 @@ with DB.IO.Blocks;
 with DB.IO.Blocks.Direct_IO;
 with DB.Types.Strings;
 with DB.Types.Strings.Unbounded;
-with DB.Utils.Global_Pool;
 
 procedure Heap
 is
@@ -34,7 +29,7 @@ is
 
    package Items    renames DB.Types.Strings.Unbounded;
    package Item_IO  renames DB.Types.Strings.Unbounded.Parted;
-   package Block_IO renames DB.IO.Blocks.Direct_IO.IO;
+   package Block_IO renames DB.IO.Blocks.Direct_IO;
 
    subtype Buffer_Type is DB.Types.Strings.Indefinite_Buffer_Type;
    subtype Length_Type is DB.Types.Strings.Length_Type;
@@ -56,8 +51,8 @@ is
       Write_Part_Of_Item => Item_IO.Write_Part_Of_String,
       Info_Index_ID      => Info_Index_ID,
       Free_Index_ID      => Free_Index_ID,
-      Storage_Pool       => DB.Utils.Global_Pool.Global'Storage_Pool,
-      Block_IO           => Block_IO);
+      Block_IO           => Block_IO.IO,
+      IO_Buffers         => Block_IO.IO_Buffers);
 
    function Make_Item (I : Positive) return Item_Type
    is

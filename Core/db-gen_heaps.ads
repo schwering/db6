@@ -26,12 +26,10 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with System.Storage_Pools;
-
 with DB.Gen_BTrees;
 with DB.IO.Blocks;
-with DB.IO.Blocks.Gen_Buffers;
 with DB.IO.Blocks.Gen_IO;
+with DB.IO.Blocks.Gen_IO.Gen_Buffers;
 with DB.Utils;
 
 generic
@@ -78,8 +76,7 @@ generic
            return String;
 
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
-
-   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
+   with package IO_Buffers is new Block_IO.Gen_Buffers (<>);
 package DB.Gen_Heaps is
    pragma Elaborate_Body;
 
@@ -333,7 +330,7 @@ private
       Skip_Value                    => Info_BTree_Types.Skip_Value,
       Is_Context_Free_Serialization => True,
       Block_IO                      => Block_IO,
-      Storage_Pool                  => Storage_Pool);
+      IO_Buffers                    => IO_Buffers);
 
 
    package Free_BTree_Types is
@@ -423,7 +420,7 @@ private
       Skip_Value                    => Free_BTree_Types.Skip_Value,
       Is_Context_Free_Serialization => True,
       Block_IO                      => Block_IO,
-      Storage_Pool                  => Storage_Pool);
+      IO_Buffers                    => IO_Buffers);
 
 
    type Heap_Ref_Type is access all Heap_Type;
@@ -441,13 +438,6 @@ private
          -- Self is only for cleanup of Transaction_Type (i.e.
          -- their Finalize procedures), for absolutely nothing else.
       end record;
-
-
-   -- All output operations use this buffer instead of direct IO so that they
-   -- can commit *all* changes at the end to avoid an inconsistent heap.
-   package IO_Buffers is new IO.Blocks.Gen_Buffers
-     (Block_IO          => Block_IO,
-      Node_Storage_Pool => Storage_Pool);
 
    type Transaction_Type is abstract tagged limited
       record

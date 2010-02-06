@@ -8,6 +8,7 @@ with System.Pool_Global; use System.Pool_Global;
 with System.Storage_Pools; use System.Storage_Pools;
 
 with DB.IO.Blocks.Gen_IO;
+with DB.IO.Blocks.Gen_Simple_Buffers;
 with DB.IO.Blocks.Asynchronous_IO;
 with DB.IO.Blocks.CFS_IO;
 with DB.IO.Blocks.Compressed_Memory_IO;
@@ -52,6 +53,12 @@ package DB.BTrees is
       with package Block_IO is new IO.Blocks.Gen_IO (<>);
    package Gen_Wrappers is
 
+      package IO_Buffers_Impl is new IO.Blocks.Gen_Simple_Buffers
+        (Block_IO          => Block_IO,
+         Node_Storage_Pool => Root_Storage_Pool'Class(Global_Pool_Object));
+      package IO_Buffers renames IO_Buffers_Impl.Buffers;
+
+
       function Key_Image     is new Utils.Gen_String_Image(Keys.Key_Type);
       function Value_Image   is new Utils.Gen_String_Image(Values.String_Type);
       function Address_Image is
@@ -79,8 +86,8 @@ package DB.BTrees is
          Is_Context_Free_Serialization => 
                                Keys.Is_Context_Free_Serialization and
                                Value_IO.Is_Context_Free_Serialization,
-         Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
-         Block_IO           => Block_IO);
+         Block_IO           => Block_IO,
+         IO_Buffers         => IO_Buffers);
       procedure Stats is new BTrees.Gen_Stats;
       procedure Check is new BTrees.Gen_Check
          (Key_Image, Value_Image, Address_Image);
@@ -102,8 +109,8 @@ package DB.BTrees is
 --         Is_Context_Free_Serialization => 
 --                               Keys.Is_Context_Free_Serialization and
 --                               Value_IO.Is_Context_Free_Serialization,
---         Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
---         Block_IO           => Climb_Caches.IO);
+--         Block_IO           => Climb_Caches.IO,
+--         IO_Buffers         => IO_Buffers);
 --      procedure Stats is new Climb_Cached_BTrees.Gen_Stats;
 --      procedure Check is new Climb_Cached_BTrees.Gen_Check
 --         (Key_Image, Value_Image, Address_Image);
@@ -125,8 +132,8 @@ package DB.BTrees is
 --         Is_Context_Free_Serialization => 
 --                               Keys.Is_Context_Free_Serialization and
 --                               Value_IO.Is_Context_Free_Serialization,
---         Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object),
---         Block_IO           => LRU_Caches.IO);
+--         Block_IO           => LRU_Caches.IO,
+--         IO_Buffers         => IO_Buffers);
 --      procedure Stats is new LRU_Cached_BTrees.Gen_Stats;
 --      procedure Check is new LRU_Cached_BTrees.Gen_Check
 --         (Key_Image, Value_Image, Address_Image);
@@ -150,8 +157,7 @@ package DB.BTrees is
       --Bytes_Wasted_In_Blocks :    out Long_Integer;
       --Bytes_In_Blocks        :    out Long_Integer)
    --renames Async_BTree_W.Stats;
-
-   --package CFS_BTree_W      is new Gen_Wrappers(CFS_IO);
+--package CFS_BTree_W      is new Gen_Wrappers(CFS_IO);
    --package CFS_BTrees       renames CFS_BTree_W.BTrees;
    --procedure Check (T : in out CFS_BTrees.Tree_Type)
    --renames CFS_BTree_W.Check;

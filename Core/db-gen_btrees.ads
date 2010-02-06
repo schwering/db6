@@ -59,11 +59,9 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with System.Storage_Pools;
-
 with DB.IO.Blocks;
-with DB.IO.Blocks.Gen_Buffers;
 with DB.IO.Blocks.Gen_IO;
+with DB.IO.Blocks.Gen_IO.Gen_Buffers;
 with DB.Locks.Mutexes;
 with DB.Utils;
 
@@ -122,8 +120,7 @@ generic
    Is_Context_Free_Serialization : in Boolean;
 
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
-
-   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
+   with package IO_Buffers is new Block_IO.Gen_Buffers (<>);
 package DB.Gen_BTrees is
    pragma Preelaborate;
    pragma Unreferenced (Skip_Value);
@@ -890,10 +887,6 @@ private
       not null access all RW_Transaction_Type'Class;
    pragma Controlled (RW_Transaction_Ref_Type);
    for RW_Transaction_Ref_Type'Storage_Size use 0;
-
-   package IO_Buffers is new IO.Blocks.Gen_Buffers
-     (Block_IO          => Block_IO,
-      Node_Storage_Pool => Storage_Pool);
 
    type RW_Transaction_Type is new Transaction_Type with
       record

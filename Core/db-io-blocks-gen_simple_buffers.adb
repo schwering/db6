@@ -6,7 +6,7 @@
 
 with Ada.Unchecked_Deallocation;
 
-package body DB.IO.Blocks.Gen_Buffers is
+package body DB.IO.Blocks.Gen_Simple_Buffers is
 
    function New_Buffer
       return Buffer_Type
@@ -140,5 +140,5 @@ package body DB.IO.Blocks.Gen_Buffers is
       end if;
    end Write;
 
-end DB.IO.Blocks.Gen_Buffers;
+end DB.IO.Blocks.Gen_Simple_Buffers;
 

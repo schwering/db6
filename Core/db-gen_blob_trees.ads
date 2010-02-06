@@ -10,12 +10,11 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with System.Storage_Pools;
-
 with DB.Gen_BTrees;
 with DB.Gen_Heaps;
 with DB.IO.Blocks;
 with DB.IO.Blocks.Gen_IO;
+with DB.IO.Blocks.Gen_IO.Gen_Buffers;
 with DB.Utils;
 
 generic
@@ -108,8 +107,7 @@ generic
    Is_Context_Free_Serialization : in Boolean;
 
    with package Block_IO is new IO.Blocks.Gen_IO (<>);
-
-   Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
+   with package IO_Buffers is new Block_IO.Gen_Buffers (<>);
 package DB.Gen_Blob_Trees is
    pragma Elaborate_Body;
 
@@ -458,8 +456,8 @@ private
       Write_Part_Of_Item => Write_Part_Of_Value,
       Info_Index_ID      => Heap_Utils.Info_Index_ID,
       Free_Index_ID      => Heap_Utils.Free_Index_ID,
-      Storage_Pool       => Storage_Pool,
-      Block_IO           => Block_IO);
+      Block_IO           => Block_IO,
+      IO_Buffers         => IO_Buffers);
 
    package BTree_Utils is
       type Value_Type (Direct : Boolean := True) is
@@ -527,7 +525,7 @@ private
       Write_Value                   => BTree_Utils.Write_Value,
       Is_Context_Free_Serialization => Is_Context_Free_Serialization,
       Block_IO                      => Block_IO,
-      Storage_Pool                  => Storage_Pool);
+      IO_Buffers                    => IO_Buffers);
 
    type Tree_Type is limited
       record

@@ -34,6 +34,7 @@ with System.Storage_Pools;
 
 with DB.IO.Blocks;
 with DB.IO.Blocks.Gen_IO;
+with DB.IO.Blocks.Gen_IO.Gen_Buffers;
 with DB.Utils;
 
 generic
@@ -92,6 +93,8 @@ generic
            Cursor  : in out IO.Blocks.Cursor_Type;
            Value   : in     Intermediate_Value_Type);
    with package Intermediate_Block_IO is new IO.Blocks.Gen_IO (<>);
+   with package Intermediate_IO_Buffers is
+      new Intermediate_Block_IO.Gen_Buffers (<>);
 
    with procedure Map
           (Key   : in     In_Key_Type;

@@ -167,6 +167,7 @@ procedure IO_Dispatcher.Map_MR is
          Skip_Intermediate_Value         => Intermediate_Values.Skip,
          Write_Intermediate_Value        => Intermediate_Values.Write,
          Intermediate_Block_IO           => DB.IO.Blocks.Memory_IO.IO,
+         Intermediate_IO_Buffers         => DB.IO.Blocks.Memory_IO.IO_Buffers,
 
          Map                => Map_Proc,
          Out_Key_Type       => Out_Key_Type,

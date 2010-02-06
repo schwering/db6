@@ -9,7 +9,6 @@ with System.Storage_Pools;
 
 with DB.Gen_BTrees;
 with DB.Utils.Gen_Queues;
-with DB.Utils.Global_Pool;
 
 procedure DB.Gen_Map_Reduce is
 
@@ -40,7 +39,7 @@ procedure DB.Gen_Map_Reduce is
       Is_Context_Free_Serialization => False,
 
       Block_IO                      => Intermediate_Block_IO,
-      Storage_Pool                  => Utils.Global_Pool.Global'Storage_Pool);
+      IO_Buffers                    => Intermediate_IO_Buffers);
 
    type Context_Type is
       record

@@ -5,8 +5,10 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.IO.Blocks.Gen_IO;
+with DB.IO.Blocks.Gen_Simple_Buffers;
 with DB.Locks.Mutexes;
 with DB.Locks.Semaphores;
+with DB.Utils.Global_Pool;
 
 package DB.IO.Blocks.Memory_IO is
    pragma Preelaborate;
@@ -131,6 +133,11 @@ package DB.IO.Blocks.Memory_IO is
       Write_Lock                 => Write_Lock,
       Certify_Lock               => Certify_Lock,
       Unlock                     => Unlock);
+
+   package IO_Buffers_Impl is new Gen_Simple_Buffers
+     (Block_IO          => IO,
+      Node_Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
+   package IO_Buffers renames IO_Buffers_Impl.Buffers;
 
 
 private

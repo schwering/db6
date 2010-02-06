@@ -15,6 +15,7 @@ with DB.Gen_BTrees;
 with DB.Gen_Blob_Trees;
 with DB.IO.Blocks;
 with DB.IO.Blocks.File_IO;
+with DB.IO.Blocks.Gen_Simple_Buffers;
 
 package DB.Tables.Maps is
    pragma Elaborate_Body;
@@ -338,6 +339,10 @@ private
    package Unbounded_Values_IO renames Types.Values.Unbounded.Uncompressed;
    package Block_IO_Impl       renames IO.Blocks.File_IO;
    package Block_IO            renames Block_IO_Impl.IO;
+   package IO_Buffers_Impl is new DB.IO.Blocks.Gen_Simple_Buffers
+     (Block_IO          => Block_IO,
+      Node_Storage_Pool => Root_Storage_Pool'Class(Global_Pool_Object));
+   package IO_Buffers          renames IO_Buffers_Impl.Buffers;
 
    package BTrees is new Gen_BTrees
      (Key_Type           => Types.Keys.Key_Type,
@@ -360,7 +365,7 @@ private
               Types.Keys.Is_Context_Free_Serialization and
               Types.Values.Bounded.Uncompressed.Is_Context_Free_Serialization,
       Block_IO           => Block_IO,
-      Storage_Pool       => Root_Storage_Pool'Class(Global_Pool_Object));
+      IO_Buffers         => IO_Buffers);
 
    package Blob_Trees is new Gen_Blob_Trees
      (Key_Type            => Types.Keys.Key_Type,
@@ -391,8 +396,8 @@ private
       Is_Context_Free_Serialization =>
               Types.Keys.Is_Context_Free_Serialization and
               Types.Values.Unbounded.Uncompressed.Is_Context_Free_Serialization,
-      Storage_Pool        => Root_Storage_Pool'Class(Global_Pool_Object),
-      Block_IO            => Block_IO);
+      Block_IO            => Block_IO,
+      IO_Buffers          => IO_Buffers);
 
    ----------
    -- Type wrappers. Always Short (=> BTrees) and not Short (=> Blob_Trees).

@@ -6,10 +6,12 @@
 
 with DB.IO.Low_Level;
 with DB.IO.Blocks.Gen_IO;
+with DB.IO.Blocks.Gen_Simple_Buffers;
 with DB.IO.Blocks.Gen_Climb_Caches;
 with DB.IO.Blocks.Gen_System_Locking_IO;
 with DB.Locks.Mutexes;
 with DB.Locks.Semaphores;
+with DB.Utils.Global_Pool;
 
 package DB.IO.Blocks.Direct_IO is
 
@@ -141,6 +143,11 @@ package DB.IO.Blocks.Direct_IO is
       Write_Lock                 => Write_Lock,
       Certify_Lock               => Certify_Lock,
       Unlock                     => Unlock);
+
+   package IO_Buffers_Impl is new Gen_Simple_Buffers
+     (Block_IO          => IO,
+      Node_Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
+   package IO_Buffers renames IO_Buffers_Impl.Buffers;
 
    package Climb_Cache is new Gen_Climb_Caches(IO);
    package Climb_Cached_IO renames Climb_Cache.IO;
