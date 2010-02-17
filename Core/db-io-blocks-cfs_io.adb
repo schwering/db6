@@ -118,7 +118,8 @@ package body DB.IO.Blocks.CFS_IO is
 
 
    Disks : Disk_Handle_Array_Type
-         := (others => (Name   => (Len => 0, others => <>), others => <>));
+         := (others => (Name   => (Len => 0, others => <>),
+                        others => <>));
 
 
    procedure Get_Disk_Handle
