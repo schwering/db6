@@ -4,7 +4,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Finalization;
 with GNAT.Regexp;
 
 with DB.IO.Blocks;
@@ -17,8 +16,7 @@ package DB.Tables.Column_Families is
    ----------
    -- Column_Family initialization operations.
 
-   type Column_Family_Type is
-      new Ada.Finalization.Limited_Controlled with private;
+   type Column_Family_Type is limited private;
 
    function New_Column_Family
      (Regexp         : in String;
@@ -26,6 +24,22 @@ package DB.Tables.Column_Families is
       Max_Value_Size : in IO.Blocks.Size_Type)
       return Column_Family_Type;
    -- Initializes a Column_Family object.
+
+   procedure Create
+     (ID             : in String;
+      Max_Key_Size   : in IO.Blocks.Size_Type;
+      Max_Value_Size : in IO.Blocks.Size_Type);
+   -- Creates a new Column_Family named ID or raises a DB.IO.IO_Error when
+   -- creation fails.
+
+   procedure Initialize
+     (Column_Family : out Column_Family_Type;
+      ID            : in  String);
+   -- Initializes Column_Family with the Column_Family named ID.
+
+   procedure Finalize
+     (Column_Family : in out Column_Family_Type);
+   -- Finalizes Column_Family, i.e. closes opened files.
 
    function Matches
      (Column_Family : Column_Family_Type;
@@ -40,23 +54,6 @@ package DB.Tables.Column_Families is
       return Boolean;
    -- Indicates whether Column_Family is to store records with the respective
    -- Column_Name.
-
-   procedure Create
-     (ID             : in String;
-      Max_Key_Size   : in IO.Blocks.Size_Type;
-      Max_Value_Size : in IO.Blocks.Size_Type);
-   -- Creates a new Column_Family named ID or raises a DB.IO.IO_Error when
-   -- creation fails.
-
-   procedure Initialize
-     (Column_Family : out Column_Family_Type;
-      ID            : in  String);
-   -- Initializes Column_Family with the Column_Family named ID.
-
-   overriding
-   procedure Finalize
-     (Column_Family : in out Column_Family_Type);
-   -- Finalizes Column_Family, i.e. closes opened files.
 
    function Max_Key_Size
      (Column_Family  : Column_Family_Type;
@@ -345,12 +342,10 @@ package DB.Tables.Column_Families is
    -- key/value-pair that should be visited next.
 
 private
-   type Map_Ref_Type is access Maps.Map_Type;
-
-   type Column_Family_Type is new Ada.Finalization.Limited_Controlled with
+   type Column_Family_Type is limited
       record
          Guard : GNAT.Regexp.Regexp;
-         Map   : Map_Ref_Type := null;
+         Map   : Maps.Map_Type;
       end record;
 
 end DB.Tables.Column_Families;

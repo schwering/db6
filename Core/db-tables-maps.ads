@@ -3,6 +3,12 @@
 -- Wrapper for BTree and Blob_Tree. Decides which to use depending on the
 -- maximum value size.
 --
+-- Design Notes:
+--
+-- Experimentally, I have removed the (<>) in the public type declarations and
+-- given all Short discriminants the default value True. The idea is that this
+-- allows to have objects of the types defined here as component in records.
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with System.Pool_Global;
@@ -23,7 +29,7 @@ package DB.Tables.Maps is
    ----------
    -- Map initialization operations.
 
-   type Map_Type (<>) is limited private;
+   type Map_Type is limited private;
 
    function New_Map
      (Max_Key_Size   : in IO.Blocks.Size_Type;
@@ -230,8 +236,8 @@ package DB.Tables.Maps is
 
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
-   type Bound_Type (<>) is private;
-   type Cursor_Type (<>) is limited private;
+   type Bound_Type is private;
+   type Cursor_Type is limited private;
 
 
    function Positive_Infinity_Bound
@@ -402,7 +408,7 @@ private
    ----------
    -- Type wrappers. Always Short (=> BTrees) and not Short (=> Blob_Trees).
 
-   type Map_Type (Short : Boolean) is limited
+   type Map_Type (Short : Boolean := True) is limited
       record
          case Short is
             when True =>  Short_Tree : BTrees.Tree_Type;
@@ -412,7 +418,8 @@ private
 
    type Transaction_Type is abstract tagged limited null record;
 
-   type RO_Transaction_Type (Short : Boolean) is new Transaction_Type with
+   type RO_Transaction_Type (Short : Boolean) is
+      new Transaction_Type with
       record
          case Short is
             when True =>  Short_Transaction : BTrees.RO_Transaction_Type;
@@ -420,7 +427,8 @@ private
          end case;
       end record;
 
-   type RW_Transaction_Type (Short : Boolean) is new Transaction_Type with
+   type RW_Transaction_Type (Short : Boolean) is
+      new Transaction_Type with
       record
          case Short is
             when True =>  Short_Transaction : BTrees.RW_Transaction_Type;
@@ -428,7 +436,7 @@ private
          end case;
       end record;
 
-   type Bound_Type (Short : Boolean) is
+   type Bound_Type (Short : Boolean := True) is
       record
          case Short is
             when True =>  Short_Bound : BTrees.Bound_Type;
@@ -436,7 +444,7 @@ private
          end case;
       end record;
 
-   type Cursor_Type (Short : Boolean) is limited
+   type Cursor_Type (Short : Boolean := True) is limited
       record
          case Short is
             when True =>  Short_Cursor : BTrees.Cursor_Type;

@@ -1,8 +1,8 @@
 #!/bin/sh
 IO=map
-BIN=bin/release/./ttree
+BIN=bin/debug/./ttree
 FILE=`cat .temp_path`btree
-C1=100k 
+C1=10k 
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
 # 3. Some mor insertions and check for all three

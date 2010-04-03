@@ -4,65 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Unchecked_Deallocation;
-
 package body DB.Tables.Column_Families is
-
-   function New_RO_Transaction
-     (Column_Family : Column_Family_Type)
-      return RO_Transaction_Type is
-   begin
-      return Maps.New_RO_Transaction(Column_Family.Map.all);
-   end New_RO_Transaction;
-
-
-   procedure Start_Transaction
-     (Column_Family : in out Column_Family_Type;
-      Transaction   : in out RO_Transaction_Type) is
-   begin
-      Maps.Start_Transaction(Column_Family.Map.all, Transaction);
-   end Start_Transaction;
-
-
-   procedure Finish_Transaction
-     (Column_Family : in out Column_Family_Type;
-      Transaction   : in out RO_Transaction_Type) is
-   begin
-      Maps.Finish_Transaction(Column_Family.Map.all, Transaction);
-   end Finish_Transaction;
-
-
-   function New_RW_Transaction
-     (Column_Family : Column_Family_Type)
-      return RW_Transaction_Type is
-   begin
-      return Maps.New_RW_Transaction(Column_Family.Map.all);
-   end New_RW_Transaction;
-
-
-   procedure Start_Transaction
-     (Column_Family : in out Column_Family_Type;
-      Transaction   : in out RW_Transaction_Type) is
-   begin
-      Maps.Start_Transaction(Column_Family.Map.all, Transaction);
-   end Start_Transaction;
-
-
-   procedure Abort_Transaction
-     (Column_Family : in out Column_Family_Type;
-      Transaction   : in out RW_Transaction_Type) is
-   begin
-      Maps.Abort_Transaction(Column_Family.Map.all, Transaction);
-   end Abort_Transaction;
-
-
-   procedure Commit_Transaction
-     (Column_Family : in out Column_Family_Type;
-      Transaction   : in out RW_Transaction_Type) is
-   begin
-      Maps.Commit_Transaction(Column_Family.Map.all, Transaction);
-   end Commit_Transaction;
-
 
    function New_Column_Family
      (Regexp         : in String;
@@ -70,11 +12,33 @@ package body DB.Tables.Column_Families is
       Max_Value_Size : in IO.Blocks.Size_Type)
       return Column_Family_Type is
    begin
-      return (Ada.Finalization.Limited_Controlled with
-              Guard => GNAT.Regexp.Compile(Regexp),
-              Map   => new Maps.Map_Type'(Maps.New_Map(Max_Key_Size,
-                                                       Max_Value_Size)));
+      return (Guard => GNAT.Regexp.Compile(Regexp),
+              Map   => Maps.New_Map(Max_Key_Size, Max_Value_Size));
    end New_Column_Family;
+
+
+   procedure Create
+     (ID             : in String;
+      Max_Key_Size   : in IO.Blocks.Size_Type;
+      Max_Value_Size : in IO.Blocks.Size_Type) is
+   begin
+      Maps.Create(ID, Max_Key_Size, Max_Value_Size);
+   end Create;
+
+
+   procedure Initialize
+     (Column_Family : out Column_Family_Type;
+      ID            : in  String) is
+   begin
+      Maps.Initialize(Column_Family.Map, ID);
+   end Initialize;
+
+
+   procedure Finalize
+     (Column_Family : in out Column_Family_Type) is
+   begin
+      Maps.Finalize(Column_Family.Map);
+   end Finalize;
 
 
    function Matches
@@ -96,49 +60,69 @@ package body DB.Tables.Column_Families is
    end Matches;
 
 
-   procedure Create
-     (ID             : in String;
-      Max_Key_Size   : in IO.Blocks.Size_Type;
-      Max_Value_Size : in IO.Blocks.Size_Type) is
-   begin
-      Maps.Create(ID, Max_Key_Size, Max_Value_Size);
-   end Create;
-
-
-   procedure Initialize
-     (Column_Family : out Column_Family_Type;
-      ID            : in  String) is
-   begin
-      Column_Family.Map := null;
-      Maps.Initialize(Column_Family.Map.all, ID);
-   exception
-      when others =>
-         Column_Family.Map := null;
-         raise;
-   end Initialize;
-
-
-   overriding
-   procedure Finalize
-     (Column_Family : in out Column_Family_Type)
-   is
-      procedure Free is new Ada.Unchecked_Deallocation
-        (Maps.Map_Type, Map_Ref_Type);
-   begin
-      if Column_Family.Map /= null then
-         Maps.Finalize(Column_Family.Map.all);
-         Free(Column_Family.Map);
-      end if;
-   end Finalize;
-
-
    function Max_Key_Size
      (Column_Family  : Column_Family_Type;
       Max_Value_Size : IO.Blocks.Size_Type)
       return IO.Blocks.Size_Type is
    begin
-      return Maps.Max_Key_Size(Column_Family.Map.all, Max_Value_Size);
+      return Maps.Max_Key_Size(Column_Family.Map, Max_Value_Size);
    end Max_Key_Size;
+
+
+   function New_RO_Transaction
+     (Column_Family : Column_Family_Type)
+      return RO_Transaction_Type is
+   begin
+      return Maps.New_RO_Transaction(Column_Family.Map);
+   end New_RO_Transaction;
+
+
+   procedure Start_Transaction
+     (Column_Family : in out Column_Family_Type;
+      Transaction   : in out RO_Transaction_Type) is
+   begin
+      Maps.Start_Transaction(Column_Family.Map, Transaction);
+   end Start_Transaction;
+
+
+   procedure Finish_Transaction
+     (Column_Family : in out Column_Family_Type;
+      Transaction   : in out RO_Transaction_Type) is
+   begin
+      Maps.Finish_Transaction(Column_Family.Map, Transaction);
+   end Finish_Transaction;
+
+
+   function New_RW_Transaction
+     (Column_Family : Column_Family_Type)
+      return RW_Transaction_Type is
+   begin
+      return Maps.New_RW_Transaction(Column_Family.Map);
+   end New_RW_Transaction;
+
+
+   procedure Start_Transaction
+     (Column_Family : in out Column_Family_Type;
+      Transaction   : in out RW_Transaction_Type) is
+   begin
+      Maps.Start_Transaction(Column_Family.Map, Transaction);
+   end Start_Transaction;
+
+
+   procedure Abort_Transaction
+     (Column_Family : in out Column_Family_Type;
+      Transaction   : in out RW_Transaction_Type) is
+   begin
+      Maps.Abort_Transaction(Column_Family.Map, Transaction);
+   end Abort_Transaction;
+
+
+   procedure Commit_Transaction
+     (Column_Family : in out Column_Family_Type;
+      Transaction   : in out RW_Transaction_Type) is
+   begin
+      Maps.Commit_Transaction(Column_Family.Map, Transaction);
+   end Commit_Transaction;
 
 
    procedure Retrieve
@@ -147,7 +131,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Retrieve(Column_Family.Map.all, Key, Value, State);
+      Maps.Retrieve(Column_Family.Map, Key, Value, State);
    end Retrieve;
 
 
@@ -158,7 +142,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Retrieve(Column_Family.Map.all, Transaction, Key, Value, State);
+      Maps.Retrieve(Column_Family.Map, Transaction, Key, Value, State);
    end Retrieve;
 
 
@@ -168,7 +152,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Minimum(Column_Family.Map.all, Key, Value, State);
+      Maps.Minimum(Column_Family.Map, Key, Value, State);
    end Minimum;
 
 
@@ -179,7 +163,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Minimum(Column_Family.Map.all, Transaction, Key, Value, State);
+      Maps.Minimum(Column_Family.Map, Transaction, Key, Value, State);
    end Minimum;
 
 
@@ -189,7 +173,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Maximum(Column_Family.Map.all, Key, Value, State);
+      Maps.Maximum(Column_Family.Map, Key, Value, State);
    end Maximum;
 
 
@@ -200,7 +184,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Maximum(Column_Family.Map.all, Transaction, Key, Value, State);
+      Maps.Maximum(Column_Family.Map, Transaction, Key, Value, State);
    end Maximum;
 
 
@@ -210,7 +194,7 @@ package body DB.Tables.Column_Families is
       Value         : in     Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Insert(Column_Family.Map.all, Key, Value, State);
+      Maps.Insert(Column_Family.Map, Key, Value, State);
    end Insert;
 
 
@@ -221,7 +205,7 @@ package body DB.Tables.Column_Families is
       Value         : in     Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Insert(Column_Family.Map.all, Transaction, Key, Value, State);
+      Maps.Insert(Column_Family.Map, Transaction, Key, Value, State);
    end Insert;
 
 
@@ -231,7 +215,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Delete(Column_Family.Map.all, Key, Value, State);
+      Maps.Delete(Column_Family.Map, Key, Value, State);
    end Delete;
 
 
@@ -242,7 +226,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Delete(Column_Family.Map.all, Transaction, Key, Value, State);
+      Maps.Delete(Column_Family.Map, Transaction, Key, Value, State);
    end Delete;
 
 
@@ -250,7 +234,7 @@ package body DB.Tables.Column_Families is
      (Column_Family : Column_Family_Type)
       return Bound_Type is
    begin
-      return Maps.Positive_Infinity_Bound(Column_Family.Map.all);
+      return Maps.Positive_Infinity_Bound(Column_Family.Map);
    end Positive_Infinity_Bound;
 
 
@@ -258,7 +242,7 @@ package body DB.Tables.Column_Families is
      (Column_Family : Column_Family_Type)
       return Bound_Type is
    begin
-      return Maps.Negative_Infinity_Bound(Column_Family.Map.all);
+      return Maps.Negative_Infinity_Bound(Column_Family.Map);
    end Negative_Infinity_Bound;
 
 
@@ -268,7 +252,7 @@ package body DB.Tables.Column_Families is
       Key           : Key_Type)
       return Bound_Type is
    begin
-      return Maps.New_Bound(Column_Family.Map.all, Comparison, Key);
+      return Maps.New_Bound(Column_Family.Map, Comparison, Key);
    end New_Bound;
 
 
@@ -281,7 +265,7 @@ package body DB.Tables.Column_Families is
       Reverse_Direction : Boolean := False)
       return Cursor_Type is
    begin
-      return Maps.New_Cursor(Column_Family.Map.all, Transaction, Thread_Safe,
+      return Maps.New_Cursor(Column_Family.Map, Transaction, Thread_Safe,
                              Lower_Bound, Upper_Bound, Reverse_Direction);
    end New_Cursor;
 
@@ -299,7 +283,7 @@ package body DB.Tables.Column_Families is
       Transaction   : in     Transaction_Type'Class;
       Cursor        : in out Cursor_Type) is
    begin
-      Maps.Finalize_Cursor(Column_Family.Map.all, Transaction, Cursor);
+      Maps.Finalize_Cursor(Column_Family.Map, Transaction, Cursor);
    end Finalize_Cursor;
 
 
@@ -307,7 +291,7 @@ package body DB.Tables.Column_Families is
      (Column_Family : in out Column_Family_Type;
       Cursor        : in out Cursor_Type) is
    begin
-      Maps.Pause(Column_Family.Map.all, Cursor);
+      Maps.Pause(Column_Family.Map, Cursor);
    end Pause;
 
 
@@ -316,7 +300,7 @@ package body DB.Tables.Column_Families is
       Transaction   : in out Transaction_Type'Class;
       Cursor        : in out Cursor_Type) is
    begin
-      Maps.Unpause(Column_Family.Map.all, Transaction, Cursor);
+      Maps.Unpause(Column_Family.Map, Transaction, Cursor);
    end Unpause;
 
 
@@ -328,7 +312,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Next(Column_Family.Map.all, Transaction, Cursor, Key, Value, State);
+      Maps.Next(Column_Family.Map, Transaction, Cursor, Key, Value, State);
    end Next;
 
 
@@ -340,7 +324,7 @@ package body DB.Tables.Column_Families is
       Value         :    out Value_Type'Class;
       State         :    out State_Type) is
    begin
-      Maps.Delete(Column_Family.Map.all, Transaction, Cursor, Key, Value,
+      Maps.Delete(Column_Family.Map, Transaction, Cursor, Key, Value,
                   State);
    end Delete;
 
@@ -349,7 +333,7 @@ package body DB.Tables.Column_Families is
      (Column_Family : in out Column_Family_Type;
       Count         :    out Count_Type) is
    begin
-      Maps.Count(Column_Family.Map.all, Count);
+      Maps.Count(Column_Family.Map, Count);
    end Count;
 
 
@@ -358,7 +342,7 @@ package body DB.Tables.Column_Families is
       Transaction   : in out Transaction_Type'Class;
       Count         :    out Count_Type) is
    begin
-      Maps.Count(Column_Family.Map.all, Transaction, Count);
+      Maps.Count(Column_Family.Map, Transaction, Count);
    end Count;
 
 
@@ -366,7 +350,7 @@ package body DB.Tables.Column_Families is
      (Column_Family : in out Column_Family_Type;
       Height        :    out Natural) is
    begin
-      Maps.Get_Height(Column_Family.Map.all, Height);
+      Maps.Get_Height(Column_Family.Map, Height);
    end Get_Height;
 
 
@@ -375,7 +359,7 @@ package body DB.Tables.Column_Families is
       Transaction   : in out Transaction_Type'Class;
       Height        :    out Natural) is
    begin
-      Maps.Get_Height(Column_Family.Map.all, Transaction, Height);
+      Maps.Get_Height(Column_Family.Map, Transaction, Height);
    end Get_Height;
 
 
@@ -383,7 +367,7 @@ package body DB.Tables.Column_Families is
      (Column_Family : in out Column_Family_Type;
       State         :    out State_Type) is
    begin
-      Maps.Clusterize(Column_Family.Map.all, State);
+      Maps.Clusterize(Column_Family.Map, State);
    end Clusterize;
 
 end DB.Tables.Column_Families;
