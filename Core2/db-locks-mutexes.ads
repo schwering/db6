@@ -24,5 +24,8 @@ private
       Locked : Boolean := False;
    end Mutex_Type;
 
+   pragma Inline (Lock);
+   pragma Inline (Unlock);
+
 end DB.Locks.Mutexes;
 

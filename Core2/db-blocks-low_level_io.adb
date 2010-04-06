@@ -125,11 +125,11 @@ package body DB.Blocks.Low_Level_IO is
       Item : out Item_Type)
    is
       Size  : constant Size_Type := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type
-            := Signed_Size_Type(C.pread(C.int(File),
-                                        Item'Address,
-                                        C.size_t(Size),
-                                        C.off_t(Pos)));
+      Count : constant Signed_Size_Type :=
+         Signed_Size_Type(C.pread(C.int(File),
+                                  Item'Address,
+                                  C.size_t(Size),
+                                  C.off_t(Pos)));
    begin
       if Count < 0 or else Size_Type(Count) /= Size then
          raise IO_Error;
@@ -143,11 +143,11 @@ package body DB.Blocks.Low_Level_IO is
       Item : in Item_Type)
    is
       Size  : constant Size_Type := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type
-            := Signed_Size_Type(C.Pwrite(C.int(File),
-                                         Item'Address,
-                                         C.size_t(Size),
-                                         C.off_t(Pos)));
+      Count : constant Signed_Size_Type :=
+         Signed_Size_Type(C.Pwrite(C.int(File),
+                                   Item'Address,
+                                   C.size_t(Size),
+                                   C.off_t(Pos)));
    begin
       if Count < 0 or else Size_Type(Count) /= Size then
          raise IO_Error;

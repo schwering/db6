@@ -110,8 +110,7 @@ generic
       Cursor  : in out Blocks.Cursor_Type;
       Value   : in     Value_Type);
 
-   with package Block_IO is new Blocks.Gen_IO (<>);
-   with package IO_Buffers is new Block_Gen_Buffers (<>);
+   with package Block_IO is new Blocks.Gen_IO_Signature (<>);
 package DB.Gen_BTrees is
    pragma Preelaborate;
    pragma Unreferenced (Skip_Value);
@@ -136,8 +135,8 @@ package DB.Gen_BTrees is
    -- Finalizes Tree, i.e. closes opened files.
 
    function Max_Key_Size
-     (Max_Value_Size : Blocks.Size_Type
-                     := Blocks.Bits_To_Units(Value_Type'Size))
+     (Max_Value_Size : Blocks.Size_Type :=
+        Blocks.Bits_To_Units(Value_Type'Size))
       return Blocks.Size_Type;
    -- Returns the maximum allowed size of keys if the maximum size of
    -- values is Max_Value_Size.
@@ -148,7 +147,7 @@ package DB.Gen_BTrees is
 
    type State_Type is (Success, Failure, Error);
 
-   procedure Retrieve
+   procedure Search
      (Tree     : in out Tree_Type;
       Key      : in     Key_Type;
       Value    :    out Value_Type;
@@ -164,16 +163,6 @@ package DB.Gen_BTrees is
       Value    :    out Value_Type;
       State    :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
-   -- such key exists.
-   -- This procedure never blocks because it uses no locks (as long as
-   -- Block_IO.Read and Block_IO.Write do not block).
-
-   procedure Maximum
-     (Tree     : in out Tree_Type;
-      Key      :    out Key_Type;
-      Value    :    out Value_Type;
-      State    :    out State_Type);
-   -- Searches the maximum Key / Value pair or sets State = Failure if no
    -- such key exists.
    -- This procedure never blocks because it uses no locks (as long as
    -- Block_IO.Read and Block_IO.Write do not block).
@@ -200,19 +189,13 @@ package DB.Gen_BTrees is
 
 
    ----------
-   -- Miscellaneous information procedures.
+   -- Miscellaneous procedures.
 
-   subtype Count_Type is Natural;
+   subtype Count_Type is Long_Integer;
 
    procedure Count
      (Tree  : in out Tree_Type;
       Count :    out Count_Type);
-   -- Determines the count N of key / value pairs in the tree.
-
-   procedure Get_Height
-     (Tree   : in out Tree_Type;
-      Height :    out Natural);
-   -- Determines the Height of the tree.
 
    procedure Reorganize
      (Tree  : in out Tree_Type;
@@ -246,18 +229,15 @@ package DB.Gen_BTrees is
    -- must satisfy: Key > Min.
 
    function New_Cursor
-     (Tree              : Tree_Type;
-      Thread_Safe       : Boolean;
-      Lower_Bound       : Bound_Type;
-      Upper_Bound       : Bound_Type;
-      Reverse_Direction : Boolean := False)
+     (Tree        : Tree_Type;
+      Thread_Safe : Boolean;
+      Lower_Bound : Bound_Type;
+      Upper_Bound : Bound_Type)
       return Cursor_Type;
    -- Creates a new cursor.
    -- If Thread_Safe is True, all operations on the cursor happen mutually
    -- exclusive.
    -- All key/value-pairs hit by the cursor satisfy Lower_Bound and Upper_Bound.
-   -- If Reverse_Direction is True, the cursor moves from the maximum to the
-   -- minimum instead of the other way around.
 
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
@@ -269,6 +249,11 @@ package DB.Gen_BTrees is
      (Tree   : in     Tree_Type;
       Cursor : in out Cursor_Type);
    -- Releases all resources hold be the cursor.
+
+   procedure Pause
+     (Tree   : in     Tree_Type;
+      Cursor : in out Cursor_Type);
+   -- Enforces recalibration upon the next operation.
 
    procedure Next
      (Tree   : in out Tree_Type;
@@ -298,7 +283,7 @@ package DB.Gen_BTrees is
 private
    package Nodes is
       RO_Node_Size : constant := Blocks.Block_Size;
-      RW_Node_Size : constant := RO_Node_Size * 5 / 4;
+      RW_Node_Size : constant := RO_Node_Size * 6 / 4;
 
       type Degree_Type is range 0 .. Blocks.Block_Size;
       subtype Index_Type is Degree_Type range 0 .. Degree_Type'Last;
@@ -314,10 +299,9 @@ private
       type State_Type is (Valid, Too_Small, Too_Large);
       subtype Validation_State_Type is State_Type;
 
-      Invalid_Index   : constant Index_Type
-                      := Index_Type'First;
-      Invalid_Address : constant Address_Type
-                      := Address_Type(Block_IO.Invalid_Address);
+      Invalid_Index   : constant Index_Type := Index_Type'First;
+      Invalid_Address : constant Address_Type :=
+         Address_Type(Block_IO.Invalid_Address);
 
       ----------
       -- Address functions.
@@ -350,16 +334,6 @@ private
          return RW_Node_Type;
       -- Returns a simple root node of degree 0.
 
-      function Free_Node
-         return RW_Node_Type;
-      -- Returns a free node.
-
-      function Is_Free
-        (Node : Node_Type)
-         return Boolean;
-      -- Indicates whether the given node is a free one (which does not contain
-      -- any valuable information) or an active one.
-
       function Is_Leaf
         (Node : Node_Type)
          return Boolean;
@@ -378,50 +352,12 @@ private
       -- Returns the degree of the node. The degree is the count of keys,
       -- children, counts and/or values.
 
-      function Parent
-        (Node : Node_Type)
-         return Address_Type;
-      -- Returns the address of the parent of the node. Is Invalid_Address if
-      -- the node is the root.
-
-      function Valid_Parent
-        (Node : Node_Type)
-         return Valid_Address_Type;
-      -- Returns the address of the parent of the node.
-
-      function Is_Root
-        (Node : Node_Type)
-         return Boolean;
-      -- Indicates whether the given node is the root. This is the case if the
-      -- left and right neighbor addresses are both invalid. (The parent address
-      -- is not considered!)
-
-      procedure Set_Left_Neighbor
-        (Node     : in out Node_Type;
-         Neighbor : in     Valid_Address_Type);
-      -- Sets the address of the left neighbor of the node.
-
-      procedure Set_Left_Neighbor
-        (Node     : in out Node_Type;
-         Neighbor : in     Address_Type);
-      -- Sets the address of the left neighbor of the node.
-
-      function Left_Neighbor
-        (Node : Node_Type)
-         return Address_Type;
-      -- Returns the address of the left neighbor of the node.
-
-      function Valid_Left_Neighbor
-        (Node : Node_Type)
-         return Valid_Address_Type;
-      -- Returns the address of the left neighbor of the node.
-
-      function Right_Neighbor
+      function Link
         (Node : Node_Type)
          return Address_Type;
       -- Returns the address of the right neighbor of the node.
 
-      function Valid_Right_Neighbor
+      function Valid_Link
         (Node : Node_Type)
          return Valid_Address_Type;
       -- Returns the address of the right neighbor of the node.
@@ -486,24 +422,12 @@ private
       --------- -
       -- Node operations.
 
-      procedure Set_Parent
-        (Node   : in out RW_Node_Type;
-         Parent : in     Address_Type);
-      -- Sets the address of the parent of the node. To mark the node as root
-      -- the address should be Invalid_Address.
-
-      procedure Set_Parent
-        (Node   : in out RW_Node_Type;
-         Parent : in     Valid_Address_Type);
-      -- Sets the address of the parent of the node. To mark the node as root
-      -- the address should be Invalid_Address.
-
-      procedure Set_Right_Neighbor
+      procedure Set_Link
         (Node     : in out RW_Node_Type;
          Neighbor : in     Address_Type);
       -- Sets the address of the right neighbor of the node.
 
-      procedure Set_Right_Neighbor
+      procedure Set_Link
         (Node     : in out RW_Node_Type;
          Neighbor : in     Valid_Address_Type);
       -- Sets the address of the right neighbor of the node.
@@ -602,9 +526,7 @@ private
          return RW_Node_Type;
       -- Returns a combination of Left_Node and Right_Node. The degree is the
       -- sum of both, the left neighbor is Left_Node's and the right neighbor is
-      -- Right_Node's one. The parent is Right_Node's parent, because in most
-      -- cases, the new node should be copied into the place of Right_Node.
-      -- The nodes must not be free. They must be either both leaves or both
+      -- Right_Node's one. The nodes must be either both leaves or both
       -- inner nodes.
 
       ----------
@@ -615,16 +537,16 @@ private
          return Blocks.Size_Type;
       -- Returns the size used in the node.
 
-      function Is_Valid
-        (Node           : Node_Type;
-         Force_Non_Root : Boolean := False)
+      function Is_Safe
+        (Node    : Node_Type;
+         Is_Root : Boolean := False)
          return Boolean;
       -- Checks whether the given node is valid, i.e. whether it fits into a
       -- single disk block.
 
       function Validation
-        (Node           : Node_Type;
-         Force_Non_Root : Boolean := False)
+        (Node    : Node_Type;
+         Is_Root : Boolean := False)
          return Validation_State_Type;
       -- Checks whether the given node is valid, i.e. whether it fits into a
       -- single disk block.
@@ -641,17 +563,12 @@ private
    private
       pragma Inline (Root_Node);
       pragma Inline (Is_Valid);
-      pragma Inline (Is_Free);
       pragma Inline (Is_Leaf);
       pragma Inline (Is_Inner);
       pragma Inline (Degree);
-      pragma Inline (Set_Parent);
-      pragma Inline (Parent);
-      pragma Inline (Is_Root);
-      pragma Inline (Set_Left_Neighbor);
-      pragma Inline (Left_Neighbor);
-      pragma Inline (Set_Right_Neighbor);
-      pragma Inline (Right_Neighbor);
+      pragma Inline (Set_Link);
+      pragma Inline (Link);
+      pragma Inline (Valid_Link);
       pragma Inline (Key);
       pragma Inline (Child);
       pragma Inline (Value);
@@ -673,10 +590,11 @@ private
    ----------
    -- Tree type.
 
-   Root_Address : constant Nodes.Valid_Address_Type
-                := Nodes.Valid_Address_Type(Block_IO.First);
-   Free_Address : constant Nodes.Valid_Address_Type
-                := Nodes.Valid_Address_Type(Block_IO.Succ(Block_IO.First));
+   Invalid_Address : constant Nodes.Address_Type :=
+      Nodes.Address_Type(Block_IO.Invalid_Address);
+
+   Root_Address : constant Nodes.Valid_Address_Type :=
+      Nodes.Valid_Address_Type(Block_IO.First);
 
    type Tree_Ref_Type is not null access all Tree_Type;
    pragma Controlled (Tree_Ref_Type);
@@ -698,19 +616,18 @@ private
    procedure Write_Node
      (Tree : in out Tree_Type;
       N_A  : in     Nodes.Valid_Address_Type;
-      N    : in     Nodes.RW_Node_Type)
+      N    : in     Nodes.RW_Node_Type);
 
    procedure Write_New_Node
      (Tree : in out Tree_Type;
       N_A  :    out Nodes.Valid_Address_Type;
-      N    : in     Nodes.RW_Node_Type)
+      N    : in     Nodes.RW_Node_Type);
 
 
    ----------
    -- Cursor types.
 
    type Bound_Kind_Type is (Concrete_Bound, Abstract_Bound);
-   type Direction_Type is (From_Upper_To_Lower, From_Lower_To_Upper);
    type Infinity_Type is (Negative_Infinity, Positive_Infinity);
    type Bound_Type (Kind : Bound_Kind_Type := Concrete_Bound) is
       record
@@ -728,7 +645,6 @@ private
          Final              : Boolean                       := False;
          Lower_Bound        : Bound_Type;
          Upper_Bound        : Bound_Type;
-         Direction          : Direction_Type;
          Has_Node           : Boolean                       := False;
          Node               : Nodes.RO_Node_Type;
          Key_Context        : Key_Context_Type;

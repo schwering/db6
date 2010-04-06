@@ -7,8 +7,7 @@ else # older Gnat
 	GPRCLEAN=
 endif
 
-all: libdb_debug
-#all: tests_debug tests_release
+all: tests_debug tests_release
 
 libdb_debug:
 	$(GPRBUILD) -p -Plibdb -XBUILD=debug -XKIND=static
