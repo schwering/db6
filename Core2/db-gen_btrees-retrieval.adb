@@ -13,45 +13,35 @@ package body Retrieval is
       Value    :    out Value_Type;
       State    :    out State_Type)
    is
-      procedure Find_Leaf_Address
-        (N_A : out Nodes.Valid_Address_Type) is
-      begin
-         N_A := Root_Address;
-         loop
-            declare
-               N : Nodes.RO_Node_Type;
-            begin
-               Read_Node(Tree, N_A, N);
-               exit when Nodes.Is_Leaf(N);
-               N_A := Scan_Node(N, Key);
-            end;
-         end loop;
-      end Find_Leaf_Address;
-
       pragma Assert (Tree.Initialized);
-      N_A : Nodes.Valid_Address_Type;
+      N_A : Nodes.Valid_Address_Type := Root_Address;
       N   : Nodes.RO_Node_Type;
       I   : Nodes.Index_Type;
    begin
-      Find_Leaf_Address(N_A);
       loop
          Read_Node(Tree, N_A, N);
-         I := Nodes.Key_Position(N, Key);
-         if Nodes.Is_Valid(I) then
-            if Nodes.Key(N, I) = Key then
-               Value := Nodes.Value(N, I);
-               State := Success;
-               return;
+         if Nodes.Is_Inner(N) then
+            N_A := Scan_Node(N, Key);
+         else
+            I := Nodes.Key_Position(N, Key);
+            if not Nodes.Is_Valid(I) then
+               if Nodes.Is_Valid(Nodes.Link(N)) then
+                  N_A := Nodes.Valid_Link(N);
+               else
+                  State := Failure;
+                  return;
+               end if;
             else
-               State := Failure;
-               return;
+               if Nodes.Key(N, I) /= Key then
+                  State := Failure;
+                  return;
+               else
+                  Value := Nodes.Value(N, I);
+                  State := Success;
+                  return;
+               end if;
             end if;
          end if;
-         if not Nodes.Is_Valid(Nodes.Link(N)) then
-            State := Failure;
-            return;
-         end if;
-         N_A := Nodes.Valid_Link(N);
       end loop;
 
    exception

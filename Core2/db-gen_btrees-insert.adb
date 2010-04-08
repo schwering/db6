@@ -18,6 +18,7 @@ is
 
    package Stacks is new Utils.Gen_Stacks
      (Item_Type    => Nodes.Valid_Address_Type,
+      Initial_Size => 8,
       Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
 
    procedure Initialize_Stack
@@ -27,7 +28,7 @@ is
       N_A : Nodes.Valid_Address_Type := Root_Address;
       N   : Nodes.RO_Node_Type;
    begin
-      Stack := Stacks.New_Stack(Initial_Size => 8);
+      Stack := Stacks.New_Stack;
       loop
          Read_Node(Tree, N_A, N);
          if Nodes.To_Address(N_A) /= Nodes.Link(N) then
@@ -46,7 +47,7 @@ is
       return Nodes.Key(N, Nodes.Degree(N));
    end High_Key;
 
-   procedure Read_Leaf
+   procedure Pop_Leaf
      (Stack : in out Stacks.Stack_Type;
       N_A   :    out Nodes.Valid_Address_Type;
       N     :    out Nodes.RW_Node_Type;
@@ -67,9 +68,9 @@ is
             Unlock(Tree, N_A);
             raise;
       end;
-   end Read_Leaf;
+   end Pop_Leaf;
 
-   procedure Read_Inner
+   procedure Pop_Inner
      (Stack : in out Stacks.Stack_Type;
       C_A   : in     Nodes.Valid_Address_Type;
       N_A   :    out Nodes.Valid_Address_Type;
@@ -96,56 +97,14 @@ is
       when others =>
          Unlock(Tree, C_A);
          raise;
-   end Read_Inner;
+   end Pop_Inner;
 
-   procedure Insert_Key_And_Update_High_Key
-     (Stack : in out Stacks.Stack_Type;
-      L_Key : in     Key_Type;
-      L_A   : in     Nodes.Valid_Address_Type;
-      R_Key : in     Key_Type;
-      R_A   : in     Nodes.Valid_Address_Type;
-      State : in out State_Type);
-
-   procedure Update_High_Key
-     (Stack : in out Stacks.Stack_Type;
-      C_Key : in     Key_Type;
-      C_A   : in     Nodes.Valid_Address_Type;
-      State : in out State_Type);
-
-   procedure Backtrack
+   procedure Write_And_Ascend
      (Stack : in out Stacks.Stack_Type;
       N_A   : in     Nodes.Valid_Address_Type;
       N_Old : in     Nodes.RW_Node_Type;
       N     : in     Nodes.RW_Node_Type;
-      State : in out State_Type)
-   is
-      use type Nodes.Degree_Type;
-   begin
-      if Nodes.Is_Safe(N, Is_Root => Stacks.Is_Empty(Stack)) then
-         Write_Node(Tree, N_A, N);
-         if Nodes.Degree(N_Old) = 0 or else High_Key(N_Old) /= High_Key(N) then
-            Update_High_Key(Stack, High_Key(N), N_A, State);
-         else
-            Unlock(Tree, N_A);
-            State := Success;
-         end if;
-      else
-         declare
-            I   : constant Nodes.Valid_Index_Type := Nodes.Split_Position(N);
-            L   : Nodes.RW_Node_Type := Nodes.Copy(N, 1, I - 1);
-            R   : Nodes.RW_Node_Type := Nodes.Copy(N, I, Nodes.Degree(N));
-            L_A : Nodes.Valid_Address_Type renames N_A;
-            R_A : Nodes.Valid_Address_Type;
-         begin
-            Nodes.Set_Link(R, Nodes.Link(N));
-            Write_New_Node(Tree, R_A, R);
-            Nodes.Set_Link(L, R_A);
-            Write_Node(Tree, L_A, L);
-            Insert_Key_And_Update_High_Key(Stack, High_Key(L), L_A,
-                                           High_Key(R), R_A, State);
-         end;
-      end if;
-   end Backtrack;
+      State : in out State_Type);
 
    -- Handles the case that the high-key of a node C changed. Then C_A is the
    -- address of C and C_Key is the high-key of C.
@@ -165,12 +124,12 @@ is
             I     : Nodes.Valid_Index_Type;
             N     : Nodes.RW_Node_Type;
          begin
-            Read_Inner(Stack, C_A, N_A, N_Old, State);
+            Pop_Inner(Stack, C_A, N_A, N_Old, State);
             declare
             begin
                I := Nodes.Child_Position(N_Old, C_A);
                N := Nodes.Substitution(N_Old, I, C_Key, C_A);
-               Backtrack(Stack, N_A, N_Old, N, State);
+               Write_And_Ascend(Stack, N_A, N_Old, N, State);
             exception
                when others =>
                   Unlock(Tree, N_A);
@@ -227,7 +186,7 @@ is
             I     : Nodes.Index_Type;
             N     : Nodes.RW_Node_Type;
          begin
-            Read_Inner(Stack, L_A, N_A, N_Old, State);
+            Pop_Inner(Stack, L_A, N_A, N_Old, State);
             declare
             begin
                I := Nodes.Child_Position(N_Old, L_A);
@@ -237,7 +196,7 @@ is
                   I := Nodes.Degree(N) + 1;
                end if;
                N := Nodes.Insertion(N, I, R_Key, R_A);
-               Backtrack(Stack, N_A, N_Old, N, State);
+               Write_And_Ascend(Stack, N_A, N_Old, N, State);
             exception
                when others =>
                   Unlock(Tree, N_A);
@@ -246,6 +205,41 @@ is
          end;
       end if;
    end Insert_Key_And_Update_High_Key;
+
+   procedure Write_And_Ascend
+     (Stack : in out Stacks.Stack_Type;
+      N_A   : in     Nodes.Valid_Address_Type;
+      N_Old : in     Nodes.RW_Node_Type;
+      N     : in     Nodes.RW_Node_Type;
+      State : in out State_Type)
+   is
+      use type Nodes.Degree_Type;
+   begin
+      if Nodes.Is_Safe(N, Is_Root => Stacks.Is_Empty(Stack)) then
+         Write_Node(Tree, N_A, N);
+         if Nodes.Degree(N_Old) = 0 or else High_Key(N_Old) /= High_Key(N) then
+            Update_High_Key(Stack, High_Key(N), N_A, State);
+         else
+            Unlock(Tree, N_A);
+            State := Success;
+         end if;
+      else
+         declare
+            I   : constant Nodes.Valid_Index_Type := Nodes.Split_Position(N);
+            L   : Nodes.RW_Node_Type := Nodes.Copy(N, 1, I - 1);
+            R   : Nodes.RW_Node_Type := Nodes.Copy(N, I, Nodes.Degree(N));
+            L_A : Nodes.Valid_Address_Type renames N_A;
+            R_A : Nodes.Valid_Address_Type;
+         begin
+            Nodes.Set_Link(R, Nodes.Link(N));
+            Write_New_Node(Tree, R_A, R);
+            Nodes.Set_Link(L, R_A);
+            Write_Node(Tree, L_A, L);
+            Insert_Key_And_Update_High_Key(Stack, High_Key(L), L_A,
+                                           High_Key(R), R_A, State);
+         end;
+      end if;
+   end Write_And_Ascend;
 
    use type Nodes.Valid_Index_Type;
    use type Blocks.Size_Type;
@@ -263,7 +257,7 @@ begin
 
    Initialize_Stack(Stack);
 
-   Read_Leaf(Stack, N_A, N_Old, State);
+   Pop_Leaf(Stack, N_A, N_Old, State);
    if State /= Success then
       return;
    end if;
@@ -275,7 +269,7 @@ begin
       return;
    end if;
    N := Nodes.Insertion(N_Old, I, Key, Value);
-   Backtrack(Stack, N_A, N_Old, N, State);
+   Write_And_Ascend(Stack, N_A, N_Old, N, State);
 
 exception
    when others =>

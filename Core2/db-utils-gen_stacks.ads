@@ -18,6 +18,7 @@ with DB.Utils.Global_Pool;
 
 generic
    type Item_Type is private;
+   Initial_Size : in Natural;
    Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
 package DB.Utils.Gen_Stacks is
    pragma Preelaborate;
@@ -25,7 +26,6 @@ package DB.Utils.Gen_Stacks is
    type Stack_Type is private;
 
    function New_Stack
-     (Initial_Size : Positive)
       return Stack_Type;
 
    procedure Finalize
@@ -53,8 +53,9 @@ private
 
    type Stack_Type is
       record
-         Items : Item_Array_Ref_Type := null;
-         Top   : Natural := 0;
+         Stack_Items : Item_Array_Type(1 .. Initial_Size);
+         Heap_Items  : Item_Array_Ref_Type := null;
+         Top         : Natural := 0;
       end record;
 
 end DB.Utils.Gen_Stacks;

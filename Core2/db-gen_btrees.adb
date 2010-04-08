@@ -151,6 +151,7 @@ package body DB.Gen_BTrees is
       Write_Node(Tree, N_A, N);
    end Write_New_Node;
 
+
    procedure Lock
      (Tree : in out Tree_Type;
       N_A  : in     Nodes.Valid_Address_Type) is
@@ -158,12 +159,14 @@ package body DB.Gen_BTrees is
       Block_IO.Lock(Tree.File, Block_IO.Valid_Address_Type(N_A));
    end Lock;
 
+
    procedure Unlock
      (Tree : in out Tree_Type;
       N_A  : in     Nodes.Valid_Address_Type) is
    begin
       Block_IO.Unlock(Tree.File, Block_IO.Valid_Address_Type(N_A));
    end Unlock;
+
 
    -- Returns the pointer to the child that induces the tree that contains Key
    -- if there is such a child. Otherwise, if the link to the right neighbor is
@@ -177,17 +180,15 @@ package body DB.Gen_BTrees is
       Key : Key_Type)
       return Nodes.Valid_Address_Type
    is
+      pragma Assert (Nodes.Is_Leaf(N));
       I : constant Nodes.Index_Type := Nodes.Key_Position(N, Key);
    begin
-      if not Nodes.Is_Inner(N) then
-         raise Tree_Error;
-      end if;
       if Nodes.Is_Valid(I) then
          return Nodes.Child(N, I);
-      elsif not Nodes.Is_Valid(Nodes.Link(N)) then
-         return Nodes.Child(N, Nodes.Degree(N));
-      else
+      elsif Nodes.Is_Valid(Nodes.Link(N)) then
          return Nodes.Valid_Link(N);
+      else
+         return Nodes.Child(N, Nodes.Degree(N));
       end if;
    end Scan_Node;
 

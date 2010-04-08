@@ -12,36 +12,55 @@ package body DB.Utils.Gen_Stacks is
      (Item_Array_Type, Item_Array_Ref_Type);
 
 
+   function Size
+     (Stack : Stack_Type)
+      return Natural
+   is
+      pragma Inline (Size);
+   begin
+      if Stack.Heap_Items = null then
+         return Stack.Stack_Items'Length;
+      else
+         return Stack.Stack_Items'Length + Stack.Heap_Items'Length;
+      end if;
+   end Size;
+
+
    procedure Resize
      (Stack : in out Stack_Type)
    is
       pragma Inline (Resize);
    begin
-      if Stack.Top = Stack.Items'Length then
+      if Stack.Top = Size(Stack) then
          declare
-            New_Size  : constant Natural := Stack.Items'Length * 3 / 2 + 1;
-            New_Items : Item_Array_Ref_Type := new Item_Array_Type(1..New_Size);
+            New_Size       : constant Natural := Size(Stack) * 3 / 2 + 1;
+            New_Heap_Items : Item_Array_Ref_Type :=
+               new Item_Array_Type(Stack.Stack_Items'Last + 1 .. New_Size);
          begin
-            New_Items(Stack.Items'Range) := Stack.Items.all;
-            Free(Stack.Items);
-            Stack.Items := New_Items;
+            if Stack.Heap_Items /= null then
+               New_Heap_Items(Stack.Heap_Items'Range) := Stack.Heap_Items.all;
+               Free(Stack.Heap_Items);
+            end if;
+            Stack.Heap_Items := New_Heap_Items;
+            pragma Assert (Size(Stack) = New_Size);
          end;
       end if;
    end Resize;
 
 
    function New_Stack
-     (Initial_Size : Positive)
       return Stack_Type is
    begin
-      return Stack_Type'(new Item_Array_Type(1 .. Initial_Size), 0);
+      return Stack_Type'(others => <>);
    end New_Stack;
 
 
    procedure Finalize
      (Stack : in out Stack_Type) is
    begin
-      Free(Stack.Items);
+      if Stack.Heap_Items /= null then
+         Free(Stack.Heap_Items);
+      end if;
    end Finalize;
 
 
@@ -51,7 +70,11 @@ package body DB.Utils.Gen_Stacks is
    begin
       Resize(Stack);
       Stack.Top := Stack.Top + 1;
-      Stack.Items(Stack.Top) := Item;
+      if Stack.Top <= Stack.Stack_Items'Last then
+         Stack.Stack_Items(Stack.Top) := Item;
+      else
+         Stack.Heap_Items(Stack.Top) := Item;
+      end if;
    end Push;
 
 
@@ -59,7 +82,11 @@ package body DB.Utils.Gen_Stacks is
      (Stack : in out Stack_Type;
       Item  :    out Item_Type) is
    begin
-      Item := Stack.Items(Stack.Top);
+      if Stack.Top <= Stack.Stack_Items'Last then
+         Item := Stack.Stack_Items(Stack.Top);
+      else
+         Item := Stack.Heap_Items(Stack.Top);
+      end if;
       Stack.Top := Stack.Top - 1;
    end Pop;
 
@@ -68,7 +95,11 @@ package body DB.Utils.Gen_Stacks is
      (Stack : Stack_Type)
       return Item_Type is
    begin
-      return Stack.Items(Stack.Top);
+      if Stack.Top <= Stack.Stack_Items'Last then
+         return Stack.Stack_Items(Stack.Top);
+      else
+         return Stack.Heap_Items(Stack.Top);
+      end if;
    end Top;
 
 
