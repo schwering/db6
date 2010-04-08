@@ -50,6 +50,7 @@ package DB.Utils.Gen_Stacks is
 private
    type Item_Array_Type is array (Positive range <>) of Item_Type;
    type Item_Array_Ref_Type is access Item_Array_Type;
+   for Item_Array_Ref_Type'Storage_Pool use Storage_Pool;
 
    type Stack_Type is
       record

@@ -18,7 +18,7 @@ is
 
    package Stacks is new Utils.Gen_Stacks
      (Item_Type    => Nodes.Valid_Address_Type,
-      Initial_Size => 8,
+      Initial_Size => 7,
       Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
 
    procedure Initialize_Stack
