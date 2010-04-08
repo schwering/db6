@@ -180,7 +180,7 @@ package body DB.Gen_BTrees is
       Key : Key_Type)
       return Nodes.Valid_Address_Type
    is
-      pragma Assert (Nodes.Is_Leaf(N));
+      pragma Assert (Nodes.Is_Inner(N));
       I : constant Nodes.Index_Type := Nodes.Key_Position(N, Key);
    begin
       if Nodes.Is_Valid(I) then
