@@ -11,6 +11,12 @@ package body DB.Blocks.Local_IO is
       return Valid_Address_Type;
 
 
+   function Hash(A : Address_Type) return Utils.Hash_Type is
+   begin
+      return Utils.Hash_Type(A);
+   end Hash;
+
+
    procedure Create
      (ID   : in  String;
       File : out File_Type) is
@@ -167,17 +173,17 @@ package body DB.Blocks.Local_IO is
 
    procedure Lock
      (File    : in out File_Type;
-      Address : in     Address_Type) is
+      Address : in     Valid_Address_Type) is
    begin
-      Low_Level_IO.Lock(File.FD, To_File_Position(Address), Block_Size);
+      Mutex_Sets.Lock(File.Mutex_Set, Address);
    end Lock;
 
 
    procedure Unlock
      (File    : in out File_Type;
-      Address : in     Address_Type) is
+      Address : in     Valid_Address_Type) is
    begin
-      Low_Level_IO.Unlock(File.FD, To_File_Position(Address), Block_Size);
+      Mutex_Sets.Unlock(File.Mutex_Set, Address);
    end Unlock;
 
 

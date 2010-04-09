@@ -1,6 +1,26 @@
 -- Abstract:
 --
--- see spec
+-- Inserts a new Key/Value pair.
+-- (1) The algorithm is as follows: first descent using the Scan_Node procedure,
+--     hence at each level walk to the right until the node induces the subtree
+--     that's ought to contain Key.
+--     During the descent, no locks are held.
+--     Stop when a leaf is read.
+-- (2) Move to the right until the checked node is ought to contain Key. This
+--     is exactly the Move_Right procedure which holds at most two locks at once
+--     and exactly one lock at return.
+--     Now start the ascent:
+-- (3.a) If the current node is not safe, split it. Update the left node's
+--       high key in parent and insert the new node's high key plus address
+--       into the parent. XXX This is wrong in the implementation.
+--       The parent is found via Move_Right which holds at most two locks
+--       at once. Additionally the current node is locked, hence at most three
+--       locks are held. At the end, the parent node is locked (and becomes
+--       the current node and the ascent is continued recursively).
+-- (3.b) If the inserted key is the high key of the new node, update the high
+--       key in the parent. The parent is found the same way as in case (3.a).
+-- (3.c) Everything is fine.
+-- Hence the maximum count of simultaneously held locks is three.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -39,7 +59,9 @@ is
       end loop;
    end Initialize_Stack;
 
-   function High_Key (N : Nodes.Node_Type) return Key_Type
+   function High_Key
+     (N : Nodes.Node_Type)
+      return Key_Type
    is
       use type Nodes.Degree_Type;
       pragma Assert (Nodes.Degree(N) > 0);
@@ -235,8 +257,10 @@ is
             Write_New_Node(Tree, R_A, R);
             Nodes.Set_Link(L, R_A);
             Write_Node(Tree, L_A, L);
-            Insert_Key_And_Update_High_Key(Stack, High_Key(L), L_A,
-                                           High_Key(R), R_A, State);
+            Insert_Key_And_Update_High_Key(Stack,
+                                           High_Key(L), L_A,
+                                           High_Key(R), R_A,
+                                           State);
          end;
       end if;
    end Write_And_Ascend;

@@ -6,39 +6,98 @@
 
 package body DB.Locks.Gen_Mutex_Sets is
 
-   function Casted_Hash (Item : Item_Type) return Ada.Containers.Hash_Type is
+   function Rehash (Hash : Utils.Hash_Type) return Utils.Hash_Type is
    begin
-      return Ada.Containers.Hash_Type(Hash(Item));
-   end Casted_Hash;
+      return Hash + 1;
+   end Rehash;
+
+
+   function Index (Hash : Utils.Hash_Type) return Utils.Hash_Type is
+   begin
+      return Hash mod Hashtable_Size;
+   end Index;
 
 
    procedure Lock
-     (Mutexes : in out Mutex_Set_Type;
-      Item    : in     Item_Type) is
+     (MS   : in out Mutex_Set_Type;
+      Item : in     Item_Type)
+   is
+      HH      : constant Utils.Hash_Type := Hash(Item);
+      H       : Utils.Hash_Type := HH;
+      Success : Boolean;
    begin
-      Mutexes.Lock(Item);
+      loop
+         exit when MS.Arr(Index(H)).Item = Item;
+         H := Rehash(H);
+         exit when H = HH;
+      end loop;
+      loop
+         MS.Arr(Index(H)).Try_Lock(Item, Success);
+         exit when Success;
+         H := Rehash(H);
+         exit when H = HH;
+      end loop;
+      if not Success then
+         raise Lock_Error;
+      end if;
    end Lock;
 
 
    procedure Unlock
-     (Mutexes : in out Mutex_Set_Type;
-      Item    : in     Item_Type) is
+     (MS   : in out Mutex_Set_Type;
+      Item : in     Item_Type)
+   is
+      HH : constant Utils.Hash_Type := Hash(Item);
+      H  : Utils.Hash_Type := HH;
    begin
-      Mutexes.Unlock(Item);
+      loop
+         exit when MS.Arr(Index(H)).Item = Item;
+         H := Rehash(H);
+         exit when H = HH;
+      end loop;
+      if MS.Arr(Index(H)).Item = Item then
+         MS.Arr(Index(H)).Unlock;
+      else
+         raise Lock_Error;
+      end if;
    end Unlock;
 
 
-   protected body Mutex_Set_Type is
-      entry Lock (Item : Item_Type) when True is
+   protected body Mutex_Type is
+      entry Try_Lock (Item : in Item_Type; Success : out Boolean) when True is
       begin
-         null;
-      end Lock;
+         pragma Assert ((Current = Invalid_Item) = (not Locked));
+         if Wait_For_Lock'Count = 0 and not Locked then
+            Current := Item;
+            Locked  := True;
+            Success := True;
+         elsif Current = Item then
+            requeue Wait_For_Lock;
+         else
+            Success := False;
+         end if;
+      end Try_Lock;
 
-      procedure Unlock (Item : Item_Type) is
+      entry Wait_For_Lock (Item : in Item_Type; Success : out Boolean)
+         when not Locked is
       begin
-         null;
+         pragma Assert (Current = Item);
+         pragma Unreferenced (Item);
+         Success := True;
+         Locked  := True;
+      end Wait_For_Lock;
+
+      procedure Unlock is
+      begin
+         Current := Invalid_Item;
+         Locked  := False;
       end Unlock;
-   end Mutex_Set_Type;
+
+      function Item return Item_Type is
+      begin
+         return Current;
+      end Item;
+   end Mutex_Type;
 
 end DB.Locks.Gen_Mutex_Sets;
 

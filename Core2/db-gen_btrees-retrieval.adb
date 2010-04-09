@@ -60,26 +60,23 @@ package body Retrieval is
       State    :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
+      use type Nodes.Degree_Type;
       N_A : Nodes.Valid_Address_Type := Root_Address;
+      N   : Nodes.RO_Node_Type;
    begin
       loop
-         declare
-            use type Nodes.Degree_Type;
-            N : Nodes.RO_Node_Type;
-         begin
-            Read_Node(Tree, N_A, N);
-            if Nodes.Degree(N) = 0 then
-               State := Failure;
-               return;
-            end if;
-            if Nodes.Is_Leaf(N) then
-               Key   := Nodes.Key(N, 1);
-               Value := Nodes.Value(N, 1);
-               State := Success;
-               return;
-            end if;
-            N_A := Nodes.Child(N, 1);
-         end;
+         Read_Node(Tree, N_A, N);
+         if Nodes.Degree(N) = 0 then
+            State := Failure;
+            return;
+         end if;
+         if Nodes.Is_Leaf(N) then
+            Key   := Nodes.Key(N, 1);
+            Value := Nodes.Value(N, 1);
+            State := Success;
+            return;
+         end if;
+         N_A := Nodes.Child(N, 1);
       end loop;
 
    exception

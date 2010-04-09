@@ -6,6 +6,8 @@
 
 with DB.Blocks.Low_Level_IO;
 with DB.Blocks.Gen_IO_Signature;
+with DB.Locks.Gen_Mutex_Sets;
+with DB.Utils;
 
 package DB.Blocks.Local_IO is
    pragma Elaborate_Body;
@@ -15,9 +17,19 @@ package DB.Blocks.Local_IO is
 
    Invalid_Address : constant Address_Type := 0;
 
+   function Hash(A : Address_Type) return Utils.Hash_Type;
+
+   package Mutex_Sets is new Locks.Gen_Mutex_Sets
+     (Item_Type           => Address_Type,
+      "="                 => "=",
+      Hash                => Hash,
+      Invalid_Item        => Invalid_Address,
+      Hashtable_Size      => 30);
+
    type File_Type is limited
       record
-         FD : Low_Level_IO.File_Descriptor_Type;
+         FD        : Low_Level_IO.File_Descriptor_Type;
+         Mutex_Set : Mutex_Sets.Mutex_Set_Type;
       end record;
 
    procedure Create
@@ -74,11 +86,11 @@ package DB.Blocks.Local_IO is
 
    procedure Lock
      (File    : in out File_Type;
-      Address : in     Address_Type);
+      Address : in     Valid_Address_Type);
 
    procedure Unlock
      (File    : in out File_Type;
-      Address : in     Address_Type);
+      Address : in     Valid_Address_Type);
 
    function FD
      (File : File_Type)

@@ -20,7 +20,7 @@ package body DB.Blocks.Memory_IO is
    Files : Entry_Ref_Array_Type := (others => null);
 
 
-   function Hash (A : Valid_Address_Type) return Utils.Hash_Type is
+   function Hash(A : Address_Type) return Utils.Hash_Type is
    begin
       return Utils.Hash_Type(A);
    end Hash;

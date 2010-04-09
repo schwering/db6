@@ -115,12 +115,14 @@ private
    type Block_Ref_Array_Ref_Type is access Block_Ref_Array_Type;
    pragma Controlled (Block_Ref_Array_Ref_Type);
 
-   function Hash (A : Valid_Address_Type) return Utils.Hash_Type;
+   function Hash(A : Address_Type) return Utils.Hash_Type;
 
    package Mutex_Sets is new Locks.Gen_Mutex_Sets
-     (Item_Type => Valid_Address_Type,
-      Hash      => Hash,
-      "="       => "=");
+     (Item_Type           => Address_Type,
+      "="                 => "=",
+      Hash                => Hash,
+      Invalid_Item        => Invalid_Address,
+      Hashtable_Size      => 30);
 
    type File_Object_Type is limited
       record

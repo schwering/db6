@@ -199,6 +199,7 @@ package body DB.Gen_BTrees is
    -- During all this time, it cares about the lock by locking the current node
    -- and unlocking it right after the right neighbor is locked.
    -- Hence on return, the node N at address N_A is locked!
+   -- The maximum count of concurrently held locks is 2.
    procedure Move_Right
      (Tree : in out Tree_Type;
       Key  : in     Key_Type;
