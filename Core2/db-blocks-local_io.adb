@@ -175,7 +175,7 @@ package body DB.Blocks.Local_IO is
      (File    : in out File_Type;
       Address : in     Valid_Address_Type) is
    begin
-      Mutex_Sets.Lock(File.Mutex_Set, Address);
+      null;--Mutex_Sets.Lock(File.Mutex_Set, Address);
    end Lock;
 
 
@@ -183,7 +183,7 @@ package body DB.Blocks.Local_IO is
      (File    : in out File_Type;
       Address : in     Valid_Address_Type) is
    begin
-      Mutex_Sets.Unlock(File.Mutex_Set, Address);
+      null;--Mutex_Sets.Unlock(File.Mutex_Set, Address);
    end Unlock;
 
 
