@@ -12,6 +12,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.Gen_BTrees;
+--with DB.Gen_Blob_Trees;
 with DB.Blocks;
 with DB.Blocks.Local_IO;
 
