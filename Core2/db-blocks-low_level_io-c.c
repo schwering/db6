@@ -152,7 +152,7 @@ inline off64_t db_blocks_low_level_io_alloc(int fd, size_t nbytes)
 retry:
 	offset = lseek64(fd, 0, SEEK_END);
 	if (offset == (off64_t)-1)
-		return;
+		return (off64_t)-1;
 	if (!try_lock(fd, offset, nbytes))
 		goto retry;
 	pwrite(fd, zeros, nbytes, offset);
