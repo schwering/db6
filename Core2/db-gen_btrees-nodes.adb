@@ -1097,7 +1097,7 @@ package body Nodes is
    function Child_Position
      (Node  : Node_Type;
       Child : Valid_Address_Type)
-      return Valid_Index_Type
+      return Index_Type
    is
       pragma Assert (Is_Ok(Node));
    begin
@@ -1106,7 +1106,7 @@ package body Nodes is
             return I;
          end if;
       end loop;
-      raise Node_Error;
+      return Invalid_Index;
    end Child_Position;
 
 

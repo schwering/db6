@@ -49,7 +49,7 @@ is
    N   : Nodes.RW_Node_Type;
 begin
    Find_Leaf_Address(N_A);
-   Move_Right(Tree, Key, N_A, N);
+   Move_Right_To_Key(Tree, Key, N_A, N);
    declare
    begin
       Delete(N_A, N);

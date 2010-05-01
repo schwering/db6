@@ -76,7 +76,7 @@ is
       State : in out State_Type) is
    begin
       Stacks.Pop(Stack, N_A);
-      Move_Right(Tree, Key, N_A, N);
+      Move_Right_To_Key(Tree, Key, N_A, N);
       declare
       begin
          if not Nodes.Is_Leaf(N) then
@@ -100,7 +100,7 @@ is
       State : in out State_Type) is
    begin
       Stacks.Pop(Stack, N_A);
-      Move_Right(Tree, Key, N_A, N);
+      Move_Right_To_Address(Tree, C_A, N_A, N);
       Unlock(Tree, C_A);
       declare
       begin
@@ -143,11 +143,11 @@ is
          declare
             N_A   : Nodes.Valid_Address_Type;
             N_Old : Nodes.RW_Node_Type;
-            I     : Nodes.Valid_Index_Type;
-            N     : Nodes.RW_Node_Type;
          begin
             Pop_Inner(Stack, C_A, N_A, N_Old, State);
             declare
+               I : Nodes.Valid_Index_Type;
+               N : Nodes.RW_Node_Type;
             begin
                I := Nodes.Child_Position(N_Old, C_A);
                N := Nodes.Substitution(N_Old, I, C_Key, C_A);
@@ -205,18 +205,15 @@ is
             use type Nodes.Index_Type;
             N_A   : Nodes.Valid_Address_Type;
             N_Old : Nodes.RW_Node_Type;
-            I     : Nodes.Index_Type;
-            N     : Nodes.RW_Node_Type;
          begin
             Pop_Inner(Stack, L_A, N_A, N_Old, State);
             declare
+               I : Nodes.Index_Type;
+               N : Nodes.RW_Node_Type;
             begin
                I := Nodes.Child_Position(N_Old, L_A);
                N := Nodes.Substitution(N_Old, I, L_Key, L_A);
-               I := Nodes.Key_Position(N, R_Key);
-               if not Nodes.Is_Valid(I) then
-                  I := Nodes.Degree(N) + 1;
-               end if;
+               I := I + 1;
                N := Nodes.Insertion(N, I, R_Key, R_A);
                Write_And_Ascend(Stack, N_A, N_Old, N, State);
             exception

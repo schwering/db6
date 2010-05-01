@@ -367,14 +367,14 @@ private
          Index       : in     Valid_Index_Type;
          Key         :    out Key_Type;
          Key_Context : in out Key_Context_Type);
-      -- Gets the Index-th key. This function is determined for both,
+      -- Gets the Index-th key. This function is defined for both,
       -- leaves and inner nodes.
 
       function Key
         (Node  : Node_Type;
          Index : Valid_Index_Type)
          return Key_Type;
-      -- Returns the Index-th key. This function is determined for both,
+      -- Returns the Index-th key. This function is defined for both,
       -- leaves and inner nodes.
 
       procedure Get_Child
@@ -382,14 +382,14 @@ private
          Index       : in     Valid_Index_Type;
          Child       :    out Valid_Address_Type;
          Key_Context : in out Key_Context_Type);
-      -- Gets the Index-th child address. This function is determined for
+      -- Gets the Index-th child address. This function is defined for
       -- inner nodes only.
 
       function Child
         (Node  : Node_Type;
          Index : Valid_Index_Type)
          return Valid_Address_Type;
-      -- Returns the Index-th child address. This function is determined for
+      -- Returns the Index-th child address. This function is defined for
       -- inner nodes only.
 
       procedure Get_Value
@@ -398,26 +398,25 @@ private
          Value         :    out Value_Type;
          Key_Context   : in out Key_Context_Type;
          Value_Context : in out Value_Context_Type);
-      -- Returns the Index-th value. This function is determined for leaves.
+      -- Returns the Index-th value. This function is defined for leaves.
 
       function Value
         (Node  : Node_Type;
          Index : Valid_Index_Type)
          return Value_Type;
-      -- Returns the Index-th value. This function is determined for leaves.
+      -- Returns the Index-th value. This function is defined for leaves.
 
       function Key_Position
         (Node : Node_Type;
          Key  : Key_Type)
          return Index_Type;
-      -- Returns the (first) position of the given key.
+      -- Returns the (first) position of the given key or returns Invalid_Index.
 
       function Child_Position
         (Node  : Node_Type;
          Child : Valid_Address_Type)
-         return Valid_Index_Type;
-      -- Returns the position of the given child. If the child is not contained
-      -- in the node, a Node_Error is raised.
+         return Index_Type;
+      -- Returns the position of the given child or returns Invalid_Index.
 
       --------- -
       -- Node operations.
@@ -457,7 +456,7 @@ private
          Child : Valid_Address_Type)
          return RW_Node_Type;
       -- Returns the node that results from the insertion of (Key, Child,
-      -- Count) at position Index. This function is determined for inner nodes.
+      -- Count) at position Index. This function is defined for inner nodes.
 
       function Insertion
         (Node  : RW_Node_Type;
@@ -466,7 +465,7 @@ private
          Value : Value_Type)
          return RW_Node_Type;
       -- Returns the node that results from the substitution of (Key, Value) at
-      -- position Index. This function is determined for leaves.
+      -- position Index. This function is defined for leaves.
 
       function Substitution
         (Node  : RW_Node_Type;
@@ -475,7 +474,7 @@ private
          Child : Valid_Address_Type)
          return RW_Node_Type;
       -- Returns the node that results from the substitution of (Key, Child,
-      -- Count) at position Index. This function is determined for inner nodes.
+      -- Count) at position Index. This function is defined for inner nodes.
 
       function Substitution
         (Node  : RW_Node_Type;
@@ -484,7 +483,7 @@ private
          Value : Value_Type)
          return RW_Node_Type;
       -- Returns the node that results from the insertion of (Key, Value) at
-      -- position Index. This function is determined for leaves.
+      -- position Index. This function is defined for leaves.
 
       procedure Set_Child
         (Node  : in out RW_Node_Type;

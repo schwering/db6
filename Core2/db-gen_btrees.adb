@@ -174,7 +174,7 @@ package body DB.Gen_BTrees is
    -- candidate that might contain Key. If the link is invalid, then the node is
    -- the outermost right one of its level and therefore the address of the
    -- greatest (i.e. outermost right) subtree is returned.
-   -- Only defined for inner nodes!
+   -- Note: Only defined for inner nodes!
    function Scan_Node
      (N   : Nodes.Node_Type;
       Key : Key_Type)
@@ -193,14 +193,14 @@ package body DB.Gen_BTrees is
    end Scan_Node;
 
 
-   -- Moves to the right starting from the leaf node at address N_A until a node
+   -- Moves to the right starting from the node at address N_A until a node
    -- whose high key is greater than or equal to Key or the outermost right node
    -- of the current level is reached.
    -- During all this time, it cares about the lock by locking the current node
    -- and unlocking it right after the right neighbor is locked.
    -- Hence on return, the node N at address N_A is locked!
    -- The maximum count of concurrently held locks is 2.
-   procedure Move_Right
+   procedure Move_Right_To_Key
      (Tree : in out Tree_Type;
       Key  : in     Key_Type;
       N_A  : in out Nodes.Valid_Address_Type;
@@ -233,7 +233,54 @@ package body DB.Gen_BTrees is
                raise;
          end;
       end loop;
-   end Move_Right;
+   end Move_Right_To_Key;
+
+
+   -- Moves to the right starting from the node at address N_A until a node
+   -- which contains a (Key, C_A) pair, i.e. a child with high key Key and
+   -- address C_A.
+   -- During all this time, it cares about the lock by locking the current node
+   -- and unlocking it right after the right neighbor is locked.
+   -- Hence on return, the node N at address N_A is locked!
+   -- The maximum count of concurrently held locks is 2.
+   -- Note: Only defined for inner nodes!
+   procedure Move_Right_To_Address
+     (Tree : in out Tree_Type;
+      C_A  : in     Nodes.Valid_Address_Type;
+      N_A  : in out Nodes.Valid_Address_Type;
+      N    :    out Nodes.Node_Type) is
+   begin
+      Lock(Tree, N_A);
+      loop
+         declare
+            use type Nodes.Valid_Address_Type;
+         begin
+            Read_Node(Tree, N_A, N);
+            exit when Nodes.Is_Valid(Nodes.Child_Position(N, C_A));
+            if not Nodes.Is_Valid(Nodes.Link(N)) then
+               raise Tree_Error;
+            end if;
+            declare
+               L_A : constant Nodes.Valid_Address_Type := Nodes.Valid_Link(N);
+            begin
+               Lock(Tree, L_A);
+               declare
+               begin
+                  Unlock(Tree, N_A);
+                  N_A := L_A;
+               exception
+                  when others =>
+                     Unlock(Tree, L_A);
+                     raise;
+               end;
+            end;
+         exception
+            when others =>
+               Unlock(Tree, N_A);
+               raise;
+         end;
+      end loop;
+   end Move_Right_To_Address;
 
 
    procedure Create
