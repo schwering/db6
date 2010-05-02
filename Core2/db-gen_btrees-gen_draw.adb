@@ -61,9 +61,10 @@ is
          end if;
       end Style;
       Deg : constant String := Degree_Type'Image(Degree(N));
+      Addr : constant String := Address_To_String(Block_IO.Address_Type(To_Address(N_A)));
    begin
-      Put(""""& Address_To_String(Block_IO.Address_Type(To_Address(N_A))) &"""");
-      Put(" [label="""& Deg &""",shape="""& Style &"""]");
+      Put(""""& Addr &"""");
+      Put(" [label="""& Deg &": "& Addr &""",shape="""& Style &"""]");
       New_Line;
    end Draw_Node;
 

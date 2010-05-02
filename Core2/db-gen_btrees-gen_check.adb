@@ -51,16 +51,20 @@ is
       end loop;
    end Init_Stack;
 
-   procedure Check_Local_Order (N : in Node_Type) is
+   procedure Check_Local_Order (N : in Node_Type; N_A : in Valid_Address_Type) is
    begin
       for I in 2 .. Degree(N) loop
          if not (Key(N, I-1) <= Key(N, I)) then
+            Put_Line("Wrong order in"&
+                     Address_To_String(Block_IO.Address_Type(
+                        To_Address(N_A))) &" "&
+                     Boolean'Image(Is_Leaf(N)));
             raise Tree_Error;
          end if;
       end loop;
    end Check_Local_Order;
 
-   procedure Check_Link_Order (N : in Node_Type)
+   procedure Check_Link_Order (N : in Node_Type; N_A : in Valid_Address_Type)
    is
       L : RO_Node_Type;
    begin
@@ -69,6 +73,11 @@ is
          return;
       end if;
       if not (Key(N, Degree(N)) <= Key(L, 1)) then
+         Put_Line("Wrong link order in"&
+                  Address_To_String(Block_IO.Address_Type(
+                     To_Address(N_A))) &" "&
+                  Address_To_String(Block_IO.Address_Type(Link(N))) &" "&
+                  Boolean'Image(Is_Leaf(N)));
          raise Tree_Error;
       end if;
    end Check_Link_Order;
@@ -114,17 +123,17 @@ is
    N   : RO_Node_Type;
 begin
    Init_Stack;
-   Draw(Tree);
+   --Draw(Tree);
    loop
       exit when Stacks.Is_Empty(Stack);
       Stacks.Pop(Stack, N_A);
       loop
          Read_Node(Tree, N_A, N);
-         Check_Local_Order(N);
+         Check_Local_Order(N, N_A);
          if Is_Inner(N) then
             Check_Child_Order(N);
             if Is_Valid(Link(N)) then
-               Check_Link_Order(N);
+               Check_Link_Order(N, N_A);
                Check_LinkChild_ChildLink_Equality(N);
             end if;
          end if;
