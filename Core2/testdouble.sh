@@ -76,35 +76,35 @@ C="$BIN $IO $FILE 0\
 	Search,$C1,Reset Delete,$C1,Reset Check,1,Cont\
 	Search,$C1,Reset Delete,$C1,Reset Check,1,Cont\
 	Antisearch,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
-	Insert,$C1,Reset\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont\
 	Insert,$C1,Reset Check,1,Cont\
 	"
 echo $C
