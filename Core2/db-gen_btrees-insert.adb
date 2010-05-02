@@ -12,7 +12,7 @@
 --     Now start the ascent:
 -- (3.a) If the current node is not safe, split it. Update the left node's
 --       high key in parent and insert the new node's high key plus address
---       into the parent. XXX This is wrong in the implementation.
+--       into the parent.
 --       The parent is found via Move_Right which holds at most two locks
 --       at once. Additionally the current node is locked, hence at most three
 --       locks are held. At the end, the parent node is locked (and becomes
@@ -26,6 +26,7 @@
 
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
+with DB.Utils.Print; use DB.Utils;
 
 separate (DB.Gen_BTrees)
 procedure Insert
@@ -73,10 +74,24 @@ is
      (Stack : in out Stacks.Stack_Type;
       N_A   :    out Nodes.Valid_Address_Type;
       N     :    out Nodes.RW_Node_Type;
-      State : in out State_Type) is
+      State : in out State_Type)
+   is
+      function Exit_Condition (N : Nodes.Node_Type) return Boolean
+      is
+         High_Key     : Key_Type;
+         Has_High_Key : Boolean;
+      begin
+         if not Nodes.Is_Valid(Nodes.Link(N)) then
+            Print("Gone to end");
+            return True;
+         end if;
+         Nodes.Get_High_Key(N, High_Key, Has_High_Key);
+         if Has_High_Key and then Key <= High_Key then Print("Before end."); end if;
+         return Has_High_Key and then Key <= High_Key;
+      end Exit_Condition;
    begin
       Stacks.Pop(Stack, N_A);
-      Move_Right_To_Key(Tree, Key, N_A, N);
+      Move_Right(Tree, Exit_Condition'Access, N_A, N);
       declare
       begin
          if not Nodes.Is_Leaf(N) then
@@ -97,10 +112,15 @@ is
       C_A   : in     Nodes.Valid_Address_Type;
       N_A   :    out Nodes.Valid_Address_Type;
       N     :    out Nodes.RW_Node_Type;
-      State : in out State_Type) is
+      State : in out State_Type)
+   is
+      function Exit_Condition (N : Nodes.Node_Type) return Boolean is
+      begin
+         return Nodes.Is_Valid(Nodes.Child_Position(N, C_A));
+      end Exit_Condition;
    begin
       Stacks.Pop(Stack, N_A);
-      Move_Right_To_Address(Tree, C_A, N_A, N);
+      Move_Right(Tree, Exit_Condition'Access, N_A, N);
       Unlock(Tree, C_A);
       declare
       begin

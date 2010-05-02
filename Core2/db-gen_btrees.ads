@@ -3,7 +3,7 @@
 -- A generic implementation of [BTree], a B-tree that provides insert, search,
 -- deletion and sequential (from lower to tupper) access for variable-length
 -- entries.
-
+--
 -- Deletions can degenerate the tree, because the do not do any reorganization
 -- of the tree. This must be carried out in a batch job or so.
 --
@@ -362,6 +362,15 @@ private
          return Valid_Address_Type;
       -- Returns the address of the right neighbor of the node.
 
+      procedure Get_High_Key
+        (Node     : in  Node_Type;
+         High_Key : out Key_Type;
+         Success  : out Boolean);
+      -- Gets the high key of Node. If Node is empty, the high key is the key
+      -- lastly deleted from Node; if Node never contained a value, Success is
+      -- set to False. Otherwise, if Node is not empty, the high is just the
+      -- greatest key.
+
       procedure Get_Key
         (Node        : in     Node_Type;
          Index       : in     Valid_Index_Type;
@@ -438,17 +447,6 @@ private
       -- first entry which should be (the first) member of the right node after
       -- the split.
 
-      function Combi_Split_Position
-        (Left_Node  : RW_Node_Type;
-         Right_Node : RW_Node_Type)
-         return Valid_Index_Type;
-      -- Returns the position for a split. This position is the index of the
-      -- first entry which should be (the first) member of the right node after
-      -- the split. If the returned index is in 1 .. Degree(Left_Node), it
-      -- denotes an element of Left_Node, if the index is in
-      -- Degree(Left_Node) + 1 .. Degree(Left_Node) + Degree(Right_Node), it
-      -- denotes an element of Right_Node.
-
       function Insertion
         (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
@@ -505,18 +503,6 @@ private
          To   : Index_Type)
          return RW_Node_Type;
       -- Returns a copy of the node which is trimmed to the entries From .. To.
-      -- This function works for both, leaves and inner nodes.
-
-      function Combi_Copy
-        (Left_Node  : RW_Node_Type;
-         Right_Node : RW_Node_Type;
-         From       : Valid_Index_Type;
-         To         : Index_Type)
-         return RW_Node_Type;
-      -- Returns a copy of the nodes which is trimmed to the entries From .. To.
-      -- For both indexes it holds that the index refers to Left_Node if it is
-      -- 1 .. Degree(Left_Node) and to Right_Node if it is in
-      -- Degree(Left_Node) + 1 .. Degree(Left_Node) + Degree(Right_Node).
       -- This function works for both, leaves and inner nodes.
 
       function Combination

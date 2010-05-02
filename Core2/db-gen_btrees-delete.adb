@@ -32,7 +32,7 @@ is
    is
       I : constant Nodes.Index_Type := Nodes.Key_Position(N_Old, Key);
    begin
-      if Nodes.Is_Valid(I) then
+      if Nodes.Is_Valid(I) and then Key = Nodes.Key(N_Old, I) then
          declare
             N : constant Nodes.RW_Node_Type := Nodes.Deletion(N_Old, I);
          begin
@@ -45,11 +45,31 @@ is
       end if;
    end Delete;
 
+   function Exit_Condition (N : Nodes.Node_Type) return Boolean
+   is
+      use type Nodes.Degree_Type;
+      High_Key     : Key_Type;
+      Has_High_Key : Boolean;
+   begin
+      if not Nodes.Is_Valid(Nodes.Link(N)) then
+         return True;
+      end if;
+      Nodes.Get_High_Key(N, High_Key, Has_High_Key);
+      if not Has_High_Key then
+         return False;
+      end if;
+      if Nodes.Degree(N) = 0 then
+         return Key < High_Key;
+      else
+         return Key <= High_Key;
+      end if;
+   end Exit_Condition;
+
    N_A : Nodes.Valid_Address_Type;
    N   : Nodes.RW_Node_Type;
 begin
    Find_Leaf_Address(N_A);
-   Move_Right_To_Key(Tree, Key, N_A, N);
+   Move_Right(Tree, Exit_Condition'Access, N_A, N);
    declare
    begin
       Delete(N_A, N);

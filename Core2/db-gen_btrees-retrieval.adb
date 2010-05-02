@@ -13,35 +13,46 @@ package body Retrieval is
       Value    :    out Value_Type;
       State    :    out State_Type)
    is
-      pragma Assert (Tree.Initialized);
-      N_A : Nodes.Valid_Address_Type := Root_Address;
-      N   : Nodes.RO_Node_Type;
-      I   : Nodes.Index_Type;
-   begin
-      loop
-         Read_Node(Tree, N_A, N);
-         if Nodes.Is_Inner(N) then
+      procedure Find_Leaf (N : out Nodes.Node_Type)
+      is
+         N_A : Nodes.Valid_Address_Type := Root_Address;
+      begin
+         loop
+            Read_Node(Tree, N_A, N);
+            exit when Nodes.Is_Leaf(N);
             N_A := Scan_Node(N, Key);
-         else
-            I := Nodes.Key_Position(N, Key);
-            if not Nodes.Is_Valid(I) then
-               if Nodes.Is_Valid(Nodes.Link(N)) then
-                  N_A := Nodes.Valid_Link(N);
-               else
-                  State := Failure;
-                  return;
-               end if;
-            else
-               if Nodes.Key(N, I) /= Key then
-                  State := Failure;
-                  return;
-               else
-                  Value := Nodes.Value(N, I);
-                  State := Success;
-                  return;
-               end if;
+         end loop;
+      end Find_Leaf;
+
+      pragma Assert (Tree.Initialized);
+      N : Nodes.RO_Node_Type;
+   begin
+      Find_Leaf(N);
+      pragma Assert (Nodes.Is_Leaf(N));
+      loop
+         declare
+            use type Utils.Comparison_Result_Type;
+            I : constant Nodes.Index_Type := Nodes.Key_Position(N, Key);
+         begin
+            if Nodes.Is_Valid(I) then
+               case Compare(Key, Nodes.Key(N, I)) is
+                  when Utils.Equal =>
+                     Value := Nodes.Value(N, I);
+                     State := Success;
+                     return;
+                  when Utils.Less =>
+                     State := Failure;
+                     return;
+                  when Utils.Greater =>
+                     State := Error;
+                     return;
+               end case;
+            elsif not Nodes.Is_Valid(Nodes.Link(N)) then
+               State := Failure;
+               return;
             end if;
-         end if;
+            Read_Node(Tree, Nodes.Valid_Link(N), N);
+         end;
       end loop;
 
    exception
