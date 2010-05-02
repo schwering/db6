@@ -7,17 +7,21 @@
 with DB.Gen_BTrees.Gen_Check;
 --with DB.Gen_Blob_Trees.Gen_Check;
 with DB.Utils.Gen_Integer_Image;
-with DB.Utils.Gen_String_Image;
 
 procedure DB.Tables.Maps.Check
   (Map : in out Map_Type)
 is
    function Key_To_String (Key : Key_Type) return String
    is
-      function Row_Image is new
-         Utils.Gen_String_Image(Types.Keys.Rows.String_Type);
-      function Column_Image is new
-         Utils.Gen_String_Image(Types.Keys.Columns.String_Type);
+      function Row_Image (S : Types.Keys.Rows.String_Type) return String is
+      begin
+         return String(Types.Keys.Rows.To_Buffer(S));
+      end Row_Image;
+
+      function Column_Image (S : Types.Keys.Columns.String_Type) return String is
+      begin
+         return String(Types.Keys.Columns.To_Buffer(S));
+      end Column_Image;
    begin
       return "("& Row_Image(Key.Row) &", "& Column_Image(Key.Column) &", "&
              Key.Time'Img &")";

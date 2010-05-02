@@ -8,6 +8,7 @@ with IO_Dispatcher.Map_Types;
 
 with DB.Blocks;
 with DB.Tables.Maps;
+with DB.Tables.Maps.Check;
 with DB.Types.Strings.Bounded;
 with DB.Types.Values.Bounded;
 with DB.Types.Times;
@@ -90,7 +91,7 @@ procedure IO_Dispatcher.Map is
       P_Search        => DB.Tables.Maps.Search,
       P_Count         => DB.Tables.Maps.Count,
       P_Stats         => Stats,
-      P_Check         => Check);
+      P_Check         => DB.Tables.Maps.Check);
 
 
    use type DB.Tables.Maps.State_Type;

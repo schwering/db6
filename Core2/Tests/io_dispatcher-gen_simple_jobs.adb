@@ -43,6 +43,9 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
       if State /= Success or else
          not Equal_Values(Get_Value(KV), Val) then
          Put_Line("Deletion failed "& State'Img);
+         Put_Line("Key   = """& Key_To_String(Get_Key(KV)) &"""");
+         Put_Line("Value = """& Value_To_String(Get_Value(KV)) &"""");
+         Put_Line("Value = """& Value_To_String(Val) &"""");
          raise Stop_Now;
       end if;
    end Delete;
