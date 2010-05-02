@@ -1,6 +1,16 @@
 -- Abstract:
 --
--- see spec
+-- Nodes are directly represented as Blocks. Writable nodes have some overflow
+-- storage space.
+-- Each node has a degree, which is 0 if it is empty. Furthermore, it is either
+-- a inner node or a leaf node. Additionally, it has a link which may point to
+-- its right neighbor if it exists.
+-- Non-empty inner and leaf nodes contain some keys and child node addresses (in
+-- case of inner nodes) or values (leaf nodes).
+-- Empty nodes however may either contain absolutely nothing but their meta
+-- data, or they may have a high key. When the node never held any key and still
+-- doesn't, it has no high key. Otherwise, the high key is the (temporally) last
+-- key contained in the node.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -11,11 +21,14 @@ package body Nodes is
 
    -- The layout of a Block, i.e. a byte sequence is the following:
    -- 1. Meta_Data
-   -- If Degree(N) > 0:
-   -- 2. If Is_Leaf(N): Degree(N) times Index_Type (end position of entry)
-   --                   where an entry is either (Key, Child) or (Key, Value)
-   -- 3. If Is_Leaf(N): Key1, Value1, ..., KeyDegree(N), ValueDegree(N)
-   --    Else:          Key1, Child_Addr, ..., KeyDegree(N), Child_Addr
+   -- a) If Degree(N) > 0:
+   --    2. If Is_Leaf(N): Degree(N) times Index_Type (end position of entry)
+   --                      where an entry is either (Key, Child) or (Key, Value)
+   --    3. If Is_Leaf(N): Key1, Value1, ..., Key_|N|, Value_|N|
+   --       Else:          Key1, Child_Addr_1, ..., Key_|N|, Child_Addr_|N|
+   -- b) If Degree(N) = 0:
+   --    2. Index_Type (end position of high key)
+   --    3. If Has_High_Key(N): High_Key
    package Phys is
       pragma Elaborate_Body;
 
@@ -259,7 +272,8 @@ package body Nodes is
          return Blocks.Base_Index_Type
       is
          pragma Inline (Entry_To_Pos);
-         pragma Assert (Entry_Index in 1 .. Degree(Block));
+         pragma Assert ((Entry_Index = 1 and Degree(Block) = 0) or
+                        Entry_Index in 1 .. Degree(Block));
          procedure Read is new Blocks.Read_At(Blocks.Base_Index_Type);
          Index : Blocks.Base_Index_Type;
       begin
@@ -279,7 +293,7 @@ package body Nodes is
                         Entry_Index in 1 .. Degree(Block));
       begin
          if Degree(Block) = 0 then
-            return Size_Of_Meta_Data + 1;
+            return Size_Of_Meta_Data + Size_Of_Position + 1;
          elsif Entry_Index = 1 then
             return Size_Of_Meta_Data + Degree(Block) * Size_Of_Position + 1;
          else
@@ -305,7 +319,8 @@ package body Nodes is
          Raw_Data_Size : in     Blocks.Base_Position_Type)
       is
          pragma Inline (Set_Entry_Size);
-         pragma Assert (Entry_Index in 1 .. Degree(Block));
+         pragma Assert ((Entry_Index = 1 and Degree(Block) = 0) or
+                        Entry_Index in 1 .. Degree(Block));
          procedure Write is new Blocks.Write_At(Blocks.Base_Index_Type);
          From : constant Blocks.Base_Index_Type :=
             Entry_From_Pos(Block, Entry_Index);
@@ -337,10 +352,13 @@ package body Nodes is
          return Blocks.Base_Position_Type is
       begin
          if Degree(Block) = 0 then
-            return 0;
+            if Has_High_Key(Block) then
+               return Entry_To_Pos(Block, 1) - Size_Of_Meta_Data;
+            else
+               return 0;
+            end if;
          else
-            return Entry_To_Pos(Block, Degree(Block)) -
-                   Size_Of_Meta_Data;
+            return Entry_To_Pos(Block, Degree(Block)) - Size_Of_Meta_Data;
          end if;
       end Entries_Size;
 
@@ -471,7 +489,7 @@ package body Nodes is
          Booleans : Booleans_Type;
       begin
          Read(Block, From, From + Size_Of_Booleans - 1, Booleans);
-         Booleans.Has_High_Key := True;
+         Booleans.Has_High_Key := Has_High_Key;
          Write(Block, From, From + Size_Of_Booleans - 1, Booleans);
       end Set_Has_High_Key;
 
@@ -568,6 +586,7 @@ package body Nodes is
          Set_Link(Block, Link);
          pragma Assert (Phys.Degree(Block) = Degree);
          pragma Assert (Phys.Is_Leaf(Block) = Is_Leaf);
+         pragma Assert (Phys.Has_High_Key(Block) = False);
          pragma Assert (Phys.Link(Block) = Link);
       end Init_Block;
 
@@ -705,7 +724,8 @@ package body Nodes is
             return;
          end if;
          declare
-            Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, 1);
+            Index  : constant Valid_Index_Type := 1;
+            Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
          begin
             Success := Blocks.Is_Valid(Cursor);
             if not Success then
@@ -819,7 +839,8 @@ package body Nodes is
       is
          pragma Assert (Degree(Block) = 0);
          pragma Assert (Has_High_Key(Block));
-         Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, 1);
+         Index  : constant Valid_Index_Type := 1;
+         Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          if not Blocks.Is_Valid(Cursor) then
             Phys.Set_Ok(Block, False);
@@ -830,6 +851,12 @@ package body Nodes is
             Phys.Set_Ok(Block, False);
             return;
          end if;
+         declare
+            Size : constant Blocks.Base_Position_Type :=
+               Blocks.Position(Cursor) - Entry_From_Pos(Block, Index);
+         begin
+            Set_Entry_Size(Block, Index, Size);
+         end;
       end Write_High_Key;
 
    end Phys;

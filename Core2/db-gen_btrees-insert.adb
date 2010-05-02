@@ -26,7 +26,6 @@
 
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
-with DB.Utils.Print; use DB.Utils;
 
 separate (DB.Gen_BTrees)
 procedure Insert
@@ -82,11 +81,9 @@ is
          Has_High_Key : Boolean;
       begin
          if not Nodes.Is_Valid(Nodes.Link(N)) then
-            Print("Gone to end");
             return True;
          end if;
          Nodes.Get_High_Key(N, High_Key, Has_High_Key);
-         if Has_High_Key and then Key <= High_Key then Print("Before end."); end if;
          return Has_High_Key and then Key <= High_Key;
       end Exit_Condition;
    begin

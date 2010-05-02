@@ -82,6 +82,35 @@ is
       end if;
    end Check_Link_Order;
 
+   procedure Check_High_Key_Order (N : in Node_Type; N_A : in Valid_Address_Type)
+   is
+      L : RO_Node_Type;
+      NHK : Key_Type;
+      LHK : Key_Type;
+      Has_NHK : Boolean;
+      Has_LHK : Boolean;
+   begin
+      Read_Node(Tree, Valid_Link(N), L);
+      Get_High_Key(N, NHK, Has_NHK);
+      Get_High_Key(L, LHK, Has_LHK);
+      if Has_NHK /= Has_LHK then
+         Put_Line("Difference about existence of high keys: "&
+                  Has_NHK'Img &" "& Has_LHK'Img);
+         raise Tree_Error;
+      end if;
+      if not Has_NHK then
+         return;
+      end if;
+      if not (NHK <= LHK) then
+         Put_Line("Wrong high key order in"&
+                  Address_To_String(Block_IO.Address_Type(
+                     To_Address(N_A))) &" "&
+                  Address_To_String(Block_IO.Address_Type(Link(N))) &" "&
+                  Boolean'Image(Is_Leaf(N)));
+         raise Tree_Error;
+      end if;
+   end Check_High_Key_Order;
+
    procedure Check_Child_Order (N : in Node_Type)
    is
       C : RO_Node_Type;
@@ -137,8 +166,11 @@ begin
                Check_LinkChild_ChildLink_Equality(N);
             end if;
          end if;
+         if Is_Valid(Link(N)) then
+            Check_High_Key_Order(N, N_A);
+         end if;
          exit when not Is_Valid(Link(N));
-         N_A := Nodes.Valid_Link(N);
+         N_A := Valid_Link(N);
       end loop;
    end loop;
 end DB.Gen_BTrees.Gen_Check;

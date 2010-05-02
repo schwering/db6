@@ -26,25 +26,6 @@ is
       end loop;
    end Find_Leaf_Address;
 
-   procedure Delete
-     (N_A   : in Nodes.Valid_Address_Type;
-      N_Old : in Nodes.Node_Type)
-   is
-      I : constant Nodes.Index_Type := Nodes.Key_Position(N_Old, Key);
-   begin
-      if Nodes.Is_Valid(I) and then Key = Nodes.Key(N_Old, I) then
-         declare
-            N : constant Nodes.RW_Node_Type := Nodes.Deletion(N_Old, I);
-         begin
-            Write_Node(Tree, N_A, N);
-            Value := Nodes.Value(N_Old, I);
-            State := Success;
-         end;
-      else
-         State := Failure;
-      end if;
-   end Delete;
-
    function Exit_Condition (N : Nodes.Node_Type) return Boolean
    is
       use type Nodes.Degree_Type;
@@ -64,6 +45,25 @@ is
          return Key <= High_Key;
       end if;
    end Exit_Condition;
+
+   procedure Delete
+     (N_A   : in Nodes.Valid_Address_Type;
+      N_Old : in Nodes.Node_Type)
+   is
+      I : constant Nodes.Index_Type := Nodes.Key_Position(N_Old, Key);
+   begin
+      if Nodes.Is_Valid(I) and then Key = Nodes.Key(N_Old, I) then
+         declare
+            N : constant Nodes.RW_Node_Type := Nodes.Deletion(N_Old, I);
+         begin
+            Write_Node(Tree, N_A, N);
+            Value := Nodes.Value(N_Old, I);
+            State := Success;
+         end;
+      else
+         State := Failure;
+      end if;
+   end Delete;
 
    N_A : Nodes.Valid_Address_Type;
    N   : Nodes.RW_Node_Type;

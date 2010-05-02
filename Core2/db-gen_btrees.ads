@@ -543,7 +543,7 @@ private
       function To_Block
         (Node : Node_Type)
          return Blocks.Block_Type;
-      -- Converts a node to a block.
+      -- Converts a node to a block. Sets unused bytes to zeros.
 
    private
       pragma Inline (Root_Node);
