@@ -6,61 +6,75 @@
 
 package body DB.Locks.Gen_Mutex_Sets is
 
-   function Index (Hash : Utils.Hash_Type) return Utils.Hash_Type
-   is
-      pragma Inline (Index);
-   begin
-      return Hash mod Hash_Range_Size;
-   end Index;
-
-
    procedure Lock
      (MS   : in out Mutex_Set_Type;
       Item : in     Item_Type) is
    begin
-      MS.Buckets(Index(Hash(Item))).Insert(Item);
+      MS.Lock(Item);
    end Lock;
+
+
+   procedure Try_Lock
+     (MS      : in out Mutex_Set_Type;
+      Item    : in     Item_Type;
+      Success :    out Boolean) is
+   begin
+      MS.Try_Lock(Item, Success);
+   end Try_Lock;
 
 
    procedure Unlock
      (MS   : in out Mutex_Set_Type;
       Item : in     Item_Type) is
    begin
-      MS.Buckets(Index(Hash(Item))).Insert(Item);
+      MS.Unlock(Item);
    end Unlock;
 
 
-   protected body Bucket_Type is
-      entry Insert (Item : in Item_Type) when True
+   protected body Mutex_Set_Type is
+      procedure Try_Lock (Item : in Item_Type; Success : out Boolean)
+      is
+         Cursor : Sets.Cursor;
+      begin
+         Sets.Insert(Set, Item, Cursor, Success);
+      end Try_Lock;
+
+      entry Lock (Item : in Item_Type) when Reset'Count = 0
       is
          Cursor   : Sets.Cursor;
          Inserted : Boolean;
       begin
          Sets.Insert(Set, Item, Cursor, Inserted);
          if not Inserted then
-            Something_Removed := False;
-            requeue Blocked_Insert;
+            requeue Wait_Lock;
          end if;
-      end Insert;
+      end Lock;
 
-      entry Blocked_Insert (Item : in Item_Type)
-         when Something_Removed and Insert'Count = 0 and Remove'Count = 0
+      entry Wait_Lock (Item : in Item_Type) when Removed
       is
          Cursor   : Sets.Cursor;
          Inserted : Boolean;
       begin
          Sets.Insert(Set, Item, Cursor, Inserted);
          if not Inserted then
-            requeue Insert;
+            requeue Lock;
          end if;
-      end Blocked_Insert;
+      end Wait_Lock;
 
-      entry Remove (Item : in Item_Type) when True is
+      entry Unlock (Item : in Item_Type) when True is
       begin
          Sets.Exclude(Set, Item);
-         Something_Removed := True;
-      end Remove;
-   end Bucket_Type;
+         if Wait_Lock'Count > 0 then
+            Removed := True;
+            requeue Reset;
+         end if;
+      end Unlock;
+
+      entry Reset when Wait_Lock'Count = 0 is
+      begin
+         Removed := False;
+      end Reset;
+   end Mutex_Set_Type;
 
 end DB.Locks.Gen_Mutex_Sets;
 
