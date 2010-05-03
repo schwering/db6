@@ -14,7 +14,6 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with System.Storage_Pools;
-with DB.Utils.Global_Pool;
 
 generic
    type Item_Type is private;
@@ -42,6 +41,9 @@ package DB.Utils.Gen_Stacks is
    function Top
      (Stack : Stack_Type)
       return Item_Type;
+
+   procedure Clear
+     (Stack : in out Stack_Type);
 
    function Is_Empty
      (Stack : Stack_Type)

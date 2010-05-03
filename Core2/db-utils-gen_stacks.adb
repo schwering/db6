@@ -103,6 +103,13 @@ package body DB.Utils.Gen_Stacks is
    end Top;
 
 
+   procedure Clear
+     (Stack : in out Stack_Type) is
+   begin
+      Stack.Top := 0;
+   end Clear;
+
+
    function Is_Empty
      (Stack : Stack_Type)
       return Boolean is
