@@ -6,98 +6,61 @@
 
 package body DB.Locks.Gen_Mutex_Sets is
 
-   function Rehash (Hash : Utils.Hash_Type) return Utils.Hash_Type is
+   function Index (Hash : Utils.Hash_Type) return Utils.Hash_Type
+   is
+      pragma Inline (Index);
    begin
-      return Hash + 1;
-   end Rehash;
-
-
-   function Index (Hash : Utils.Hash_Type) return Utils.Hash_Type is
-   begin
-      return Hash mod Hashtable_Size;
+      return Hash mod Hash_Range_Size;
    end Index;
 
 
    procedure Lock
      (MS   : in out Mutex_Set_Type;
-      Item : in     Item_Type)
-   is
-      HH      : constant Utils.Hash_Type := Hash(Item);
-      H       : Utils.Hash_Type := HH;
-      Success : Boolean;
+      Item : in     Item_Type) is
    begin
-      loop
-         exit when MS.Arr(Index(H)).Item = Item;
-         H := Rehash(H);
-         exit when H = HH;
-      end loop;
-      loop
-         MS.Arr(Index(H)).Try_Lock(Item, Success);
-         exit when Success;
-         H := Rehash(H);
-         exit when H = HH;
-      end loop;
-      if not Success then
-         raise Lock_Error;
-      end if;
+      MS.Buckets(Index(Hash(Item))).Insert(Item);
    end Lock;
 
 
    procedure Unlock
      (MS   : in out Mutex_Set_Type;
-      Item : in     Item_Type)
-   is
-      HH : constant Utils.Hash_Type := Hash(Item);
-      H  : Utils.Hash_Type := HH;
+      Item : in     Item_Type) is
    begin
-      loop
-         exit when MS.Arr(Index(H)).Item = Item;
-         H := Rehash(H);
-         exit when H = HH;
-      end loop;
-      if MS.Arr(Index(H)).Item = Item then
-         MS.Arr(Index(H)).Unlock;
-      else
-         raise Lock_Error;
-      end if;
+      MS.Buckets(Index(Hash(Item))).Insert(Item);
    end Unlock;
 
 
-   protected body Mutex_Type is
-      entry Try_Lock (Item : in Item_Type; Success : out Boolean) when True is
+   protected body Bucket_Type is
+      entry Insert (Item : in Item_Type) when True
+      is
+         Cursor   : Sets.Cursor;
+         Inserted : Boolean;
       begin
-         pragma Assert ((Current = Invalid_Item) = (not Locked));
-         if Wait_For_Lock'Count = 0 and not Locked then
-            Current := Item;
-            Locked  := True;
-            Success := True;
-         elsif Current = Item then
-            requeue Wait_For_Lock;
-         else
-            Success := False;
+         Sets.Insert(Set, Item, Cursor, Inserted);
+         if not Inserted then
+            Something_Removed := False;
+            requeue Blocked_Insert;
          end if;
-      end Try_Lock;
+      end Insert;
 
-      entry Wait_For_Lock (Item : in Item_Type; Success : out Boolean)
-         when not Locked is
+      entry Blocked_Insert (Item : in Item_Type)
+         when Something_Removed and Insert'Count = 0 and Remove'Count = 0
+      is
+         Cursor   : Sets.Cursor;
+         Inserted : Boolean;
       begin
-         pragma Assert (Current = Item);
-         pragma Unreferenced (Item);
-         Success := True;
-         Locked  := True;
-      end Wait_For_Lock;
+         Sets.Insert(Set, Item, Cursor, Inserted);
+         if not Inserted then
+            requeue Insert;
+         end if;
+      end Blocked_Insert;
 
-      procedure Unlock is
+      entry Remove (Item : in Item_Type) when True is
       begin
-         Current := Invalid_Item;
-         Locked  := False;
-      end Unlock;
-
-      function Item return Item_Type is
-      begin
-         return Current;
-      end Item;
-   end Mutex_Type;
+         Sets.Exclude(Set, Item);
+         Something_Removed := True;
+      end Remove;
+   end Bucket_Type;
 
 end DB.Locks.Gen_Mutex_Sets;
 

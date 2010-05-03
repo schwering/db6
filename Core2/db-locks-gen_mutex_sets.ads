@@ -1,32 +1,36 @@
 -- Abstract:
 --
--- A set of bounded size of mutexes. The locked items are of Item_Type.
--- Invalid_Item may never be locked (it's used to indicate an unused lock).
--- Be careful not to lock more than Hashtable_Size items at once! In this case
--- Lock_Error is thrown (but possibly deadlocks or infinite loops will occur,
--- I'll check that).
+-- A set of bounded size of mutexes.
 --
 -- Design Notes;
 --
--- The mutexes are held in a closed hashtable with Hashtable_Size entries. The
--- rehash-function just adds 1 for fast wrap-around.
---
--- The search for a lock is concurrent and therefore effective; mutual exclusion
--- happens only per-lock for each attempt to lock or unlock it.
---
--- The lock procedure first looks whether there is a lock for the specific item.
--- If it's found, another 
+-- At the first level, a hashtable of fixed size is held. The values of the
+-- table are sets that contain the currently locked addresses that have the
+-- respective hash value. These sets are called buckets.
+-- To ensure thread-safety, locks are needed somewhere in the (un)locking
+-- process itself. The construction with a fixed-size hash table and sets as
+-- the hashtable's values avoids top-level locking. Instead, it suffices to
+-- ensure mutual exclusion at the bucket-level.
+-- We do this with protected types. Unfortunately choosing the wait-conditions
+-- is not that straightforward, because we cannot access the item that is to be
+-- locked. If we could do this, the Lock-entry's wait-condition was simply
+-- "when not Set.Contains(Item)".
+-- Instead, the locking process is as follows: try to insert, i.e. lock, the
+-- item directly. If this fails, requeue an entry call that waits until some
+-- item was removed from the set, i.e. unlocked. When this happens.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
+
+with Ada.Containers.Ordered_Sets;
 
 with DB.Utils;
 
 generic
    type Item_Type is private;
+   with function "<" (Left, Right : Item_Type) return Boolean is <>;
    with function "=" (Left, Right : Item_Type) return Boolean is <>;
    with function Hash (Item : Item_Type) return Utils.Hash_Type;
-   Invalid_Item   : in Item_Type;
-   Hashtable_Size : in Utils.Hash_Type;
+   Hash_Range_Size : in Utils.Hash_Type;
 package DB.Locks.Gen_Mutex_Sets is
    pragma Preelaborate;
 
@@ -41,28 +45,29 @@ package DB.Locks.Gen_Mutex_Sets is
       Item : in     Item_Type);
 
 private
-   protected type Mutex_Type is
-      entry Try_Lock (Item : in Item_Type; Success : out Boolean);
-      entry Wait_For_Lock (Item : in Item_Type; Success : out Boolean);
-      procedure Unlock;
-      function Item return Item_Type;
-   private
-      Current : Item_Type := Invalid_Item;
-      Locked  : Boolean   := False;
-   end Mutex_Type;
-
    use type Utils.Hash_Type;
 
-   type Mutex_Array_Type is array (Utils.Hash_Type range 0 .. Hashtable_Size-1)
-      of Mutex_Type;
+   package Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => Item_Type,
+      "<"          => "<",
+      "="          => "=");
+
+   protected type Bucket_Type is
+      entry Insert (Item : in Item_Type);
+      entry Remove (Item : in Item_Type);
+   private
+      entry Blocked_Insert (Item : in Item_Type);
+      Set               : Sets.Set;
+      Something_Removed : Boolean := False;
+   end Bucket_Type;
+
+   type Bucket_Array_Type is
+      array (Utils.Hash_Type range 0 .. Hash_Range_Size - 1) of Bucket_Type;
 
    type Mutex_Set_Type is limited
       record
-         Arr : Mutex_Array_Type;
+         Buckets : Bucket_Array_Type;
       end record;
-
-   pragma Inline (Lock);
-   pragma Inline (Unlock);
 
 end DB.Locks.Gen_Mutex_Sets;
 
