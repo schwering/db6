@@ -160,22 +160,61 @@ package body DB.Blocks.Local_IO is
    end Write;
 
 
-   procedure Allocate
+   procedure Write_New_Block
      (File    : in out File_Type;
-      Address :    out Valid_Address_Type)
+      Address :    out Valid_Address_Type;
+      Block   : in     Block_Type)
    is
-      Pos : Low_Level_IO.File_Position_Type;
+      Pos     : Low_Level_IO.File_Position_Type;
+      Success : Boolean;
    begin
-      Low_Level_IO.Allocate(File.FD, Block_Size, Pos);
+   <<Retry>>
+      Low_Level_IO.Seek_End(File.FD, Pos);
       Address := To_Valid_Address(Pos);
-   end Allocate;
+      Try_Lock(File, Address, Success);
+      if not Success then
+         goto Retry;
+      end if;
+      declare
+         use type Low_Level_IO.File_Position_Type;
+         Check_Pos : Low_Level_IO.File_Position_Type;
+      begin
+         Low_Level_IO.Seek_End(File.FD, Check_Pos);
+         if Check_Pos /= Pos then
+            Unlock(File, Address);
+            goto Retry;
+         end if;
+      exception
+         when others =>
+            Unlock(File, Address);
+            raise;
+      end;
+      declare
+      begin
+         Write(File, Address, Block);
+      exception
+         when others =>
+            Unlock(File, Address);
+            raise;
+      end;
+      Unlock(File, Address);
+   end Write_New_Block;
+
+
+   procedure Try_Lock
+     (File    : in out File_Type;
+      Address : in     Valid_Address_Type;
+      Success :    out Boolean) is
+   begin
+      Mutex_Sets.Try_Lock(File.Mutex_Set, Address, Success);
+   end Try_Lock;
 
 
    procedure Lock
      (File    : in out File_Type;
       Address : in     Valid_Address_Type) is
    begin
-      null;--Mutex_Sets.Lock(File.Mutex_Set, Address);
+      Mutex_Sets.Lock(File.Mutex_Set, Address);
    end Lock;
 
 
@@ -183,7 +222,7 @@ package body DB.Blocks.Local_IO is
      (File    : in out File_Type;
       Address : in     Valid_Address_Type) is
    begin
-      null;--Mutex_Sets.Unlock(File.Mutex_Set, Address);
+      Mutex_Sets.Unlock(File.Mutex_Set, Address);
    end Unlock;
 
 

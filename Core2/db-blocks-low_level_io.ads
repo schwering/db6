@@ -49,6 +49,12 @@ package DB.Blocks.Low_Level_IO is
      (File   : in  File_Descriptor_Type;
       Length : in  Size_Type;
       Pos    : out File_Position_Type);
+   -- Note that this call is not thread-safe! But it is process-safe. Have a
+   -- look at the C code.
+
+   procedure Seek_End
+     (File : in  File_Descriptor_Type;
+      Pos  : out File_Position_Type);
 
    procedure Lock
      (File   : in File_Descriptor_Type;

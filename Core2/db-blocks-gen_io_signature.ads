@@ -105,13 +105,11 @@ generic
    -- Reads a Block from File at position Address. There must exist some
    -- data on Address, otherwise an IO_Error is raised.
 
-   with procedure Allocate
+   with procedure Write_New_Block
      (File    : in out File_Type;
-      Address :    out Valid_Address_Type);
-   -- Sets Address to a new position in File at which further Write calls
-   -- will not fail and at which further Read calls will do fail before the
-   -- next Write. No further assumptions can be done (in particular, no
-   -- assumptions with regard to the ordering and successor-relation).
+      Address :    out Valid_Address_Type;
+      Block   : in     Block_Type);
+   -- Writes Block to some new, previously unused Address.
    -- If this fails for whatever reason, an IO_Error is raised.
 
    with procedure Lock

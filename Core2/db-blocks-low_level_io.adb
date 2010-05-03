@@ -52,6 +52,9 @@ package body DB.Blocks.Low_Level_IO is
       function alloc (FD : int; NBytes : size_t) return off_t;
       pragma Import (C, alloc, "db_blocks_low_level_io_alloc");
 
+      function seek_end (FD : int) return off_t;
+      pragma Import (C, seek_end, "db_blocks_low_level_io_seek_end");
+
       function lock (FD : int; Offset : off_t; NBytes : size_t) return int;
       pragma Import (C, lock, "db_blocks_low_level_io_lock");
 
@@ -165,6 +168,17 @@ package body DB.Blocks.Low_Level_IO is
          raise IO_Error;
       end if;
    end Allocate;
+
+
+   procedure Seek_End
+     (File : in  File_Descriptor_Type;
+      Pos  : out File_Position_Type) is
+   begin
+      Pos := File_Position_Type(C.seek_end(C.int(File)));
+      if Pos = File_Position_Type'Last then
+         raise IO_Error;
+      end if;
+   end Seek_End;
 
 
    procedure Lock

@@ -193,21 +193,23 @@ package body DB.Blocks.Memory_IO is
    end Write;
 
 
-   procedure Allocate
+   procedure Write_New_Block
      (File    : in out File_Type;
-      Address :    out Address_Type) is
+      Address :    out Address_Type;
+      Block   : in     Block_Type) is
    begin
       Locks.Mutexes.Lock(File.Mutex);
 
       File.Current := File.Maximum + 1;
       Address      := File.Current + 1;
+      Write(File, Address, Block);
 
       Locks.Mutexes.Unlock(File.Mutex);
    exception
       when others =>
          Locks.Mutexes.Unlock(File.Mutex);
          raise;
-   end Allocate;
+   end Write_New_Block;
 
 
    procedure Lock

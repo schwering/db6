@@ -20,11 +20,9 @@ package DB.Blocks.Local_IO is
    function Hash(A : Address_Type) return Utils.Hash_Type;
 
    package Mutex_Sets is new Locks.Gen_Mutex_Sets
-     (Item_Type           => Address_Type,
-      "="                 => "=",
-      Hash                => Hash,
-      Invalid_Item        => Invalid_Address,
-      Hashtable_Size      => 30);
+     (Item_Type           => Valid_Address_Type,
+      "<"                 => "<",
+      "="                 => "=");
 
    type File_Type is limited
       record
@@ -80,9 +78,15 @@ package DB.Blocks.Local_IO is
       Address : in     Valid_Address_Type;
       Block   : in     Block_Type);
 
-   procedure Allocate
+   procedure Write_New_Block
      (File    : in out File_Type;
-      Address :    out Valid_Address_Type);
+      Address :    out Valid_Address_Type;
+      Block   : in     Block_Type);
+
+   procedure Try_Lock
+     (File    : in out File_Type;
+      Address : in     Valid_Address_Type;
+      Success :    out Boolean);
 
    procedure Lock
      (File    : in out File_Type;
@@ -116,7 +120,7 @@ package DB.Blocks.Local_IO is
       Is_Valid_Address           => Is_Valid_Address,
       Read                       => Read,
       Write                      => Write,
-      Allocate                   => Allocate,
+      Write_New_Block            => Write_New_Block,
       Lock                       => Lock,
       Unlock                     => Unlock);
 
@@ -129,7 +133,7 @@ private
    pragma Inline (Is_Valid_Address);
    pragma Inline (Read);
    pragma Inline (Write);
-   pragma Inline (Allocate);
+   pragma Inline (Write_New_Block);
    pragma Inline (Lock);
    pragma Inline (Unlock);
 

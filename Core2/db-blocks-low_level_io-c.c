@@ -62,17 +62,6 @@ const int db_blocks_low_level_io_file_mode = FILE_MODE;
 #endif
 
 
-/* third arguments for lseek64() */
-#ifndef SEEK_SET
-  #define SEEK_SET	0
-  #define SEEK_CUR	1
-  #define SEEK_END	2
-#endif
-const int db_blocks_low_level_io_seek_set = SEEK_SET;
-const int db_blocks_low_level_io_seek_cur = SEEK_CUR;
-const int db_blocks_low_level_io_seek_end = SEEK_END;
-
-
 inline int db_blocks_low_level_io_open(char *path, int flags, int mode)
 {
 	return open(path, flags, mode);
@@ -155,10 +144,19 @@ retry:
 		return (off64_t)-1;
 	if (!try_lock(fd, offset, nbytes))
 		goto retry;
+	if (lseek64(fd, 0, SEEK_END) != offset) {
+		unlock(fd, offset, nbytes);
+		goto retry;
+	}
 	pwrite(fd, zeros, nbytes, offset);
 	free(zeros);
 	unlock(fd, offset, nbytes);
 	return offset;
+}
+
+inline off64_t db_blocks_low_level_io_seek_end(int fd)
+{
+	return lseek64(fd, 0, SEEK_END);
 }
 
 inline int db_blocks_low_level_io_lock(int fd, off64_t offset, size_t len)
