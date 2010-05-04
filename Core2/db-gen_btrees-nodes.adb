@@ -61,6 +61,7 @@ package body Nodes is
         (Block   : in out Blocks.Base_Block_Type;
          Is_Ok   : in     Boolean;
          Is_Leaf : in     Boolean;
+         Level   : in     Level_Type;
          Degree  : in     Degree_Type;
          Link    : in     Address_Type);
 
@@ -79,6 +80,10 @@ package body Nodes is
       procedure Set_Has_High_Key
         (Block        : in out Blocks.Base_Block_Type;
          Has_High_Key : in     Boolean);
+
+      function Level
+        (Block : Blocks.Base_Block_Type)
+         return Level_Type;
 
       function Degree
         (Block : Blocks.Base_Block_Type)
@@ -197,16 +202,20 @@ package body Nodes is
       pragma Pack (Booleans_Type);
 
       function Size_Of is new Blocks.Size_Of(Booleans_Type);
+      function Size_Of is new Blocks.Size_Of(Level_Type);
       function Size_Of is new Blocks.Size_Of(Degree_Type);
       function Size_Of is new Blocks.Size_Of(Address_Type);
       function Size_Of is new Blocks.Size_Of(Blocks.Position_Type);
       function Size_Of is new Blocks.Size_Of(Valid_Address_Type);
 
-      Size_Of_Degree    : constant Blocks.Base_Position_Type :=
-         Blocks.Base_Position_Type(Size_Of(Degree_Type'(0)));
-
       Size_Of_Booleans  : constant Blocks.Base_Position_Type :=
          Blocks.Base_Position_Type(Size_Of(Booleans_Type'(others => <>)));
+
+      Size_Of_Level     : constant Blocks.Base_Position_Type :=
+         Blocks.Base_Position_Type(Size_Of(Level_Type'First));
+
+      Size_Of_Degree    : constant Blocks.Base_Position_Type :=
+         Blocks.Base_Position_Type(Size_Of(Degree_Type'First));
 
       Size_Of_Address   : constant Blocks.Base_Position_Type :=
          Blocks.Base_Position_Type(Size_Of(Invalid_Address));
@@ -218,14 +227,15 @@ package body Nodes is
          Blocks.Base_Position_Type(Size_Of(Valid_Address_Type(Block_IO.First)));
 
       Size_Of_Meta_Data : constant Blocks.Base_Position_Type :=
-         Size_Of_Degree + Size_Of_Booleans + Size_Of_Address;
+         Size_Of_Booleans + Size_Of_Level + Size_Of_Degree + Size_Of_Address;
 
       -- Layout of Node Blocks is as follows:
       -- 1. Is_Ok/Is_Leaf/Has_High_Key     (Size_Of_Booleans)
-      -- 2. Degree                         (Size_Of_Degree)
-      -- 3. Link                           (Size_Of_Address)
-      -- 4. Indexes                        (|Degree| * Size_Of_Position)
-      -- 5. Entries                        (Size_Of(Key_1) + Size_Of_Child ..
+      -- 2. Level                          (Size_Of_Level)
+      -- 3. Degree                         (Size_Of_Degree)
+      -- 4. Link                           (Size_Of_Address)
+      -- 5. Indexes                        (|Degree| * Size_Of_Position)
+      -- 6. Entries                        (Size_Of(Key_1) + Size_Of_Child ..
       --                                    Size_Of(Key_N) + Size_Of_Child)
       --                                or (Size_Of(Key_1) + Size_Of(Value_1) ..
       --                                    Size_Of(Key_N) + Size_Of(Value_N))
@@ -494,12 +504,43 @@ package body Nodes is
       end Set_Has_High_Key;
 
 
+      function Level
+        (Block : Blocks.Base_Block_Type)
+         return Level_Type
+      is
+         procedure Read is new Blocks.Read_At(Level_Type);
+         Offset : constant Blocks.Base_Position_Type := Size_Of_Booleans;
+         From   : constant Blocks.Base_Index_Type :=
+            Blocks.Base_Index_Type'First + Offset;
+         Level : Level_Type;
+      begin
+         Read(Block, From, From + Size_Of_Level - 1, Level);
+         pragma Assert (Level'Valid);
+         return Level;
+      end Level;
+
+
+      procedure Set_Level
+        (Block : in out Blocks.Base_Block_Type;
+         Level : in     Level_Type)
+      is
+         procedure Write is new Blocks.Write_At(Level_Type);
+         Offset : constant Blocks.Base_Position_Type := Size_Of_Booleans;
+         From   : constant Blocks.Base_Index_Type :=
+            Blocks.Base_Index_Type'First + Offset;
+      begin
+         Write(Block, From, From + Size_Of_Level - 1, Level);
+         pragma Assert (Level = Phys.Level(Block));
+      end Set_Level;
+
+
       function Degree
         (Block : Blocks.Base_Block_Type)
          return Degree_Type
       is
          procedure Read is new Blocks.Read_At(Degree_Type);
-         Offset : constant Blocks.Base_Position_Type := Size_Of_Booleans;
+         Offset : constant Blocks.Base_Position_Type :=
+            Size_Of_Booleans + Size_Of_Level;
          From   : constant Blocks.Base_Index_Type :=
             Blocks.Base_Index_Type'First + Offset;
          Degree : Degree_Type;
@@ -515,7 +556,8 @@ package body Nodes is
          Degree : in     Degree_Type)
       is
          procedure Write is new Blocks.Write_At(Degree_Type);
-         Offset : constant Blocks.Base_Position_Type := Size_Of_Booleans;
+         Offset : constant Blocks.Base_Position_Type :=
+            Size_Of_Booleans + Size_Of_Level;
          From   : constant Blocks.Base_Index_Type :=
             Blocks.Base_Index_Type'First + Offset;
       begin
@@ -530,7 +572,7 @@ package body Nodes is
       is
          procedure Read is new Blocks.Read_At(Address_Type);
          Offset  : constant Blocks.Base_Position_Type :=
-            Size_Of_Booleans + Size_Of_Degree;
+            Size_Of_Booleans + Size_Of_Level + Size_Of_Degree;
          From    : constant Blocks.Base_Index_Type :=
             Blocks.Base_Index_Type'First + Offset;
          Address : Address_Type;
@@ -546,7 +588,7 @@ package body Nodes is
       is
          procedure Write is new Blocks.Write_At(Address_Type);
          Offset : constant Blocks.Base_Position_Type :=
-            Size_Of_Booleans + Size_Of_Degree;
+            Size_Of_Booleans + Size_Of_Level + Size_Of_Degree;
          From   : constant Blocks.Base_Index_Type :=
             Blocks.Base_Index_Type'First + Offset;
       begin
@@ -559,6 +601,7 @@ package body Nodes is
         (Block        : in out Blocks.Base_Block_Type;
          Is_Ok        : in     Boolean;
          Is_Leaf      : in     Boolean;
+         Level        : in     Level_Type;
          Degree       : in     Degree_Type;
          Link         : in     Address_Type)
       is
@@ -582,8 +625,10 @@ package body Nodes is
                            Has_High_Key => False);
       begin
          Set_Booleans(Block, Booleans);
+         Set_Level(Block, Level);
          Set_Degree(Block, Degree);
          Set_Link(Block, Link);
+         pragma Assert (Phys.Level(Block) = Level);
          pragma Assert (Phys.Degree(Block) = Degree);
          pragma Assert (Phys.Is_Leaf(Block) = Is_Leaf);
          pragma Assert (Phys.Has_High_Key(Block) = False);
@@ -913,6 +958,7 @@ package body Nodes is
    function New_RW_Node
         (Is_Ok   : Boolean;
          Is_Leaf : Boolean;
+         Level   : Level_Type;
          Degree  : Degree_Type;
          Link    : Address_Type)
          return RW_Node_Type
@@ -922,6 +968,7 @@ package body Nodes is
       Phys.Init_Block(Block   => Blocks.Base_Block_Type(Node),
                       Is_Ok   => Is_Ok,
                       Is_Leaf => Is_Leaf,
+                      Level   => Level,
                       Degree  => Degree,
                       Link    => Link);
       return Node;
@@ -933,17 +980,20 @@ package body Nodes is
    begin
       return New_RW_Node(Is_Ok   => False,
                          Is_Leaf => True,
+                         Level   => 0,
                          Degree  => 0,
                          Link    => Invalid_Address);
    end Invalid_Node;
 
 
    function Root_Node
-     (Is_Leaf : Boolean)
+     (Is_Leaf : Boolean;
+      Level   : Level_Type)
       return RW_Node_Type is
    begin
       return New_RW_Node(Is_Ok   => True,
                          Is_Leaf => Is_Leaf,
+                         Level   => Level,
                          Degree  => 0,
                          Link    => Invalid_Address);
    end Root_Node;
@@ -955,6 +1005,16 @@ package body Nodes is
    begin
       return Phys.Is_Ok(Blocks.Base_Block_Type(Node));
    end Is_Ok;
+
+
+   function Level
+     (Node : Node_Type)
+      return Level_Type
+   is
+      pragma Assert (Is_Ok(Node));
+   begin
+      return Phys.Level(Blocks.Base_Block_Type(Node));
+   end Level;
 
 
    function Degree
@@ -1395,6 +1455,7 @@ package body Nodes is
 
       N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
                                       Is_Leaf => Is_Leaf(Node),
+                                      Level   => Level(Node),
                                       Degree  => Degree(Node) + 1,
                                       Link    => Link(Node));
       Key_Read_Context  : Key_Context_Type := New_Key_Context;
@@ -1435,6 +1496,7 @@ package body Nodes is
 
       N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
                                       Is_Leaf => Is_Leaf(Node),
+                                      Level   => Level(Node),
                                       Degree  => Degree(Node) + 1,
                                       Link    => Link(Node));
       Key_Read_Context    : Key_Context_Type   := New_Key_Context;
@@ -1480,6 +1542,7 @@ package body Nodes is
 
       N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
                                       Is_Leaf => Is_Leaf(Node),
+                                      Level   => Level(Node),
                                       Degree  => Degree(Node),
                                       Link    => Link(Node));
       Key_Read_Context  : Key_Context_Type := New_Key_Context;
@@ -1520,6 +1583,7 @@ package body Nodes is
 
       N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
                                       Is_Leaf => Is_Leaf(Node),
+                                      Level   => Level(Node),
                                       Degree  => Degree(Node),
                                       Link    => Link(Node));
       Key_Read_Context    : Key_Context_Type   := New_Key_Context;
@@ -1561,6 +1625,7 @@ package body Nodes is
 
       N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
                                       Is_Leaf => Is_Leaf(Node),
+                                      Level   => Level(Node),
                                       Degree  => Degree(Node) - 1,
                                       Link    => Link(Node));
    begin
@@ -1626,6 +1691,7 @@ package body Nodes is
       declare
          N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
                                          Is_Leaf => Is_Leaf(Node),
+                                         Level   => Level(Node),
                                          Degree  => To - From + 1,
                                          Link    => Link(Node));
          Shift_By : constant Integer := -1 * Integer(From) + 1;
@@ -1687,12 +1753,14 @@ package body Nodes is
          pragma Assert (Validation(Left_Node) /= Too_Large or
                         Validation(Right_Node) /= Too_Large);
          pragma Assert (Is_Leaf(Left_Node) = Is_Leaf(Right_Node));
+         pragma Assert (Level(Left_Node) = Level(Right_Node));
 
          Left_Degree  : constant Degree_Type := Degree(Left_Node);
          Right_Degree : constant Degree_Type := Degree(Right_Node);
          Degree       : constant Degree_Type := Left_Degree + Right_Degree;
          N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
                                          Is_Leaf => Is_Leaf(Right_Node),
+                                         Level   => Level(Right_Node),
                                          Degree  => Degree,
                                          Link    => Link(Right_Node));
       begin

@@ -286,6 +286,7 @@ private
       RW_Node_Size : constant := RO_Node_Size * 6 / 4;
 
       type Degree_Type is range 0 .. Blocks.Block_Size;
+      type Level_Type is range 0 .. 255;
       subtype Index_Type is Degree_Type range 0 .. Degree_Type'Last;
       subtype Valid_Index_Type is Index_Type range 1 .. Index_Type'Last;
 
@@ -330,7 +331,8 @@ private
       -- General and accessor subprograms.
 
       function Root_Node
-        (Is_Leaf : Boolean)
+        (Is_Leaf : Boolean;
+         Level   : Level_Type)
          return RW_Node_Type;
       -- Returns a simple root node of degree 0.
 
@@ -345,6 +347,12 @@ private
          return Boolean;
       -- Indicates whether the given node is a leaf. Leaves have
       -- (Key, Child, Count) entries.
+
+      function Level
+        (Node : Node_Type)
+         return Level_Type;
+      -- Returns the level of the node. The level of leaves is zero, the level
+      -- of the parent's of leaves is 1 etc.
 
       function Degree
         (Node : Node_Type)
@@ -550,6 +558,7 @@ private
       pragma Inline (Is_Valid);
       pragma Inline (Is_Leaf);
       pragma Inline (Is_Inner);
+      pragma Inline (Level);
       pragma Inline (Degree);
       pragma Inline (Set_Link);
       pragma Inline (Link);
