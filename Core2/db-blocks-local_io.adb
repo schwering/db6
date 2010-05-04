@@ -168,7 +168,7 @@ package body DB.Blocks.Local_IO is
       Pos     : Low_Level_IO.File_Position_Type;
       Success : Boolean;
    begin
-   <<Retry>>
+      <<Retry>>
       Low_Level_IO.Seek_End(File.FD, Pos);
       Address := To_Valid_Address(Pos);
       Try_Lock(File, Address, Success);
