@@ -22,10 +22,6 @@ package DB is
    -- Indicates a serios IO error.
    -- Raised in DB.IO and its child packages.
 
-   Lock_Error : exception;
-   -- Indicates a wrong usage of a lock.
-   -- Raised in DB.Locks and its child packages.
-
    Tree_Error : exception;
    -- This exception is only raised when there are extremely serious
    -- errors in the tree such as dangling references to child or neighbor

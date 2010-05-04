@@ -102,7 +102,7 @@ package body IO_Dispatcher.Args is
                exit;
             end if;
          end loop;
-         Concurrency_Degree := 1;
+         Concurrency_Degree := 10;
          if To = 0 then
             Short_Job_Execution_Count := Random.Count_Type(To_Number
                                              (S(From .. S'Last)));

@@ -11,7 +11,8 @@ package body Initialization is
      (ID : in String)
    is
       File : Block_IO.File_Type;
-      Root : constant Nodes.RW_Node_Type := Nodes.Root_Node(Is_Leaf => True);
+      Root : constant Nodes.RW_Node_Type :=
+         Nodes.Root_Node(Is_Leaf => True, Level => 0);
    begin
       Block_IO.Create(ID, File);
       declare

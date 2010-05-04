@@ -26,8 +26,12 @@ is
       end loop;
    end Find_Leaf_Address;
 
-   function Exit_Condition (N : Nodes.Node_Type) return Boolean
+   function Exit_Condition
+     (N_A : Nodes.Valid_Address_Type;
+      N   : Nodes.Node_Type)
+      return Boolean
    is
+      pragma Unreferenced (N_A);
       use type Nodes.Degree_Type;
       High_Key     : Key_Type;
       Has_High_Key : Boolean;

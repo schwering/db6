@@ -92,6 +92,26 @@ package body DB.Gen_BTrees is
    end Misc;
 
 
+--   function Image
+--     (N_A : Nodes.Valid_Address_Type)
+--      return String is
+--   begin
+--      return Block_IO.Image(Block_IO.Valid_Address_Type(N_A));
+--   end Image;
+
+
+--   function Image
+--     (N_A : Nodes.Address_Type)
+--      return String is
+--   begin
+--      if Nodes.Is_Valid(N_A) then
+--         return Image(Nodes.To_Valid_Address(N_A));
+--      else
+--         return "Invalid_Address";
+--      end if;
+--   end Image;
+
+
    function "<"
      (Left, Right : Key_Type)
       return Boolean
@@ -157,9 +177,11 @@ package body DB.Gen_BTrees is
       N    : in     Nodes.RW_Node_Type)
    is
       pragma Inline (Write_New_Node);
+      use type Nodes.Validation_State_Type;
+      pragma Assert (Nodes.Validation(N) = Nodes.Valid);
    begin
-      Block_IO.Allocate(Tree.File, Block_IO.Valid_Address_Type(N_A));
-      Write_Node(Tree, N_A, N);
+      Block_IO.Write_New_Block(Tree.File, Block_IO.Valid_Address_Type(N_A),
+                               Nodes.To_Block(N));
    end Write_New_Node;
 
 
@@ -212,7 +234,9 @@ package body DB.Gen_BTrees is
    -- The maximum count of concurrently held locks is 2.
    procedure Move_Right
      (Tree      : in out          Tree_Type;
-      Exit_Cond : not null access function (N : Nodes.Node_Type) return Boolean;
+      Exit_Cond : not null access function (N_A : Nodes.Valid_Address_Type;
+                                            N   : Nodes.Node_Type)
+                                            return Boolean;
       N_A       : in out          Nodes.Valid_Address_Type;
       N         :    out          Nodes.Node_Type) is
    begin
@@ -222,7 +246,7 @@ package body DB.Gen_BTrees is
             use type Nodes.Valid_Address_Type;
          begin
             Read_Node(Tree, N_A, N);
-            exit when Exit_Cond(N);
+            exit when Exit_Cond(N_A, N);
             if not Nodes.Is_Valid(Nodes.Link(N)) then
                raise Tree_Error;
             end if;
