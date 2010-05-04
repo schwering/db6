@@ -13,6 +13,14 @@ package body DB.Locks.Mutexes is
    end Lock;
 
 
+   procedure Try_Lock
+     (M       : in out Mutex_Type;
+      Success :    out Boolean) is
+   begin
+      M.Try_Lock(Success);
+   end Try_Lock;
+
+
    procedure Unlock
      (M : in out Mutex_Type) is
    begin
@@ -23,9 +31,20 @@ package body DB.Locks.Mutexes is
    protected body Mutex_Type is
 
       entry Lock when not Locked is
-         begin
+      begin
          Locked := True;
       end Lock;
+
+
+      procedure Try_Lock (Success : out Boolean) is
+      begin
+         if Locked then
+            Success := False;
+         else
+            Locked := True;
+            Success := True;
+         end if;
+      end Try_Lock;
 
 
       procedure Unlock is

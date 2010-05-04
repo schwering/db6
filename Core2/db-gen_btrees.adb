@@ -234,9 +234,7 @@ package body DB.Gen_BTrees is
    -- The maximum count of concurrently held locks is 2.
    procedure Move_Right
      (Tree      : in out          Tree_Type;
-      Exit_Cond : not null access function (N_A : Nodes.Valid_Address_Type;
-                                            N   : Nodes.Node_Type)
-                                            return Boolean;
+      Exit_Cond : not null access function (N : Nodes.Node_Type) return Boolean;
       N_A       : in out          Nodes.Valid_Address_Type;
       N         :    out          Nodes.Node_Type) is
    begin
@@ -246,7 +244,7 @@ package body DB.Gen_BTrees is
             use type Nodes.Valid_Address_Type;
          begin
             Read_Node(Tree, N_A, N);
-            exit when Exit_Cond(N_A, N);
+            exit when Exit_Cond(N);
             if not Nodes.Is_Valid(Nodes.Link(N)) then
                raise Tree_Error;
             end if;
