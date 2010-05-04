@@ -59,7 +59,7 @@ is
                      Address_To_String(Block_IO.Address_Type(
                         To_Address(N_A))) &" "&
                      Boolean'Image(Is_Leaf(N)));
-            raise Tree_Error;
+            raise Tree_Error with "wrong node-internal order";
          end if;
       end loop;
    end Check_Local_Order;
@@ -69,6 +69,9 @@ is
       L : RO_Node_Type;
    begin
       Read_Node(Tree, Valid_Link(N), L);
+      if Level(N) /= Level(L) then
+         raise Tree_Error with "node and link have inequal level";
+      end if;
       if Degree(L) = 0 then
          return;
       end if;
@@ -78,7 +81,7 @@ is
                      To_Address(N_A))) &" "&
                   Address_To_String(Block_IO.Address_Type(Link(N))) &" "&
                   Boolean'Image(Is_Leaf(N)));
-         raise Tree_Error;
+         raise Tree_Error with "link's keys are less than node's";
       end if;
    end Check_Link_Order;
 
@@ -96,7 +99,7 @@ is
       if Has_NHK /= Has_LHK then
          Put_Line("Difference about existence of high keys: "&
                   Has_NHK'Img &" "& Has_LHK'Img);
-         raise Tree_Error;
+         raise Tree_Error with "node and link differ in having a high key";
       end if;
       if not Has_NHK then
          return;
@@ -107,7 +110,7 @@ is
                      To_Address(N_A))) &" "&
                   Address_To_String(Block_IO.Address_Type(Link(N))) &" "&
                   Boolean'Image(Is_Leaf(N)));
-         raise Tree_Error;
+         raise Tree_Error with "link's high key is less than node's";
       end if;
    end Check_High_Key_Order;
 
@@ -116,12 +119,30 @@ is
       C : RO_Node_Type;
    begin
       Read_Node(Tree, Child(N, Degree(N)), C);
+      if Level(N) - 1 /= Level(C) then
+         raise Tree_Error with "child's level is not one less than node's";
+      end if;
       if Degree(C) = 0 then
          return;
       end if;
-      if not (Key(C, Degree(C)) <= Key(N, Degree(N))) then
-         raise Tree_Error;
-      end if;
+      declare
+         NHK  : Key_Type;
+         NHHK : Boolean;
+         CHK  : Key_Type;
+         CHHK : Boolean;
+      begin
+         Get_High_Key(N, NHK, NHHK);
+         Get_High_Key(C, CHK, CHHK);
+         if not NHHK then
+            raise Tree_Error with "node has no high key";
+         end if;
+         if not CHHK then
+            raise Tree_Error with "child has no high key";
+         end if;
+         if not (CHK <= NHK) then
+            raise Tree_Error with "child's high key is greater than node's";
+         end if;
+      end;
    end Check_Child_Order;
 
    procedure Check_LinkChild_ChildLink_Equality (N : in Node_Type)
@@ -142,9 +163,16 @@ is
          CL_A := Valid_Link(C);
       end;
       if LC_A /= CL_A then
-         raise Tree_Error;
+         raise Tree_Error with "parallelogram equality not satisfied";
       end if;
    end Check_LinkChild_ChildLink_Equality;
+
+   procedure Check_Leaf_Level (N : in Node_Type) is
+   begin
+      if Level(N) /= 0 then
+         raise Tree_Error with "leaf has not level zero";
+      end if;
+   end Check_Leaf_Level;
 
    procedure Draw is new Gen_Draw(Address_To_String);
 
@@ -165,6 +193,9 @@ begin
                Check_Link_Order(N, N_A);
                Check_LinkChild_ChildLink_Equality(N);
             end if;
+         end if;
+         if Is_Leaf(N) then
+            Check_Leaf_Level(N);
          end if;
          if Is_Valid(Link(N)) then
             Check_High_Key_Order(N, N_A);
