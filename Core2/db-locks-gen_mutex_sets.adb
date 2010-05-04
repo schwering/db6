@@ -63,6 +63,7 @@ package body DB.Locks.Gen_Mutex_Sets is
 
       entry Unlock (Item : in Item_Type) when True is
       begin
+         pragma Assert (Sets.Contains(Set, Item));
          Sets.Exclude(Set, Item);
          if Wait_Lock'Count > 0 then
             Removed := True;
