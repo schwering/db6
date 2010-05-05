@@ -26,8 +26,6 @@
 
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
-with DB.Utils.Print;
-use DB.Utils;
 
 separate (DB.Gen_BTrees)
 procedure Insert
@@ -169,7 +167,7 @@ is
          High_Key     : Key_Type;
          Has_High_Key : Boolean;
       begin
-         if Stacks.Is_Empty(Stack) and not Nodes.Is_leaf(N) then
+         if Stacks.Is_Empty(Stack) and not Nodes.Is_Leaf(N) then
             Rebuild := True;
             return True;
          end if;
@@ -182,10 +180,9 @@ is
    begin
       <<Retry>>
       Stack_Pop(N_A, Level);
-      Move_Right(Tree, Exit_Condition'Access, N_A, N);
       Rebuild := False;
+      Move_Right(Tree, Exit_Condition'Access, N_A, N);
       if Rebuild then
-         Print("Rebuilding Stack 1");
          Unlock(Tree, N_A);
          Build_Stack;
          goto Retry;
@@ -234,7 +231,6 @@ is
       Rebuild := False;
       Move_Right(Tree, Exit_Condition'Access, N_A, N);
       if Rebuild then
-         Print("Rebuilding Stack 2");
          Unlock(Tree, N_A);
          Rebuild_Stack(Level, C_A);
          goto Retry;
