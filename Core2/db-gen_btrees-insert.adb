@@ -26,6 +26,7 @@
 
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
+with DB.Utils.Print;
 
 separate (DB.Gen_BTrees)
 procedure Insert
@@ -73,11 +74,7 @@ is
       N   : Nodes.RO_Node_Type;
    begin
       Stacks.Clear(Stack);
-      <<Retry>>
       Read_Node(Tree, N_A, N);
-      if Nodes.Is_Valid(Nodes.Link(N)) then
-         goto Retry;
-      end if;
       loop
          if Nodes.Is_Inner(N) then
             declare
@@ -106,11 +103,7 @@ is
       N   : Nodes.RO_Node_Type;
    begin
       Stacks.Clear(Stack);
-      <<Retry>>
       Read_Node(Tree, N_A, N);
-      if Nodes.Is_Valid(Nodes.Link(N)) then
-         goto Retry;
-      end if;
       loop
          pragma Assert (Nodes.Is_Inner(N));
          if Nodes.Level(N) /= Level then
@@ -183,6 +176,7 @@ is
       Rebuild := False;
       Move_Right(Tree, Exit_Condition'Access, N_A, N);
       if Rebuild then
+         Utils.Print("Rebuilding 1");
          Unlock(Tree, N_A);
          Build_Stack;
          goto Retry;
@@ -231,6 +225,7 @@ is
       Rebuild := False;
       Move_Right(Tree, Exit_Condition'Access, N_A, N);
       if Rebuild then
+         Utils.Print("Rebuilding 2");
          Unlock(Tree, N_A);
          Rebuild_Stack(Level, C_A);
          goto Retry;

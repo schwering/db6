@@ -17,7 +17,7 @@ package DB.Blocks.Local_IO is
 
    Invalid_Address : constant Address_Type := 0;
 
-   function Hash(A : Address_Type) return Utils.Hash_Type;
+   function Hash (A : Address_Type) return Utils.Hash_Type;
 
    package Mutex_Sets is new Locks.Gen_Mutex_Sets
      (Item_Type           => Valid_Address_Type,

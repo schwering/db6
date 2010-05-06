@@ -230,6 +230,8 @@ package body DB.Blocks is
       type Array_Sub_Type is array (From .. To) of Item_Type;
       function Size_Of_Data is new Size_Of(Array_Sub_Type);
    begin
+      pragma Assert (From in Arr'Range);
+      pragma Assert (To in Arr'Range);
       return Size_Of_Index(To) + Size_Of_Data(Array_Sub_Type(Arr(From .. To)));
    end Size_Of_Array;
 
@@ -247,6 +249,8 @@ package body DB.Blocks is
    begin
       Write_Index(Block, Cursor, To);
       if Is_Valid(Cursor) then
+         pragma Assert (From in Arr'Range);
+         pragma Assert (To in Arr'Range);
          Write_Data(Block, Cursor, Array_Sub_Type(Arr(From .. To)));
       end if;
    end Write_Array;
@@ -267,6 +271,8 @@ package body DB.Blocks is
             type Array_Sub_Type is array (From .. To) of Item_Type;
             procedure Read_Data is new Read(Array_Sub_Type);
          begin
+            pragma Assert (From in Arr'Range);
+            pragma Assert (To in Arr'Range);
             Read_Data(Block, Cursor, Array_Sub_Type(Arr(From .. To)));
          end;
       end if;

@@ -174,6 +174,37 @@ is
       end if;
    end Check_Leaf_Level;
 
+   procedure Check_Keys (N : in Node_Type)
+   is
+      Key_Context : Key_Context_Type := New_Key_Context;
+      Key         : Key_Type;
+   begin
+      for I in 1 .. Degree(N) loop
+         Get_Key(N, I, Key, Key_Context);
+      end loop;
+   end Check_Keys;
+
+   procedure Check_Children (N : in Node_Type)
+   is
+      Key_Context : Key_Context_Type := New_Key_Context;
+      Child       : Valid_Address_Type;
+   begin
+      for I in 1 .. Degree(N) loop
+         Get_Child(N, I, Child, Key_Context);
+      end loop;
+   end Check_Children;
+
+   procedure Check_Values (N : in Node_Type)
+   is
+      Key_Context   : Key_Context_Type := New_Key_Context;
+      Value_Context : Value_Context_Type := New_Value_Context;
+      Value         : Value_Type;
+   begin
+      for I in 1 .. Degree(N) loop
+         Get_Value(N, I, Value, Key_Context, Value_Context);
+      end loop;
+   end Check_Values;
+
    procedure Draw is new Gen_Draw(Address_To_String);
 
    N_A : Valid_Address_Type;
@@ -187,16 +218,20 @@ begin
       loop
          Read_Node(Tree, N_A, N);
          Check_Local_Order(N, N_A);
-         if Is_Inner(N) then
-            Check_Child_Order(N);
-            if Is_Valid(Link(N)) then
-               Check_Link_Order(N, N_A);
-               Check_LinkChild_ChildLink_Equality(N);
-            end if;
-         end if;
-         if Is_Leaf(N) then
-            Check_Leaf_Level(N);
-         end if;
+         case Is_Inner(N) is
+            when True =>
+               Check_Child_Order(N);
+               if Is_Valid(Link(N)) then
+                  Check_Link_Order(N, N_A);
+                  Check_LinkChild_ChildLink_Equality(N);
+               end if;
+               Check_Keys(N);
+               Check_Children(N);
+            when False =>
+               Check_Leaf_Level(N);
+               Check_Keys(N);
+               Check_Values(N);
+         end case;
          if Is_Valid(Link(N)) then
             Check_High_Key_Order(N, N_A);
          end if;

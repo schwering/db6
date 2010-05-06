@@ -11,7 +11,7 @@ package body DB.Blocks.Local_IO is
       return Valid_Address_Type;
 
 
-   function Hash(A : Address_Type) return Utils.Hash_Type is
+   function Hash (A : Address_Type) return Utils.Hash_Type is
    begin
       return Utils.Hash_Type(A);
    end Hash;
