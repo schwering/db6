@@ -24,18 +24,40 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Interfaces.C;
+
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
-with DB.Utils.Print;
+with DB.Utils.Print; use DB.Utils;
 
 separate (DB.Gen_BTrees)
 procedure Insert
-  (Tree     : in out Tree_Type;
-   Key      : in     Key_Type;
-   Value    : in     Value_Type;
-   State    :    out State_Type)
+  (Tree  : in out Tree_Type;
+   Key   : in     Key_Type;
+   Value : in     Value_Type;
+   State :    out State_Type)
 is
    pragma Assert (Tree.Initialized);
+
+   procedure Sleep
+   is
+      use Interfaces.C;
+      function C_Rand return Int;
+      pragma Import (C, C_Rand, "rand");
+      function C_Sleep (Secs : Int) return Int;
+      pragma Import (C, C_Sleep, "usleep");
+      R : constant Int := C_Rand mod 77;
+      D : constant Int := R * 100000;
+   begin
+      if R = 4 then
+         declare
+            I : constant Int := C_Sleep(D);
+            pragma Unreferenced (I);
+         begin
+            Print("Sleeped for "& D'Img &" usecs");
+         end;
+      end if;
+   end Sleep;
 
    type Stack_Item_Type is
       record
@@ -144,9 +166,8 @@ is
    end High_Key;
 
    procedure Pop_Leaf
-     (N_A   :    out Nodes.Valid_Address_Type;
-      N     :    out Nodes.RW_Node_Type;
-      State : in out State_Type)
+     (N_A :    out Nodes.Valid_Address_Type;
+      N   :    out Nodes.RW_Node_Type)
    is
       use type Nodes.Valid_Address_Type;
 
@@ -176,7 +197,6 @@ is
       Rebuild := False;
       Move_Right(Tree, Exit_Condition'Access, N_A, N);
       if Rebuild then
-         Utils.Print("Rebuilding 1");
          Unlock(Tree, N_A);
          Build_Stack;
          goto Retry;
@@ -185,9 +205,6 @@ is
       declare
       begin
          if not Nodes.Is_Leaf(N) then
-            pragma Warnings (Off);
-            State := Error;
-            pragma Warnings (On);
             raise Tree_Error;
          end if;
       exception
@@ -198,10 +215,9 @@ is
    end Pop_Leaf;
 
    procedure Pop_Inner
-     (C_A   : in     Nodes.Valid_Address_Type;
-      N_A   :    out Nodes.Valid_Address_Type;
-      N     :    out Nodes.RW_Node_Type;
-      State : in out State_Type)
+     (C_A : in     Nodes.Valid_Address_Type;
+      N_A :    out Nodes.Valid_Address_Type;
+      N   :    out Nodes.RW_Node_Type)
    is
       use type Nodes.Valid_Address_Type;
       use type Nodes.Level_Type;
@@ -220,24 +236,27 @@ is
          return Nodes.Is_Valid(Nodes.Child_Position(N, C_A));
       end Exit_Condition;
    begin
-      <<Retry>>
-      Stack_Pop(N_A, Level);
-      Rebuild := False;
-      Move_Right(Tree, Exit_Condition'Access, N_A, N);
-      if Rebuild then
-         Utils.Print("Rebuilding 2");
-         Unlock(Tree, N_A);
-         Rebuild_Stack(Level, C_A);
-         goto Retry;
-      end if;
+      declare
+      begin
+         <<Retry>>
+         Stack_Pop(N_A, Level);
+         Rebuild := False;
+         Move_Right(Tree, Exit_Condition'Access, N_A, N);
+         if Rebuild then
+            Unlock(Tree, N_A);
+            Rebuild_Stack(Level, C_A);
+            goto Retry;
+         end if;
+      exception
+         when others =>
+            Unlock(Tree, C_A);
+            raise;
+      end;
       Unlock(Tree, C_A);
 
       declare
       begin
          if not Nodes.Is_Inner(N) then
-            pragma Warnings (Off);
-            State := Error;
-            pragma Warnings (On);
             raise Tree_Error;
          end if;
       exception
@@ -245,24 +264,18 @@ is
             Unlock(Tree, N_A);
             raise;
       end;
-   exception
-      when others =>
-         Unlock(Tree, C_A);
-         raise;
    end Pop_Inner;
 
    procedure Write_And_Ascend
      (N_A   : in     Nodes.Valid_Address_Type;
       N_Old : in     Nodes.RW_Node_Type;
-      N     : in     Nodes.RW_Node_Type;
-      State : in out State_Type);
+      N     : in     Nodes.RW_Node_Type);
 
    -- Handles the case that the high-key of a node C changed. Then C_A is the
    -- address of C and C_Key is the high-key of C.
    procedure Update_High_Key
      (C_Key : in     Key_Type;
-      C_A   : in     Nodes.Valid_Address_Type;
-      State : in out State_Type) is
+      C_A   : in     Nodes.Valid_Address_Type) is
    begin
       if Stacks.Is_Empty(Stack) then
          Unlock(Tree, C_A);
@@ -271,20 +284,20 @@ is
          declare
             N_A   : Nodes.Valid_Address_Type;
             N_Old : Nodes.RW_Node_Type;
+            I     : Nodes.Valid_Index_Type;
+            N     : Nodes.RW_Node_Type;
          begin
-            Pop_Inner(C_A, N_A, N_Old, State);
+            Pop_Inner(C_A, N_A, N_Old);
             declare
-               I : Nodes.Valid_Index_Type;
-               N : Nodes.RW_Node_Type;
             begin
                I := Nodes.Child_Position(N_Old, C_A);
                N := Nodes.Substitution(N_Old, I, C_Key, C_A);
-               Write_And_Ascend(N_A, N_Old, N, State);
             exception
                when others =>
                   Unlock(Tree, N_A);
                   raise;
             end;
+            Write_And_Ascend(N_A, N_Old, N);
          end;
       end if;
    end Update_High_Key;
@@ -298,12 +311,13 @@ is
    -- Otherwise, in the parent N of L, the key of the pointer to L is set to the
    -- possibly changed high-key of L and the pointer to R and its high-key are
    -- inserted.
+   -- The addresses L_A and R_A must be locked when this procedure is called.
+   -- L_A and R_A are unlocked by this procedure.
    procedure Insert_Key_And_Update_High_Key
      (L_Key : in     Key_Type;
       L_A   : in     Nodes.Valid_Address_Type;
       R_Key : in     Key_Type;
-      R_A   : in     Nodes.Valid_Address_Type;
-      State : in out State_Type)
+      R_A   : in     Nodes.Valid_Address_Type)
    is
       use type Nodes.Valid_Address_Type;
    begin
@@ -325,9 +339,15 @@ is
             N := Nodes.Insertion(N, 2, R_Key, R_A);
             Nodes.Set_Link(N, Invalid_Address);
             Write_Node(Tree, N_A, N);
-            Unlock(Tree, L_A);
-            State := Success;
+         exception
+            when others =>
+               Unlock(Tree, L_A);
+               Unlock(Tree, R_A);
+               raise;
          end;
+         Unlock(Tree, L_A);
+         Unlock(Tree, R_A);
+         State := Success;
       else
          -- Update high key of L and insert high key of R.
          declare
@@ -335,7 +355,15 @@ is
             N_A   : Nodes.Valid_Address_Type;
             N_Old : Nodes.RW_Node_Type;
          begin
-            Pop_Inner(L_A, N_A, N_Old, State);
+            declare
+            begin
+               Pop_Inner(L_A, N_A, N_Old);
+            exception
+               when others =>
+                  Unlock(Tree, R_A);
+                  raise;
+            end;
+            Unlock(Tree, R_A);
             declare
                I : Nodes.Index_Type;
                N : Nodes.RW_Node_Type;
@@ -344,28 +372,33 @@ is
                N := Nodes.Substitution(N_Old, I, L_Key, L_A);
                I := I + 1;
                N := Nodes.Insertion(N, I, R_Key, R_A);
-               Write_And_Ascend(N_A, N_Old, N, State);
-            exception
-               when others =>
-                  Unlock(Tree, N_A);
-                  raise;
+               Write_And_Ascend(N_A, N_Old, N);
             end;
          end;
       end if;
    end Insert_Key_And_Update_High_Key;
 
+   -- Writes back the node(s) visited of the current level.
+   -- The address N_A must be locked when this procedure is called.
+   -- N_A is unlocked by this procedure.
    procedure Write_And_Ascend
      (N_A   : in     Nodes.Valid_Address_Type;
       N_Old : in     Nodes.RW_Node_Type;
-      N     : in     Nodes.RW_Node_Type;
-      State : in out State_Type)
+      N     : in     Nodes.RW_Node_Type)
    is
       use type Nodes.Degree_Type;
    begin
       if Nodes.Is_Safe(N, Is_Root => Stacks.Is_Empty(Stack)) then
-         Write_Node(Tree, N_A, N);
+         declare
+         begin
+            Write_Node(Tree, N_A, N);
+         exception
+            when others =>
+               Unlock(Tree, N_A);
+               raise;
+         end;
          if Nodes.Degree(N_Old) = 0 or else High_Key(N_Old) /= High_Key(N) then
-            Update_High_Key(High_Key(N), N_A, State);
+            Update_High_Key(High_Key(N), N_A);
          else
             Unlock(Tree, N_A);
             State := Success;
@@ -381,19 +414,10 @@ is
             Nodes.Set_Link(R, Nodes.Link(N));
             Write_New_Node(Tree, R_A, R);
             Lock(Tree, R_A);
-            declare
-            begin
-               Nodes.Set_Link(L, R_A);
-               Write_Node(Tree, L_A, L);
-               Insert_Key_And_Update_High_Key(High_Key(L), L_A,
-                                              High_Key(R), R_A,
-                                              State);
-               Unlock(Tree, R_A);
-            exception
-               when others =>
-                  Unlock(Tree, R_A);
-                  raise;
-            end;
+            Nodes.Set_Link(L, R_A);
+            Write_Node(Tree, L_A, L);
+            Insert_Key_And_Update_High_Key(High_Key(L), L_A,
+                                           High_Key(R), R_A);
          end;
       end if;
    end Write_And_Ascend;
@@ -405,7 +429,6 @@ is
    I     : Nodes.Index_Type;
    N     : Nodes.RW_Node_Type;
 begin
-   State := Success;
    if Key_Size_Bound(Key) > Max_Key_Size(Value_Size_Bound(Value)) then
       State := Failure;
       return;
@@ -415,25 +438,32 @@ begin
 
    Build_Stack;
 
-   Pop_Leaf(N_A, N_Old, State);
-   if State /= Success then
-      return;
-   end if;
-   I := Nodes.Key_Position(N_Old, Key);
-   if not Nodes.Is_Valid(I) then
-      I := Nodes.Degree(N_Old) + 1;
-   elsif not Allow_Duplicates and then Nodes.Key(N_Old, I) = Key then
-      State := Failure;
-      return;
-   end if;
-   N := Nodes.Insertion(N_Old, I, Key, Value);
-   Write_And_Ascend(N_A, N_Old, N, State);
+   Pop_Leaf(N_A, N_Old);
+   declare
+   begin
+      I := Nodes.Key_Position(N_Old, Key);
+      if not Nodes.Is_Valid(I) then
+         I := Nodes.Degree(N_Old) + 1;
+      elsif not Allow_Duplicates and then Nodes.Key(N_Old, I) = Key then
+         State := Failure;
+         return;
+      end if;
+      N := Nodes.Insertion(N_Old, I, Key, Value);
+   exception
+      when others =>
+         Unlock(Tree, N_A);
+         raise;
+   end;
+   Write_And_Ascend(N_A, N_Old, N);
 
    Stacks.Finalize(Stack);
 
 exception
    when others =>
       Stacks.Finalize(Stack);
+      pragma Warnings (Off);
+      State := Error;
+      pragma Warnings (On);
       raise;
 end Insert;
 

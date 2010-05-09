@@ -4,6 +4,9 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with DB.UTils.Print;
+use DB.UTils;
+
 package body DB.Blocks.Local_IO is
  
    function To_Valid_Address
@@ -165,11 +168,15 @@ package body DB.Blocks.Local_IO is
       Address :    out Valid_Address_Type;
       Block   : in     Block_Type)
    is
+      use type Low_Level_IO.File_Position_Type;
       Pos     : Low_Level_IO.File_Position_Type;
       Success : Boolean;
    begin
       <<Retry>>
       Low_Level_IO.Seek_End(File.FD, Pos);
+      if Pos mod 4096 /= 0 then
+         raise IO_Error;
+      end if;
       Address := To_Valid_Address(Pos);
       Try_Lock(File, Address, Success);
       if not Success then
@@ -180,6 +187,10 @@ package body DB.Blocks.Local_IO is
          Check_Pos : Low_Level_IO.File_Position_Type;
       begin
          Low_Level_IO.Seek_End(File.FD, Check_Pos);
+         if Check_Pos mod 4096 /= 0 then
+            Print("Check_Pos ="& Check_Pos'Img &" Pos ="& Pos'Img);
+            raise IO_Error;
+         end if;
          if Check_Pos /= Pos then
             Unlock(File, Address);
             goto Retry;

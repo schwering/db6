@@ -102,6 +102,9 @@ procedure IO_Dispatcher.Map is
 begin
    declare
    begin
+      Put_Line("Trying to create Map "& Args.File_Name);
+      Put_Line("Max_Key_Size ="& Map_Types.Max_Key_Size'Img);
+      Put_Line("Max_Value_Size ="& Map_Types.Max_Value_Size'Img);
       DB.Tables.Maps.Create(Args.File_Name,
                             Map_Types.Max_Key_Size,
                             Map_Types.Max_Value_Size);

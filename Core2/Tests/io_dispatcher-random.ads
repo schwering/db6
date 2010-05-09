@@ -6,7 +6,7 @@ private
 package IO_Dispatcher.Random is
 
    Block_Size : constant := DB.Blocks.Block_Size;
-   Max_Key_Size : constant := (Block_Size - 17) * 1/4 - 2 - 4 - 4
+   Max_Key_Size : constant := (Block_Size - 9) * 1/4 - 2 - 4 - 4
    --                                       ^M     ^B  ^P  ^VL ^VB
                                 ;--+ 1; -- to enforce heaped map
    Max_Value_Size : constant := 4 + 4;

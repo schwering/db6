@@ -29,11 +29,11 @@ project Attributes is
                 "-gnatwa" &        -- all warnings
 --              "-gnatD" &         -- dg-files
 --              "-gnatwFa" &       -- turn off unref formal
-                "-gnato" &         -- overflow checking
+--              "-gnato" &         -- overflow checking
 --              "-fstack-check" &  -- generate stack checking code
 --              "-fstack-usage" &  -- should make stack-usage
-                "-u0" &            -- should make per-thread-stack-usage
-                "-gnatE" &         -- dynamic elaboration checking (what?)
+--              "-u0" &            -- should make per-thread-stack-usage
+--              "-gnatE" &         -- dynamic elaboration checking (what?)
                 "";--"-fprofile-arcs" & -- for code coverage with gcov
                 --"-ftest-coverage"; -- for code coverage with gcov
       end case;

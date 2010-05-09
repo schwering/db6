@@ -16,21 +16,6 @@ C1=1k
 C="$BIN $IO $FILE 0\
         \
 	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
-	Insert,$C1,Reset Check,1,Cont\
 	"
 echo $C
 $C

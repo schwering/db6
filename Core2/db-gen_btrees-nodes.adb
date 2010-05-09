@@ -15,6 +15,8 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.Utils.Binary_Search;
+with DB.Utils.Print;
+use DB.Utils;
 
 separate (DB.Gen_BTrees)
 package body Nodes is
@@ -647,10 +649,26 @@ package body Nodes is
       begin
          Success := Blocks.Is_Valid(Cursor);
          if not Success then
+            for I in 1 .. Degree(Block) loop
+               Print("A"& Blocks.Base_Position_Type'Image(Entry_From_Pos(Block, I)) &
+                     Blocks.Base_Position_Type'Image(Entry_To_Pos(Block, I)));
+            end loop;
+            Print("A"& Index'Img &" "& Degree_Type'Image(Degree(Block)) &" "& 
+                  Blocks.Base_Position_Type'Image(Blocks.Position(Cursor)) &
+                  Blocks.Base_Position_Type'Image(Entries_Size(Blocks.Base_Block_Type(Block))));
             return;
          end if;
          Read_Key(Key_Context, Block, Cursor, Key);
          Success := Blocks.Is_Valid(Cursor);
+         if not Success then
+            for I in 1 .. Degree(Block) loop
+               Print("B"& Blocks.Base_Position_Type'Image(Entry_From_Pos(Block, I)) &
+                     Blocks.Base_Position_Type'Image(Entry_To_Pos(Block, I)));
+            end loop;
+            Print("B"& Index'Img &" "& Degree_Type'Image(Degree(Block)) &" "& 
+                  Blocks.Base_Position_Type'Image(Blocks.Position(Cursor)) &
+                  Blocks.Base_Position_Type'Image(Entries_Size(Blocks.Base_Block_Type(Block))));
+         end if;
       end Read_Key;
 
 
@@ -1100,6 +1118,16 @@ package body Nodes is
       Phys.Read_Key(Key_Context, Blocks.Base_Block_Type(Node), Index, Key,
                     Success);
       if not Success then
+         Print("Node: "& Boolean'Image(Nodes.Is_Inner(Node)) &
+               Nodes.Level_Type'Image(Nodes.Level(Node)) &
+               Boolean'Image(Nodes.Is_Valid(Nodes.Link(Node))));
+         declare
+            type I_Ref is access Integer;
+            IR : I_Ref := null;
+            I  : Integer := IR.all;
+         begin
+            null;
+         end;
          raise Node_Error;
       end if;
    end Get_Key;
@@ -1115,6 +1143,10 @@ package body Nodes is
    begin
       Get_Key(Node, Index, Key, Key_Context);
       return Key;
+   exception
+      when others =>
+         Print("Key");
+         raise;
    end Key;
 
 
@@ -1207,6 +1239,10 @@ package body Nodes is
       begin
          Get_Key(Node, Index, Key, Key_Context);
          return Key;
+      exception
+         when others =>
+            Print("Get_Key");
+            raise;
       end Get_Key;
 
       function Key_Position_Uniform_Binary
@@ -1848,6 +1884,28 @@ package body Nodes is
       if not Nodes.Is_Ok(Node) then
          return Too_Large;
       end if;
+
+      -- XXX TODO remove
+      declare
+         K : Key_Type;
+         C : Valid_Address_Type;
+         V : Value_type;
+         S : Boolean;
+      begin
+         if Nodes.Degree(Node) = 0 then
+            Get_High_Key(Node, K, S);
+         elsif Nodes.Is_Inner(Node) then
+            for I in 1 .. Degree(Node) loop
+               K := Key(Node, I);
+               C := Child(Node, I);
+            end loop;
+         else
+            for I in 1 .. Degree(Node) loop
+               K := Key(Node, I);
+               V := Value(Node, I);
+            end loop;
+         end if;
+      end;
 
       declare
          use type Blocks.Base_Position_Type;

@@ -115,9 +115,12 @@ package body IO_Dispatcher.Jobs is
                   when Error : others =>
                      Put_Line("Exception: "& Exception_Information(Error));
                      declare
+                        I : access Integer := null;
+                        J : Integer;
                         procedure Kill_Program (Exit_Value : in Integer);
                         pragma Import (C, Kill_Program, "exit");
                      begin
+                        J := I.all;
                         Kill_Program(1);
                      end;
                      exit;

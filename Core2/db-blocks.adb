@@ -7,6 +7,9 @@
 with Ada.Unchecked_Conversion;
 with System;
 
+with DB.Utils.Print;
+use DB.Utils;
+
 package body DB.Blocks is
 
    function To_Block
@@ -87,8 +90,7 @@ package body DB.Blocks is
 
 
    function Moved_Since
-     (Block  : Base_Block_Type;
-      Cursor : Cursor_Type;
+     (Cursor : Cursor_Type;
       Since  : Base_Position_Type)
       return Size_Type is
    begin
@@ -151,8 +153,8 @@ package body DB.Blocks is
       Cursor : in out Cursor_Type;
       Item   : in     Item_Type)
    is
-      Len : constant Base_Position_Type
-          := Base_Position_Type(Bits_To_Units(Item'Size));
+      Len : constant Base_Position_Type :=
+         Base_Position_Type(Bits_To_Units(Item'Size));
       subtype Raw_Type is Base_Block_Type(1 .. Len);
       function Convert is new Ada.Unchecked_Conversion(Item_Type, Raw_Type);
    begin
@@ -177,17 +179,19 @@ package body DB.Blocks is
       Cursor : in out Cursor_Type;
       Item   :    out Item_Type)
    is
-      Len : constant Base_Position_Type
-          := Base_Position_Type(Bits_To_Units(Item'Size));
+      Len : constant Base_Position_Type :=
+         Base_Position_Type(Bits_To_Units(Item'Size));
       subtype Raw_Type is Base_Block_Type(1 .. Len);
       function Convert is new Ada.Unchecked_Conversion(Raw_Type, Item_Type);
    begin
       declare
          subtype Block_Range is
-            Integer range Integer(Block'First) ..  Integer(Block'Last);
+            Integer range Integer(Block'First) .. Integer(Block'Last);
       begin
          if Integer(Cursor.Pos) not in Block_Range or
             Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
+            Print("Cursor not in range: "& Cursor.Pos'Img & Len'Img &
+                  Block'Last'Img);
             Cursor.Pos := Invalid_Position;
             pragma Assert (Cursor.Pos not in Block'Range);
             return;
@@ -202,8 +206,8 @@ package body DB.Blocks is
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type)
    is
-      Len : constant Base_Position_Type
-          := Base_Position_Type(Bits_To_Units(Item_Type'Size));
+      Len : constant Base_Position_Type :=
+         Base_Position_Type(Bits_To_Units(Item_Type'Size));
    begin
       declare
          subtype Block_Range is
@@ -230,6 +234,7 @@ package body DB.Blocks is
       type Array_Sub_Type is array (From .. To) of Item_Type;
       function Size_Of_Data is new Size_Of(Array_Sub_Type);
    begin
+      pragma Assert (From <= Index_Type'Base'Succ(To));
       pragma Assert (From in Arr'Range);
       pragma Assert (To in Arr'Range);
       return Size_Of_Index(To) + Size_Of_Data(Array_Sub_Type(Arr(From .. To)));
@@ -249,6 +254,7 @@ package body DB.Blocks is
    begin
       Write_Index(Block, Cursor, To);
       if Is_Valid(Cursor) then
+         pragma Assert (From <= Index_Type'Base'Succ(To));
          pragma Assert (From in Arr'Range);
          pragma Assert (To in Arr'Range);
          Write_Data(Block, Cursor, Array_Sub_Type(Arr(From .. To)));
@@ -265,15 +271,25 @@ package body DB.Blocks is
    is
       procedure Read_Index is new Read(Index_Type'Base);
    begin
+      if not Is_Valid(Cursor) then
+         Print("X"& Cursor.Pos'Img & From'Img);
+      end if;
       Read_Index(Block, Cursor, To);
+      if not Is_Valid(Cursor) or To > 4096 then
+         Print("Y"& Cursor.Pos'Img & From'Img & To'Img);
+      end if;
       if Is_Valid(Cursor) then
          declare
             type Array_Sub_Type is array (From .. To) of Item_Type;
             procedure Read_Data is new Read(Array_Sub_Type);
          begin
+            pragma Assert (From <= Index_Type'Base'Succ(To));
             pragma Assert (From in Arr'Range);
             pragma Assert (To in Arr'Range);
             Read_Data(Block, Cursor, Array_Sub_Type(Arr(From .. To)));
+            if not Is_Valid(Cursor) then
+               Print("Z"& Cursor.Pos'Img & From'Img & To'Img);
+            end if;
          end;
       end if;
    end Read_Array;

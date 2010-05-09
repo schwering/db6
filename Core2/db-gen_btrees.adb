@@ -163,8 +163,8 @@ package body DB.Gen_BTrees is
       N    : in     Nodes.RW_Node_Type)
    is
       pragma Inline (Write_Node);
-      use type Nodes.Validation_State_Type;
-      pragma Assert (Nodes.Validation(N) = Nodes.Valid);
+      use type Nodes.Valid_Address_Type;
+      pragma Assert (Nodes.Is_Safe(N, Is_Root => N_A = Root_Address));
    begin
       Block_IO.Write(Tree.File, Block_IO.Valid_Address_Type(N_A),
                      Nodes.To_Block(N));
@@ -177,8 +177,7 @@ package body DB.Gen_BTrees is
       N    : in     Nodes.RW_Node_Type)
    is
       pragma Inline (Write_New_Node);
-      use type Nodes.Validation_State_Type;
-      pragma Assert (Nodes.Validation(N) = Nodes.Valid);
+      pragma Assert (Nodes.Is_Safe(N, Is_Root => False));
    begin
       Block_IO.Write_New_Block(Tree.File, Block_IO.Valid_Address_Type(N_A),
                                Nodes.To_Block(N));
@@ -248,24 +247,17 @@ package body DB.Gen_BTrees is
             if not Nodes.Is_Valid(Nodes.Link(N)) then
                raise Tree_Error;
             end if;
-            declare
-               L_A : constant Nodes.Valid_Address_Type := Nodes.Valid_Link(N);
-            begin
-               Lock(Tree, L_A);
-               declare
-               begin
-                  Unlock(Tree, N_A);
-                  N_A := L_A;
-               exception
-                  when others =>
-                     Unlock(Tree, L_A);
-                     raise;
-               end;
-            end;
          exception
             when others =>
                Unlock(Tree, N_A);
                raise;
+         end;
+         declare
+            R_A : constant Nodes.Valid_Address_Type := Nodes.Valid_Link(N);
+         begin
+            Lock(Tree, R_A);
+            Unlock(Tree, N_A);
+            N_A := R_A;
          end;
       end loop;
    end Move_Right;

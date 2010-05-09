@@ -127,6 +127,6 @@ generic
    pragma Warnings (On);
 
 package DB.Blocks.Gen_IO_Signature is
-   pragma Pure;
+   pragma Preelaborate; -- XXX Pure
 end DB.Blocks.Gen_IO_Signature;
 

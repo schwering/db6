@@ -7,7 +7,7 @@
 with System.Storage_Elements;
 
 package DB.Blocks is
-   pragma Pure;
+   pragma Preelaborate; -- XXX Pure
 
    subtype Storage_Element_Type is System.Storage_Elements.Storage_Element;
    subtype Size_Type is System.Storage_Elements.Storage_Offset;
@@ -19,7 +19,7 @@ package DB.Blocks is
    type Base_Position_Type is range 0 .. Last_Position;
    for Base_Position_Type'Size use 15;
    -- Base_Position_Type is intended to have some overflow space, for example
-   -- for applications that use Base_BlocK_Type greater than disk Block_Types
+   -- for applications that use Base_Block_Type greater than disk Block_Types
    -- that are truncated to Block_Types before being written to disk. It's
    -- limited to 15 bits because this allows Base_Block_Types of 16383 bytes,
    -- hence almost 4 times the size of a normal Block_Size. However, there is
@@ -84,8 +84,7 @@ package DB.Blocks is
       return Size_Type;
 
    function Moved_Since
-     (Block  : Base_Block_Type;
-      Cursor : Cursor_Type;
+     (Cursor : Cursor_Type;
       Since  : Base_Position_Type)
       return Size_Type;
 
@@ -160,7 +159,7 @@ package DB.Blocks is
       To     : in     Index_Type'Base);
 
    generic
-      type Index_Type is (<>);
+      type Index_Type is range <>;
       type Item_Type is private;
       type Array_Type is array (Index_Type) of Item_Type;
    procedure Read_Array
@@ -173,7 +172,6 @@ package DB.Blocks is
    generic
       type Index_Type is (<>);
       type Item_Type is private;
-      type Array_Type is array (Index_Type) of Item_Type;
    procedure Skip_Array
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type;

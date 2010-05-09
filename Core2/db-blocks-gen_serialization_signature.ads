@@ -38,6 +38,6 @@ generic
    pragma Warnings (On);
 
 package DB.Blocks.Gen_Serialization_Signature is
-   pragma Pure;
+   pragma Preelaborate; -- XXX Pure
 end DB.Blocks.Gen_Serialization_Signature;
 
