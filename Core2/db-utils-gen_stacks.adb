@@ -157,7 +157,7 @@ package body DB.Utils.Gen_Stacks is
    is
       procedure Swap (I, J : Positive)
       is
-         Tmp : Item_Type := Get(Stack, I);
+         Tmp : constant Item_Type := Get(Stack, I);
       begin
          Set(Stack, I, Get(Stack, J));
          Set(Stack, J, Tmp);
