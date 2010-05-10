@@ -7,9 +7,6 @@
 with Ada.Unchecked_Conversion;
 with System;
 
-with DB.Utils.Print;
-use DB.Utils;
-
 package body DB.Blocks is
 
    function To_Block
@@ -190,8 +187,6 @@ package body DB.Blocks is
       begin
          if Integer(Cursor.Pos) not in Block_Range or
             Integer(Cursor.Pos) + Integer(Len) - 1 not in Block_Range then
-            Print("Cursor not in range: "& Cursor.Pos'Img & Len'Img &
-                  Block'Last'Img);
             Cursor.Pos := Invalid_Position;
             pragma Assert (Cursor.Pos not in Block'Range);
             return;
@@ -271,13 +266,7 @@ package body DB.Blocks is
    is
       procedure Read_Index is new Read(Index_Type'Base);
    begin
-      if not Is_Valid(Cursor) then
-         Print("X"& Cursor.Pos'Img & From'Img);
-      end if;
       Read_Index(Block, Cursor, To);
-      if not Is_Valid(Cursor) or To > 4096 then
-         Print("Y"& Cursor.Pos'Img & From'Img & To'Img);
-      end if;
       if Is_Valid(Cursor) then
          declare
             type Array_Sub_Type is array (From .. To) of Item_Type;
@@ -287,9 +276,6 @@ package body DB.Blocks is
             pragma Assert (From in Arr'Range);
             pragma Assert (To in Arr'Range);
             Read_Data(Block, Cursor, Array_Sub_Type(Arr(From .. To)));
-            if not Is_Valid(Cursor) then
-               Print("Z"& Cursor.Pos'Img & From'Img & To'Img);
-            end if;
          end;
       end if;
    end Read_Array;

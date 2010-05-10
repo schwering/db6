@@ -10,7 +10,7 @@ with DB.Utils;
 generic
    type P_Number_Type is (<>);
 package DB.Types.Gen_Numbers is
-   pragma Preelaborate; -- XXX Pure
+   pragma Pure;
 
    subtype Number_Type is P_Number_Type;
 

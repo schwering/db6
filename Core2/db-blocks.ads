@@ -7,7 +7,7 @@
 with System.Storage_Elements;
 
 package DB.Blocks is
-   pragma Preelaborate; -- XXX Pure
+   pragma Pure;
 
    subtype Storage_Element_Type is System.Storage_Elements.Storage_Element;
    subtype Size_Type is System.Storage_Elements.Storage_Offset;
@@ -159,7 +159,7 @@ package DB.Blocks is
       To     : in     Index_Type'Base);
 
    generic
-      type Index_Type is range <>;
+      type Index_Type is (<>);
       type Item_Type is private;
       type Array_Type is array (Index_Type) of Item_Type;
    procedure Read_Array

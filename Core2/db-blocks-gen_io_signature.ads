@@ -117,16 +117,22 @@ generic
       Address : in     Valid_Address_Type);
    -- Locks the block at the given Address. Blocks until the lock is available.
    -- Otherwise raises IO_Error.
+   -- TODO XXX In fact, this may *never* raise an error, does it? We have to
+   -- think about this very carefully and re-design gen_btrees-insert.adb
+   -- respectively.
 
    with procedure Unlock
      (File    : in out File_Type;
       Address : in     Valid_Address_Type);
    -- Unlocks the lock held on the block at Address.
    -- Otherwise raises IO_Error.
+   -- TODO XXX In fact, this may *never* raise an error, does it? We have to
+   -- think about this very carefully and re-design gen_btrees-insert.adb
+   -- respectively.
 
    pragma Warnings (On);
 
 package DB.Blocks.Gen_IO_Signature is
-   pragma Preelaborate; -- XXX Pure
+   pragma Pure;
 end DB.Blocks.Gen_IO_Signature;
 

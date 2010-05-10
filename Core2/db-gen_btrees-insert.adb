@@ -22,13 +22,31 @@
 -- (3.c) Everything is fine.
 -- Hence the maximum count of simultaneously held locks is three.
 --
+-- Design Notes:
+--
+-- We have the handling procedures Write_And_Ascend, Update_High_Key, and
+-- Insert_Key_And_Update_High_Key.
+-- Write_And_Ascend terminates the handling of the current level. If necessary,
+-- it ascends by calling Update_High_Key or Insert_Key_And_Update_High_Key on
+-- the parent level.
+--
+-- Locking conventions (apply to all parameters of type Valid_Address_Type):
+-- * In-parameters must be locked at entrance of the procedure by the caller.
+-- * In-parameters must be unlocked by the called procedure.
+-- * Out-parameters must be locked by the called procedure.
+--
+-- Error conventions:
+-- * Expect exceptions (IO_Error) from IO operations.
+-- * Do not expect exceptions from any functions, including Nodes.Insertion
+--   etc., as they indicate really serious problems in the tree structure or the
+--   code.
+-- * XXX Expect exceptions from Lock/Unlock or not? Or only from Lock but not
+--   Unlock? Or success-parameter? Very difficult.
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
-
-with Interfaces.C;
 
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
-with DB.Utils.Print; use DB.Utils;
 
 separate (DB.Gen_BTrees)
 procedure Insert
@@ -38,26 +56,6 @@ procedure Insert
    State :    out State_Type)
 is
    pragma Assert (Tree.Initialized);
-
-   procedure Sleep
-   is
-      use Interfaces.C;
-      function C_Rand return Int;
-      pragma Import (C, C_Rand, "rand");
-      function C_Sleep (Secs : Int) return Int;
-      pragma Import (C, C_Sleep, "usleep");
-      R : constant Int := C_Rand mod 77;
-      D : constant Int := R * 100000;
-   begin
-      if R = 4 then
-         declare
-            I : constant Int := C_Sleep(D);
-            pragma Unreferenced (I);
-         begin
-            Print("Sleeped for "& D'Img &" usecs");
-         end;
-      end if;
-   end Sleep;
 
    type Stack_Item_Type is
       record
@@ -166,8 +164,8 @@ is
    end High_Key;
 
    procedure Pop_Leaf
-     (N_A :    out Nodes.Valid_Address_Type;
-      N   :    out Nodes.RW_Node_Type)
+     (N_A : out Nodes.Valid_Address_Type;
+      N   : out Nodes.RW_Node_Type)
    is
       use type Nodes.Valid_Address_Type;
 
@@ -215,9 +213,9 @@ is
    end Pop_Leaf;
 
    procedure Pop_Inner
-     (C_A : in     Nodes.Valid_Address_Type;
-      N_A :    out Nodes.Valid_Address_Type;
-      N   :    out Nodes.RW_Node_Type)
+     (C_A : in  Nodes.Valid_Address_Type;
+      N_A : out Nodes.Valid_Address_Type;
+      N   : out Nodes.RW_Node_Type)
    is
       use type Nodes.Valid_Address_Type;
       use type Nodes.Level_Type;
@@ -267,15 +265,15 @@ is
    end Pop_Inner;
 
    procedure Write_And_Ascend
-     (N_A   : in     Nodes.Valid_Address_Type;
-      N_Old : in     Nodes.RW_Node_Type;
-      N     : in     Nodes.RW_Node_Type);
+     (N_A   : in Nodes.Valid_Address_Type;
+      N_Old : in Nodes.RW_Node_Type;
+      N     : in Nodes.RW_Node_Type);
 
    -- Handles the case that the high-key of a node C changed. Then C_A is the
    -- address of C and C_Key is the high-key of C.
    procedure Update_High_Key
-     (C_Key : in     Key_Type;
-      C_A   : in     Nodes.Valid_Address_Type) is
+     (C_Key : in Key_Type;
+      C_A   : in Nodes.Valid_Address_Type) is
    begin
       if Stacks.Is_Empty(Stack) then
          Unlock(Tree, C_A);
@@ -311,13 +309,11 @@ is
    -- Otherwise, in the parent N of L, the key of the pointer to L is set to the
    -- possibly changed high-key of L and the pointer to R and its high-key are
    -- inserted.
-   -- The addresses L_A and R_A must be locked when this procedure is called.
-   -- L_A and R_A are unlocked by this procedure.
    procedure Insert_Key_And_Update_High_Key
-     (L_Key : in     Key_Type;
-      L_A   : in     Nodes.Valid_Address_Type;
-      R_Key : in     Key_Type;
-      R_A   : in     Nodes.Valid_Address_Type)
+     (L_Key : in Key_Type;
+      L_A   : in Nodes.Valid_Address_Type;
+      R_Key : in Key_Type;
+      R_A   : in Nodes.Valid_Address_Type)
    is
       use type Nodes.Valid_Address_Type;
    begin
