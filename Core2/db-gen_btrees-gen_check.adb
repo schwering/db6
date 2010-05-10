@@ -49,16 +49,14 @@ is
          exit when Is_Leaf(N);
          N_A := Child(N, 1);
       end loop;
+      Stacks.Flip(Stack);
    end Init_Stack;
 
    procedure Check_Local_Order (N : in Node_Type; N_A : in Valid_Address_Type) is
    begin
       for I in 2 .. Degree(N) loop
          if not (Key(N, I-1) <= Key(N, I)) then
-            Put_Line("Wrong order in"&
-                     Address_To_String(Block_IO.Address_Type(
-                        To_Address(N_A))) &" "&
-                     Boolean'Image(Is_Leaf(N)));
+            Put_Line("Wrong order in"& Image(N_A) &" "& Boolean'Image(Is_Leaf(N)));
             raise Tree_Error with "wrong node-internal order";
          end if;
       end loop;
@@ -70,12 +68,8 @@ is
    begin
       Read_Node(Tree, Valid_Link(N), L);
       if Level(N) /= Level(L) then
-         Put_Line("N_A ="& 
-                  Address_To_String(Block_IO.Address_Type(
-                     To_Address(N_A))) &" "&
-                  "R_A ="&
-                  Address_To_String(Block_IO.Address_Type(
-                     To_Address(Nodes.Valid_Link(N)))));
+         Put_Line("N_A ="& Image(N_A) &" "&
+                  "R_A ="& Image(Valid_Link(N)));
          Put_Line("Level N ="& Nodes.Level_Type'Image(Nodes.Level(N)));
          Put_Line("Level R ="& Nodes.Level_Type'Image(Nodes.Level(L)));
          if Is_Inner(N) then
@@ -106,10 +100,7 @@ is
          return;
       end if;
       if not (Key(N, Degree(N)) <= Key(L, 1)) then
-         Put_Line("Wrong link order in"&
-                  Address_To_String(Block_IO.Address_Type(
-                     To_Address(N_A))) &" "&
-                  Address_To_String(Block_IO.Address_Type(Link(N))) &" "&
+         Put_Line("Wrong link order in"& Image(N_A) &" "& Image(Link(N)) &" "&
                   Boolean'Image(Is_Leaf(N)));
          raise Tree_Error with "link's keys are less than node's";
       end if;
@@ -135,16 +126,14 @@ is
          return;
       end if;
       if not (NHK <= LHK) then
-         Put_Line("Wrong high key order in"&
-                  Address_To_String(Block_IO.Address_Type(
-                     To_Address(N_A))) &" "&
-                  Address_To_String(Block_IO.Address_Type(Link(N))) &" "&
+         Put_Line("Wrong high key order in"& Image(N_A) &" "&
+                  Image(Link(N)) &" "&
                   Boolean'Image(Is_Leaf(N)));
          raise Tree_Error with "link's high key is less than node's";
       end if;
    end Check_High_Key_Order;
 
-   procedure Check_Child_Order (N : in Node_Type)
+   procedure Check_Child_Order (N : in Node_Type; N_A : in Valid_Address_Type)
    is
       C : RO_Node_Type;
    begin
@@ -170,6 +159,7 @@ is
             raise Tree_Error with "child has no high key";
          end if;
          if not (CHK <= NHK) then
+            Put_Line("N_A ="& Image(N_A) &" C_A ="& Image(Child(N, Degree(N))));
             raise Tree_Error with "child's high key is greater than node's";
          end if;
       end;
@@ -241,7 +231,7 @@ is
    N   : RO_Node_Type;
 begin
    Init_Stack;
-   --Draw(Tree);
+   Draw(Tree);
    loop
       exit when Stacks.Is_Empty(Stack);
       Stacks.Pop(Stack, N_A);
@@ -250,7 +240,7 @@ begin
          Check_Local_Order(N, N_A);
          case Is_Inner(N) is
             when True =>
-               Check_Child_Order(N);
+               Check_Child_Order(N, N_A);
                if Is_Valid(Link(N)) then
                   Check_Link_Order(N, N_A);
                   Check_LinkChild_ChildLink_Equality(N);

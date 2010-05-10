@@ -49,6 +49,23 @@ package DB.Utils.Gen_Stacks is
      (Stack : Stack_Type)
       return Boolean;
 
+   function Size
+     (Stack : Stack_Type)
+      return Natural;
+
+   function Get
+     (Stack : Stack_Type;
+      I     : Positive)
+      return Item_Type;
+
+   procedure Set
+     (Stack : in out Stack_Type;
+      I     : in     Positive;
+      Item  : in     Item_Type);
+
+   procedure Flip
+     (Stack : in out Stack_Type);
+
 private
    type Item_Array_Type is array (Positive range <>) of Item_Type;
    type Item_Array_Ref_Type is access Item_Array_Type;
@@ -60,6 +77,10 @@ private
          Heap_Items  : Item_Array_Ref_Type := null;
          Top         : Natural := 0;
       end record;
+
+   pragma Inline (Size);
+   pragma Inline (Get);
+   pragma Inline (Set);
 
 end DB.Utils.Gen_Stacks;
 

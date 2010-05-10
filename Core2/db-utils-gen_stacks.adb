@@ -12,18 +12,18 @@ package body DB.Utils.Gen_Stacks is
      (Item_Array_Type, Item_Array_Ref_Type);
 
 
-   function Size
+   function Capacity
      (Stack : Stack_Type)
       return Natural
    is
-      pragma Inline (Size);
+      pragma Inline (Capacity);
    begin
       if Stack.Heap_Items = null then
          return Stack.Stack_Items'Length;
       else
          return Stack.Stack_Items'Length + Stack.Heap_Items'Length;
       end if;
-   end Size;
+   end Capacity;
 
 
    procedure Resize
@@ -31,18 +31,18 @@ package body DB.Utils.Gen_Stacks is
    is
       pragma Inline (Resize);
    begin
-      if Stack.Top = Size(Stack) then
+      if Stack.Top = Capacity(Stack) then
          declare
-            New_Size       : constant Natural := Size(Stack) * 3 / 2 + 1;
+            New_Capacity   : constant Natural := Capacity(Stack) * 3 / 2 + 1;
             New_Heap_Items : Item_Array_Ref_Type :=
-               new Item_Array_Type(Stack.Stack_Items'Last + 1 .. New_Size);
+               new Item_Array_Type(Stack.Stack_Items'Last + 1 .. New_Capacity);
          begin
             if Stack.Heap_Items /= null then
                New_Heap_Items(Stack.Heap_Items'Range) := Stack.Heap_Items.all;
                Free(Stack.Heap_Items);
             end if;
             Stack.Heap_Items := New_Heap_Items;
-            pragma Assert (Size(Stack) = New_Size);
+            pragma Assert (Capacity(Stack) = New_Capacity);
          end;
       end if;
    end Resize;
@@ -116,6 +116,57 @@ package body DB.Utils.Gen_Stacks is
    begin
       return Stack.Top = 0;
    end Is_Empty;
+
+
+   function Size
+     (Stack : Stack_Type)
+      return Natural is
+   begin
+      return Stack.Top;
+   end Size;
+
+
+   function Get
+     (Stack : Stack_Type;
+      I     : Positive)
+      return Item_Type is
+   begin
+      if I <= Stack.Stack_Items'Last then
+         return Stack.Stack_Items(I);
+      else
+         return Stack.Heap_Items(I);
+      end if;
+   end Get;
+
+
+   procedure Set
+     (Stack : in out Stack_Type;
+      I     : in     Positive;
+      Item  : in     Item_Type) is
+   begin
+      if I <= Stack.Stack_Items'Last then
+         Stack.Stack_Items(I) := Item;
+      else
+         Stack.Heap_Items(I) := Item;
+      end if;
+   end Set;
+
+
+   procedure Flip
+     (Stack : in out Stack_Type)
+   is
+      procedure Swap (I, J : Positive)
+      is
+         Tmp : Item_Type := Get(Stack, I);
+      begin
+         Set(Stack, I, Get(Stack, J));
+         Set(Stack, J, Tmp);
+      end Swap;
+   begin
+      for I in 1 .. Size(Stack) / 2 loop
+         Swap(I, Size(Stack) - I + 1);
+      end loop;
+   end Flip;
 
 end DB.Utils.Gen_Stacks;
 
