@@ -110,9 +110,6 @@ is
       IO_Name : constant String := Args.Pop_Argument(1);
    begin
       GNAT.Exception_Actions.Register_Id_Action
-        (DB.IO_Error'Identity,
-         GNAT.Exception_Actions.Core_Dump'Access);
-      GNAT.Exception_Actions.Register_Id_Action
         (DB.Tree_Error'Identity,
          GNAT.Exception_Actions.Core_Dump'Access);
       for I in Procs'Range loop
