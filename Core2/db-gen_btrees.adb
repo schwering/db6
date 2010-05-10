@@ -151,7 +151,22 @@ package body DB.Gen_BTrees is
       N    :    out Nodes.Node_Type)
    is
       pragma Inline (Read_Node);
+
+      function Same_Level return Boolean
+      is
+         use type Nodes.Level_Type;
+         R : Nodes.RO_Node_Type;
+      begin
+         if not Nodes.Is_Valid(Nodes.Link(N)) then
+            return True;
+         end if;
+         Read_Node(Tree, Nodes.Valid_Link(N), R);
+         return Nodes.Level(N) = Nodes.Level(R);
+      end Same_Level;
    begin
+      if not Same_Level then
+         raise Tree_Error;
+      end if;
       Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(N_A),
                     Blocks.Base_Block_Type(N(Nodes.RO_Node_Type'Range)));
    end Read_Node;
@@ -165,7 +180,22 @@ package body DB.Gen_BTrees is
       pragma Inline (Write_Node);
       use type Nodes.Valid_Address_Type;
       pragma Assert (Nodes.Is_Safe(N, Is_Root => N_A = Root_Address));
+
+      function Same_Level return Boolean
+      is
+         use type Nodes.Level_Type;
+         R : Nodes.RO_Node_Type;
+      begin
+         if not Nodes.Is_Valid(Nodes.Link(N)) then
+            return True;
+         end if;
+         Read_Node(Tree, Nodes.Valid_Link(N), R);
+         return Nodes.Level(N) = Nodes.Level(R);
+      end Same_Level;
    begin
+      if not Same_Level then
+         raise Tree_Error;
+      end if;
       Block_IO.Write(Tree.File, Block_IO.Valid_Address_Type(N_A),
                      Nodes.To_Block(N));
    end Write_Node;
@@ -178,7 +208,22 @@ package body DB.Gen_BTrees is
    is
       pragma Inline (Write_New_Node);
       pragma Assert (Nodes.Is_Safe(N, Is_Root => False));
+
+      function Same_Level return Boolean
+      is
+         use type Nodes.Level_Type;
+         R : Nodes.RO_Node_Type;
+      begin
+         if not Nodes.Is_Valid(Nodes.Link(N)) then
+            return True;
+         end if;
+         Read_Node(Tree, Nodes.Valid_Link(N), R);
+         return Nodes.Level(N) = Nodes.Level(R);
+      end Same_Level;
    begin
+      if not Same_Level then
+         raise Tree_Error;
+      end if;
       Block_IO.Write_New_Block(Tree.File, Block_IO.Valid_Address_Type(N_A),
                                Nodes.To_Block(N));
    end Write_New_Node;
