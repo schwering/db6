@@ -5,6 +5,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Text_IO;
+with Ada.Containers.Ordered_Sets;
 
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
@@ -14,6 +15,25 @@ procedure DB.Gen_BTrees.Gen_Draw
 is
    use Ada.Text_IO;
    use Nodes;
+
+   function "<" (A, B : Valid_Address_Type) return Boolean
+   is
+      use Block_IO;
+   begin
+      return Block_IO.Valid_Address_Type(A) < Block_IO.Valid_Address_Type(B);
+   end;
+
+   function "=" (A, B : Valid_Address_Type) return Boolean
+   is
+      use Block_IO;
+   begin
+      return Block_IO.Valid_Address_Type(A) = Block_IO.Valid_Address_Type(B);
+   end;
+
+   package Sets is new Ada.Containers.Ordered_Sets
+     (Valid_Address_Type, "<", "=");
+
+   Set : Sets.Set;
 
    function Image (N_A : Valid_Address_Type) return String is
    begin
@@ -60,11 +80,12 @@ is
             return "circle";
          end if;
       end Style;
-      Deg : constant String := Degree_Type'Image(Degree(N));
+      Deg  : constant String := Degree_Type'Image(Degree(N));
       Addr : constant String := Address_To_String(Block_IO.Address_Type(To_Address(N_A)));
+      Lev  : constant String := Level_Type'Image(Level(N));
    begin
       Put(""""& Addr &"""");
-      Put(" [label="""& Deg &": "& Addr &""",shape="""& Style &"""]");
+      Put(" [label="""& Addr &": "& Deg &", "& Lev &""",shape="""& Style &"""]");
       New_Line;
    end Draw_Node;
 
@@ -79,6 +100,29 @@ is
       New_Line;
    end Draw_Arrow;
 
+   procedure Handle_Node (N_A : Nodes.Valid_Address_Type; N : out Node_Type) is
+   begin
+      if Sets.Contains(Set, N_A) then
+         return;
+      end if;
+      Sets.Insert(Set, N_A);
+      Read_Node(Tree, N_A, N);
+      Draw_Node(N_A, N);
+      if Is_Valid(Link(N)) then
+         Draw_Arrow(N_A, Valid_Link(N), Is_Link => True);
+      end if;
+      if Is_Inner(N) then
+         for I in 1 .. Degree(N) loop
+            Draw_Arrow(N_A, Child(N, I), Is_Link => False);
+            declare
+               C : RO_Node_Type;
+            begin
+               Handle_Node(Child(N, I), C);
+            end;
+         end loop;
+      end if;
+   end Handle_Node;
+
    N_A : Valid_Address_Type;
    N   : RO_Node_Type;
 begin
@@ -89,16 +133,7 @@ begin
       exit when Stacks.Is_Empty(Stack);
       Stacks.Pop(Stack, N_A);
       loop
-         Read_Node(Tree, N_A, N);
-         Draw_Node(N_A, N);
-         if Is_Valid(Link(N)) then
-            Draw_Arrow(N_A, Valid_Link(N), Is_Link => True);
-         end if;
-         if Is_Inner(N) then
-            for I in 1 .. Degree(N) loop
-               Draw_Arrow(N_A, Child(N, I), Is_Link => False);
-            end loop;
-         end if;
+         Handle_Node(N_A, N);
          exit when not Is_Valid(Link(N));
          N_A := Valid_Link(N);
       end loop;

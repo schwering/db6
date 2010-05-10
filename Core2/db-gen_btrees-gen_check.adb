@@ -70,6 +70,36 @@ is
    begin
       Read_Node(Tree, Valid_Link(N), L);
       if Level(N) /= Level(L) then
+         Put_Line("N_A ="& 
+                  Address_To_String(Block_IO.Address_Type(
+                     To_Address(N_A))) &" "&
+                  "R_A ="&
+                  Address_To_String(Block_IO.Address_Type(
+                     To_Address(Nodes.Valid_Link(N)))));
+         Put_Line("Level N ="& Nodes.Level_Type'Image(Nodes.Level(N)));
+         Put_Line("Level R ="& Nodes.Level_Type'Image(Nodes.Level(L)));
+         if Is_Inner(N) then
+            for I in 1 .. Degree(N) loop
+               declare
+                  C : Nodes.RO_Node_Type;
+               begin
+                  Read_Node(Tree, Child(N, I), C);
+                  Put_Line("Level Child(N,"&I'Img&") ="&
+                           Nodes.Level_Type'Image(Nodes.Level(C)));
+               end;
+            end loop;
+         end if;
+         if Is_Inner(L) then
+            for I in 1 .. Degree(L) loop
+               declare
+                  C : Nodes.RO_Node_Type;
+               begin
+                  Read_Node(Tree, Child(L, I), C);
+                  Put_Line("Level Child(L,"&I'Img&") ="&
+                           Nodes.Level_Type'Image(Nodes.Level(C)));
+               end;
+            end loop;
+         end if;
          raise Tree_Error with "node and link have inequal level";
       end if;
       if Degree(L) = 0 then
