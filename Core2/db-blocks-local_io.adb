@@ -5,16 +5,10 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 package body DB.Blocks.Local_IO is
- 
+
    function To_Valid_Address
      (Position : Low_Level_IO.File_Position_Type)
       return Valid_Address_Type;
-
-
-   function Hash (A : Address_Type) return Utils.Hash_Type is
-   begin
-      return Utils.Hash_Type(A);
-   end Hash;
 
 
    procedure Create
@@ -143,7 +137,7 @@ package body DB.Blocks.Local_IO is
       Address : in     Valid_Address_Type;
       Block   :    out Block_Type)
    is
-      procedure LL_Read is new Low_Level_IO.PRead(Block_Type);
+      procedure LL_Read is new Low_Level_IO.Read(Block_Type);
    begin
       LL_Read(File.FD, To_File_Position(Address), Block);
    end Read;
@@ -154,7 +148,7 @@ package body DB.Blocks.Local_IO is
       Address : in     Valid_Address_Type;
       Block   : in     Block_Type)
    is
-      procedure LL_Write is new Low_Level_IO.PWrite(Block_Type);
+      procedure LL_Write is new Low_Level_IO.Write(Block_Type);
    begin
       LL_Write(File.FD, To_File_Position(Address), Block);
    end Write;
@@ -165,39 +159,11 @@ package body DB.Blocks.Local_IO is
       Address :    out Valid_Address_Type;
       Block   : in     Block_Type)
    is
-      Pos     : Low_Level_IO.File_Position_Type;
-      Success : Boolean;
+      procedure LL_Write_New is new Low_Level_IO.Write_New(Block_Type);
+      Pos : Low_Level_IO.File_Position_Type;
    begin
-      <<Retry>>
-      Low_Level_IO.Seek_End(File.FD, Pos);
+      LL_Write_New(File.FD, Pos, Block);
       Address := To_Valid_Address(Pos);
-      Try_Lock(File, Address, Success);
-      if not Success then
-         goto Retry;
-      end if;
-      declare
-         use type Low_Level_IO.File_Position_Type;
-         Check_Pos : Low_Level_IO.File_Position_Type;
-      begin
-         Low_Level_IO.Seek_End(File.FD, Check_Pos);
-         if Check_Pos /= Pos then
-            Unlock(File, Address);
-            goto Retry;
-         end if;
-      exception
-         when others =>
-            Unlock(File, Address);
-            raise;
-      end;
-      declare
-      begin
-         Write(File, Address, Block);
-      exception
-         when others =>
-            Unlock(File, Address);
-            raise;
-      end;
-      Unlock(File, Address);
    end Write_New_Block;
 
 

@@ -33,24 +33,24 @@ package DB.Blocks.Low_Level_IO is
 
    generic
       type Item_Type is limited private;
-   procedure PRead
+   procedure Read
      (File : in  File_Descriptor_Type;
       Pos  : in  File_Position_Type;
       Item : out Item_Type);
 
    generic
       type Item_Type is limited private;
-   procedure PWrite
+   procedure Write
      (File : in File_Descriptor_Type;
       Pos  : in File_Position_Type;
       Item : in Item_Type);
 
-   procedure Allocate
-     (File   : in  File_Descriptor_Type;
-      Length : in  Size_Type;
-      Pos    : out File_Position_Type);
-   -- Note that this call is not thread-safe! But it is process-safe. Have a
-   -- look at the C code.
+   generic
+      type Item_Type is limited private;
+   procedure Write_New
+     (File : in  File_Descriptor_Type;
+      Pos  : out File_Position_Type;
+      Item : in  Item_Type);
 
    procedure Seek_End
      (File : in  File_Descriptor_Type;
@@ -72,9 +72,9 @@ package DB.Blocks.Low_Level_IO is
 private
    pragma Inline (Open);
    pragma Inline (Close);
-   pragma Inline (PRead);
-   pragma Inline (PWrite);
-   pragma Inline (Allocate);
+   pragma Inline (Read);
+   pragma Inline (Write);
+   pragma Inline (Write_New);
    pragma Inline (Lock);
    pragma Inline (Unlock);
 

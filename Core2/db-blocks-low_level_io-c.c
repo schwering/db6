@@ -104,7 +104,7 @@ int db_blocks_low_level_io_close(int fd)
 	return retval;
 }
 
-ssize_t db_blocks_low_level_io_pread(int fd, void *buf, size_t nbytes,
+ssize_t db_blocks_low_level_io_read(int fd, void *buf, size_t nbytes,
 		off64_t offset)
 {
 	ssize_t retval;
@@ -114,7 +114,7 @@ ssize_t db_blocks_low_level_io_pread(int fd, void *buf, size_t nbytes,
 	return retval;
 }
 
-ssize_t db_blocks_low_level_io_pwrite(int fd, const void *buf,
+ssize_t db_blocks_low_level_io_write(int fd, const void *buf,
 		size_t nbytes, off64_t offset)
 {
 	ssize_t retval;
@@ -122,6 +122,22 @@ ssize_t db_blocks_low_level_io_pwrite(int fd, const void *buf,
 	retval = pwrite(fd, buf, nbytes, offset);
 	io_unlock();
 	return retval;
+}
+
+off64_t db_blocks_low_level_io_write_new(int fd, const void *buf,
+		size_t nbytes)
+{
+	off64_t offset;
+
+	io_lock();
+	offset = lseek64(fd, 0, SEEK_END);
+	if (offset == (off64_t)-1) {
+		io_unlock();
+		return (off64_t)-1;
+	}
+	pwrite(fd, buf, nbytes, offset);
+	io_unlock();
+	return offset;
 }
 
 static int try_lock(int fd, off64_t offset, size_t len)
@@ -164,31 +180,6 @@ static int unlock(int fd, off64_t offset, size_t len)
 	lock.l_len = len;
 	//lock.l_pid = getpid();
 	return fcntl(fd, cmd, &lock) != -1;
-}
-
-off64_t db_blocks_low_level_io_alloc(int fd, size_t nbytes)
-{
-	off64_t offset;
-	void *zeros;
-
-	zeros = malloc(nbytes);
-	memset(zeros, 0, nbytes);
-retry:
-	offset = lseek64(fd, 0, SEEK_END);
-	if (offset == (off64_t)-1)
-		return (off64_t)-1;
-	if (!try_lock(fd, offset, nbytes))
-		goto retry;
-	if (lseek64(fd, 0, SEEK_END) != offset) {
-		unlock(fd, offset, nbytes);
-		goto retry;
-	}
-	io_lock();
-	pwrite(fd, zeros, nbytes, offset);
-	io_unlock();
-	free(zeros);
-	unlock(fd, offset, nbytes);
-	return offset;
 }
 
 off64_t db_blocks_low_level_io_seek_end(int fd)

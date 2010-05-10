@@ -41,16 +41,17 @@ package body DB.Blocks.Low_Level_IO is
       function close (FD : int) return int;
       pragma Import (C, close, "db_blocks_low_level_io_close");
 
-      function pread (FD : int; Buf : void_ptr; NBytes : size_t;
+      function read (FD : int; Buf : void_ptr; NBytes : size_t;
+                     Offset : off_t) return ssize_t;
+      pragma Import(C, read, "db_blocks_low_level_io_read");
+
+      function write (FD : int; Buf : void_ptr; NBytes : size_t;
                       Offset : off_t) return ssize_t;
-      pragma Import(C, pread, "db_blocks_low_level_io_pread");
+      pragma Import (C, write, "db_blocks_low_level_io_write");
 
-      function pwrite (FD : int; Buf : void_ptr; NBytes : size_t;
-                       Offset : off_t) return ssize_t;
-      pragma Import (C, pwrite, "db_blocks_low_level_io_pwrite");
-
-      function alloc (FD : int; NBytes : size_t) return off_t;
-      pragma Import (C, alloc, "db_blocks_low_level_io_alloc");
+      function write_new (FD : int; Buf : void_ptr; NBytes : size_t)
+         return off_t;
+      pragma Import (C, write_new, "db_blocks_low_level_io_write_new");
 
       function seek_end (FD : int) return off_t;
       pragma Import (C, seek_end, "db_blocks_low_level_io_seek_end");
@@ -122,14 +123,32 @@ package body DB.Blocks.Low_Level_IO is
    end Close;
 
 
-   procedure PRead
+   procedure Read
      (File : in  File_Descriptor_Type;
       Pos  : in  File_Position_Type;
       Item : out Item_Type)
    is
       Size  : constant Size_Type := Item'Size / System.Storage_Unit;
       Count : constant Signed_Size_Type :=
-         Signed_Size_Type(C.pread(C.int(File),
+         Signed_Size_Type(C.read(C.int(File),
+                                 Item'Address,
+                                 C.size_t(Size),
+                                 C.off_t(Pos)));
+   begin
+      if Count < 0 or else Size_Type(Count) /= Size then
+         raise IO_Error;
+      end if;
+   end Read;
+
+
+   procedure Write
+     (File : in File_Descriptor_Type;
+      Pos  : in File_Position_Type;
+      Item : in Item_Type)
+   is
+      Size  : constant Size_Type := Item'Size / System.Storage_Unit;
+      Count : constant Signed_Size_Type :=
+         Signed_Size_Type(C.write(C.int(File),
                                   Item'Address,
                                   C.size_t(Size),
                                   C.off_t(Pos)));
@@ -137,37 +156,23 @@ package body DB.Blocks.Low_Level_IO is
       if Count < 0 or else Size_Type(Count) /= Size then
          raise IO_Error;
       end if;
-   end PRead;
+   end Write;
 
 
-   procedure PWrite
-     (File : in File_Descriptor_Type;
-      Pos  : in File_Position_Type;
-      Item : in Item_Type)
+   procedure Write_New
+     (File : in  File_Descriptor_Type;
+      Pos  : out File_Position_Type;
+      Item : in  Item_Type)
    is
       Size  : constant Size_Type := Item'Size / System.Storage_Unit;
-      Count : constant Signed_Size_Type :=
-         Signed_Size_Type(C.Pwrite(C.int(File),
-                                   Item'Address,
-                                   C.size_t(Size),
-                                   C.off_t(Pos)));
    begin
-      if Count < 0 or else Size_Type(Count) /= Size then
-         raise IO_Error;
-      end if;
-   end PWrite;
-
-
-   procedure Allocate
-     (File   : in  File_Descriptor_Type;
-      Length : in  Size_Type;
-      Pos    : out File_Position_Type) is
-   begin
-      Pos := File_Position_Type(C.alloc(C.int(File), C.size_t(Length)));
+      Pos := File_Position_Type(C.write_new(C.int(File),
+                                            Item'Address,
+                                            C.size_t(Size)));
       if Pos = File_Position_Type'Last then
          raise IO_Error;
       end if;
-   end Allocate;
+   end Write_New;
 
 
    procedure Seek_End
