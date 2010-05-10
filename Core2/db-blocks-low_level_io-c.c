@@ -1,10 +1,12 @@
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/file.h>
 #include <errno.h>
+#include <pthread.h>
 
 #ifndef O_NOATIME
   #define O_NOATIME 	0
@@ -61,9 +63,15 @@ const int db_blocks_low_level_io_file_mode = FILE_MODE;
   #define lseek64 lseek
 #endif
 
+static pthread_spinlock_t spinlock;
+static bool spinlock_initialized = false;
 
 inline int db_blocks_low_level_io_open(char *path, int flags, int mode)
 {
+	if (!spinlock_initialized) {
+		pthread_spin_init(&spinlock, 0);
+		spinlock_initialized = true;
+	}
 	return open(path, flags, mode);
 }
 
@@ -74,19 +82,31 @@ inline int db_blocks_low_level_io_unlink(char *path)
 
 inline int db_blocks_low_level_io_close(int fd)
 {
-	return close(fd);
+	int retval;
+	pthread_spin_lock(&spinlock);
+	retval = close(fd);
+	pthread_spin_unlock(&spinlock);
+	return retval;
 }
 
 inline ssize_t db_blocks_low_level_io_pread(int fd, void *buf, size_t nbytes,
 		off64_t offset)
 {
-	return pread(fd, buf, nbytes, offset);
+	ssize_t retval;
+	pthread_spin_lock(&spinlock);
+	retval = pread(fd, buf, nbytes, offset);
+	pthread_spin_unlock(&spinlock);
+	return retval;
 }
 
 inline ssize_t db_blocks_low_level_io_pwrite(int fd, const void *buf,
 		size_t nbytes, off64_t offset)
 {
-	return pwrite(fd, buf, nbytes, offset);
+	ssize_t retval;
+	pthread_spin_lock(&spinlock);
+	retval = pwrite(fd, buf, nbytes, offset);
+	pthread_spin_unlock(&spinlock);
+	return retval;
 }
 
 static int try_lock(int fd, off64_t offset, size_t len)
