@@ -43,6 +43,31 @@
 -- * XXX Expect exceptions from Lock/Unlock or not? Or only from Lock but not
 --   Unlock? Or success-parameter? Very difficult.
 --
+-- Stack building and guarantees (the gotos):
+--  * Goto retry in Build_Stack and Rebuild_Stack:
+--    The first item in the stack *must* be the root, because when we ascend,
+--    the last remaining item might be considered as root and split. The
+--    ascending procedure does recognize when the last remaining item has been
+--    split since the stack was built (if this is the case, the stack is
+--    rebuilt). But there's a moment where due to a parallel insertion the node
+--    at Root_Address might have a right neighbor. When the Build_Stack or
+--    Rebuild_Stack moves to this right neighbor and then traverses down, it
+--    won't ascend to the root but to this right neighbor and therefore possibly
+--    split this right neighbor instead of the root!
+-- * Goto retry in Pop_Leaf and Pop_Inner:
+--   After the stack was build with some node addresses, these nodes might have
+--   been split and the tree might therefore gained in height. Since the tree
+--   grows at the root and the node at Root_Node is the only one where the level
+--   changes (because our invariable is that the root always resides at
+--   the static address Root_Node), the root has been split if the level of the
+--   read node differs from the node it had when the stack was built.
+--   Why can be sure that the read node really is the root and not an old, just
+--   split root? This is because during the split, the root is locked. And the
+--   Move_Right procedure also locks it, so we are sure that it isn't read
+--   during the split. (Additionally, the fact that the stack is empty
+--   guarantees that actually the address points to the root, because this is a
+--   guarantee of the stack).
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.Utils.Gen_Stacks;
@@ -94,7 +119,12 @@ is
       N   : Nodes.RO_Node_Type;
    begin
       Stacks.Clear(Stack);
+      <<Retry>>
       Read_Node(Tree, N_A, N);
+      if Nodes.Is_Valid(Nodes.Link(N)) then
+         -- First item in stack *must* be the node. (See above.)
+         goto Retry;
+      end if;
       loop
          if Nodes.Is_Inner(N) then
             declare
@@ -123,7 +153,12 @@ is
       N   : Nodes.RO_Node_Type;
    begin
       Stacks.Clear(Stack);
+      <<Retry>>
       Read_Node(Tree, N_A, N);
+      if Nodes.Is_Valid(Nodes.Link(N)) then
+         -- First item in stack *must* be the node. (See above.)
+         goto Retry;
+      end if;
       loop
          pragma Assert (Nodes.Is_Inner(N));
          if Nodes.Level(N) /= Level then
@@ -167,7 +202,7 @@ is
      (N_A : out Nodes.Valid_Address_Type;
       N   : out Nodes.RW_Node_Type)
    is
-      use type Nodes.Valid_Address_Type;
+      use type Nodes.Level_Type;
 
       Rebuild : Boolean;
       Level   : Nodes.Level_Type;
@@ -179,7 +214,7 @@ is
          High_Key     : Key_Type;
          Has_High_Key : Boolean;
       begin
-         if Stacks.Is_Empty(Stack) and not Nodes.Is_Leaf(N) then
+         if Stacks.Is_Empty(Stack) and Nodes.Level(N) /= Level then
             Rebuild := True;
             return True;
          end if;
@@ -217,7 +252,6 @@ is
       N_A : out Nodes.Valid_Address_Type;
       N   : out Nodes.RW_Node_Type)
    is
-      use type Nodes.Valid_Address_Type;
       use type Nodes.Level_Type;
 
       Rebuild : Boolean;
@@ -286,15 +320,8 @@ is
             N     : Nodes.RW_Node_Type;
          begin
             Pop_Inner(C_A, N_A, N_Old);
-            declare
-            begin
-               I := Nodes.Child_Position(N_Old, C_A);
-               N := Nodes.Substitution(N_Old, I, C_Key, C_A);
-            exception
-               when others =>
-                  Unlock(Tree, N_A);
-                  raise;
-            end;
+            I := Nodes.Child_Position(N_Old, C_A);
+            N := Nodes.Substitution(N_Old, I, C_Key, C_A);
             Write_And_Ascend(N_A, N_Old, N);
          end;
       end if;

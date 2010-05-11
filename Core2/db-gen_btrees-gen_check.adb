@@ -231,7 +231,7 @@ is
    N   : RO_Node_Type;
 begin
    Init_Stack;
-   Draw(Tree);
+   --Draw(Tree);
    loop
       exit when Stacks.Is_Empty(Stack);
       Stacks.Pop(Stack, N_A);

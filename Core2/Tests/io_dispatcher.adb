@@ -1,6 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
-with GNAT.Exception_Actions;
+--with GNAT.Exception_Actions;
 
 with IO_Dispatcher.Args;
 --with IO_Dispatcher.Gen_BTrees;
@@ -109,9 +109,9 @@ is
 
       IO_Name : constant String := Args.Pop_Argument(1);
    begin
-      GNAT.Exception_Actions.Register_Id_Action
-        (DB.Tree_Error'Identity,
-         GNAT.Exception_Actions.Core_Dump'Access);
+      --GNAT.Exception_Actions.Register_Id_Action
+        --(DB.Tree_Error'Identity,
+         --GNAT.Exception_Actions.Core_Dump'Access);
       for I in Procs'Range loop
          if Procs(I).Name = IO_Name then
             Put_Line(To_String(Procs(I).Name));
