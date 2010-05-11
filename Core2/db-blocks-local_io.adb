@@ -6,8 +6,6 @@
 
 package body DB.Blocks.Local_IO is
 
-   Check_Lock : Boolean := False;
-
    function To_Valid_Address
      (Position : Low_Level_IO.File_Position_Type)
       return Valid_Address_Type;
@@ -17,7 +15,6 @@ package body DB.Blocks.Local_IO is
      (ID   : in  String;
       File : out File_Type) is
    begin
-      Check_Lock := False;
       Low_Level_IO.Open(Path      => ID,
                         Open_Kind => Low_Level_IO.Create,
                         File      => File.FD);
@@ -28,7 +25,6 @@ package body DB.Blocks.Local_IO is
      (ID   : in  String;
       File : out File_Type) is
    begin
-      Check_Lock := False;
       declare
       begin
          Create(ID, File);
@@ -45,7 +41,6 @@ package body DB.Blocks.Local_IO is
      (ID   : in  String;
       File : out File_Type) is
    begin
-      Check_Lock := True;
       Low_Level_IO.Open(Path      => ID,
                         Open_Kind => Low_Level_IO.Read_Write,
                         File      => File.FD);
@@ -154,12 +149,7 @@ package body DB.Blocks.Local_IO is
       Block   : in     Block_Type)
    is
       procedure LL_Write is new Low_Level_IO.Write(Block_Type);
-      Success : Boolean;
    begin
-      Mutex_Sets.Check_Owner(File.Mutex_Set, Address, Success);
-      if Check_Lock and not Success then
-         raise Tree_Error;
-      end if;
       LL_Write(File.FD, To_File_Position(Address), Block);
    end Write;
 
