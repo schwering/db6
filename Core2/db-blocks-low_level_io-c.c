@@ -140,20 +140,6 @@ off64_t db_blocks_low_level_io_write_new(int fd, const void *buf,
 	return offset;
 }
 
-static int try_lock(int fd, off64_t offset, size_t len)
-{
-	int cmd;
-	struct flock lock;
-
-	cmd = F_SETLK;
-	lock.l_type = F_WRLCK;
-	lock.l_whence = SEEK_SET;
-	lock.l_start = offset;
-	lock.l_len = len;
-	//lock.l_pid = getpid();
-	return fcntl(fd, cmd, &lock) != -1;
-}
-
 static int lock(int fd, off64_t offset, size_t len)
 {
 	int cmd;

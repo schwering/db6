@@ -7,7 +7,6 @@
 with DB.Blocks.Low_Level_IO;
 with DB.Blocks.Gen_IO_Signature;
 with DB.Locks.Gen_Mutex_Sets;
-with DB.Utils;
 
 package DB.Blocks.Local_IO is
    pragma Elaborate_Body;
