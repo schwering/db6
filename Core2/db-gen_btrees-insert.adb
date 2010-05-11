@@ -21,6 +21,9 @@
 --       key in the parent. The parent is found the same way as in case (3.a).
 -- (3.c) Everything is fine.
 -- Hence the maximum count of simultaneously held locks is three.
+-- XXX This count is not correct due to the facts that in the split case (a) R_A
+-- is locked also and (b) R_A is unlocked after the ascend has completed (which
+-- could be done earlier but would require some [not so big] code changes).
 --
 -- Design Notes:
 --
@@ -145,8 +148,8 @@ is
    end Build_Stack;
 
    procedure Rebuild_Stack
-     (Level : in  Nodes.Level_Type;
-      C_A   : in  Nodes.Valid_Address_Type)
+     (Level : in Nodes.Level_Type;
+      C_A   : in Nodes.Valid_Address_Type)
    is
       use type Nodes.Level_Type;
       N_A : Nodes.Valid_Address_Type := Root_Address;
@@ -214,7 +217,8 @@ is
          High_Key     : Key_Type;
          Has_High_Key : Boolean;
       begin
-         if Stacks.Is_Empty(Stack) and Nodes.Level(N) /= Level then
+         if Nodes.Level(N) /= Level then
+            pragma Assert (Stacks.Is_Empty(Stack));
             Rebuild := True;
             return True;
          end if;
@@ -261,7 +265,8 @@ is
         (N : Nodes.Node_Type)
          return Boolean is
       begin
-         if Stacks.Is_Empty(Stack) and Nodes.Level(N) /= Level then
+         if Nodes.Level(N) /= Level then
+            pragma Assert (Stacks.Is_Empty(Stack));
             Rebuild := True;
             return True;
          end if;
@@ -377,6 +382,8 @@ is
             use type Nodes.Index_Type;
             N_A   : Nodes.Valid_Address_Type;
             N_Old : Nodes.RW_Node_Type;
+            I     : Nodes.Index_Type;
+            N     : Nodes.RW_Node_Type;
          begin
             declare
             begin
@@ -386,17 +393,14 @@ is
                   Unlock(Tree, R_A);
                   raise;
             end;
+            I := Nodes.Child_Position(N_Old, L_A);
+            N := Nodes.Substitution(N_Old, I, L_Key, L_A);
+            I := I + 1;
+            N := Nodes.Insertion(N, I, R_Key, R_A);
+            Write_And_Ascend(N_A, N_Old, N);
+            -- R_A could be unlocked right after N is written in
+            -- Write_And_Ascend and the procedures called by it.
             Unlock(Tree, R_A);
-            declare
-               I : Nodes.Index_Type;
-               N : Nodes.RW_Node_Type;
-            begin
-               I := Nodes.Child_Position(N_Old, L_A);
-               N := Nodes.Substitution(N_Old, I, L_Key, L_A);
-               I := I + 1;
-               N := Nodes.Insertion(N, I, R_Key, R_A);
-               Write_And_Ascend(N_A, N_Old, N);
-            end;
          end;
       end if;
    end Insert_Key_And_Update_High_Key;
@@ -405,9 +409,9 @@ is
    -- The address N_A must be locked when this procedure is called.
    -- N_A is unlocked by this procedure.
    procedure Write_And_Ascend
-     (N_A   : in     Nodes.Valid_Address_Type;
-      N_Old : in     Nodes.RW_Node_Type;
-      N     : in     Nodes.RW_Node_Type)
+     (N_A   : in Nodes.Valid_Address_Type;
+      N_Old : in Nodes.RW_Node_Type;
+      N     : in Nodes.RW_Node_Type)
    is
       use type Nodes.Degree_Type;
    begin
