@@ -8,8 +8,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Containers.Ordered_Maps;
-with DB.Locks.Mutexes;
+with Ada.Containers.Ordered_Sets;
 
 generic
    type Item_Type is private;
@@ -33,24 +32,21 @@ package DB.Locks.Gen_Mutex_Sets is
      (MS   : in out Mutex_Set_Type;
       Item : in     Item_Type);
 
-   procedure Get_Is_Locked
-     (MS        : in out Mutex_Set_Type;
-      Item      : in     Item_Type;
-      Is_Locked :    out Boolean);
-
 private
-   type Mutex_Ref_Type is access Mutexes.Mutex_Type;
-
-   package Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type     => Item_Type,
-      Element_Type => Mutex_Ref_Type,
-      "<"          => Gen_Mutex_Sets."<",
-      "="          => Gen_Mutex_Sets."=");
+   package Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => Item_Type,
+      "<"          => "<",
+      "="          => "=");
 
    protected type Mutex_Set_Type is
-      procedure Get_Lock (Item : in Item_Type; Mutex : out Mutex_Ref_Type);
+      procedure Try_Lock (Item : in Item_Type; Success : out Boolean);
+      entry Lock (Item : in Item_Type);
+      entry Unlock (Item : in Item_Type);
    private
-      Map : Maps.Map;
+      entry Wait_Lock (Item : in Item_Type);
+      entry Reset;
+      Set     : Sets.Set;
+      Removed : Boolean := False;
    end Mutex_Set_Type;
 
 end DB.Locks.Gen_Mutex_Sets;
