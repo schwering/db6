@@ -187,6 +187,18 @@ is
       end loop;
    end Build_Stack;
 
+   function High_Key
+     (N : Nodes.Node_Type)
+      return Key_Type
+   is
+      High_Key     : Key_Type;
+      Has_High_Key : Boolean;
+   begin
+      Nodes.Get_High_Key(N, High_Key, Has_High_Key);
+      pragma Assert (Has_High_Key);
+      return High_Key;
+   end High_Key;
+
    procedure Move_Right
      (Level     : in              Nodes.Level_Type;
       Exit_Cond : not null access function (N : Nodes.Node_Type) return Boolean;
@@ -364,14 +376,10 @@ is
          end;
          declare
             Old_High_Key     : Key_Type;
-            New_High_Key     : Key_Type;
             Old_Has_High_Key : Boolean;
-            New_Has_High_Key : Boolean;
          begin
             Nodes.Get_High_Key(N_Old, Old_High_Key, Old_Has_High_Key);
-            Nodes.Get_High_Key(N, New_High_Key, New_Has_High_Key);
-            pragma Assert (New_Has_High_Key);
-            if not Old_Has_High_Key or else Old_High_Key < New_High_Key then
+            if not Old_Has_High_Key or else Old_High_Key < High_Key(N) then
                Update_High_Key(High_Key(N), N_A);
             else
                Unlock(Tree, N_A);
