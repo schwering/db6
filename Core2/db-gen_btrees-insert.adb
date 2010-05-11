@@ -46,30 +46,29 @@
 -- * XXX Expect exceptions from Lock/Unlock or not? Or only from Lock but not
 --   Unlock? Or success-parameter? Very difficult.
 --
--- Stack building and guarantees (the gotos):
---  * Goto retry in Build_Stack and Rebuild_Stack:
---    The first item in the stack *must* be the root, because when we ascend,
---    the last remaining item might be considered as root and split. The
---    ascending procedure does recognize when the last remaining item has been
---    split since the stack was built (if this is the case, the stack is
---    rebuilt). But there's a moment where due to a parallel insertion the node
---    at Root_Address might have a right neighbor. When the Build_Stack or
---    Rebuild_Stack moves to this right neighbor and then traverses down, it
---    won't ascend to the root but to this right neighbor and therefore possibly
---    split this right neighbor instead of the root!
--- * Goto retry in Pop_Leaf and Pop_Inner:
---   After the stack was build with some node addresses, these nodes might have
---   been split and the tree might therefore gained in height. Since the tree
---   grows at the root and the node at Root_Node is the only one where the level
---   changes (because our invariable is that the root always resides at
---   the static address Root_Node), the root has been split if the level of the
---   read node differs from the node it had when the stack was built.
---   Why can be sure that the read node really is the root and not an old, just
---   split root? This is because during the split, the root is locked. And the
---   Move_Right procedure also locks it, so we are sure that it isn't read
---   during the split. (Additionally, the fact that the stack is empty
---   guarantees that actually the address points to the root, because this is a
---   guarantee of the stack).
+-- Stack building and guarantees:
+-- * The stack always has Root_Node as last remaining element (except when it is
+--   empty, of course).
+-- * Build_Stack descends in the tree up to a given level.
+-- * Move_Right thread-safely moves right at a given level. If a read node
+--   appears to be from another level, then a split must have occurred. In fact,
+--   the read node must have been at address Root_Address, because the node is
+--   locked in advance and the address Root_Address is the only one whose
+--   underlying node's level might change.
+--   In this case we unlock the read node, i.e. Root_Address, immediately and
+--   rebuild the stack. In the meantime and after the stack building, the root
+--   might be split again and again, but this doesn't matter: The stack is
+--   rebuilt and the top item in the stack will not be the root, because we
+--   build the stack up to the expected level which is not the root level due to
+--   the split.
+--   Not earlier than in the next step in the ascend the root might be
+--   reconsidered. If the level has changed since the stack was rebuilt, it is
+--   rebuilt again and we are again below the root. This repeats until some time
+--   the root wasn't split between the stack was built and the ascend has
+--   reached the root.
+-- * Pop_Inner's search for a node that has a pointer works because it is
+--   guaranteed that the pointer to C_A has already been inserted. This is
+--   because we use thread-safe Move_Right in the search in Pop_Inner.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -85,77 +84,84 @@ procedure Insert
 is
    pragma Assert (Tree.Initialized);
 
-   type Stack_Item_Type is
-      record
-         Address : Nodes.Valid_Address_Type;
-         Level   : Nodes.Level_Type;
-      end record;
+   package Stack is
+      use Nodes;
 
-   package Stacks is new Utils.Gen_Stacks
-     (Item_Type    => Stack_Item_Type,
-      Initial_Size => 7,
-      Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
+      procedure Initialize;
+      procedure Finalize;
+      procedure Clear;
+      function Is_Empty return Boolean;
+      procedure Push (N_A : in Valid_Address_Type; Level : in Level_Type);
+      procedure Pop (N_A : out Valid_Address_Type);
+      procedure Pop (N_A : out Valid_Address_Type; Level : out Level_Type);
 
-   Stack : Stacks.Stack_Type;
+   private
+      type Item_Type is
+         record
+            Address : Valid_Address_Type;
+            Level   : Level_Type;
+         end record;
 
-   procedure Stack_Pop
-     (N_A   : out Nodes.Valid_Address_Type;
-      Level : out Nodes.Level_Type)
-   is
-      Item : Stack_Item_Type;
-   begin
-      Stacks.Pop(Stack, Item);
-      N_A := Item.Address;
-      Level := Item.Level;
-   end Stack_Pop;
+      package Stacks is new Utils.Gen_Stacks
+        (Item_Type    => Item_Type,
+         Initial_Size => 7,
+         Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
 
-   procedure Stack_Push
-     (N_A   : in Nodes.Valid_Address_Type;
-      Level : in Nodes.Level_Type) is
-   begin
-      Stacks.Push(Stack, Stack_Item_Type'(N_A, Level));
-   end Stack_Push;
+      Stack : Stacks.Stack_Type;
+   end Stack;
+
+   package body Stack is
+      procedure Initialize is
+      begin
+         Stack := Stacks.New_Stack;
+      end Initialize;
+
+      procedure Finalize is
+      begin
+         Stacks.Finalize(Stack);
+      end Finalize;
+
+      procedure Clear is
+      begin
+         Stacks.Clear(Stack);
+      end Clear;
+
+      function Is_Empty return Boolean is
+      begin
+         return Stacks.Is_Empty(Stack);
+      end Is_Empty;
+
+      procedure Push (N_A : in Valid_Address_Type; Level : in Level_Type) is
+      begin
+         Stacks.Push(Stack, Item_Type'(N_A, Level));
+      end Push;
+
+      procedure Pop (N_A : out Valid_Address_Type)
+      is
+         Level : Level_Type;
+      begin
+         Pop(N_A, Level);
+      end Pop;
+
+      procedure Pop (N_A : out Valid_Address_Type; Level : out Level_Type)
+      is
+         Item : Item_Type;
+      begin
+         Stacks.Pop(Stack, Item);
+         N_A := Item.Address;
+         Level := Item.Level;
+      end Pop;
+   end Stack;
 
    procedure Build_Stack
-   is
-      N_A : Nodes.Valid_Address_Type := Root_Address;
-      N   : Nodes.RO_Node_Type;
-   begin
-      Stacks.Clear(Stack);
-      <<Retry>>
-      Read_Node(Tree, N_A, N);
-      if Nodes.Is_Valid(Nodes.Link(N)) then
-         -- First item in stack *must* be the node. (See above.)
-         goto Retry;
-      end if;
-      loop
-         if Nodes.Is_Inner(N) then
-            declare
-               use type Nodes.Address_Type;
-               NN_A : constant Nodes.Valid_Address_Type := Scan_Node(N, Key);
-            begin
-               if Nodes.To_Address(NN_A) /= Nodes.Link(N) then
-                  Stack_Push(N_A, Nodes.Level(N));
-               end if;
-               N_A := NN_A;
-            end;
-            Read_Node(Tree, N_A, N);
-         else
-            Stack_Push(N_A, Nodes.Level(N));
-            exit;
-         end if;
-      end loop;
-   end Build_Stack;
-
-   procedure Rebuild_Stack
-     (Level : in Nodes.Level_Type;
-      C_A   : in Nodes.Valid_Address_Type)
+     (Level : in Nodes.Level_Type)
    is
       use type Nodes.Level_Type;
-      N_A : Nodes.Valid_Address_Type := Root_Address;
+      N_A : Nodes.Valid_Address_Type;
       N   : Nodes.RO_Node_Type;
    begin
-      Stacks.Clear(Stack);
+      N_A := Root_Address;
+      Stack.Clear;
       <<Retry>>
       Read_Node(Tree, N_A, N);
       if Nodes.Is_Valid(Nodes.Link(N)) then
@@ -163,33 +169,23 @@ is
          goto Retry;
       end if;
       loop
-         pragma Assert (Nodes.Is_Inner(N));
-         if Nodes.Level(N) /= Level then
-            declare
-               use type Nodes.Address_Type;
-               NN_A : constant Nodes.Valid_Address_Type := Scan_Node(N, Key);
-            begin
-               if Nodes.To_Address(NN_A) /= Nodes.Link(N) then
-                  Stack_Push(N_A, Nodes.Level(N));
-               end if;
-               N_A := NN_A;
-            end;
-            Read_Node(Tree, N_A, N);
-         else
-            declare
-               I : constant Nodes.Index_Type := Nodes.Child_Position(N, C_A);
-            begin
-               if not Nodes.Is_Valid(I) then
-                  N_A := Nodes.Valid_Link(N);
-                  Read_Node(Tree, N_A, N);
-               else
-                  Stack_Push(N_A, Nodes.Level(N));
-                  exit;
-               end if;
-            end;
+         if Nodes.Level(N) = Level then
+            Stack.Push(N_A, Nodes.Level(N));
+            exit;
          end if;
+         pragma Assert (Nodes.Level(N) > Level);
+         declare
+            use type Nodes.Address_Type;
+            NN_A : constant Nodes.Valid_Address_Type := Scan_Node(N, Key);
+         begin
+            if Nodes.To_Address(NN_A) /= Nodes.Link(N) then
+               Stack.Push(N_A, Nodes.Level(N));
+            end if;
+            N_A := NN_A;
+         end;
+         Read_Node(Tree, N_A, N);
       end loop;
-   end Rebuild_Stack;
+   end Build_Stack;
 
    function High_Key
      (N : Nodes.Node_Type)
@@ -201,106 +197,58 @@ is
       return Nodes.Key(N, Nodes.Degree(N));
    end High_Key;
 
-   procedure Pop_Leaf
-     (N_A : out Nodes.Valid_Address_Type;
-      N   : out Nodes.RW_Node_Type)
+   procedure Move_Right
+     (Level     : in              Nodes.Level_Type;
+      Exit_Cond : not null access function (N : Nodes.Node_Type) return Boolean;
+      N_A       : in out          Nodes.Valid_Address_Type;
+      N         :    out          Nodes.Node_Type)
    is
       use type Nodes.Level_Type;
+      use type Nodes.Valid_Address_Type;
 
-      Rebuild : Boolean;
-      Level   : Nodes.Level_Type;
-
-      function Exit_Condition
-        (N : Nodes.Node_Type)
-         return Boolean
-      is
-         High_Key     : Key_Type;
-         Has_High_Key : Boolean;
+      function Precise_Exit_Cond (N : Nodes.Node_Type) return Boolean is
       begin
          if Nodes.Level(N) /= Level then
-            pragma Assert (Stacks.Is_Empty(Stack));
-            Rebuild := True;
+            pragma Assert (Stack.Is_Empty);
             return True;
          end if;
-         if not Nodes.Is_Valid(Nodes.Link(N)) then
-            return True;
-         end if;
-         Nodes.Get_High_Key(N, High_Key, Has_High_Key);
-         return Has_High_Key and then Key <= High_Key;
-      end Exit_Condition;
+         return Exit_Cond(N);
+      end Precise_Exit_Cond;
    begin
-      <<Retry>>
-      Stack_Pop(N_A, Level);
-      Rebuild := False;
-      Move_Right(Tree, Exit_Condition'Access, N_A, N);
-      if Rebuild then
+      Move_Right(Tree, Precise_Exit_Cond'Access, N_A, N);
+      if Nodes.Level(N) /= Level then
+         pragma Assert (N_A = Root_Address);
          Unlock(Tree, N_A);
-         Build_Stack;
-         goto Retry;
+         Build_Stack(Level);
+         Stack.Pop(N_A);
+         pragma Assert (N_A /= Root_Address);
+         Move_Right(Tree, Precise_Exit_Cond'Access, N_A, N);
+         pragma Assert (Nodes.Level(N) = Level);
       end if;
-
-      declare
-      begin
-         if not Nodes.Is_Leaf(N) then
-            raise Tree_Error;
-         end if;
-      exception
-         when others =>
-            Unlock(Tree, N_A);
-            raise;
-      end;
-   end Pop_Leaf;
+   end Move_Right;
 
    procedure Pop_Inner
      (C_A : in  Nodes.Valid_Address_Type;
       N_A : out Nodes.Valid_Address_Type;
       N   : out Nodes.RW_Node_Type)
    is
-      use type Nodes.Level_Type;
-
-      Rebuild : Boolean;
-      Level   : Nodes.Level_Type;
-
-      function Exit_Condition
-        (N : Nodes.Node_Type)
-         return Boolean is
+      function Exit_Cond (N : Nodes.Node_Type) return Boolean is
       begin
-         if Nodes.Level(N) /= Level then
-            pragma Assert (Stacks.Is_Empty(Stack));
-            Rebuild := True;
-            return True;
-         end if;
          return Nodes.Is_Valid(Nodes.Child_Position(N, C_A));
-      end Exit_Condition;
+      end Exit_Cond;
+
+      Level : Nodes.Level_Type;
    begin
       declare
       begin
-         <<Retry>>
-         Stack_Pop(N_A, Level);
-         Rebuild := False;
-         Move_Right(Tree, Exit_Condition'Access, N_A, N);
-         if Rebuild then
-            Unlock(Tree, N_A);
-            Rebuild_Stack(Level, C_A);
-            goto Retry;
-         end if;
+         Stack.Pop(N_A, Level);
+         Move_Right(Level, Exit_Cond'Access, N_A, N);
       exception
          when others =>
             Unlock(Tree, C_A);
             raise;
       end;
       Unlock(Tree, C_A);
-
-      declare
-      begin
-         if not Nodes.Is_Inner(N) then
-            raise Tree_Error;
-         end if;
-      exception
-         when others =>
-            Unlock(Tree, N_A);
-            raise;
-      end;
    end Pop_Inner;
 
    procedure Write_And_Ascend
@@ -314,7 +262,7 @@ is
      (C_Key : in Key_Type;
       C_A   : in Nodes.Valid_Address_Type) is
    begin
-      if Stacks.Is_Empty(Stack) then
+      if Stack.Is_Empty then
          Unlock(Tree, C_A);
          State := Success;
       else
@@ -349,7 +297,7 @@ is
    is
       use type Nodes.Valid_Address_Type;
    begin
-      if Stacks.Is_Empty(Stack) then
+      if Stack.Is_Empty then
          -- Create a new root that points to L and R.
          pragma Assert (L_A = Root_Address);
          declare
@@ -393,6 +341,7 @@ is
                   Unlock(Tree, R_A);
                   raise;
             end;
+            Unlock(Tree, R_A);
             I := Nodes.Child_Position(N_Old, L_A);
             N := Nodes.Substitution(N_Old, I, L_Key, L_A);
             I := I + 1;
@@ -400,7 +349,6 @@ is
             Write_And_Ascend(N_A, N_Old, N);
             -- R_A could be unlocked right after N is written in
             -- Write_And_Ascend and the procedures called by it.
-            Unlock(Tree, R_A);
          end;
       end if;
    end Insert_Key_And_Update_High_Key;
@@ -415,7 +363,7 @@ is
    is
       use type Nodes.Degree_Type;
    begin
-      if Nodes.Is_Safe(N, Is_Root => Stacks.Is_Empty(Stack)) then
+      if Nodes.Is_Safe(N, Is_Root => Stack.Is_Empty) then
          declare
          begin
             Write_Node(Tree, N_A, N);
@@ -461,11 +409,32 @@ begin
       return;
    end if;
 
-   Stack := Stacks.New_Stack;
+   Stack.Initialize;
 
-   Build_Stack;
+   declare
+      use type Nodes.Level_Type;
+      use type Nodes.Valid_Address_Type;
 
-   Pop_Leaf(N_A, N_Old);
+      function Exit_Cond (N : Nodes.Node_Type) return Boolean
+      is
+         High_Key     : Key_Type;
+         Has_High_Key : Boolean;
+      begin
+         if not Nodes.Is_Leaf(N) then
+            return True;
+         end if;
+         if not Nodes.Is_Valid(Nodes.Link(N)) then
+            return True;
+         end if;
+         Nodes.Get_High_Key(N, High_Key, Has_High_Key);
+         return Has_High_Key and then Key <= High_Key;
+      end Exit_Cond;
+   begin
+      Build_Stack(Nodes.Leaf_Level);
+      Stack.Pop(N_A);
+      Move_Right(Nodes.Leaf_Level, Exit_Cond'Access, N_A, N_Old);
+   end;
+
    declare
    begin
       I := Nodes.Key_Position(N_Old, Key);
@@ -483,11 +452,11 @@ begin
    end;
    Write_And_Ascend(N_A, N_Old, N);
 
-   Stacks.Finalize(Stack);
+   Stack.Finalize;
 
 exception
    when others =>
-      Stacks.Finalize(Stack);
+      Stack.Finalize;
       pragma Warnings (Off);
       State := Error;
       pragma Warnings (On);

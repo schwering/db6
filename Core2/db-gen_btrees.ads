@@ -303,6 +303,7 @@ private
       Invalid_Index   : constant Index_Type := Index_Type'First;
       Invalid_Address : constant Address_Type :=
          Address_Type(Block_IO.Invalid_Address);
+      Leaf_Level      : constant Level_Type := Level_Type'First;
 
       ----------
       -- Address functions.

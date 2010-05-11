@@ -980,7 +980,7 @@ package body Nodes is
    begin
       return New_RW_Node(Is_Ok   => False,
                          Is_Leaf => True,
-                         Level   => 0,
+                         Level   => Leaf_Level,
                          Degree  => 0,
                          Link    => Invalid_Address);
    end Invalid_Node;
