@@ -4,12 +4,8 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Task_Identification;
-
 package DB.Locks.Mutexes is
    pragma Preelaborate;
-
-   package ATI renames Ada.Task_Identification;
 
    type Mutex_Type is limited private;
 
@@ -27,21 +23,15 @@ package DB.Locks.Mutexes is
      (M : Mutex_Type)
       return Boolean;
 
-   function Owner
-     (M : Mutex_Type)
-      return ATI.Task_Id;
-
 private
    protected type Mutex_Type is
-      entry Lock (Owner : in ATI.Task_Id);
-      procedure Try_Lock  (Owner : in ATI.Task_Id; Success : out Boolean);
+      entry Lock;
+      procedure Try_Lock  (Success : out Boolean);
       procedure Unlock;
       function Is_Locked return Boolean;
-      function Owner return ATI.Task_Id;
 
    private
       Locked : Boolean := False;
-      Owning_Task : ATI.Task_Id := ATI.Null_Task_Id;
    end Mutex_Type;
 
    pragma Inline (Lock);

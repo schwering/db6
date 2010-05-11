@@ -9,7 +9,7 @@ package body DB.Locks.Mutexes is
    procedure Lock
      (M : in out Mutex_Type) is
    begin
-      M.Lock(Ada.Task_Identification.Current_Task);
+      M.Lock;
    end Lock;
 
 
@@ -17,7 +17,7 @@ package body DB.Locks.Mutexes is
      (M       : in out Mutex_Type;
       Success :    out Boolean) is
    begin
-      M.Try_Lock(Ada.Task_Identification.Current_Task, Success);
+      M.Try_Lock(Success);
    end Try_Lock;
 
 
@@ -36,30 +36,20 @@ package body DB.Locks.Mutexes is
    end Is_Locked;
 
 
-   function Owner
-     (M : Mutex_Type)
-      return ATI.Task_Id is
-   begin
-      return M.Owner;
-   end Owner;
-
-
    protected body Mutex_Type is
 
-      entry Lock (Owner : in ATI.Task_Id) when not Locked is
+      entry Lock when not Locked is
       begin
          Locked := True;
-         Owning_Task := Owner;
       end Lock;
 
 
-      procedure Try_Lock (Owner : in ATI.Task_Id; Success : out Boolean) is
+      procedure Try_Lock (Success : out Boolean) is
       begin
          if Locked then
             Success := False;
          else
-            Locked := True;
-            Owning_Task := Owner;
+            Locked  := True;
             Success := True;
          end if;
       end Try_Lock;
@@ -68,7 +58,6 @@ package body DB.Locks.Mutexes is
       procedure Unlock is
       begin
          Locked := False;
-         Owning_Task := ATI.Null_Task_Id;
       end Unlock;
 
 
@@ -76,12 +65,6 @@ package body DB.Locks.Mutexes is
       begin
          return Locked;
       end Is_Locked;
-
-
-      function Owner return ATI.Task_Id is
-      begin
-         return Owning_Task;
-      end Owner;
 
    end Mutex_Type;
 

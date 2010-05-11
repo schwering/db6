@@ -9,8 +9,6 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Containers.Ordered_Maps;
-with Ada.Task_Identification;
-
 with DB.Locks.Mutexes;
 
 generic
@@ -19,8 +17,6 @@ generic
    with function "=" (Left, Right : Item_Type) return Boolean is <>;
 package DB.Locks.Gen_Mutex_Sets is
    pragma Preelaborate;
-
-   package ATI renames Ada.Task_Identification;
 
    type Mutex_Set_Type is limited private;
 
@@ -41,16 +37,6 @@ package DB.Locks.Gen_Mutex_Sets is
      (MS        : in out Mutex_Set_Type;
       Item      : in     Item_Type;
       Is_Locked :    out Boolean);
-
-   procedure Get_Owner
-     (MS    : in out Mutex_Set_Type;
-      Item  : in     Item_Type;
-      Owner :    out ATI.Task_Id);
-
-   procedure Check_Owner
-     (MS   : in out Mutex_Set_Type;
-      Item : in     Item_Type;
-      Ok   :    out Boolean);
 
 private
    type Mutex_Ref_Type is access Mutexes.Mutex_Type;
