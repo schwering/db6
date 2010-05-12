@@ -429,7 +429,6 @@ is
    use type Blocks.Size_Type;
    N_A   : Nodes.Valid_Address_Type;
    N_Old : Nodes.RW_Node_Type;
-   I     : Nodes.Index_Type;
    N     : Nodes.RW_Node_Type;
 begin
    if Key_Size_Bound(Key) > Max_Key_Size(Value_Size_Bound(Value)) then
@@ -445,8 +444,19 @@ begin
 
       function Exit_Cond (N : Nodes.Node_Type) return Boolean
       is
-         High_Key     : Key_Type;
-         Has_High_Key : Boolean;
+         function Fits_Into_Node (K : Key_Type; V : Value_Type) return Boolean
+         is
+            use type Nodes.Validation_State_Type;
+            I : Nodes.Index_Type;
+         begin
+           I := Nodes.Key_Position(N, K);
+           if not Nodes.Is_Valid(I) then
+              I := Nodes.Degree(N) + 1;
+           end if;
+           return Nodes.Validation(Nodes.Insertion(N, I, K, V)) /=
+                  Nodes.Too_Large;
+         end Fits_Into_Node;
+
       begin
          if not Nodes.Is_Leaf(N) then
             return True;
@@ -454,9 +464,13 @@ begin
          if not Nodes.Is_Valid(Nodes.Link(N)) then
             return True;
          end if;
-         Nodes.Get_High_Key(N, High_Key, Has_High_Key);
-         return Has_High_Key and then Key <= High_Key;
+         case Compare(Key, High_Key(N)) is
+            when Utils.Less    => return True;
+            when Utils.Equal   => return Fits_Into_Node(Key, Value);
+            when Utils.Greater => return False;
+         end case;
       end Exit_Cond;
+
    begin
       Build_Stack(Nodes.Leaf_Level);
       Stack.Pop(N_A);
@@ -464,6 +478,7 @@ begin
    end;
 
    declare
+      I : Nodes.Index_Type;
    begin
       I := Nodes.Key_Position(N_Old, Key);
       if not Nodes.Is_Valid(I) then
