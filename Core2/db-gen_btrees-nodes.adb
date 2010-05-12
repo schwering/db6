@@ -60,16 +60,11 @@ package body Nodes is
       procedure Init_Block
         (Block   : in out Blocks.Base_Block_Type;
          Is_Ok   : in     Boolean;
-         Is_Leaf : in     Boolean;
          Level   : in     Level_Type;
          Degree  : in     Degree_Type;
          Link    : in     Address_Type);
 
       function Is_Ok
-        (Block : Blocks.Base_Block_Type)
-         return Boolean;
-
-      function Is_Leaf
         (Block : Blocks.Base_Block_Type)
          return Boolean;
 
@@ -177,7 +172,6 @@ package body Nodes is
          pragma Inline (Init_Block);
          pragma Inline (Is_Ok);
          pragma Inline (Degree);
-         pragma Inline (Is_Leaf);
          pragma Inline (Link);
          pragma Inline (Read_Key);
          pragma Inline (Read_Child);
@@ -196,7 +190,6 @@ package body Nodes is
       type Booleans_Type is
          record
             Is_Ok        : Boolean;
-            Is_Leaf      : Boolean;
             Has_High_Key : Boolean;
          end record;
       pragma Pack (Booleans_Type);
@@ -230,7 +223,7 @@ package body Nodes is
          Size_Of_Booleans + Size_Of_Level + Size_Of_Degree + Size_Of_Address;
 
       -- Layout of Node Blocks is as follows:
-      -- 1. Is_Ok/Is_Leaf/Has_High_Key     (Size_Of_Booleans)
+      -- 1. Is_Ok/Has_High_Key             (Size_Of_Booleans)
       -- 2. Level                          (Size_Of_Level)
       -- 3. Degree                         (Size_Of_Degree)
       -- 4. Link                           (Size_Of_Address)
@@ -456,21 +449,6 @@ package body Nodes is
       end Set_Ok;
 
 
-      function Is_Leaf
-        (Block : Blocks.Base_Block_Type)
-         return Boolean
-      is
-         procedure Read is new Blocks.Read_At(Booleans_Type);
-         Offset   : constant Blocks.Base_Position_Type := 0;
-         From     : constant Blocks.Base_Index_Type :=
-            Blocks.Base_Index_Type'First + Offset;
-         Booleans : Booleans_Type;
-      begin
-         Read(Block, From, From + Size_Of_Booleans - 1, Booleans);
-         return Booleans.Is_Leaf;
-      end Is_Leaf;
-
-
       function Has_High_Key
         (Block : Blocks.Base_Block_Type)
          return Boolean
@@ -598,12 +576,11 @@ package body Nodes is
 
 
       procedure Init_Block
-        (Block        : in out Blocks.Base_Block_Type;
-         Is_Ok        : in     Boolean;
-         Is_Leaf      : in     Boolean;
-         Level        : in     Level_Type;
-         Degree       : in     Degree_Type;
-         Link         : in     Address_Type)
+        (Block  : in out Blocks.Base_Block_Type;
+         Is_Ok  : in     Boolean;
+         Level  : in     Level_Type;
+         Degree : in     Degree_Type;
+         Link   : in     Address_Type)
       is
          procedure Set_Booleans
            (Block    : in out Blocks.Base_Block_Type;
@@ -616,12 +593,11 @@ package body Nodes is
          begin
             Write(Block, From, From + Size_Of_Booleans - 1, Booleans);
             pragma Assert (Phys.Is_Ok(Block) = Booleans.Is_Ok);
-            pragma Assert (Phys.Is_Leaf(Block) = Booleans.Is_Leaf);
+            pragma Assert (Phys.Has_High_Key(Block) = Booleans.Has_High_Key);
          end Set_Booleans;
 
          Booleans : constant Booleans_Type :=
             Booleans_Type'(Is_Ok        => Is_Ok,
-                           Is_Leaf      => Is_Leaf,
                            Has_High_Key => False);
       begin
          Set_Booleans(Block, Booleans);
@@ -630,7 +606,6 @@ package body Nodes is
          Set_Link(Block, Link);
          pragma Assert (Phys.Level(Block) = Level);
          pragma Assert (Phys.Degree(Block) = Degree);
-         pragma Assert (Phys.Is_Leaf(Block) = Is_Leaf);
          pragma Assert (Phys.Has_High_Key(Block) = False);
          pragma Assert (Phys.Link(Block) = Link);
       end Init_Block;
@@ -661,7 +636,7 @@ package body Nodes is
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
       is
-         pragma Assert (not Is_Leaf(Block));
+         pragma Assert (Level(Block) > Leaf_Level);
          procedure Read_Child is new Blocks.Read(Valid_Address_Type);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
@@ -687,7 +662,7 @@ package body Nodes is
          Value         :    out Value_Type;
          Success       :    out Boolean)
       is
-         pragma Assert (Is_Leaf(Block));
+         pragma Assert (Level(Block) = Leaf_Level);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          Success := Blocks.Is_Valid(Cursor);
@@ -712,7 +687,7 @@ package body Nodes is
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
       is
-         pragma Assert (not Is_Leaf(Block));
+         pragma Assert (Level(Block) > Leaf_Level);
          procedure Read_Child is new Blocks.Read(Valid_Address_Type);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
@@ -739,7 +714,7 @@ package body Nodes is
          Value         :    out Value_Type;
          Success       :    out Boolean)
       is
-         pragma Assert (Is_Leaf(Block));
+         pragma Assert (Level(Block) = Leaf_Level);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          Success := Blocks.Is_Valid(Cursor);
@@ -789,7 +764,7 @@ package body Nodes is
          Key         : in     Key_Type;
          Child       : in     Valid_Address_Type)
       is
-         pragma Assert (not Is_Leaf(Block));
+         pragma Assert (Level(Block) > Leaf_Level);
          procedure Write_Child is new Blocks.Write(Valid_Address_Type);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
@@ -824,7 +799,7 @@ package body Nodes is
          Key           : in     Key_Type;
          Value         : in     Value_Type)
       is
-         pragma Assert (Is_Leaf(Block));
+         pragma Assert (Level(Block) = Leaf_Level);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          if not Blocks.Is_Valid(Cursor) then
@@ -856,7 +831,7 @@ package body Nodes is
          Index       : in     Valid_Index_Type;
          Child       : in     Valid_Address_Type)
       is
-         pragma Assert (not Is_Leaf(Block));
+         pragma Assert (Level(Block) > Leaf_Level);
          procedure Write_Child is new Blocks.Write(Valid_Address_Type);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
@@ -957,7 +932,6 @@ package body Nodes is
 
    function New_RW_Node
         (Is_Ok   : Boolean;
-         Is_Leaf : Boolean;
          Level   : Level_Type;
          Degree  : Degree_Type;
          Link    : Address_Type)
@@ -967,7 +941,6 @@ package body Nodes is
    begin
       Phys.Init_Block(Block   => Blocks.Base_Block_Type(Node),
                       Is_Ok   => Is_Ok,
-                      Is_Leaf => Is_Leaf,
                       Level   => Level,
                       Degree  => Degree,
                       Link    => Link);
@@ -979,7 +952,6 @@ package body Nodes is
      return RW_Node_Type is
    begin
       return New_RW_Node(Is_Ok   => False,
-                         Is_Leaf => True,
                          Level   => Leaf_Level,
                          Degree  => 0,
                          Link    => Invalid_Address);
@@ -987,15 +959,13 @@ package body Nodes is
 
 
    function Root_Node
-     (Is_Leaf : Boolean;
-      Level   : Level_Type)
+     (Level : Level_Type)
       return RW_Node_Type is
    begin
-      return New_RW_Node(Is_Ok   => True,
-                         Is_Leaf => Is_Leaf,
-                         Level   => Level,
-                         Degree  => 0,
-                         Link    => Invalid_Address);
+      return New_RW_Node(Is_Ok  => True,
+                         Level  => Level,
+                         Degree => 0,
+                         Link   => Invalid_Address);
    end Root_Node;
 
 
@@ -1033,7 +1003,7 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
    begin
-      return Phys.Is_Leaf(Blocks.Base_Block_Type(Node));
+      return Phys.Level(Blocks.Base_Block_Type(Node)) = Leaf_Level;
    end Is_Leaf;
 
 
@@ -1454,11 +1424,10 @@ package body Nodes is
       pragma Assert (Is_Ok(Node));
       pragma Assert (Is_Inner(Node));
 
-      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
-                                      Is_Leaf => Is_Leaf(Node),
-                                      Level   => Level(Node),
-                                      Degree  => Degree(Node) + 1,
-                                      Link    => Link(Node));
+      N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
+                                      Level  => Level(Node),
+                                      Degree => Degree(Node) + 1,
+                                      Link   => Link(Node));
       Key_Read_Context  : Key_Context_Type := New_Key_Context;
       Key_Write_Context : Key_Context_Type := New_Key_Context;
    begin
@@ -1495,11 +1464,10 @@ package body Nodes is
       pragma Assert (Is_Ok(Node));
       pragma Assert (Is_Leaf(Node));
 
-      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
-                                      Is_Leaf => Is_Leaf(Node),
-                                      Level   => Level(Node),
-                                      Degree  => Degree(Node) + 1,
-                                      Link    => Link(Node));
+      N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
+                                      Level  => Level(Node),
+                                      Degree => Degree(Node) + 1,
+                                      Link   => Link(Node));
       Key_Read_Context    : Key_Context_Type   := New_Key_Context;
       Key_Write_Context   : Key_Context_Type   := New_Key_Context;
       Value_Read_Context  : Value_Context_Type := New_Value_Context;
@@ -1541,11 +1509,10 @@ package body Nodes is
       pragma Assert (Is_Inner(Node));
       pragma Assert (Is_Valid(Child));
 
-      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
-                                      Is_Leaf => Is_Leaf(Node),
-                                      Level   => Level(Node),
-                                      Degree  => Degree(Node),
-                                      Link    => Link(Node));
+      N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
+                                      Level  => Level(Node),
+                                      Degree => Degree(Node),
+                                      Link   => Link(Node));
       Key_Read_Context  : Key_Context_Type := New_Key_Context;
       Key_Write_Context : Key_Context_Type := New_Key_Context;
    begin
@@ -1582,11 +1549,10 @@ package body Nodes is
       pragma Assert (Is_Ok(Node));
       pragma Assert (Is_Leaf(Node));
 
-      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
-                                      Is_Leaf => Is_Leaf(Node),
-                                      Level   => Level(Node),
-                                      Degree  => Degree(Node),
-                                      Link    => Link(Node));
+      N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
+                                      Level  => Level(Node),
+                                      Degree => Degree(Node),
+                                      Link   => Link(Node));
       Key_Read_Context    : Key_Context_Type   := New_Key_Context;
       Key_Write_Context   : Key_Context_Type   := New_Key_Context;
       Value_Read_Context  : Value_Context_Type := New_Value_Context;
@@ -1624,11 +1590,10 @@ package body Nodes is
    is
       pragma Assert (Is_Ok(Node));
 
-      N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
-                                      Is_Leaf => Is_Leaf(Node),
-                                      Level   => Level(Node),
-                                      Degree  => Degree(Node) - 1,
-                                      Link    => Link(Node));
+      N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
+                                      Level  => Level(Node),
+                                      Degree => Degree(Node) - 1,
+                                      Link   => Link(Node));
    begin
       if Is_Inner(Node) then
          declare
@@ -1690,11 +1655,10 @@ package body Nodes is
       end if;
 
       declare
-         N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
-                                         Is_Leaf => Is_Leaf(Node),
-                                         Level   => Level(Node),
-                                         Degree  => To - From + 1,
-                                         Link    => Link(Node));
+         N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
+                                         Level  => Level(Node),
+                                         Degree => To - From + 1,
+                                         Link   => Link(Node));
          Shift_By : constant Integer := -1 * Integer(From) + 1;
       begin
          if Is_Inner(Node) then
@@ -1759,11 +1723,10 @@ package body Nodes is
          Left_Degree  : constant Degree_Type := Degree(Left_Node);
          Right_Degree : constant Degree_Type := Degree(Right_Node);
          Degree       : constant Degree_Type := Left_Degree + Right_Degree;
-         N : RW_Node_Type := New_RW_Node(Is_Ok   => True,
-                                         Is_Leaf => Is_Leaf(Right_Node),
-                                         Level   => Level(Right_Node),
-                                         Degree  => Degree,
-                                         Link    => Link(Right_Node));
+         N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
+                                         Level  => Level(Right_Node),
+                                         Degree => Degree,
+                                         Link   => Link(Right_Node));
       begin
          if Is_Inner(Right_Node) then
             declare

@@ -312,7 +312,7 @@ is
             Read_Node(Tree, L_A, L);
             pragma Assert (Nodes.Valid_Link(L) = R_A);
             Write_New_Node(Tree, L_A_New, L);
-            N := Nodes.Root_Node(Is_Leaf => False, Level => Nodes.Level(L) + 1);
+            N := Nodes.Root_Node(Nodes.Level(L) + 1);
             N := Nodes.Insertion(N, 1, L_Key, L_A_New);
             N := Nodes.Insertion(N, 2, R_Key, R_A);
             Nodes.Set_Link(N, Invalid_Address);

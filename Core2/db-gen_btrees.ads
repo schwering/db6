@@ -332,8 +332,7 @@ private
       -- General and accessor subprograms.
 
       function Root_Node
-        (Is_Leaf : Boolean;
-         Level   : Level_Type)
+        (Level : Level_Type)
          return RW_Node_Type;
       -- Returns a simple root node of degree 0.
 

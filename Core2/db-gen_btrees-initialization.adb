@@ -12,7 +12,7 @@ package body Initialization is
    is
       File : Block_IO.File_Type;
       Root : constant Nodes.RW_Node_Type :=
-         Nodes.Root_Node(Is_Leaf => True, Level => Nodes.Leaf_Level);
+         Nodes.Root_Node(Nodes.Leaf_Level);
    begin
       Block_IO.Create(ID, File);
       declare
