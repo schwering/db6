@@ -5,7 +5,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 separate (DB.Gen_BTrees)
-package body Retrieval is
+package body Searches is
 
    procedure Search
      (Tree     : in out Tree_Type;
@@ -98,5 +98,5 @@ package body Retrieval is
          raise;
    end Minimum;
 
-end Retrieval;
+end Searches;
 

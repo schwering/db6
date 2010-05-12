@@ -19,7 +19,7 @@ package body DB.Gen_BTrees is
    end Initialization;
 
 
-   package Retrieval is
+   package Searches is
       procedure Search
         (Tree     : in out Tree_Type;
          Key      : in     Key_Type;
@@ -31,7 +31,7 @@ package body DB.Gen_BTrees is
          Key      :    out Key_Type;
          Value    :    out Value_Type;
          State    :    out State_Type);
-   end Retrieval;
+   end Searches;
 
 
    package Cursors is
@@ -291,7 +291,7 @@ package body DB.Gen_BTrees is
       Key   : in     Key_Type;
       Value :    out Value_Type;
       State :    out State_Type)
-   renames Retrieval.Search;
+   renames Searches.Search;
 
 
    procedure Minimum
@@ -299,7 +299,7 @@ package body DB.Gen_BTrees is
       Key   :    out Key_Type;
       Value :    out Value_Type;
       State :    out State_Type)
-   renames Retrieval.Minimum;
+   renames Searches.Minimum;
 
 
    procedure Insert
@@ -393,7 +393,7 @@ package body DB.Gen_BTrees is
 
    package body Nodes is separate;
    package body Initialization is separate;
-   package body Retrieval is separate;
+   package body Searches is separate;
    package body Cursors is separate;
    package body Misc is separate;
 
