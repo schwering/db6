@@ -150,16 +150,11 @@ package body Cursors is
       use type Utils.Comparison_Result_Type;
    begin
       case Comparison is
-         when Less =>
-            return Compare(Left, Right) = Utils.Less;
-         when Less_Or_Equal =>
-            return Compare(Left, Right) /= Utils.Greater;
-         when Equal =>
-            return Compare(Left, Right) = Utils.Equal;
-         when Greater_Or_Equal =>
-            return Compare(Left, Right) /= Utils.Less;
-         when Greater =>
-            return Compare(Left, Right) = Utils.Greater;
+         when Less             => return Compare(Left, Right) = Utils.Less;
+         when Less_Or_Equal    => return Compare(Left, Right) /= Utils.Greater;
+         when Equal            => return Compare(Left, Right) = Utils.Equal;
+         when Greater_Or_Equal => return Compare(Left, Right) /= Utils.Less;
+         when Greater          => return Compare(Left, Right) = Utils.Greater;
       end case;
    end Key_Matches;
 
