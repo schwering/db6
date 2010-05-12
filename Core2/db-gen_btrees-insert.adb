@@ -110,6 +110,7 @@ is
       Stack : Stacks.Stack_Type;
    end Stack;
 
+
    package body Stack is
       procedure Initialize is
       begin
@@ -152,6 +153,7 @@ is
          Level := Item.Level;
       end Pop;
    end Stack;
+
 
    procedure Build_Stack
      (Level : in Nodes.Level_Type)
@@ -198,6 +200,7 @@ is
       end loop;
    end Build_Stack;
 
+
    function High_Key
      (N : Nodes.Node_Type)
       return Key_Type
@@ -209,6 +212,7 @@ is
       pragma Assert (Has_High_Key);
       return High_Key;
    end High_Key;
+
 
    procedure Move_Right
      (Level     : in              Nodes.Level_Type;
@@ -240,6 +244,7 @@ is
       end if;
    end Move_Right;
 
+
    procedure Pop_Inner
      (C_A : in  Nodes.Valid_Address_Type;
       N_A : out Nodes.Valid_Address_Type;
@@ -264,10 +269,12 @@ is
       Unlock(Tree, C_A);
    end Pop_Inner;
 
+
    procedure Write_And_Ascend
      (N_A   : in Nodes.Valid_Address_Type;
       N_Old : in Nodes.RW_Node_Type;
       N     : in Nodes.RW_Node_Type);
+
 
    -- Handles the case that the high-key of a node C changed. Then C_A is the
    -- address of C and C_Key is the high-key of C.
@@ -292,6 +299,7 @@ is
          end;
       end if;
    end Update_High_Key;
+
 
    -- Handles the split of a node into nodes L and R, where L is written back to
    -- the position of the original node, L_A, and R is written to a new address,
@@ -365,6 +373,7 @@ is
          end;
       end if;
    end Insert_Key_And_Update_High_Key;
+
 
    -- Writes back the node(s) visited of the current level.
    -- The address N_A must be locked when this procedure is called.
