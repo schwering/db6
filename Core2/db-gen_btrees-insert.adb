@@ -9,21 +9,26 @@
 -- (2) Move to the right until the checked node is ought to contain Key. This
 --     is exactly the Move_Right procedure which holds at most two locks at once
 --     and exactly one lock at return.
+--     Choose the node wisely: if duplicate keys are allowed and you always
+--     choose the first node candidate, insertions after deletions will lead to
+--     many splits. Hence, if the current leaf has no space for the entry and
+--     the neighbor leaf could contain the entry, too, try to insert it in the
+--     neighbor.
 --     Now start the ascent:
 -- (3.a) If the current node is not safe, split it. Update the left node's
 --       high key in parent and insert the new node's high key plus address
 --       into the parent.
 --       The parent is found via Move_Right which holds at most two locks
---       at once. Additionally the current node is locked, hence at most three
+--       at once. Additionally the current nodes are locked, hence at most four
 --       locks are held. At the end, the parent node is locked (and becomes
 --       the current node and the ascent is continued recursively).
 -- (3.b) If the inserted key is the high key of the new node, update the high
 --       key in the parent. The parent is found the same way as in case (3.a).
 -- (3.c) Everything is fine.
--- Hence the maximum count of simultaneously held locks is three.
--- XXX This count is not correct due to the facts that in the split case (a) R_A
--- is locked also and (b) R_A is unlocked after the ascend has completed (which
--- could be done earlier but would require some [not so big] code changes).
+-- The Build_Stack procedure locks the root sometimes. But this does not affect
+-- the maximum count of simultaneous locks since at most two locks are held at
+-- the time Build_Stack is called.
+-- Hence the maximum count of simultaneously held locks is four.
 --
 -- Design Notes:
 --
@@ -37,6 +42,8 @@
 -- * In-parameters must be locked at entrance of the procedure by the caller.
 -- * In-parameters must be unlocked by the called procedure.
 -- * Out-parameters must be locked by the called procedure.
+-- * The exception is Move_Right in that its in-parameter N_A must not be locked
+--   (but the out-parameter N_A is locked).
 --
 -- Error conventions:
 -- * Expect exceptions (IO_Error) from IO operations.

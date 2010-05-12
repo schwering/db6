@@ -1,6 +1,8 @@
 -- Abstract:
 --
--- see spec
+-- The search descends to a leaf and then moves right as long as there is hope
+-- to find the key.
+-- During all this time, nothing is locked.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
