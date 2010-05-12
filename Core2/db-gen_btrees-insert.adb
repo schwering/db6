@@ -160,14 +160,20 @@ is
       N_A : Nodes.Valid_Address_Type;
       N   : Nodes.RO_Node_Type;
    begin
-      N_A := Root_Address;
       Stack.Clear;
-      <<Retry>>
-      Read_Node(Tree, N_A, N);
-      if Nodes.Is_Valid(Nodes.Link(N)) then
-         -- First item in stack *must* be the node. (See above.)
-         goto Retry;
-      end if;
+      N_A := Root_Address;
+      -- Lock root to enforce that it is the first node in the stack.
+      Lock(Tree, N_A);
+      declare
+      begin
+         Read_Node(Tree, N_A, N);
+         pragma Assert (not Nodes.Is_Valid(Nodes.Link(N)));
+      exception
+         when others =>
+            Unlock(Tree, N_A);
+            raise;
+      end;
+      Unlock(Tree, N_A);
       loop
          if Nodes.Level(N) = Level then
             Stack.Push(N_A, Nodes.Level(N));
