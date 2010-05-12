@@ -28,8 +28,8 @@ package body Searches is
       N : Nodes.RO_Node_Type;
    begin
       Find_Leaf(N);
-      pragma Assert (Nodes.Is_Leaf(N));
       loop
+         pragma Assert (Nodes.Is_Leaf(N));
          declare
             use type Utils.Comparison_Result_Type;
             I : constant Nodes.Index_Type := Nodes.Key_Position(N, Key);
@@ -47,12 +47,23 @@ package body Searches is
                      State := Error;
                      return;
                end case;
-            elsif not Nodes.Is_Valid(Nodes.Link(N)) then
+            end if;
+         end;
+         if not Nodes.Is_Valid(Nodes.Link(N)) then
+            State := Failure;
+            return;
+         end if;
+         declare
+            High_Key     : Key_Type;
+            Has_High_Key : Boolean;
+         begin
+            Nodes.Get_High_Key(N, High_Key, Has_High_Key);
+            if Has_High_Key and then Key < High_Key then
                State := Failure;
                return;
             end if;
-            Read_Node(Tree, Nodes.Valid_Link(N), N);
          end;
+         Read_Node(Tree, Nodes.Valid_Link(N), N);
       end loop;
 
    exception
