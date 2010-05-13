@@ -362,8 +362,6 @@ is
             I := I + 1;
             N := Nodes.Insertion(N, I, R_Key, R_A);
             Write_And_Ascend(N_A, N_Old, N);
-            -- R_A could be unlocked right after N is written in
-            -- Write_And_Ascend and the procedures called by it.
          end;
       end if;
    end Insert_Key_And_Update_High_Key;
