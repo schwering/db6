@@ -379,6 +379,17 @@ private
       -- set to False. Otherwise, if Node is not empty, the high is just the
       -- greatest key.
 
+      function Has_High_Key
+        (Node : Nodes.Node_Type)
+         return Boolean;
+      -- Returns True iff Node has a high key.
+
+      function High_Key
+        (Node : Nodes.Node_Type)
+         return Key_Type;
+      -- Returns the high key of Node if it exists. Otherwise Tree_Error is
+      -- raised.
+
       procedure Get_Key
         (Node        : in     Node_Type;
          Index       : in     Valid_Index_Type;

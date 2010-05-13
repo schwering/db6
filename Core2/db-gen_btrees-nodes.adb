@@ -1056,6 +1056,41 @@ package body Nodes is
    end Get_High_Key;
 
 
+   function Has_High_Key
+     (Node : Nodes.Node_Type)
+      return Boolean is
+   begin
+      if Degree(Node) = 0 then
+         declare
+            Key_Context  : Key_Context_Type := New_Key_Context;
+            High_Key     : Key_Type;
+            Has_High_Key : Boolean;
+         begin
+            Phys.Read_High_Key(Key_Context, Blocks.Base_Block_Type(Node),
+                               High_Key, Has_High_Key);
+            return Has_High_Key;
+         end;
+      else
+         return True;
+      end if;
+   end Has_High_Key;
+
+
+   function High_Key
+     (Node : Nodes.Node_Type)
+      return Key_Type
+   is
+      High_Key     : Key_Type;
+      Has_High_Key : Boolean;
+   begin
+      Nodes.Get_High_Key(Node, High_Key, Has_High_Key);
+      if not Has_High_Key then
+         raise Tree_Error;
+      end if;
+      return High_Key;
+   end High_Key;
+
+
    procedure Get_Key
      (Node        : in     Node_Type;
       Index       : in     Valid_Index_Type;

@@ -208,19 +208,6 @@ is
    end Build_Stack;
 
 
-   function High_Key
-     (N : Nodes.Node_Type)
-      return Key_Type
-   is
-      High_Key     : Key_Type;
-      Has_High_Key : Boolean;
-   begin
-      Nodes.Get_High_Key(N, High_Key, Has_High_Key);
-      pragma Assert (Has_High_Key);
-      return High_Key;
-   end High_Key;
-
-
    procedure Move_Right
      (Level     : in              Nodes.Level_Type;
       Exit_Cond : not null access function (N : Nodes.Node_Type) return Boolean;
@@ -401,18 +388,13 @@ is
                Unlock(Tree, N_A);
                raise;
          end;
-         declare
-            Old_High_Key     : Key_Type;
-            Old_Has_High_Key : Boolean;
-         begin
-            Nodes.Get_High_Key(N_Old, Old_High_Key, Old_Has_High_Key);
-            if not Old_Has_High_Key or else Old_High_Key < High_Key(N) then
-               Update_High_Key(High_Key(N), N_A);
-            else
-               Unlock(Tree, N_A);
-               State := Success;
-            end if;
-         end;
+         if not Nodes.Has_High_Key(N_Old) or else
+            Nodes.High_Key(N_Old) /= Nodes.High_Key(N) then
+            Update_High_Key(Nodes.High_Key(N), N_A);
+         else
+            Unlock(Tree, N_A);
+            State := Success;
+         end if;
       else
          declare
             I   : constant Nodes.Valid_Index_Type := Nodes.Split_Position(N);
@@ -426,8 +408,8 @@ is
             Lock(Tree, R_A);
             Nodes.Set_Link(L, R_A);
             Write_Node(Tree, L_A, L);
-            Insert_Key_And_Update_High_Key(High_Key(L), L_A,
-                                           High_Key(R), R_A);
+            Insert_Key_And_Update_High_Key(Nodes.High_Key(L), L_A,
+                                           Nodes.High_Key(R), R_A);
          end;
       end if;
    end Write_And_Ascend;
@@ -471,7 +453,7 @@ begin
          if not Nodes.Is_Valid(Nodes.Link(N)) then
             return True;
          end if;
-         case Compare(Key, High_Key(N)) is
+         case Compare(Key, Nodes.High_Key(N)) is
             when Utils.Less    => return True;
             when Utils.Equal   => return Fits_Into_Node(Key, Value);
             when Utils.Greater => return False;
