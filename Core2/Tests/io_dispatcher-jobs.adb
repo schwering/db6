@@ -1,5 +1,6 @@
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with DB.Utils.Timers;
 
@@ -126,6 +127,7 @@ package body IO_Dispatcher.Jobs is
          exception
             when Error : others =>
                Put_Line("Exception: "& Exception_Information(Error));
+               Set_Exit_Status(Failure);
          end Task_Type;
 
          Tasks : array (1 .. Concurrency_Degree) of Task_Type;

@@ -1,5 +1,6 @@
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Text_IO; use Ada.Text_IO;
 --with GNAT.Exception_Actions;
 
 with IO_Dispatcher.Args;
@@ -131,6 +132,7 @@ is
    exception
       when Error : others =>
          Put_Line(Exception_Information(Error));
+         Set_Exit_Status(Failure);
    end Dispatch;
 
 end IO_Dispatcher;
