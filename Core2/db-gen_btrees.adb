@@ -51,6 +51,16 @@ package body DB.Gen_BTrees is
       -- splits of the tree correctly. If the nodes read starting from N_A are
       -- not from the expected Level, the Stack is re-built.
 
+      procedure Write_And_Ascend
+        (Tree  : in out Tree_Type;
+         Stack : in out Stack_Type;
+         N_A   : in     Nodes.Valid_Address_Type;
+         N_Old : in     Nodes.RW_Node_Type;
+         N     : in     Nodes.RW_Node_Type);
+      -- Writes back the node(s) visited of the current level.
+      -- The address N_A must be locked when this procedure is called.
+      -- N_A is unlocked by this procedure.
+
    private
       type Item_Type is
          record
