@@ -79,9 +79,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Utils.Gen_Stacks;
-with DB.Utils.Global_Pool;
-
 separate (DB.Gen_BTrees)
 procedure Insert
   (Tree  : in out Tree_Type;
@@ -91,153 +88,7 @@ procedure Insert
 is
    pragma Assert (Tree.Initialized);
 
-   package Stack is
-      use Nodes;
-
-      procedure Initialize;
-      procedure Finalize;
-      procedure Clear;
-      function Is_Empty return Boolean;
-      procedure Push (N_A : in Valid_Address_Type; Level : in Level_Type);
-      procedure Pop (N_A : out Valid_Address_Type);
-      procedure Pop (N_A : out Valid_Address_Type; Level : out Level_Type);
-
-   private
-      type Item_Type is
-         record
-            Address : Valid_Address_Type;
-            Level   : Level_Type;
-         end record;
-
-      package Stacks is new Utils.Gen_Stacks
-        (Item_Type    => Item_Type,
-         Initial_Size => 7,
-         Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
-
-      Stack : Stacks.Stack_Type;
-   end Stack;
-
-
-   package body Stack is
-      procedure Initialize is
-      begin
-         Stack := Stacks.New_Stack;
-      end Initialize;
-
-      procedure Finalize is
-      begin
-         Stacks.Finalize(Stack);
-      end Finalize;
-
-      procedure Clear is
-      begin
-         Stacks.Clear(Stack);
-      end Clear;
-
-      function Is_Empty return Boolean is
-      begin
-         return Stacks.Is_Empty(Stack);
-      end Is_Empty;
-
-      procedure Push (N_A : in Valid_Address_Type; Level : in Level_Type) is
-      begin
-         Stacks.Push(Stack, Item_Type'(N_A, Level));
-      end Push;
-
-      procedure Pop (N_A : out Valid_Address_Type)
-      is
-         Level : Level_Type;
-      begin
-         Pop(N_A, Level);
-      end Pop;
-
-      procedure Pop (N_A : out Valid_Address_Type; Level : out Level_Type)
-      is
-         Item : Item_Type;
-      begin
-         Stacks.Pop(Stack, Item);
-         N_A := Item.Address;
-         Level := Item.Level;
-      end Pop;
-   end Stack;
-
-
-   procedure Build_Stack
-     (Level : in Nodes.Level_Type)
-   is
-      use type Nodes.Level_Type;
-      N_A : Nodes.Valid_Address_Type;
-      N   : Nodes.RO_Node_Type;
-   begin
-      Stack.Clear;
-
-      N_A := Root_Address;
-      Read_Node(Tree, N_A, N);
-      if Nodes.Is_Valid(Nodes.Link(N)) then
-         -- Lock root to enforce that it is the first node in the stack.
-         Lock(Tree, N_A);
-         declare
-         begin
-            Read_Node(Tree, N_A, N);
-            pragma Assert (not Nodes.Is_Valid(Nodes.Link(N)));
-         exception
-            when others =>
-               Unlock(Tree, N_A);
-               raise;
-         end;
-         Unlock(Tree, N_A);
-      end if;
-
-      loop
-         if Nodes.Level(N) = Level then
-            Stack.Push(N_A, Nodes.Level(N));
-            exit;
-         end if;
-         pragma Assert (Nodes.Level(N) > Level);
-         declare
-            use type Nodes.Address_Type;
-            NN_A : constant Nodes.Valid_Address_Type := Scan_Node(N, Key);
-         begin
-            if Nodes.To_Address(NN_A) /= Nodes.Link(N) then
-               Stack.Push(N_A, Nodes.Level(N));
-            end if;
-            N_A := NN_A;
-         end;
-         Read_Node(Tree, N_A, N);
-      end loop;
-   end Build_Stack;
-
-
-   procedure Move_Right
-     (Level     : in              Nodes.Level_Type;
-      Exit_Cond : not null access function (N : Nodes.Node_Type) return Boolean;
-      N_A       : in out          Nodes.Valid_Address_Type;
-      N         :    out          Nodes.Node_Type)
-   is
-      use type Nodes.Level_Type;
-      use type Nodes.Valid_Address_Type;
-
-      function Precise_Exit_Cond (N : Nodes.Node_Type) return Boolean is
-      begin
-         if Nodes.Level(N) /= Level then
-            pragma Assert (Stack.Is_Empty);
-            return True;
-         end if;
-         return Exit_Cond(N);
-      end Precise_Exit_Cond;
-   begin
-      Move_Right(Tree, Precise_Exit_Cond'Access, N_A, N);
-      if Nodes.Level(N) /= Level then
-         pragma Assert (N_A = Root_Address);
-         Unlock(Tree, N_A);
-         Build_Stack(Level);
-         Stack.Pop(N_A);
-         pragma Assert (N_A /= Root_Address);
-         Move_Right(Tree, Precise_Exit_Cond'Access, N_A, N);
-         pragma Assert (Nodes.Level(N) = Level);
-      end if;
-   end Move_Right;
-
+   Stack : Stacks.Stack_Type;
 
    procedure Pop_Inner
      (C_A : in  Nodes.Valid_Address_Type;
@@ -253,8 +104,8 @@ is
    begin
       declare
       begin
-         Stack.Pop(N_A, Level);
-         Move_Right(Level, Exit_Cond'Access, N_A, N);
+         Stacks.Pop(Stack, N_A, Level);
+         Stacks.Move_Right(Tree, Stack, Level, Exit_Cond'Access, N_A, N);
       exception
          when others =>
             Unlock(Tree, C_A);
@@ -276,7 +127,7 @@ is
      (C_Key : in Key_Type;
       C_A   : in Nodes.Valid_Address_Type) is
    begin
-      if Stack.Is_Empty then
+      if Stacks.Is_Empty(Stack) then
          Unlock(Tree, C_A);
          State := Success;
       else
@@ -312,7 +163,7 @@ is
    is
       use type Nodes.Valid_Address_Type;
    begin
-      if Stack.Is_Empty then
+      if Stacks.Is_Empty(Stack) then
          -- Create a new root that points to L and R.
          pragma Assert (L_A = Root_Address);
          declare
@@ -377,7 +228,7 @@ is
    is
       use type Nodes.Degree_Type;
    begin
-      if Nodes.Is_Safe(N, Is_Root => Stack.Is_Empty) then
+      if Nodes.Is_Safe(N, Is_Root => Stacks.Is_Empty(Stack)) then
          declare
          begin
             Write_Node(Tree, N_A, N);
@@ -416,14 +267,13 @@ is
    use type Blocks.Size_Type;
    N_A   : Nodes.Valid_Address_Type;
    N_Old : Nodes.RW_Node_Type;
-   N     : Nodes.RW_Node_Type;
 begin
    if Key_Size_Bound(Key) > Max_Key_Size(Value_Size_Bound(Value)) then
       State := Failure;
       return;
    end if;
 
-   Stack.Initialize;
+   Stacks.Initialize(Stack, Key);
 
    declare
       use type Nodes.Level_Type;
@@ -443,7 +293,6 @@ begin
            return Nodes.Validation(Nodes.Insertion(N, I, K, V)) /=
                   Nodes.Too_Large;
          end Fits_Into_Node;
-
       begin
          if not Nodes.Is_Leaf(N) then
             return True;
@@ -457,36 +306,34 @@ begin
             when Utils.Greater => return False;
          end case;
       end Exit_Cond;
-
    begin
-      Build_Stack(Nodes.Leaf_Level);
-      Stack.Pop(N_A);
-      Move_Right(Nodes.Leaf_Level, Exit_Cond'Access, N_A, N_Old);
+      Stacks.Build_Stack(Tree, Stack, Nodes.Leaf_Level);
+      Stacks.Pop(Stack, N_A);
+      Stacks.Move_Right(Tree, Stack, Nodes.Leaf_Level, Exit_Cond'Access,
+                        N_A, N_Old);
    end;
 
    declare
+      N : Nodes.RW_Node_Type;
       I : Nodes.Index_Type;
    begin
       I := Nodes.Key_Position(N_Old, Key);
       if not Nodes.Is_Valid(I) then
          I := Nodes.Degree(N_Old) + 1;
       elsif not Allow_Duplicates and then Nodes.Key(N_Old, I) = Key then
+         Stacks.Finalize(Stack);
          State := Failure;
          return;
       end if;
       N := Nodes.Insertion(N_Old, I, Key, Value);
-   exception
-      when others =>
-         Unlock(Tree, N_A);
-         raise;
+      Write_And_Ascend(N_A, N_Old, N);
    end;
-   Write_And_Ascend(N_A, N_Old, N);
 
-   Stack.Finalize;
+   Stacks.Finalize(Stack);
 
 exception
    when others =>
-      Stack.Finalize;
+      Stacks.Finalize(Stack);
       pragma Warnings (Off);
       State := Error;
       pragma Warnings (On);
