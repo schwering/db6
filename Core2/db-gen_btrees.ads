@@ -42,7 +42,7 @@
 --
 -- References:
 --
--- [BTree] Lehman and Yao -- Efficient locking for concurrent operations on
+-- [L&Y] Lehman and Yao -- Efficient locking for concurrent operations on
 -- B-trees (http://portal.acm.org/citation.cfm?id=319663)
 --
 -- Design Notes:
@@ -50,6 +50,7 @@
 -- Exceptions should only be raised under really serious circumstances or in
 -- debugging mode.
 -- In productive use, the State_Type should be used.
+-- XXX Really?
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
