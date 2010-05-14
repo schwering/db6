@@ -277,7 +277,6 @@ begin
 
    declare
       use type Nodes.Level_Type;
-      use type Nodes.Valid_Address_Type;
 
       function Exit_Cond (N : Nodes.Node_Type) return Boolean
       is
