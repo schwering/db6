@@ -37,6 +37,7 @@ package body Misc is
       end loop;
    end Count;
 
+
    procedure Reorganize
      (Tree  : in out Tree_Type;
       State :    out State_Type) is

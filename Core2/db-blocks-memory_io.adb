@@ -20,10 +20,32 @@ package body DB.Blocks.Memory_IO is
    Files : Entry_Ref_Array_Type := (others => null);
 
 
-   function Hash(A : Address_Type) return Utils.Hash_Type is
-   begin
-      return Utils.Hash_Type(A);
-   end Hash;
+   protected body Item_Type is
+      procedure Write (Block : in Blocks.Block_Type) is
+      begin
+         Item_Type.Block := Block;
+      end Write;
+
+      function Read return Blocks.Block_Type is
+      begin
+         return Block;
+      end Read;
+
+      entry Lock when not Locked is
+      begin
+         Locked := True;
+      end Lock;
+
+      procedure Unlock is
+      begin
+         Locked := False;
+      end Unlock;
+
+      function Is_Locked return Boolean is
+      begin
+         return Locked;
+      end Is_Locked;
+   end Item_Type;
 
 
    procedure Create
@@ -117,93 +139,82 @@ package body DB.Blocks.Memory_IO is
    procedure Resize_Buffer
      (File : in File_Type) is
    begin
-      if File.Current >= File.Capacity then
+      if File.Maximum > File.Capacity then
          declare
-            Capacity : constant Address_Type
-                     := File.Capacity * 4 / 3 + 1;
-            Buffer   : constant Block_Ref_Array_Ref_Type
-                     := new Block_Ref_Array_Type(1 .. Capacity);
+            Capacity : constant Address_Type :=
+               File.Maximum * 4 / 3 + 1;
+            Buffer   : constant Item_Ref_Array_Ref_Type :=
+               new Item_Ref_Array_Type(1 .. Capacity);
          begin
             if File.Buffer /= null then
                Buffer(File.Buffer'Range) := File.Buffer(File.Buffer'Range);
             end if;
             for I in File.Capacity + 1 .. Capacity loop
-               Buffer(I) := new Block_Type;
+               Buffer(I) := new Item_Type;
             end loop;
             File.Capacity := Capacity;
-            File.Buffer := Buffer;
+            File.Buffer   := Buffer;
          end;
       end if;
    end Resize_Buffer;
 
 
-   procedure Next_Block
-     (File : in File_Type) is
-   begin
-      File.Current := File.Current + 1;
-      Resize_Buffer(File);
-   end Next_Block;
-
-
    procedure Read
      (File    : in out File_Type;
       Address : in     Valid_Address_Type;
-      Block   :    out Block_Type) is
+      Block   :    out Block_Type)
+   is
+      use type Blocks.Block_Type;
    begin
-      Locks.Mutexes.Lock(File.Mutex);
-
-      File.Current := Address;
-
-      if File.Current > File.Maximum then
-         raise IO_Error;
-      end if;
-
-      Block := File.Buffer(File.Current).all;
-      Next_Block(File);
-
-      Locks.Mutexes.Unlock(File.Mutex);
-   exception
-      when others =>
-         Locks.Mutexes.Unlock(File.Mutex);
-         raise;
+      pragma Assert (Address in File.Buffer'Range);
+      Block := File.Buffer(Address).Read;
    end Read;
 
 
    procedure Write
      (File    : in out File_Type;
       Address : in     Valid_Address_Type;
-      Block   : in     Block_Type) is
+      Block   : in     Block_Type)
+   is
+      use type Blocks.Block_Type;
    begin
-      Locks.Mutexes.Lock(File.Mutex);
-
-      File.Current := Address;
-
-      Resize_Buffer(File);
-      File.Buffer(File.Current).all := Block;
-      if File.Maximum < File.Current then
-         File.Maximum := File.Current;
+      if Address > File.Maximum then -- not thread-safe (that's intended)
+         declare
+         begin
+            Locks.Mutexes.Lock(File.Mutex);
+            File.Maximum := Address;
+            Resize_Buffer(File);
+            Locks.Mutexes.Unlock(File.Mutex);
+         exception
+            when others =>
+               Locks.Mutexes.Unlock(File.Mutex);
+               raise;
+         end;
+      else
+         if not File.Buffer(Address).Is_Locked then
+            raise IO_Error;
+         end if;
       end if;
-      Next_Block(File);
-
-      Locks.Mutexes.Unlock(File.Mutex);
-   exception
-      when others =>
-         Locks.Mutexes.Unlock(File.Mutex);
-         raise;
+      pragma Assert (Address in File.Buffer'Range);
+      File.Buffer(Address).Write(Block);
+      pragma Assert (File.Buffer(Address).Read = Block);
    end Write;
 
 
    procedure Write_New_Block
      (File    : in out File_Type;
       Address :    out Address_Type;
-      Block   : in     Block_Type) is
+      Block   : in     Block_Type)
+   is
+      use type Blocks.Block_Type;
    begin
       Locks.Mutexes.Lock(File.Mutex);
-
-      File.Current := File.Maximum + 1;
-      Address      := File.Current + 1;
-      Write(File, Address, Block);
-
+      File.Maximum := File.Maximum + 1;
+      Address := File.Maximum;
+      Resize_Buffer(File);
+      pragma Assert (Address in File.Buffer'Range);
+      File.Buffer(Address).Write(Block);
+      pragma Assert (File.Buffer(Address).Read = Block);
       Locks.Mutexes.Unlock(File.Mutex);
    exception
       when others =>
@@ -216,7 +227,7 @@ package body DB.Blocks.Memory_IO is
      (File    : in out File_Type;
       Address : in     Valid_Address_Type) is
    begin
-      Mutex_Sets.Lock(File.Mutex_Set, Address);
+      File.Buffer(Address).Lock;
    end Lock;
 
 
@@ -224,7 +235,7 @@ package body DB.Blocks.Memory_IO is
      (File    : in out File_Type;
       Address : in     Valid_Address_Type) is
    begin
-      Mutex_Sets.Unlock(File.Mutex_Set, Address);
+      File.Buffer(Address).Unlock;
    end Unlock;
 
 end DB.Blocks.Memory_IO;
