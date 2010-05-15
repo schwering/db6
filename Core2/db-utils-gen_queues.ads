@@ -1,10 +1,6 @@
 -- Abstract:
 --
--- A generic thread-safe (protected) queue.
---
--- Design Notes:
---
--- (Content)
+-- A generic thread-safe (protected) fixed-size queue.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
