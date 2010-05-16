@@ -1,4 +1,5 @@
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Fixed;
 
 with IO_Dispatcher.Random; use IO_Dispatcher.Random;
 with IO_Dispatcher.Args;
@@ -9,6 +10,7 @@ with IO_Dispatcher.Map_Types;
 with DB.Blocks;
 with DB.Tables.Maps;
 with DB.Tables.Maps.Check;
+with DB.Tables.Maps.Stats;
 with DB.Types.Strings.Bounded;
 with DB.Types.Values.Bounded;
 with DB.Types.Times;
@@ -46,20 +48,51 @@ procedure IO_Dispatcher.Map is
    Null_Value : DB.Tables.Value_Type'Class := Map_Types.Null_Value;
 
    procedure Stats
-     (Map                    : in out DB.Tables.Maps.Map_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   is null;
+     (Object : in out DB.Tables.Maps.Map_Type)
+   is
+      use DB.Tables.Maps.Stats;
 
-   procedure Check
-     (Map : in out DB.Tables.Maps.Map_Type)
-   is null;
+      Last_Level : Level_Type := 0;
+
+      procedure Emit (Level : in Level_Type;
+                      Key   : in String;
+                      Value : in Data_Type)
+      is
+         type Percent_Type is delta 0.1 digits 5;
+         LS : constant String := Ada.Strings.Fixed.Trim(Natural'Image(Level),
+                                                        Ada.Strings.Both);
+      begin
+         if Level /= Last_Level then
+            New_Line;
+         end if;
+         Put("   Level_"& LS &": "& Key);
+         case Value.Compound is
+            when True =>
+               Put(" "& Value.Avg'Img &" "& Value.Max'Img &" "& Value.Min'Img);
+            when False =>
+               Put(" "& Value.Val'Img);
+         end case;
+         if Key = "Count" then
+            Put(" "&
+                Absolute_Type'Image(Value.Val *
+                                    Absolute_Type(DB.Blocks.Block_Size) /
+                                    1024**2) &"MB");
+         elsif Key ="Size" or Key = "Waste" then
+            Put(" "&
+                Percent_Type'Image(Percent_Type(
+                  Float(Value.Avg) / Float(DB.Blocks.Block_Size) * 100.0)) &
+                "%");
+         end if;
+
+         New_Line;
+         Last_Level := Level;
+      end Emit;
+
+   begin
+      Put_Line("Stats {");
+      DB.Tables.Maps.Stats.Make_Stats(Object, Emit'Access);
+      Put_Line("}");
+   end Stats;
 
    package Simple_Jobs is new Gen_Simple_Jobs
      (Object_Type     => DB.Tables.Maps.Map_Type,

@@ -45,15 +45,7 @@ generic
           (Object : in out Object_Type;
            Count  :    out Count_Type);
    with procedure P_Stats
-          (Object                 : in out Object_Type;
-           Height                 :    out Natural;
-           Blocks                 :    out Natural;
-           Free_Blocks            :    out Natural;
-           Max_Degree             :    out Natural;
-           Avg_Degree             :    out Natural;
-           Min_Degree             :    out Natural;
-           Bytes_Wasted_In_Blocks :    out Long_Integer;
-           Bytes_In_Blocks        :    out Long_Integer);
+          (Object : in out Object_Type);
    with procedure P_Check
           (Object : in out Object_Type);
 package IO_Dispatcher.Gen_Simple_Jobs is
