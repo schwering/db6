@@ -2,7 +2,7 @@
 IO=map
 BIN=bin/debug/./ttree
 FILE=`cat .temp_path`btree
-C1=1k
+C1=10k
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
 # 3. Some mor insertions and check for all three
@@ -15,7 +15,9 @@ C1=1k
 #    three blocks of insertions)
 C="$BIN $IO $FILE 0\
         \
-	Insert,$C1,Reset Check,1,Cont\
+	Insert,$C1,Reset Check,1,Cont Stats,1,Cont\
+	Insert,$C1,Reset Check,1,Cont Stats,1,Cont\
+	Insert,$C1,Reset Check,1,Cont Stats,1,Cont\
 	"
 echo $C
 $C

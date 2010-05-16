@@ -63,6 +63,9 @@ procedure IO_Dispatcher.Map is
          return Average_Type(Elementary_Functions.Sqrt(Float(A)));
       end Sqrt;
 
+      Avg_Size   : Average_Type := 0.0;
+      Avg_Degree : Average_Type := 0.0;
+
       procedure Emit (Level : in Level_Type;
                       Key   : in String;
                       Value : in Data_Type)
@@ -108,6 +111,17 @@ procedure IO_Dispatcher.Map is
 
          New_Line;
          Last_Level := Level;
+         if Key = "Degree" then
+            Avg_Degree := Value.Avg;
+         end if;
+         if Key = "Size" then
+            Avg_Size := Value.Avg;
+         end if;
+         if Key = "Waste" then
+            Put_Line("   Level_"& Img(Level) &": "&
+                     "EntrySize"&
+                     "  avg="& Img(Avg_Size / Avg_Degree));
+         end if;
       end Emit;
 
    begin
