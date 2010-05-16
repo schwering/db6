@@ -10,13 +10,14 @@ package DB.Gen_BTrees.Gen_Stats is
    pragma Preelaborate;
 
    subtype Level_Type is Natural;
-   subtype Absolute_Type is Long_Integer;
-   type Average_Type is delta 10.0**(-2) digits 12;
+   subtype Absolute_Type is Long_Long_Integer range 0 .. Long_Long_Integer'Last;
+   type Average_Type is delta 10.0**(-1) digits 18;
    type Data_Type (Compound : Boolean) is
       record
          case Compound is
             when True =>
                Avg : Average_Type;
+               Var : Average_Type;
                Min : Absolute_Type;
                Max : Absolute_Type;
             when False =>

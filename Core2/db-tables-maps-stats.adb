@@ -30,6 +30,7 @@ package body DB.Tables.Maps.Stats is
                              Key,
                              Data_Type'(Compound => True,
                                         Avg => Average_Type(Value.Avg),
+                                        Var => Average_Type(Value.Var),
                                         Min => Absolute_Type(Value.Min),
                                         Max => Absolute_Type(Value.Max)));
                      when False =>
@@ -56,6 +57,7 @@ package body DB.Tables.Maps.Stats is
                              Key,
                              Data_Type'(Compound => True,
                                         Avg => Average_Type(Value.Avg),
+                                        Var => Average_Type(Value.Var),
                                         Min => Absolute_Type(Value.Min),
                                         Max => Absolute_Type(Value.Max)));
                      when False =>

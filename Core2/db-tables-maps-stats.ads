@@ -9,12 +9,13 @@ package DB.Tables.Maps.Stats is
 
    subtype Level_Type is Natural;
    subtype Absolute_Type is Long_Integer;
-   type Average_Type is delta 10.0**(-2) digits 12;
+   type Average_Type is delta 10.0**(-1) digits 17;
    type Data_Type (Compound : Boolean) is
       record
          case Compound is
             when True =>
                Avg : Average_Type;
+               Var : Average_Type;
                Min : Absolute_Type;
                Max : Absolute_Type;
             when False =>

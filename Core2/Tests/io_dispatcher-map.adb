@@ -1,5 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Fixed;
+with Ada.Numerics.Generic_Elementary_Functions;
 
 with IO_Dispatcher.Random; use IO_Dispatcher.Random;
 with IO_Dispatcher.Args;
@@ -54,23 +55,44 @@ procedure IO_Dispatcher.Map is
 
       Last_Level : Level_Type := 0;
 
+      function Sqrt (A : Average_Type) return Average_Type
+      is
+         package Elementary_Functions is new
+         Ada.Numerics.Generic_Elementary_Functions(Float);
+      begin
+         return Average_Type(Elementary_Functions.Sqrt(Float(A)));
+      end Sqrt;
+
       procedure Emit (Level : in Level_Type;
                       Key   : in String;
                       Value : in Data_Type)
       is
+         function Trim (S : String) return String is
+         begin return Ada.Strings.Fixed.Trim(S, Ada.Strings.Both); end;
+
+         function Img (L : Level_Type) return String is
+         begin return Trim(L'Img); end;
+
+         function Img (A : Absolute_Type) return String is
+         begin return Trim(A'Img); end;
+
+         function Img (A : Average_Type) return String is
+         begin return Trim(A'Img); end;
+
          type Percent_Type is delta 0.1 digits 5;
-         LS : constant String := Ada.Strings.Fixed.Trim(Natural'Image(Level),
-                                                        Ada.Strings.Both);
       begin
          if Level /= Last_Level then
             New_Line;
          end if;
-         Put("   Level_"& LS &": "& Key);
+         Put("   Level_"& Img(Level) &": "& Key);
          case Value.Compound is
             when True =>
-               Put(" "& Value.Avg'Img &" "& Value.Max'Img &" "& Value.Min'Img);
+               Put("  avg="& Img(Value.Avg) &
+                   "  dev="& Img(Sqrt(Value.Var)) &
+                   "  max="& Img(Value.Max) &
+                   "  min="& Img(Value.Min));
             when False =>
-               Put(" "& Value.Val'Img);
+               Put("  val="& Img(Value.Val));
          end case;
          if Key = "Count" then
             Put(" "&
