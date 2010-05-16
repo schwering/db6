@@ -1,0 +1,1313 @@
+Statistik steht unten.
+Probleme sind offensichtlich zu lange Keys.
+Behebbar durch kleinere Keys in den Vaetern?
+
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Newly created Map /home/chs/Backup/db/btree
+Size = 0
+Init = 1
+Insert 100000 10 FALSE:  0m 16s (16000000)     0m 12s (129652206)
+Insert 100000 10 TRUE:  0m 18s (18760000)     0m 13s (139949722)
+Search 100000 10 TRUE:  0m 9s (9500000)     0m 4s (49935924)
+Insert 100000 10 FALSE:  0m 19s (19430000)     0m 15s (159768044)
+Search 100000 10 TRUE:  0m 9s (9880000)     0m 5s (50001420)
+Search 100000 10 FALSE:  0m 9s (9570000)     0m 5s (50208908)
+Insert 100000 10 FALSE:  0m 20s (20560000)     0m 16s (160660162)
+Search 100000 10 TRUE:  0m 10s (10470000)     0m 5s (59262412)
+Search 100000 10 FALSE:  0m 10s (10270000)     0m 5s (50270664)
+Search 100000 10 FALSE:  0m 10s (10160000)     0m 5s (50324316)
+Delete 100000 10 TRUE:  0m 14s (14720000)     0m 8s (89226924)
+Delete 100000 10 TRUE:  0m 17s (17910000)     0m 9s (90449162)
+Antisearch 100000 10 TRUE:  0m 9s (9370000)     0m 5s (50158572)
+Search 100000 10 FALSE:  0m 9s (9960000)     0m 5s (50290450)
+Search 100000 10 FALSE:  0m 10s (10300000)     0m 5s (59299606)
+Insert 100000 10 TRUE:  0m 21s (21520000)     0m 13s (130145590)
+Search 100000 10 TRUE:  0m 10s (10210000)     0m 5s (50268738)
+Search 100000 10 FALSE:  0m 9s (9890000)     0m 5s (50250950)
+Search 100000 10 FALSE:  0m 10s (10160000)     0m 5s (59564760)
+Total time for job execution:  4m 8s (248970000)     2m 32s (1529770970)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Check,1,Reset
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 300000
+Init = 300001
+Check 1 10 TRUE:  0m 2s (2050000)     0m 2s (20045740)
+Total time for job execution:  0m 2s (2300000)     0m 2s (20330022)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 300000
+Init = 300001
+Insert 100000 10 FALSE:  0m 20s (20750000)     0m 17s (170074204)
+Insert 100000 10 TRUE:  0m 21s (21950000)     0m 15s (150733028)
+Search 100000 10 TRUE:  0m 10s (10260000)     0m 5s (59493454)
+Insert 100000 10 FALSE:  0m 21s (21480000)     0m 17s (179623200)
+Search 100000 10 TRUE:  0m 10s (10640000)     0m 5s (50503256)
+Search 100000 10 FALSE:  0m 10s (10670000)     0m 5s (59487336)
+Insert 100000 10 FALSE:  0m 21s (21960000)     0m 18s (180094460)
+Search 100000 10 TRUE:  0m 10s (10940000)     0m 5s (50847894)
+Search 100000 10 FALSE:  0m 11s (11100000)     0m 5s (59775162)
+Search 100000 10 FALSE:  0m 11s (11110000)     0m 5s (59913314)
+Delete 100000 10 TRUE:  0m 15s (15450000)     0m 8s (89627030)
+Delete 100000 10 TRUE:  0m 17s (17360000)     0m 9s (99756040)
+Antisearch 100000 10 TRUE:  0m 10s (10820000)     0m 5s (50662334)
+Search 100000 10 FALSE:  0m 11s (11030000)     0m 5s (59770910)
+Search 100000 10 FALSE:  0m 11s (11150000)     0m 5s (59798736)
+Insert 100000 10 TRUE:  0m 23s (23450000)     0m 14s (140526482)
+Search 100000 10 TRUE:  0m 11s (11070000)     0m 5s (59814092)
+Search 100000 10 FALSE:  0m 10s (10860000)     0m 5s (59756190)
+Search 100000 10 FALSE:  0m 11s (11290000)     0m 5s (59862564)
+Total time for job execution:  4m 33s (273360000)     2m 50s (1709403792)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Check,1,Reset
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 600000
+Init = 600001
+Check 1 10 TRUE:  0m 4s (4120000)     0m 4s (40127208)
+Total time for job execution:  0m 4s (4600000)     0m 4s (40614006)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 600000
+Init = 600001
+Insert 100000 10 FALSE:  0m 24s (24020000)     0m 18s (189894972)
+Insert 100000 10 TRUE:  0m 25s (25080000)     0m 19s (199939946)
+Search 100000 10 TRUE:  0m 11s (11450000)     0m 6s (60163598)
+Insert 100000 10 FALSE:  0m 22s (22480000)     0m 18s (180364632)
+Search 100000 10 TRUE:  0m 11s (11580000)     0m 6s (60018278)
+Search 100000 10 FALSE:  0m 11s (11180000)     0m 5s (59969946)
+Insert 100000 10 FALSE:  0m 24s (24230000)     0m 19s (190077730)
+Search 100000 10 TRUE:  0m 11s (11100000)     0m 7s (79346584)
+Search 100000 10 FALSE:  0m 10s (10740000)     0m 7s (70476380)
+Search 100000 10 FALSE:  0m 10s (10760000)     0m 7s (70200048)
+Delete 100000 10 TRUE:  0m 14s (14540000)     0m 10s (100102624)
+Delete 100000 10 TRUE:  0m 17s (17230000)     0m 11s (119161588)
+Antisearch 100000 10 TRUE:  0m 11s (11580000)     0m 11s (110100640)
+Search 100000 10 FALSE:  0m 12s (12010000)     0m 6s (60162926)
+Search 100000 10 FALSE:  0m 11s (11790000)     0m 6s (60283112)
+Insert 100000 10 TRUE:  0m 25s (25750000)     0m 14s (149926176)
+Search 100000 10 TRUE:  0m 11s (11770000)     0m 6s (60118268)
+Search 100000 10 FALSE:  0m 12s (12130000)     0m 6s (60192702)
+Search 100000 10 FALSE:  0m 11s (11660000)     0m 6s (69893332)
+Total time for job execution:  4m 51s (291750000)     3m 16s (1969612206)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Check,1,Reset
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 900000
+Init = 900001
+Check 1 10 TRUE:  0m 9s (9850000)     15m 38s (9389555266)
+Total time for job execution:  0m 11s (11670000)     22m 4s (13249860024)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 900000
+Init = 900001
+Insert 100000 10 FALSE:  0m 23s (23630000)     1m 2s (620133748)
+Insert 100000 10 TRUE:  0m 24s (24400000)     0m 17s (179889012)
+Search 100000 10 TRUE:  0m 12s (12260000)     0m 6s (69207590)
+Insert 100000 10 FALSE:  0m 24s (24010000)     0m 19s (190917294)
+Search 100000 10 TRUE:  0m 12s (12160000)     0m 6s (69234722)
+Search 100000 10 FALSE:  0m 12s (12070000)     0m 6s (60268614)
+Insert 100000 10 FALSE:  0m 25s (25120000)     0m 19s (199828226)
+Search 100000 10 TRUE:  0m 12s (12240000)     0m 8s (80066122)
+Search 100000 10 FALSE:  0m 12s (12120000)     0m 6s (60426352)
+Search 100000 10 FALSE:  0m 12s (12280000)     0m 6s (69288064)
+Delete 100000 10 TRUE:  0m 17s (17000000)     0m 9s (90452528)
+Delete 100000 10 TRUE:  0m 18s (18500000)     0m 10s (109620552)
+Antisearch 100000 10 TRUE:  0m 11s (11680000)     0m 6s (69940158)
+Search 100000 10 FALSE:  0m 12s (12190000)     0m 6s (60220652)
+Search 100000 10 FALSE:  0m 12s (12220000)     0m 6s (60296196)
+Insert 100000 10 TRUE:  0m 27s (27130000)     0m 15s (150067308)
+Search 100000 10 TRUE:  0m 12s (12100000)     0m 6s (60173364)
+Search 100000 10 FALSE:  0m 11s (11780000)     0m 6s (69268140)
+Search 100000 10 FALSE:  0m 12s (12260000)     0m 6s (60338388)
+Total time for job execution:  5m 6s (306910000)     10m 52s (6529633084)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Check,1,Reset
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 1200000
+Init = 1200001
+Check 1 10 TRUE:  0m 15s (15850000)     38m 55s (23350109702)
+Total time for job execution:  0m 20s (20140000)     54m 43s (32830002586)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 1200000
+Init = 1200001
+Insert 100000 10 FALSE:  0m 25s (25380000)     1m 51s (1119978746)
+Insert 100000 10 TRUE:  0m 26s (26400000)     0m 19s (190064732)
+Search 100000 10 TRUE:  0m 12s (12380000)     0m 6s (60339340)
+Insert 100000 10 FALSE:  0m 24s (24720000)     0m 19s (199836332)
+Search 100000 10 TRUE:  0m 11s (11750000)     0m 6s (69529904)
+Search 100000 10 FALSE:  0m 11s (11970000)     0m 6s (60402702)
+Insert 100000 10 FALSE:  0m 24s (24730000)     0m 19s (199885038)
+Search 100000 10 TRUE:  0m 12s (12390000)     0m 6s (60285800)
+Search 100000 10 FALSE:  0m 12s (12100000)     0m 6s (60210858)
+Search 100000 10 FALSE:  0m 12s (12530000)     0m 6s (69299524)
+Delete 100000 10 TRUE:  0m 16s (16020000)     0m 9s (90714890)
+Delete 100000 10 TRUE:  0m 18s (18540000)     0m 11s (119277714)
+Antisearch 100000 10 TRUE:  0m 11s (11690000)     0m 7s (79762676)
+Search 100000 10 FALSE:  0m 11s (11750000)     0m 6s (60363286)
+Search 100000 10 FALSE:  0m 11s (11700000)     0m 6s (60434464)
+Insert 100000 10 TRUE:  0m 27s (27140000)     0m 14s (149874854)
+Search 100000 10 TRUE:  0m 12s (12000000)     0m 6s (60189088)
+Search 100000 10 FALSE:  0m 11s (11820000)     0m 6s (69342792)
+Search 100000 10 FALSE:  0m 11s (11050000)     0m 7s (70241284)
+Total time for job execution:  5m 11s (311140000)     22m 48s (13680419804)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Check,1,Reset
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 1500000
+Init = 1500001
+Check 1 10 TRUE:  0m 22s (22770000)     60m 18s (36189541756)
+Total time for job execution:  0m 28s (28660000)     87m 52s (52729748788)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 1500000
+Init = 1500001
+Insert 100000 10 FALSE:  0m 26s (26040000)     2m 14s (1340398612)
+Insert 100000 10 TRUE:  0m 25s (25530000)     0m 19s (199960658)
+Search 100000 10 TRUE:  0m 12s (12690000)     0m 6s (69610968)
+Insert 100000 10 FALSE:  0m 25s (25930000)     0m 20s (209652764)
+Search 100000 10 TRUE:  0m 12s (12320000)     0m 6s (60770358)
+Search 100000 10 FALSE:  0m 12s (12360000)     0m 6s (69604940)
+Insert 100000 10 FALSE:  0m 25s (25130000)     0m 20s (200102208)
+Search 100000 10 TRUE:  0m 12s (12870000)     0m 6s (69570192)
+Search 100000 10 FALSE:  0m 12s (12420000)     0m 6s (60496934)
+Search 100000 10 FALSE:  0m 12s (12580000)     0m 6s (69514796)
+Delete 100000 10 TRUE:  0m 17s (17290000)     0m 9s (90540012)
+Delete 100000 10 TRUE:  0m 18s (18900000)     0m 10s (109673528)
+Antisearch 100000 10 TRUE:  0m 11s (11870000)     0m 7s (79881908)
+Search 100000 10 FALSE:  0m 12s (12630000)     0m 6s (60397932)
+Search 100000 10 FALSE:  0m 11s (11770000)     0m 7s (70006660)
+Insert 100000 10 TRUE:  0m 24s (24370000)     0m 16s (169986222)
+Search 100000 10 TRUE:  0m 11s (11460000)     0m 7s (79424996)
+Search 100000 10 FALSE:  0m 11s (11040000)     0m 8s (80044868)
+Search 100000 10 FALSE:  0m 11s (11830000)     0m 6s (69902036)
+Total time for job execution:  5m 15s (315770000)     33m 14s (19949469488)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Check,1,Reset
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 1800000
+Init = 1800001
+Check 1 10 TRUE:  0m 27s (27270000)     81m 36s (48969560054)
+Total time for job execution:  0m 35s (35370000)     120m 2s (72029926368)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 1800000
+Init = 1800001
+Insert 100000 10 FALSE:  0m 26s (26090000)     2m 45s (1659804222)
+Insert 100000 10 TRUE:  0m 28s (28340000)     0m 19s (190229166)
+Search 100000 10 TRUE:  0m 12s (12860000)     0m 7s (79118662)
+Insert 100000 10 FALSE:  0m 25s (25740000)     0m 20s (200749276)
+Search 100000 10 TRUE:  0m 12s (12430000)     0m 7s (70039884)
+Search 100000 10 FALSE:  0m 13s (13130000)     0m 6s (69783938)
+Insert 100000 10 FALSE:  0m 25s (25500000)     0m 20s (209933036)
+Search 100000 10 TRUE:  0m 12s (12650000)     0m 7s (70088872)
+Search 100000 10 FALSE:  0m 13s (13380000)     0m 6s (69779180)
+Search 100000 10 FALSE:  0m 12s (12610000)     0m 6s (69801220)
+Delete 100000 10 TRUE:  0m 17s (17380000)     0m 10s (100025318)
+Delete 100000 10 TRUE:  0m 18s (18860000)     0m 11s (110552094)
+Antisearch 100000 10 TRUE:  0m 12s (12340000)     0m 7s (79992376)
+Search 100000 10 FALSE:  0m 12s (12740000)     0m 6s (69753632)
+Search 100000 10 FALSE:  0m 13s (13080000)     0m 6s (69686084)
+Insert 100000 10 TRUE:  0m 27s (27790000)     0m 15s (159878300)
+Search 100000 10 TRUE:  0m 12s (12760000)     0m 6s (60565892)
+Search 100000 10 FALSE:  0m 12s (12680000)     0m 7s (70148378)
+Search 100000 10 FALSE:  0m 13s (13160000)     0m 7s (70150332)
+Total time for job execution:  5m 32s (332070000)     45m 34s (27340389224)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 2100000
+Init = 2100001
+Insert 100000 10 FALSE:  0m 25s (25900000)     0m 42s (420234796)
+Insert 100000 10 TRUE:  0m 27s (27760000)     0m 21s (219527162)
+Search 100000 10 TRUE:  0m 13s (13040000)     0m 6s (60781666)
+Insert 100000 10 FALSE:  0m 25s (25930000)     0m 20s (209987684)
+Search 100000 10 TRUE:  0m 12s (12860000)     0m 6s (69771096)
+Search 100000 10 FALSE:  0m 13s (13050000)     0m 6s (69776466)
+Insert 100000 10 FALSE:  0m 26s (26010000)     0m 20s (209509216)
+Search 100000 10 TRUE:  0m 12s (12680000)     0m 6s (60789288)
+Search 100000 10 FALSE:  0m 12s (12730000)     0m 7s (79390746)
+Search 100000 10 FALSE:  0m 12s (12990000)     0m 6s (69945320)
+Delete 100000 10 TRUE:  0m 17s (17000000)     0m 9s (99909728)
+Delete 100000 10 TRUE:  0m 19s (19260000)     0m 10s (109972122)
+Antisearch 100000 10 TRUE:  0m 12s (12520000)     0m 6s (60924938)
+Search 100000 10 FALSE:  0m 12s (12970000)     0m 6s (69682472)
+Search 100000 10 FALSE:  0m 13s (13210000)     0m 6s (69782076)
+Insert 100000 10 TRUE:  0m 27s (27760000)     0m 16s (160410746)
+Search 100000 10 TRUE:  0m 12s (12790000)     0m 7s (79226160)
+Search 100000 10 FALSE:  0m 12s (12800000)     0m 7s (70238122)
+Search 100000 10 FALSE:  0m 12s (12420000)     0m 7s (70465312)
+Total time for job execution:  5m 27s (327970000)     4m 25s (2650394248)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 2400000
+Init = 2400001
+Insert 100000 10 FALSE:  0m 26s (26090000)     0m 36s (369971552)
+Insert 100000 10 TRUE:  0m 27s (27830000)     0m 19s (199756208)
+Search 100000 10 TRUE:  0m 13s (13370000)     0m 7s (70017168)
+Insert 100000 10 FALSE:  0m 25s (25930000)     0m 22s (220464882)
+Search 100000 10 TRUE:  0m 13s (13130000)     0m 6s (69765580)
+Search 100000 10 FALSE:  0m 13s (13260000)     0m 6s (69751476)
+Insert 100000 10 FALSE:  0m 25s (25530000)     0m 21s (210390916)
+Search 100000 10 TRUE:  0m 12s (12840000)     0m 7s (79554824)
+Search 100000 10 FALSE:  0m 13s (13080000)     0m 6s (69996810)
+Search 100000 10 FALSE:  0m 13s (13140000)     0m 6s (69831994)
+Delete 100000 10 TRUE:  0m 17s (17480000)     0m 9s (99952510)
+Delete 100000 10 TRUE:  0m 19s (19260000)     0m 11s (110245228)
+Antisearch 100000 10 TRUE:  0m 12s (12710000)     0m 8s (89917924)
+Search 100000 10 FALSE:  0m 13s (13080000)     0m 6s (60729274)
+Search 100000 10 FALSE:  0m 12s (12950000)     0m 6s (69731364)
+Insert 100000 10 TRUE:  0m 27s (27490000)     0m 16s (169395904)
+Search 100000 10 TRUE:  0m 13s (13120000)     0m 6s (60713064)
+Search 100000 10 FALSE:  0m 12s (12970000)     0m 7s (79199556)
+Search 100000 10 FALSE:  0m 12s (12930000)     0m 7s (70416748)
+Total time for job execution:  5m 30s (330570000)     4m 36s (2760360062)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 2700000
+Init = 2700001
+Insert 100000 10 FALSE:  0m 26s (26610000)     0m 42s (420341892)
+Insert 100000 10 TRUE:  0m 27s (27310000)     0m 20s (209483686)
+Search 100000 10 TRUE:  0m 13s (13570000)     0m 6s (69956318)
+Insert 100000 10 FALSE:  0m 26s (26540000)     0m 21s (210141588)
+Search 100000 10 TRUE:  0m 13s (13660000)     0m 7s (70026100)
+Search 100000 10 FALSE:  0m 13s (13280000)     0m 6s (69938128)
+Insert 100000 10 FALSE:  0m 26s (26260000)     0m 21s (210335364)
+Search 100000 10 TRUE:  0m 13s (13220000)     0m 7s (70027908)
+Search 100000 10 FALSE:  0m 13s (13150000)     0m 7s (70069640)
+Search 100000 10 FALSE:  0m 13s (13260000)     0m 7s (70014138)
+Delete 100000 10 TRUE:  0m 17s (17680000)     0m 10s (100037250)
+Delete 100000 10 TRUE:  0m 19s (19920000)     0m 11s (119133208)
+Antisearch 100000 10 TRUE:  0m 12s (12470000)     0m 7s (70842724)
+Search 100000 10 FALSE:  0m 13s (13180000)     0m 6s (69802988)
+Search 100000 10 FALSE:  0m 13s (13360000)     0m 6s (69990692)
+Insert 100000 10 TRUE:  0m 28s (28560000)     0m 16s (169292530)
+Search 100000 10 TRUE:  0m 13s (13120000)     0m 6s (60774870)
+Search 100000 10 FALSE:  0m 13s (13230000)     0m 6s (69795852)
+Search 100000 10 FALSE:  0m 13s (13210000)     0m 6s (69908110)
+Total time for job execution:  5m 36s (336440000)     4m 41s (2819588136)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 3000000
+Init = 3000001
+Insert 100000 10 FALSE:  0m 26s (26690000)     1m 35s (959849278)
+Insert 100000 10 TRUE:  0m 28s (28190000)     0m 19s (199805960)
+Search 100000 10 TRUE:  0m 13s (13300000)     0m 6s (60823000)
+Insert 100000 10 FALSE:  0m 25s (25540000)     0m 21s (219148456)
+Search 100000 10 TRUE:  0m 13s (13400000)     0m 6s (69977370)
+Search 100000 10 FALSE:  0m 13s (13330000)     0m 6s (60870186)
+Insert 100000 10 FALSE:  0m 26s (26120000)     0m 20s (209939622)
+Search 100000 10 TRUE:  0m 12s (12970000)     0m 7s (79425362)
+Search 100000 10 FALSE:  0m 12s (12940000)     0m 7s (70050632)
+Search 100000 10 FALSE:  0m 13s (13040000)     0m 6s (69869512)
+Delete 100000 10 TRUE:  0m 17s (17330000)     0m 10s (100102204)
+Delete 100000 10 TRUE:  0m 19s (19020000)     0m 11s (110216468)
+Antisearch 100000 10 TRUE:  0m 12s (12680000)     0m 8s (89823352)
+Search 100000 10 FALSE:  0m 13s (13330000)     0m 6s (69816514)
+Search 100000 10 FALSE:  0m 12s (12960000)     0m 6s (60833060)
+Insert 100000 10 TRUE:  0m 28s (28440000)     0m 16s (169519760)
+Search 100000 10 TRUE:  0m 12s (12960000)     0m 6s (69676720)
+Search 100000 10 FALSE:  0m 12s (12940000)     0m 6s (60742876)
+Search 100000 10 FALSE:  0m 13s (13190000)     0m 6s (69903582)
+Total time for job execution:  5m 33s (333710000)     5m 46s (3460087322)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 3300000
+Init = 3300001
+Insert 100000 10 FALSE:  0m 27s (27750000)     1m 21s (810422496)
+Insert 100000 10 TRUE:  0m 27s (27640000)     0m 20s (200221420)
+Search 100000 10 TRUE:  0m 13s (13470000)     0m 6s (69964460)
+Insert 100000 10 FALSE:  0m 26s (26160000)     0m 22s (229261672)
+Search 100000 10 TRUE:  0m 12s (12930000)     0m 7s (70294738)
+Search 100000 10 FALSE:  0m 13s (13510000)     0m 7s (70080566)
+Insert 100000 10 FALSE:  0m 25s (25910000)     0m 21s (210155786)
+Search 100000 10 TRUE:  0m 12s (12960000)     0m 7s (70144256)
+Search 100000 10 FALSE:  0m 13s (13410000)     0m 7s (70072800)
+Search 100000 10 FALSE:  0m 13s (13510000)     0m 6s (69875344)
+Delete 100000 10 TRUE:  0m 17s (17310000)     0m 10s (100189812)
+Delete 100000 10 TRUE:  0m 20s (20240000)     0m 11s (110057080)
+Antisearch 100000 10 TRUE:  0m 12s (12660000)     0m 7s (79741610)
+Search 100000 10 FALSE:  0m 13s (13060000)     0m 7s (79974770)
+Search 100000 10 FALSE:  0m 13s (13580000)     0m 7s (70029112)
+Insert 100000 10 TRUE:  0m 27s (27250000)     0m 16s (169760546)
+Search 100000 10 TRUE:  0m 11s (11980000)     0m 7s (79957984)
+Search 100000 10 FALSE:  0m 12s (12230000)     0m 8s (80088132)
+Search 100000 10 FALSE:  0m 12s (12570000)     0m 8s (80292748)
+Total time for job execution:  5m 34s (334410000)     5m 42s (3420816500)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 3600000
+Init = 3600001
+Insert 100000 10 FALSE:  0m 27s (27090000)     0m 54s (549594734)
+Insert 100000 10 TRUE:  0m 26s (26360000)     0m 20s (200548034)
+Search 100000 10 TRUE:  0m 12s (12160000)     0m 7s (79545094)
+Insert 100000 10 FALSE:  0m 26s (26280000)     0m 22s (220267456)
+Search 100000 10 TRUE:  0m 12s (12150000)     0m 8s (89495020)
+Search 100000 10 FALSE:  0m 12s (12710000)     0m 7s (70619592)
+Insert 100000 10 FALSE:  0m 25s (25980000)     0m 22s (229481956)
+Search 100000 10 TRUE:  0m 11s (11950000)     0m 10s (100076984)
+Search 100000 10 FALSE:  0m 12s (12310000)     0m 8s (80733308)
+Search 100000 10 FALSE:  0m 12s (12820000)     0m 7s (79481540)
+Delete 100000 10 TRUE:  0m 17s (17630000)     0m 10s (109814446)
+Delete 100000 10 TRUE:  0m 19s (19870000)     0m 11s (110090078)
+Antisearch 100000 10 TRUE:  0m 12s (12430000)     0m 10s (100159690)
+Search 100000 10 FALSE:  0m 13s (13300000)     0m 7s (70138288)
+Search 100000 10 FALSE:  0m 13s (13200000)     0m 6s (69972726)
+Insert 100000 10 TRUE:  0m 28s (28050000)     0m 16s (169574834)
+Search 100000 10 TRUE:  0m 13s (13100000)     0m 7s (70277450)
+Search 100000 10 FALSE:  0m 13s (13230000)     0m 7s (70380218)
+Search 100000 10 FALSE:  0m 13s (13150000)     0m 7s (70094132)
+Total time for job execution:  5m 30s (330900000)     5m 30s (3300798402)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 3900000
+Init = 3900001
+Insert 100000 10 FALSE:  0m 27s (27500000)     0m 47s (479582728)
+Insert 100000 10 TRUE:  0m 28s (28890000)     0m 20s (200024442)
+Search 100000 10 TRUE:  0m 13s (13060000)     0m 7s (70261196)
+Insert 100000 10 FALSE:  0m 25s (25930000)     0m 22s (220423372)
+Search 100000 10 TRUE:  0m 12s (12600000)     0m 7s (79723812)
+Search 100000 10 FALSE:  0m 13s (13350000)     0m 6s (69985276)
+Insert 100000 10 FALSE:  0m 28s (28260000)     0m 22s (229577046)
+Search 100000 10 TRUE:  0m 12s (12960000)     0m 10s (100387182)
+Search 100000 10 FALSE:  0m 12s (12790000)     0m 7s (79649638)
+Search 100000 10 FALSE:  0m 13s (13590000)     0m 6s (69982176)
+Delete 100000 10 TRUE:  0m 18s (18400000)     0m 9s (99964394)
+Delete 100000 10 TRUE:  0m 17s (17150000)     0m 11s (110250736)
+Antisearch 100000 10 TRUE:  0m 12s (12750000)     0m 8s (89830344)
+Search 100000 10 FALSE:  0m 13s (13290000)     0m 6s (69903204)
+Search 100000 10 FALSE:  0m 13s (13430000)     0m 6s (69952004)
+Insert 100000 10 TRUE:  0m 29s (29370000)     0m 16s (160370106)
+Search 100000 10 TRUE:  0m 13s (13420000)     0m 6s (69872266)
+Search 100000 10 FALSE:  0m 13s (13240000)     0m 6s (69838000)
+Search 100000 10 FALSE:  0m 13s (13460000)     0m 6s (69874414)
+Total time for job execution:  5m 42s (342920000)     5m 14s (3149742318)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 4200000
+Init = 4200001
+Insert 100000 10 FALSE:  0m 28s (28650000)     1m 18s (780188500)
+Insert 100000 10 TRUE:  0m 29s (29290000)     0m 22s (220235374)
+Search 100000 10 TRUE:  0m 13s (13610000)     0m 6s (69997968)
+Insert 100000 10 FALSE:  0m 26s (26630000)     0m 21s (219516794)
+Search 100000 10 TRUE:  0m 13s (13200000)     0m 7s (70044668)
+Search 100000 10 FALSE:  0m 13s (13570000)     0m 6s (69924588)
+Insert 100000 10 FALSE:  0m 26s (26640000)     0m 22s (220058916)
+Search 100000 10 TRUE:  0m 14s (14140000)     0m 7s (70305536)
+Search 100000 10 FALSE:  0m 14s (14090000)     0m 7s (70233738)
+Search 100000 10 FALSE:  0m 14s (14260000)     0m 7s (79250938)
+Delete 100000 10 TRUE:  0m 18s (18360000)     0m 10s (100807356)
+Delete 100000 10 TRUE:  0m 21s (21050000)     0m 11s (119441920)
+Antisearch 100000 10 TRUE:  0m 13s (13340000)     0m 9s (99781380)
+Search 100000 10 FALSE:  0m 13s (13980000)     0m 7s (70295130)
+Search 100000 10 FALSE:  0m 14s (14220000)     0m 7s (70359350)
+Insert 100000 10 TRUE:  0m 28s (28300000)     0m 17s (179817548)
+Search 100000 10 TRUE:  0m 13s (13840000)     0m 7s (79645654)
+Search 100000 10 FALSE:  0m 13s (13790000)     0m 7s (79782480)
+Search 100000 10 FALSE:  0m 14s (14060000)     0m 7s (70246378)
+Total time for job execution:  5m 51s (351840000)     6m 7s (3670429796)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 4500000
+Init = 4500001
+Insert 100000 10 FALSE:  0m 27s (27730000)     1m 42s (1029740856)
+Insert 100000 10 TRUE:  0m 29s (29020000)     0m 20s (200274044)
+Search 100000 10 TRUE:  0m 14s (14340000)     0m 7s (79286308)
+Insert 100000 10 FALSE:  0m 27s (27250000)     0m 23s (230389748)
+Search 100000 10 TRUE:  0m 14s (14070000)     0m 7s (79684388)
+Search 100000 10 FALSE:  0m 13s (13980000)     0m 7s (70460070)
+Insert 100000 10 FALSE:  0m 28s (28330000)     0m 23s (239411458)
+Search 100000 10 TRUE:  0m 13s (13990000)     0m 10s (100822940)
+Search 100000 10 FALSE:  0m 13s (13590000)     0m 9s (99809540)
+Search 100000 10 FALSE:  0m 14s (14350000)     0m 7s (79360404)
+Delete 100000 10 TRUE:  0m 18s (18900000)     0m 10s (100263796)
+Delete 100000 10 TRUE:  0m 20s (20210000)     0m 11s (119711116)
+Antisearch 100000 10 TRUE:  0m 13s (13380000)     0m 9s (90832084)
+Search 100000 10 FALSE:  0m 14s (14170000)     0m 7s (79235318)
+Search 100000 10 FALSE:  0m 13s (13990000)     0m 7s (70295068)
+Insert 100000 10 TRUE:  0m 29s (29770000)     0m 17s (170264666)
+Search 100000 10 TRUE:  0m 13s (13890000)     0m 7s (70277218)
+Search 100000 10 FALSE:  0m 14s (14110000)     0m 7s (79258592)
+Search 100000 10 FALSE:  0m 13s (13950000)     0m 7s (70347506)
+Total time for job execution:  5m 57s (357030000)     6m 32s (3920564672)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 4800000
+Init = 4800001
+Insert 100000 10 FALSE:  0m 29s (29660000)     1m 27s (879689988)
+Insert 100000 10 TRUE:  0m 28s (28830000)     0m 21s (210140370)
+Search 100000 10 TRUE:  0m 14s (14330000)     0m 7s (70346468)
+Insert 100000 10 FALSE:  0m 28s (28110000)     0m 22s (229422744)
+Search 100000 10 TRUE:  0m 13s (13870000)     0m 7s (70566724)
+Search 100000 10 FALSE:  0m 14s (14210000)     0m 7s (79557932)
+Insert 100000 10 FALSE:  0m 27s (27240000)     0m 22s (229630570)
+Search 100000 10 TRUE:  0m 14s (14360000)     0m 7s (70369062)
+Search 100000 10 FALSE:  0m 13s (13970000)     0m 7s (70432810)
+Search 100000 10 FALSE:  0m 14s (14470000)     0m 7s (79263246)
+Delete 100000 10 TRUE:  0m 18s (18070000)     0m 10s (100556766)
+Delete 100000 10 TRUE:  0m 21s (21010000)     0m 11s (119633168)
+Antisearch 100000 10 TRUE:  0m 13s (13590000)     0m 8s (89693392)
+Search 100000 10 FALSE:  0m 14s (14060000)     0m 7s (70261354)
+Search 100000 10 FALSE:  0m 14s (14220000)     0m 7s (70303390)
+Insert 100000 10 TRUE:  0m 29s (29780000)     0m 17s (179957346)
+Search 100000 10 TRUE:  0m 11s (11030000)     0m 7s (79644268)
+Search 100000 10 FALSE:  0m 14s (14020000)     0m 7s (79912960)
+Search 100000 10 FALSE:  0m 14s (14040000)     0m 7s (70370074)
+Total time for job execution:  5m 59s (359790000)     6m 26s (3869675508)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 5100000
+Init = 5100001
+Insert 100000 10 FALSE:  0m 27s (27790000)     1m 12s (720120568)
+Insert 100000 10 TRUE:  0m 29s (29410000)     0m 21s (219319996)
+Search 100000 10 TRUE:  0m 14s (14450000)     0m 7s (70640296)
+Insert 100000 10 FALSE:  0m 28s (28020000)     0m 23s (239118284)
+Search 100000 10 TRUE:  0m 14s (14110000)     0m 10s (100569110)
+Search 100000 10 FALSE:  0m 14s (14360000)     0m 9s (90096818)
+Insert 100000 10 FALSE:  0m 27s (27260000)     0m 22s (229819060)
+Search 100000 10 TRUE:  0m 14s (14740000)     0m 7s (79739304)
+Search 100000 10 FALSE:  0m 14s (14190000)     0m 7s (70685060)
+Search 100000 10 FALSE:  0m 14s (14330000)     0m 7s (79708260)
+Delete 100000 10 TRUE:  0m 17s (17980000)     0m 11s (110002644)
+Delete 100000 10 TRUE:  0m 21s (21010000)     0m 11s (119739208)
+Antisearch 100000 10 TRUE:  0m 13s (13650000)     0m 8s (89751092)
+Search 100000 10 FALSE:  0m 14s (14290000)     0m 7s (70492368)
+Search 100000 10 FALSE:  0m 14s (14420000)     0m 7s (79515552)
+Insert 100000 10 TRUE:  0m 29s (29630000)     0m 18s (180119100)
+Search 100000 10 TRUE:  0m 14s (14160000)     0m 7s (70456174)
+Search 100000 10 FALSE:  0m 14s (14280000)     0m 7s (79551560)
+Search 100000 10 FALSE:  0m 14s (14560000)     0m 7s (79868140)
+Total time for job execution:  6m 3s (363180000)     6m 40s (4009447488)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 5400000
+Init = 5400001
+Insert 100000 10 FALSE:  0m 29s (29930000)     1m 55s (1150018818)
+Insert 100000 10 TRUE:  0m 29s (29580000)     0m 20s (209766104)
+Search 100000 10 TRUE:  0m 14s (14480000)     0m 7s (79511910)
+Insert 100000 10 FALSE:  0m 27s (27070000)     0m 22s (220507876)
+Search 100000 10 TRUE:  0m 14s (14230000)     0m 7s (79451470)
+Search 100000 10 FALSE:  0m 14s (14000000)     0m 7s (70437092)
+Insert 100000 10 FALSE:  0m 27s (27680000)     0m 23s (230137820)
+Search 100000 10 TRUE:  0m 14s (14240000)     0m 7s (79970728)
+Search 100000 10 FALSE:  0m 13s (13790000)     0m 7s (79939420)
+Search 100000 10 FALSE:  0m 14s (14420000)     0m 7s (79461200)
+Delete 100000 10 TRUE:  0m 18s (18800000)     0m 10s (100640448)
+Delete 100000 10 TRUE:  0m 21s (21020000)     0m 11s (119742814)
+Antisearch 100000 10 TRUE:  0m 13s (13480000)     0m 8s (89630628)
+Search 100000 10 FALSE:  0m 14s (14070000)     0m 7s (70479782)
+Search 100000 10 FALSE:  0m 14s (14470000)     0m 7s (79364500)
+Insert 100000 10 TRUE:  0m 29s (29930000)     0m 17s (170619968)
+Search 100000 10 TRUE:  0m 14s (14010000)     0m 7s (79473970)
+Search 100000 10 FALSE:  0m 14s (14120000)     0m 7s (70609164)
+Search 100000 10 FALSE:  0m 14s (14300000)     0m 7s (79941814)
+Total time for job execution:  6m 3s (363840000)     7m 21s (4410281352)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 5700000
+Init = 5700001
+Insert 100000 10 FALSE:  0m 28s (28490000)     1m 32s (929863400)
+Insert 100000 10 TRUE:  0m 30s (30680000)     0m 21s (210835208)
+Search 100000 10 TRUE:  0m 14s (14500000)     0m 7s (79750324)
+Insert 100000 10 FALSE:  0m 27s (27630000)     0m 22s (229761254)
+Search 100000 10 TRUE:  0m 14s (14620000)     0m 7s (70385552)
+Search 100000 10 FALSE:  0m 14s (14050000)     0m 7s (79368308)
+Insert 100000 10 FALSE:  0m 28s (28120000)     0m 22s (220241214)
+Search 100000 10 TRUE:  0m 14s (14440000)     0m 7s (70386310)
+Search 100000 10 FALSE:  0m 13s (13630000)     0m 8s (89250828)
+Search 100000 10 FALSE:  0m 13s (13380000)     0m 9s (90015976)
+Delete 100000 10 TRUE:  0m 18s (18450000)     0m 11s (110065058)
+Delete 100000 10 TRUE:  0m 19s (19340000)     0m 14s (149968864)
+Antisearch 100000 10 TRUE:  0m 12s (12260000)     0m 11s (110008330)
+Search 100000 10 FALSE:  0m 13s (13820000)     0m 8s (80354390)
+Search 100000 10 FALSE:  0m 14s (14070000)     0m 7s (79847678)
+Insert 100000 10 TRUE:  0m 30s (30370000)     0m 17s (170342670)
+Search 100000 10 TRUE:  0m 13s (13980000)     0m 7s (70291196)
+Search 100000 10 FALSE:  0m 14s (14260000)     0m 7s (79403122)
+Search 100000 10 FALSE:  0m 14s (14270000)     0m 7s (70498096)
+Total time for job execution:  6m 1s (361020000)     6m 58s (4180795672)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 6000000
+Init = 6000001
+Insert 100000 10 FALSE:  0m 30s (30230000)     1m 36s (960095202)
+Insert 100000 10 TRUE:  0m 28s (28890000)     0m 20s (209780918)
+Search 100000 10 TRUE:  0m 14s (14540000)     0m 7s (70431642)
+Insert 100000 10 FALSE:  0m 27s (27890000)     0m 22s (229868706)
+Search 100000 10 TRUE:  0m 14s (14260000)     0m 7s (70559808)
+Search 100000 10 FALSE:  0m 14s (14290000)     0m 7s (79427488)
+Insert 100000 10 FALSE:  0m 30s (30260000)     0m 23s (230244416)
+Search 100000 10 TRUE:  0m 14s (14300000)     0m 7s (79451404)
+Search 100000 10 FALSE:  0m 13s (13960000)     0m 8s (80067360)
+Search 100000 10 FALSE:  0m 14s (14490000)     0m 8s (80240872)
+Delete 100000 10 TRUE:  0m 18s (18290000)     0m 11s (110324638)
+Delete 100000 10 TRUE:  0m 20s (20800000)     0m 11s (119790436)
+Antisearch 100000 10 TRUE:  0m 13s (13730000)     0m 8s (89652900)
+Search 100000 10 FALSE:  0m 14s (14260000)     0m 7s (70397676)
+Search 100000 10 FALSE:  0m 14s (14300000)     0m 7s (70378572)
+Insert 100000 10 TRUE:  0m 29s (29810000)     0m 18s (180012436)
+Search 100000 10 TRUE:  0m 13s (13890000)     0m 7s (79636716)
+Search 100000 10 FALSE:  0m 13s (13970000)     0m 7s (79752726)
+Search 100000 10 FALSE:  0m 14s (14370000)     0m 7s (70371864)
+Total time for job execution:  6m 7s (367200000)     7m 6s (4260727472)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 6300000
+Init = 6300001
+Insert 100000 10 FALSE:  0m 28s (28500000)     1m 12s (720167822)
+Insert 100000 10 TRUE:  0m 29s (29760000)     0m 23s (230051966)
+Search 100000 10 TRUE:  0m 14s (14260000)     0m 7s (70329944)
+Insert 100000 10 FALSE:  0m 27s (27880000)     0m 22s (229373708)
+Search 100000 10 TRUE:  0m 13s (13750000)     0m 7s (79722006)
+Search 100000 10 FALSE:  0m 14s (14340000)     0m 7s (70412612)
+Insert 100000 10 FALSE:  0m 30s (30010000)     0m 22s (220141312)
+Search 100000 10 TRUE:  0m 14s (14250000)     0m 7s (79821092)
+Search 100000 10 FALSE:  0m 14s (14200000)     0m 7s (70344644)
+Search 100000 10 FALSE:  0m 14s (14260000)     0m 7s (79531058)
+Delete 100000 10 TRUE:  0m 19s (19130000)     0m 10s (100388170)
+Delete 100000 10 TRUE:  0m 20s (20280000)     0m 11s (119714836)
+Antisearch 100000 10 TRUE:  0m 13s (13220000)     0m 8s (89799794)
+Search 100000 10 FALSE:  0m 14s (14470000)     0m 7s (70277494)
+Search 100000 10 FALSE:  0m 14s (14180000)     0m 7s (70371658)
+Insert 100000 10 TRUE:  0m 30s (30020000)     0m 17s (179444550)
+Search 100000 10 TRUE:  0m 14s (14060000)     0m 7s (70211114)
+Search 100000 10 FALSE:  0m 14s (14100000)     0m 7s (79585808)
+Search 100000 10 FALSE:  0m 14s (14210000)     0m 7s (70890312)
+Total time for job execution:  6m 6s (366230000)     6m 59s (4199973210)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 6600000
+Init = 6600001
+Insert 100000 10 FALSE:  0m 27s (27940000)     1m 50s (1100112728)
+Insert 100000 10 TRUE:  0m 27s (27220000)     0m 21s (219821836)
+Search 100000 10 TRUE:  0m 14s (14710000)     0m 7s (79500836)
+Insert 100000 10 FALSE:  0m 28s (28660000)     0m 24s (240119636)
+Search 100000 10 TRUE:  0m 14s (14910000)     0m 8s (80135430)
+Search 100000 10 FALSE:  0m 14s (14860000)     0m 8s (80063590)
+Insert 100000 10 FALSE:  0m 28s (28130000)     0m 24s (240478550)
+Search 100000 10 TRUE:  0m 14s (14310000)     0m 8s (89255740)
+Search 100000 10 FALSE:  0m 14s (14740000)     0m 8s (80169056)
+Search 100000 10 FALSE:  0m 14s (14720000)     0m 8s (80115886)
+Delete 100000 10 TRUE:  0m 18s (18560000)     0m 11s (110327228)
+Delete 100000 10 TRUE:  0m 20s (20920000)     0m 12s (120160074)
+Antisearch 100000 10 TRUE:  0m 12s (12480000)     0m 9s (99728844)
+Search 100000 10 FALSE:  0m 14s (14610000)     0m 7s (79803400)
+Search 100000 10 FALSE:  0m 14s (14630000)     0m 7s (79814710)
+Insert 100000 10 TRUE:  0m 30s (30820000)     0m 20s (200235496)
+Search 100000 10 TRUE:  0m 14s (14780000)     0m 7s (79922100)
+Search 100000 10 FALSE:  0m 14s (14490000)     0m 7s (79916646)
+Search 100000 10 FALSE:  0m 14s (14880000)     0m 7s (79898378)
+Total time for job execution:  6m 12s (372020000)     7m 42s (4629897772)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 6900000
+Init = 6900001
+Insert 100000 10 FALSE:  0m 28s (28890000)     1m 22s (829617070)
+Insert 100000 10 TRUE:  0m 30s (30750000)     0m 24s (240777172)
+Search 100000 10 TRUE:  0m 14s (14830000)     0m 8s (80012136)
+Insert 100000 10 FALSE:  0m 28s (28430000)     0m 23s (239530394)
+Search 100000 10 TRUE:  0m 14s (14870000)     0m 10s (100236332)
+Search 100000 10 FALSE:  0m 15s (15100000)     0m 7s (79752294)
+Insert 100000 10 FALSE:  0m 28s (28180000)     0m 24s (240131024)
+Search 100000 10 TRUE:  0m 14s (14860000)     0m 7s (79784880)
+Search 100000 10 FALSE:  0m 14s (14930000)     0m 7s (79769952)
+Search 100000 10 FALSE:  0m 14s (14850000)     0m 8s (80755954)
+Delete 100000 10 TRUE:  0m 18s (18920000)     0m 11s (119194388)
+Delete 100000 10 TRUE:  0m 20s (20620000)     0m 12s (120217200)
+Antisearch 100000 10 TRUE:  0m 14s (14420000)     0m 8s (80619898)
+Search 100000 10 FALSE:  0m 13s (13790000)     0m 8s (89464928)
+Search 100000 10 FALSE:  0m 13s (13640000)     0m 8s (89703212)
+Insert 100000 10 TRUE:  0m 27s (27180000)     0m 19s (190912670)
+Search 100000 10 TRUE:  0m 13s (13620000)     0m 8s (89391382)
+Search 100000 10 FALSE:  0m 14s (14800000)     0m 7s (79655486)
+Search 100000 10 FALSE:  0m 14s (14580000)     0m 7s (70726984)
+Total time for job execution:  6m 8s (368710000)     7m 23s (4430223306)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 7200000
+Init = 7200001
+Insert 100000 10 FALSE:  0m 31s (31530000)     1m 56s (1169623084)
+Insert 100000 10 TRUE:  0m 31s (31440000)     0m 31s (310866190)
+Search 100000 10 TRUE:  0m 15s (15120000)     0m 8s (89346552)
+Insert 100000 10 FALSE:  0m 28s (28440000)     0m 23s (230117560)
+Search 100000 10 TRUE:  0m 15s (15100000)     0m 7s (79832588)
+Search 100000 10 FALSE:  0m 15s (15010000)     0m 7s (79826644)
+Insert 100000 10 FALSE:  0m 28s (28640000)     0m 23s (230792558)
+Search 100000 10 TRUE:  0m 15s (15180000)     0m 7s (79853002)
+Search 100000 10 FALSE:  0m 14s (14810000)     0m 7s (79817086)
+Search 100000 10 FALSE:  0m 14s (14760000)     0m 7s (79804094)
+Delete 100000 10 TRUE:  0m 19s (19380000)     0m 11s (110024244)
+Delete 100000 10 TRUE:  0m 21s (21520000)     0m 12s (120276340)
+Antisearch 100000 10 TRUE:  0m 14s (14420000)     0m 9s (99626412)
+Search 100000 10 FALSE:  0m 14s (14810000)     0m 7s (70704378)
+Search 100000 10 FALSE:  0m 15s (15110000)     0m 7s (79686496)
+Insert 100000 10 TRUE:  0m 31s (31310000)     0m 18s (189412116)
+Search 100000 10 TRUE:  0m 11s (11910000)     0m 7s (70661088)
+Search 100000 10 FALSE:  0m 14s (14880000)     0m 7s (79732014)
+Search 100000 10 FALSE:  0m 14s (14860000)     0m 7s (79720900)
+Total time for job execution:  6m 25s (385350000)     8m 11s (4919220428)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 7500000
+Init = 7500001
+Insert 100000 10 FALSE:  0m 29s (29060000)     1m 15s (759567006)
+Insert 100000 10 TRUE:  0m 29s (29340000)     0m 22s (220335100)
+Search 100000 10 TRUE:  0m 15s (15130000)     0m 7s (79729696)
+Insert 100000 10 FALSE:  0m 30s (30240000)     0m 23s (239511438)
+Search 100000 10 TRUE:  0m 15s (15080000)     0m 9s (90640632)
+Search 100000 10 FALSE:  0m 15s (15150000)     0m 7s (79814168)
+Insert 100000 10 FALSE:  0m 28s (28520000)     0m 23s (230101392)
+Search 100000 10 TRUE:  0m 14s (14840000)     0m 7s (79769588)
+Search 100000 10 FALSE:  0m 14s (14760000)     0m 7s (79787870)
+Search 100000 10 FALSE:  0m 14s (14870000)     0m 7s (70735514)
+Delete 100000 10 TRUE:  0m 19s (19610000)     0m 10s (109893024)
+Delete 100000 10 TRUE:  0m 21s (21430000)     0m 11s (119999492)
+Antisearch 100000 10 TRUE:  0m 14s (14360000)     0m 9s (90103812)
+Search 100000 10 FALSE:  0m 14s (14790000)     0m 7s (79714066)
+Search 100000 10 FALSE:  0m 14s (14690000)     0m 7s (79727580)
+Insert 100000 10 TRUE:  0m 32s (32030000)     0m 18s (180344270)
+Search 100000 10 TRUE:  0m 14s (14670000)     0m 7s (79651006)
+Search 100000 10 FALSE:  0m 14s (14880000)     0m 7s (79676214)
+Search 100000 10 FALSE:  0m 14s (14930000)     0m 7s (70720010)
+Total time for job execution:  6m 21s (381450000)     7m 26s (4460357448)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 7800000
+Init = 7800001
+Insert 100000 10 FALSE:  0m 29s (29130000)     1m 55s (1150939618)
+Insert 100000 10 TRUE:  0m 30s (30810000)     0m 22s (229331704)
+Search 100000 10 TRUE:  0m 14s (14820000)     0m 7s (79998262)
+Insert 100000 10 FALSE:  0m 28s (28960000)     0m 24s (240079468)
+Search 100000 10 TRUE:  0m 13s (13810000)     0m 8s (89761248)
+Search 100000 10 FALSE:  0m 13s (13440000)     0m 8s (89777164)
+Insert 100000 10 FALSE:  0m 28s (28560000)     0m 27s (270179446)
+Search 100000 10 TRUE:  0m 14s (14740000)     0m 15s (150142888)
+Search 100000 10 FALSE:  0m 14s (14470000)     0m 12s (120212548)
+Search 100000 10 FALSE:  0m 14s (14880000)     0m 7s (79834016)
+Delete 100000 10 TRUE:  0m 19s (19070000)     0m 10s (109885014)
+Delete 100000 10 TRUE:  0m 20s (20370000)     0m 12s (120269232)
+Antisearch 100000 10 TRUE:  0m 14s (14220000)     0m 14s (149255012)
+Search 100000 10 FALSE:  0m 14s (14540000)     0m 7s (70722124)
+Search 100000 10 FALSE:  0m 14s (14800000)     0m 7s (79754088)
+Insert 100000 10 TRUE:  0m 29s (29830000)     0m 18s (189743404)
+Search 100000 10 TRUE:  0m 14s (14990000)     0m 7s (70651156)
+Search 100000 10 FALSE:  0m 14s (14810000)     0m 7s (79651360)
+Search 100000 10 FALSE:  0m 14s (14760000)     0m 7s (79715568)
+Total time for job execution:  6m 14s (374990000)     8m 36s (5169336418)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 8100000
+Init = 8100001
+Insert 100000 10 FALSE:  0m 31s (31000000)     1m 34s (940223312)
+Insert 100000 10 TRUE:  0m 29s (29510000)     0m 21s (210555928)
+Search 100000 10 TRUE:  0m 15s (15120000)     0m 7s (79771500)
+Insert 100000 10 FALSE:  0m 30s (30050000)     0m 23s (239846232)
+Search 100000 10 TRUE:  0m 15s (15180000)     0m 7s (79888024)
+Search 100000 10 FALSE:  0m 14s (14950000)     0m 8s (80333416)
+Insert 100000 10 FALSE:  0m 28s (28500000)     0m 23s (239223958)
+Search 100000 10 TRUE:  0m 14s (14850000)     0m 7s (70685138)
+Search 100000 10 FALSE:  0m 14s (14840000)     0m 7s (79702760)
+Search 100000 10 FALSE:  0m 14s (14530000)     0m 8s (80330392)
+Delete 100000 10 TRUE:  0m 17s (17480000)     0m 11s (119958938)
+Delete 100000 10 TRUE:  0m 19s (19140000)     0m 13s (130046954)
+Antisearch 100000 10 TRUE:  0m 13s (13100000)     0m 10s (109788108)
+Search 100000 10 FALSE:  0m 13s (13700000)     0m 8s (89464872)
+Search 100000 10 FALSE:  0m 14s (14890000)     0m 7s (70769956)
+Insert 100000 10 TRUE:  0m 31s (31690000)     0m 18s (189385784)
+Search 100000 10 TRUE:  0m 14s (14520000)     0m 7s (70720184)
+Search 100000 10 FALSE:  0m 14s (14560000)     0m 7s (79686152)
+Search 100000 10 FALSE:  0m 14s (14920000)     0m 7s (79758562)
+Total time for job execution:  6m 17s (377380000)     7m 58s (4789750460)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 8400000
+Init = 8400001
+Insert 100000 10 FALSE:  0m 29s (29470000)     2m 3s (1239979776)
+Insert 100000 10 TRUE:  0m 30s (30910000)     0m 22s (220552108)
+Search 100000 10 TRUE:  0m 14s (14790000)     0m 8s (80002126)
+Insert 100000 10 FALSE:  0m 28s (28220000)     0m 23s (239582918)
+Search 100000 10 TRUE:  0m 14s (14890000)     0m 8s (80193066)
+Search 100000 10 FALSE:  0m 14s (14550000)     0m 7s (79706448)
+Insert 100000 10 FALSE:  0m 29s (29720000)     0m 25s (250022604)
+Search 100000 10 TRUE:  0m 14s (14200000)     0m 12s (129782896)
+Search 100000 10 FALSE:  0m 13s (13700000)     0m 8s (80694070)
+Search 100000 10 FALSE:  0m 13s (13650000)     0m 8s (89714226)
+Delete 100000 10 TRUE:  0m 17s (17410000)     0m 12s (120195688)
+Delete 100000 10 TRUE:  0m 18s (18770000)     0m 13s (139415616)
+Antisearch 100000 10 TRUE:  0m 13s (13720000)     0m 12s (120271028)
+Search 100000 10 FALSE:  0m 13s (13910000)     0m 8s (80497944)
+Search 100000 10 FALSE:  0m 13s (13880000)     0m 8s (89383688)
+Insert 100000 10 TRUE:  0m 28s (28320000)     0m 19s (190294376)
+Search 100000 10 TRUE:  0m 13s (13690000)     0m 8s (89496896)
+Search 100000 10 FALSE:  0m 13s (13500000)     0m 8s (80741950)
+Search 100000 10 FALSE:  0m 13s (13420000)     0m 8s (89858706)
+Total time for job execution:  6m 5s (365490000)     8m 51s (5310099742)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 8700000
+Init = 8700001
+Insert 100000 10 FALSE:  0m 30s (30780000)     1m 25s (859803510)
+Insert 100000 10 TRUE:  0m 28s (28980000)     0m 23s (230285048)
+Search 100000 10 TRUE:  0m 13s (13770000)     0m 8s (89892820)
+Insert 100000 10 FALSE:  0m 28s (28550000)     0m 24s (249780890)
+Search 100000 10 TRUE:  0m 14s (14640000)     0m 9s (90238492)
+Search 100000 10 FALSE:  0m 14s (14840000)     0m 8s (80246204)
+Insert 100000 10 FALSE:  0m 28s (28400000)     0m 25s (259474120)
+Search 100000 10 TRUE:  0m 14s (14430000)     0m 8s (80228788)
+Search 100000 10 FALSE:  0m 14s (14970000)     0m 7s (79842446)
+Search 100000 10 FALSE:  0m 15s (15370000)     0m 8s (80275832)
+Delete 100000 10 TRUE:  0m 19s (19470000)     0m 11s (110278656)
+Delete 100000 10 TRUE:  0m 18s (18950000)     0m 12s (120181878)
+Antisearch 100000 10 TRUE:  0m 14s (14260000)     0m 9s (99469886)
+Search 100000 10 FALSE:  0m 14s (14910000)     0m 7s (79991760)
+Search 100000 10 FALSE:  0m 15s (15000000)     0m 7s (79914606)
+Insert 100000 10 TRUE:  0m 29s (29830000)     0m 18s (189891164)
+Search 100000 10 TRUE:  0m 14s (14960000)     0m 7s (79882082)
+Search 100000 10 FALSE:  0m 14s (14870000)     0m 8s (80280482)
+Search 100000 10 FALSE:  0m 14s (14870000)     0m 8s (80379972)
+Total time for job execution:  6m 21s (381020000)     8m 15s (4959693020)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 9000000
+Init = 9000001
+Insert 100000 10 FALSE:  0m 30s (30550000)     1m 45s (1059645094)
+Insert 100000 10 TRUE:  0m 29s (29570000)     0m 21s (219771490)
+Search 100000 10 TRUE:  0m 15s (15360000)     0m 7s (70741092)
+Insert 100000 10 FALSE:  0m 29s (29330000)     0m 23s (239869470)
+Search 100000 10 TRUE:  0m 14s (14870000)     0m 9s (90029866)
+Search 100000 10 FALSE:  0m 15s (15120000)     0m 7s (79815528)
+Insert 100000 10 FALSE:  0m 30s (30610000)     0m 23s (239828400)
+Search 100000 10 TRUE:  0m 14s (14890000)     0m 11s (110264084)
+Search 100000 10 FALSE:  0m 14s (14600000)     0m 8s (80058166)
+Search 100000 10 FALSE:  0m 15s (15140000)     0m 7s (79820110)
+Delete 100000 10 TRUE:  0m 19s (19620000)     0m 11s (119660426)
+Delete 100000 10 TRUE:  0m 21s (21380000)     0m 12s (120395148)
+Antisearch 100000 10 TRUE:  0m 14s (14520000)     0m 11s (119639420)
+Search 100000 10 FALSE:  0m 14s (14990000)     0m 7s (70765410)
+Search 100000 10 FALSE:  0m 14s (14880000)     0m 7s (79762462)
+Insert 100000 10 TRUE:  0m 31s (31770000)     0m 19s (190073240)
+Search 100000 10 TRUE:  0m 15s (15080000)     0m 8s (89266952)
+Search 100000 10 FALSE:  0m 15s (15000000)     0m 7s (70870466)
+Search 100000 10 FALSE:  0m 15s (15190000)     0m 7s (79765500)
+Total time for job execution:  6m 29s (389500000)     8m 47s (5270645326)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 9300000
+Init = 9300001
+Insert 100000 10 FALSE:  0m 30s (30180000)     1m 46s (1069756074)
+Insert 100000 10 TRUE:  0m 30s (30840000)     0m 22s (220887950)
+Search 100000 10 TRUE:  0m 15s (15440000)     0m 8s (80029944)
+Insert 100000 10 FALSE:  0m 29s (29670000)     0m 23s (239834106)
+Search 100000 10 TRUE:  0m 15s (15220000)     0m 8s (80038576)
+Search 100000 10 FALSE:  0m 15s (15060000)     0m 7s (79993692)
+Insert 100000 10 FALSE:  0m 30s (30650000)     0m 24s (240141814)
+Search 100000 10 TRUE:  0m 15s (15200000)     0m 8s (89215220)
+Search 100000 10 FALSE:  0m 14s (14970000)     0m 7s (79816512)
+Search 100000 10 FALSE:  0m 15s (15340000)     0m 7s (79986294)
+Delete 100000 10 TRUE:  0m 18s (18620000)     0m 20s (209570462)
+Delete 100000 10 TRUE:  0m 20s (20530000)     0m 13s (139481792)
+Antisearch 100000 10 TRUE:  0m 14s (14560000)     0m 11s (110215676)
+Search 100000 10 FALSE:  0m 14s (14520000)     0m 8s (80366500)
+Search 100000 10 FALSE:  0m 15s (15180000)     0m 7s (79818464)
+Insert 100000 10 TRUE:  0m 30s (30940000)     0m 19s (190492952)
+Search 100000 10 TRUE:  0m 15s (15110000)     0m 8s (89390828)
+Search 100000 10 FALSE:  0m 14s (14980000)     0m 7s (79802146)
+Search 100000 10 FALSE:  0m 15s (15130000)     0m 7s (70865140)
+Total time for job execution:  6m 29s (389390000)     8m 51s (5310018560)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 9600000
+Init = 9600001
+Insert 100000 10 FALSE:  0m 29s (29190000)     0m 43s (430197474)
+Insert 100000 10 TRUE:  0m 31s (31210000)     0m 23s (230465532)
+Search 100000 10 TRUE:  0m 15s (15300000)     0m 7s (79823436)
+Insert 100000 10 FALSE:  0m 29s (29500000)     0m 23s (230337338)
+Search 100000 10 TRUE:  0m 15s (15270000)     0m 7s (79807476)
+Search 100000 10 FALSE:  0m 15s (15030000)     0m 7s (79786098)
+Insert 100000 10 FALSE:  0m 29s (29230000)     0m 23s (239654004)
+Search 100000 10 TRUE:  0m 15s (15280000)     0m 7s (79856858)
+Search 100000 10 FALSE:  0m 14s (14720000)     0m 8s (80110608)
+Search 100000 10 FALSE:  0m 15s (15260000)     0m 7s (79832624)
+Delete 100000 10 TRUE:  0m 19s (19340000)     0m 11s (110117992)
+Delete 100000 10 TRUE:  0m 21s (21100000)     0m 12s (120441270)
+Antisearch 100000 10 TRUE:  0m 14s (14360000)     0m 9s (99687348)
+Search 100000 10 FALSE:  0m 15s (15330000)     0m 7s (79914886)
+Search 100000 10 FALSE:  0m 14s (14880000)     0m 7s (70774150)
+Insert 100000 10 TRUE:  0m 31s (31490000)     0m 18s (189899152)
+Search 100000 10 TRUE:  0m 14s (14850000)     0m 8s (89221590)
+Search 100000 10 FALSE:  0m 14s (14870000)     0m 8s (80280954)
+Search 100000 10 FALSE:  0m 14s (14770000)     0m 7s (79885204)
+Total time for job execution:  6m 28s (388830000)     7m 42s (4620041780)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 9900000
+Init = 9900001
+Insert 100000 10 FALSE:  0m 30s (30250000)     1m 33s (930038160)
+Insert 100000 10 TRUE:  0m 31s (31140000)     0m 25s (259256176)
+Search 100000 10 TRUE:  0m 15s (15140000)     0m 8s (80065222)
+Insert 100000 10 FALSE:  0m 29s (29810000)     0m 23s (230547908)
+Search 100000 10 TRUE:  0m 15s (15270000)     0m 7s (79821708)
+Search 100000 10 FALSE:  0m 14s (14430000)     0m 8s (89655488)
+Insert 100000 10 FALSE:  0m 28s (28430000)     0m 25s (250414448)
+Search 100000 10 TRUE:  0m 14s (14950000)     0m 8s (80299864)
+Search 100000 10 FALSE:  0m 14s (14920000)     0m 8s (89323544)
+Search 100000 10 FALSE:  0m 15s (15180000)     0m 7s (79959320)
+Delete 100000 10 TRUE:  0m 19s (19110000)     0m 11s (110624204)
+Delete 100000 10 TRUE:  0m 21s (21730000)     0m 11s (119955764)
+Antisearch 100000 10 TRUE:  0m 14s (14690000)     0m 11s (110068298)
+Search 100000 10 FALSE:  0m 14s (14930000)     0m 7s (79925046)
+Search 100000 10 FALSE:  0m 14s (14900000)     0m 9s (99180756)
+Insert 100000 10 TRUE:  0m 31s (31680000)     0m 19s (190579332)
+Search 100000 10 TRUE:  0m 15s (15080000)     0m 7s (79756560)
+Search 100000 10 FALSE:  0m 14s (14900000)     0m 8s (80260880)
+Search 100000 10 FALSE:  0m 15s (15250000)     0m 7s (79853098)
+Total time for job execution:  6m 30s (390380000)     8m 27s (5079958232)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 10200000
+Init = 10200001
+Insert 100000 10 FALSE:  0m 31s (31810000)     1m 32s (929632834)
+Insert 100000 10 TRUE:  0m 30s (30910000)     0m 27s (270716018)
+Search 100000 10 TRUE:  0m 15s (15290000)     0m 7s (79895396)
+Insert 100000 10 FALSE:  0m 30s (30190000)     0m 24s (249277768)
+Search 100000 10 TRUE:  0m 14s (14700000)     0m 10s (109923480)
+Search 100000 10 FALSE:  0m 13s (13880000)     0m 8s (80833426)
+Insert 100000 10 FALSE:  0m 29s (29830000)     0m 26s (269300668)
+Search 100000 10 TRUE:  0m 14s (14860000)     0m 8s (80607124)
+Search 100000 10 FALSE:  0m 14s (14810000)     0m 7s (79887520)
+Search 100000 10 FALSE:  0m 15s (15890000)     0m 7s (79931428)
+Delete 100000 10 TRUE:  0m 19s (19630000)     0m 11s (110223872)
+Delete 100000 10 TRUE:  0m 21s (21610000)     0m 12s (129496268)
+Antisearch 100000 10 TRUE:  0m 14s (14980000)     0m 11s (110002188)
+Search 100000 10 FALSE:  0m 15s (15080000)     0m 7s (79788380)
+Search 100000 10 FALSE:  0m 15s (15350000)     0m 7s (70820954)
+Insert 100000 10 TRUE:  0m 32s (32630000)     0m 18s (189520854)
+Search 100000 10 TRUE:  0m 15s (15110000)     0m 7s (79781940)
+Search 100000 10 FALSE:  0m 14s (14920000)     0m 8s (80182760)
+Search 100000 10 FALSE:  0m 15s (15140000)     0m 8s (80354816)
+Total time for job execution:  6m 35s (395230000)     8m 43s (5239995236)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 10500000
+Init = 10500001
+Insert 100000 10 FALSE:  0m 29s (29060000)     1m 26s (860555440)
+Insert 100000 10 TRUE:  0m 32s (32620000)     0m 21s (219629748)
+Search 100000 10 TRUE:  0m 15s (15210000)     0m 7s (79877032)
+Insert 100000 10 FALSE:  0m 28s (28900000)     0m 24s (240132166)
+Search 100000 10 TRUE:  0m 15s (15040000)     0m 7s (79902460)
+Search 100000 10 FALSE:  0m 15s (15230000)     0m 7s (79820828)
+Insert 100000 10 FALSE:  0m 29s (29310000)     0m 27s (270213600)
+Search 100000 10 TRUE:  0m 14s (14040000)     0m 12s (120276230)
+Search 100000 10 FALSE:  0m 14s (14730000)     0m 8s (89875536)
+Search 100000 10 FALSE:  0m 15s (15040000)     0m 7s (79886808)
+Delete 100000 10 TRUE:  0m 19s (19090000)     0m 11s (110070388)
+Delete 100000 10 TRUE:  0m 21s (21620000)     0m 12s (129799856)
+Antisearch 100000 10 TRUE:  0m 14s (14080000)     0m 11s (110087796)
+Search 100000 10 FALSE:  0m 14s (14240000)     0m 8s (80646368)
+Search 100000 10 FALSE:  0m 14s (14000000)     0m 9s (90006066)
+Insert 100000 10 TRUE:  0m 28s (28010000)     0m 20s (209614136)
+Search 100000 10 TRUE:  0m 14s (14620000)     0m 8s (80394734)
+Search 100000 10 FALSE:  0m 15s (15040000)     0m 7s (79941434)
+Search 100000 10 FALSE:  0m 15s (15070000)     0m 7s (79785828)
+Total time for job execution:  6m 25s (385380000)     8m 40s (5200397640)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 10800000
+Init = 10800001
+Insert 100000 10 FALSE:  0m 30s (30190000)     1m 41s (1010187346)
+Insert 100000 10 TRUE:  0m 31s (31330000)     0m 22s (229699566)
+Search 100000 10 TRUE:  0m 15s (15150000)     0m 7s (79969018)
+Insert 100000 10 FALSE:  0m 29s (29000000)     0m 23s (239601576)
+Search 100000 10 TRUE:  0m 14s (14720000)     0m 8s (80005050)
+Search 100000 10 FALSE:  0m 14s (14800000)     0m 7s (70868056)
+Insert 100000 10 FALSE:  0m 29s (29980000)     0m 24s (240016944)
+Search 100000 10 TRUE:  0m 15s (15230000)     0m 7s (79919226)
+Search 100000 10 FALSE:  0m 14s (14820000)     0m 7s (79854362)
+Search 100000 10 FALSE:  0m 15s (15080000)     0m 7s (79793650)
+Delete 100000 10 TRUE:  0m 19s (19440000)     0m 11s (110301224)
+Delete 100000 10 TRUE:  0m 20s (20350000)     0m 14s (149415144)
+Antisearch 100000 10 TRUE:  0m 14s (14450000)     0m 10s (100187406)
+Search 100000 10 FALSE:  0m 14s (14670000)     0m 7s (79880124)
+Search 100000 10 FALSE:  0m 14s (14820000)     0m 7s (79877856)
+Insert 100000 10 TRUE:  0m 32s (32240000)     0m 18s (180467668)
+Search 100000 10 TRUE:  0m 14s (14990000)     0m 7s (79716712)
+Search 100000 10 FALSE:  0m 15s (15020000)     0m 7s (79720416)
+Search 100000 10 FALSE:  0m 14s (14810000)     0m 8s (80084868)
+Total time for job execution:  6m 31s (391800000)     8m 50s (5309364636)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 11100000
+Init = 11100001
+Insert 100000 10 FALSE:  0m 30s (30480000)     2m 28s (1489875968)
+Insert 100000 10 TRUE:  0m 28s (28750000)     0m 25s (259766018)
+Search 100000 10 TRUE:  0m 15s (15330000)     0m 7s (79820528)
+Insert 100000 10 FALSE:  0m 29s (29080000)     0m 24s (240201444)
+Search 100000 10 TRUE:  0m 15s (15140000)     0m 7s (79915490)
+Search 100000 10 FALSE:  0m 15s (15000000)     0m 7s (79796976)
+Insert 100000 10 FALSE:  0m 30s (30960000)     0m 23s (230622516)
+Search 100000 10 TRUE:  0m 15s (15040000)     0m 12s (129408444)
+Search 100000 10 FALSE:  0m 14s (14800000)     0m 8s (80083528)
+Search 100000 10 FALSE:  0m 14s (14940000)     0m 7s (79774460)
+Delete 100000 10 TRUE:  0m 19s (19560000)     0m 11s (110567944)
+Delete 100000 10 TRUE:  0m 21s (21680000)     0m 12s (120263670)
+Antisearch 100000 10 TRUE:  0m 14s (14580000)     0m 10s (109449136)
+Search 100000 10 FALSE:  0m 15s (15140000)     0m 7s (79775256)
+Search 100000 10 FALSE:  0m 15s (15400000)     0m 7s (70797280)
+Insert 100000 10 TRUE:  0m 31s (31630000)     0m 19s (199230376)
+Search 100000 10 TRUE:  0m 15s (15270000)     0m 8s (80099108)
+Search 100000 10 FALSE:  0m 14s (14750000)     0m 8s (80243240)
+Search 100000 10 FALSE:  0m 15s (15160000)     0m 7s (79799952)
+Total time for job execution:  6m 33s (393550000)     10m 7s (6079639078)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 11400000
+Init = 11400001
+Insert 100000 10 FALSE:  0m 30s (30530000)     1m 34s (949718918)
+Insert 100000 10 TRUE:  0m 30s (30120000)     0m 21s (219862130)
+Search 100000 10 TRUE:  0m 15s (15170000)     0m 7s (79955184)
+Insert 100000 10 FALSE:  0m 31s (31300000)     0m 24s (240344852)
+Search 100000 10 TRUE:  0m 15s (15410000)     0m 8s (80061542)
+Search 100000 10 FALSE:  0m 15s (15240000)     0m 8s (89561470)
+Insert 100000 10 FALSE:  0m 28s (28890000)     0m 23s (230812576)
+Search 100000 10 TRUE:  0m 15s (15660000)     0m 7s (79786164)
+Search 100000 10 FALSE:  0m 14s (14940000)     0m 8s (80108448)
+Search 100000 10 FALSE:  0m 15s (15180000)     0m 7s (79903608)
+Delete 100000 10 TRUE:  0m 19s (19460000)     0m 11s (110145904)
+Delete 100000 10 TRUE:  0m 21s (21710000)     0m 12s (129297540)
+Antisearch 100000 10 TRUE:  0m 14s (14560000)     0m 9s (90736190)
+Search 100000 10 FALSE:  0m 14s (14930000)     0m 7s (79764172)
+Search 100000 10 FALSE:  0m 15s (15180000)     0m 7s (79883372)
+Insert 100000 10 TRUE:  0m 30s (30990000)     0m 19s (190205768)
+Search 100000 10 TRUE:  0m 14s (14890000)     0m 8s (80208228)
+Search 100000 10 FALSE:  0m 15s (15030000)     0m 8s (89335714)
+Search 100000 10 FALSE:  0m 15s (15120000)     0m 7s (79810346)
+Total time for job execution:  6m 35s (395460000)     9m 23s (5639654196)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 11700000
+Init = 11700001
+Insert 100000 10 FALSE:  0m 29s (29150000)     2m 0s (1200184402)
+Insert 100000 10 TRUE:  0m 31s (31500000)     0m 22s (220153672)
+Search 100000 10 TRUE:  0m 15s (15430000)     0m 7s (79886972)
+Insert 100000 10 FALSE:  0m 28s (28960000)     0m 25s (259838908)
+Search 100000 10 TRUE:  0m 15s (15090000)     0m 8s (80099936)
+Search 100000 10 FALSE:  0m 15s (15010000)     0m 7s (79798430)
+Insert 100000 10 FALSE:  0m 29s (29300000)     0m 23s (230337146)
+Search 100000 10 TRUE:  0m 15s (15040000)     0m 7s (79719380)
+Search 100000 10 FALSE:  0m 15s (15110000)     0m 7s (70709756)
+Search 100000 10 FALSE:  0m 14s (14790000)     0m 7s (79897012)
+Delete 100000 10 TRUE:  0m 19s (19060000)     0m 11s (119528924)
+Delete 100000 10 TRUE:  0m 21s (21290000)     0m 12s (120049116)
+Antisearch 100000 10 TRUE:  0m 14s (14550000)     0m 10s (109817994)
+Search 100000 10 FALSE:  0m 14s (14750000)     0m 8s (80555676)
+Search 100000 10 FALSE:  0m 14s (14900000)     0m 7s (79924234)
+Insert 100000 10 TRUE:  0m 31s (31340000)     0m 21s (219688546)
+Search 100000 10 TRUE:  0m 15s (15020000)     0m 8s (80486898)
+Search 100000 10 FALSE:  0m 14s (14680000)     0m 10s (109358888)
+Search 100000 10 FALSE:  0m 14s (14900000)     0m 8s (80112780)
+Total time for job execution:  6m 32s (392220000)     9m 58s (5980097986)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 12000000
+Init = 12000001
+Insert 100000 10 FALSE:  0m 30s (30510000)     1m 28s (889957264)
+Insert 100000 10 TRUE:  0m 31s (31690000)     0m 29s (290057120)
+Search 100000 10 TRUE:  0m 15s (15460000)     0m 8s (80164890)
+Insert 100000 10 FALSE:  0m 29s (29390000)     0m 24s (240175772)
+Search 100000 10 TRUE:  0m 15s (15660000)     0m 8s (80108478)
+Search 100000 10 FALSE:  0m 15s (15530000)     0m 8s (89063726)
+Insert 100000 10 FALSE:  0m 29s (29820000)     0m 24s (240045100)
+Search 100000 10 TRUE:  0m 15s (15220000)     0m 8s (80606208)
+Search 100000 10 FALSE:  0m 15s (15050000)     0m 9s (99997980)
+Search 100000 10 FALSE:  0m 15s (15280000)     0m 9s (90295382)
+Delete 100000 10 TRUE:  0m 19s (19810000)     0m 11s (119653370)
+Delete 100000 10 TRUE:  0m 22s (22450000)     0m 12s (129550148)
+Antisearch 100000 10 TRUE:  0m 14s (14660000)     0m 8s (89968044)
+Search 100000 10 FALSE:  0m 15s (15280000)     0m 8s (80084708)
+Search 100000 10 FALSE:  0m 15s (15500000)     0m 8s (80103154)
+Insert 100000 10 TRUE:  0m 32s (32480000)     0m 18s (189824224)
+Search 100000 10 TRUE:  0m 15s (15390000)     0m 7s (79963786)
+Search 100000 10 FALSE:  0m 15s (15120000)     0m 8s (80141004)
+Search 100000 10 FALSE:  0m 15s (15230000)     0m 8s (80374322)
+Total time for job execution:  6m 41s (401740000)     9m 41s (5819929852)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 12300000
+Init = 12300001
+Insert 100000 10 FALSE:  0m 29s (29070000)     1m 50s (1109906856)
+Insert 100000 10 TRUE:  0m 30s (30920000)     0m 22s (220013234)
+Search 100000 10 TRUE:  0m 14s (14960000)     0m 7s (70875274)
+Insert 100000 10 FALSE:  0m 32s (32310000)     0m 25s (259526596)
+Search 100000 10 TRUE:  0m 14s (14830000)     0m 8s (80412608)
+Search 100000 10 FALSE:  0m 15s (15260000)     0m 7s (79828664)
+Insert 100000 10 FALSE:  0m 29s (29010000)     0m 23s (239662408)
+Search 100000 10 TRUE:  0m 15s (15170000)     0m 8s (80195904)
+Search 100000 10 FALSE:  0m 14s (14980000)     0m 8s (80054708)
+Search 100000 10 FALSE:  0m 15s (15100000)     0m 7s (79880724)
+Delete 100000 10 TRUE:  0m 19s (19230000)     0m 11s (110200014)
+Delete 100000 10 TRUE:  0m 20s (20960000)     0m 12s (120225614)
+Antisearch 100000 10 TRUE:  0m 14s (14990000)     0m 9s (99828956)
+Search 100000 10 FALSE:  0m 15s (15060000)     0m 7s (79774058)
+Search 100000 10 FALSE:  0m 15s (15150000)     0m 7s (79876292)
+Insert 100000 10 TRUE:  0m 32s (32180000)     0m 19s (190308910)
+Search 100000 10 TRUE:  0m 14s (14850000)     0m 8s (80148446)
+Search 100000 10 FALSE:  0m 15s (15100000)     0m 8s (89218632)
+Search 100000 10 FALSE:  0m 15s (15280000)     0m 7s (79985802)
+Total time for job execution:  6m 36s (396610000)     9m 54s (5949107756)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 12600000
+Init = 12600001
+Insert 100000 10 FALSE:  0m 31s (31080000)     2m 10s (1300915488)
+Insert 100000 10 TRUE:  0m 31s (31310000)     0m 23s (239687272)
+Search 100000 10 TRUE:  0m 14s (14220000)     0m 8s (89912354)
+Insert 100000 10 FALSE:  0m 29s (29250000)     0m 24s (249520270)
+Search 100000 10 TRUE:  0m 13s (13810000)     0m 9s (90030466)
+Search 100000 10 FALSE:  0m 14s (14110000)     0m 8s (80684578)
+Insert 100000 10 FALSE:  0m 29s (29640000)     0m 28s (289591744)
+Search 100000 10 TRUE:  0m 13s (13610000)     0m 9s (90588796)
+Search 100000 10 FALSE:  0m 13s (13440000)     0m 9s (99481442)
+Search 100000 10 FALSE:  0m 13s (13770000)     0m 9s (90114400)
+Delete 100000 10 TRUE:  0m 18s (18220000)     0m 12s (120312708)
+Delete 100000 10 TRUE:  0m 21s (21510000)     0m 12s (129274628)
+Antisearch 100000 10 TRUE:  0m 14s (14190000)     0m 10s (100007448)
+Search 100000 10 FALSE:  0m 15s (15200000)     0m 7s (79877786)
+Search 100000 10 FALSE:  0m 14s (14980000)     0m 8s (80046302)
+Insert 100000 10 TRUE:  0m 30s (30680000)     0m 19s (190096322)
+Search 100000 10 TRUE:  0m 15s (15170000)     0m 8s (80021824)
+Search 100000 10 FALSE:  0m 15s (15210000)     0m 8s (80391166)
+Search 100000 10 FALSE:  0m 15s (15210000)     0m 7s (79877196)
+Total time for job execution:  6m 28s (388010000)     10m 38s (6380206412)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 12900000
+Init = 12900001
+Insert 100000 10 FALSE:  0m 31s (31110000)     1m 45s (1050168524)
+Insert 100000 10 TRUE:  0m 30s (30470000)     0m 24s (249783394)
+Search 100000 10 TRUE:  0m 15s (15600000)     0m 7s (79832226)
+Insert 100000 10 FALSE:  0m 29s (29310000)     0m 24s (240504496)
+Search 100000 10 TRUE:  0m 15s (15350000)     0m 8s (89281442)
+Search 100000 10 FALSE:  0m 15s (15320000)     0m 8s (80084084)
+Insert 100000 10 FALSE:  0m 30s (30100000)     0m 24s (240162054)
+Search 100000 10 TRUE:  0m 15s (15290000)     0m 8s (80111838)
+Search 100000 10 FALSE:  0m 14s (14800000)     0m 8s (80439704)
+Search 100000 10 FALSE:  0m 15s (15180000)     0m 7s (79807096)
+Delete 100000 10 TRUE:  0m 19s (19890000)     0m 10s (109968842)
+Delete 100000 10 TRUE:  0m 21s (21420000)     0m 12s (120167692)
+Antisearch 100000 10 TRUE:  0m 14s (14380000)     0m 9s (99965398)
+Search 100000 10 FALSE:  0m 14s (14990000)     0m 7s (79726136)
+Search 100000 10 FALSE:  0m 15s (15350000)     0m 7s (79758350)
+Insert 100000 10 TRUE:  0m 30s (30510000)     0m 18s (189942528)
+Search 100000 10 TRUE:  0m 14s (14950000)     0m 7s (70719304)
+Search 100000 10 FALSE:  0m 15s (15050000)     0m 8s (89245844)
+Search 100000 10 FALSE:  0m 14s (14850000)     0m 8s (80306948)
+Total time for job execution:  6m 37s (397280000)     10m 4s (6049544378)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 13200000
+Init = 13200001
+Insert 100000 10 FALSE:  0m 30s (30710000)     1m 43s (1039608536)
+Insert 100000 10 TRUE:  0m 31s (31270000)     0m 27s (279924792)
+Search 100000 10 TRUE:  0m 14s (14990000)     0m 8s (80139650)
+Insert 100000 10 FALSE:  0m 29s (29250000)     0m 23s (239584472)
+Search 100000 10 TRUE:  0m 15s (15340000)     0m 7s (79899522)
+Search 100000 10 FALSE:  0m 15s (15180000)     0m 8s (80242944)
+Insert 100000 10 FALSE:  0m 30s (30670000)     0m 23s (239839798)
+Search 100000 10 TRUE:  0m 15s (15820000)     0m 8s (80027220)
+Search 100000 10 FALSE:  0m 14s (14940000)     0m 10s (109820924)
+Search 100000 10 FALSE:  0m 15s (15090000)     0m 7s (79945810)
+Delete 100000 10 TRUE:  0m 18s (18610000)     0m 11s (119995682)
+Delete 100000 10 TRUE:  0m 21s (21860000)     0m 12s (120346008)
+Antisearch 100000 10 TRUE:  0m 14s (14340000)     0m 10s (109945098)
+Search 100000 10 FALSE:  0m 14s (14990000)     0m 7s (79821576)
+Search 100000 10 FALSE:  0m 15s (15460000)     0m 7s (79836832)
+Insert 100000 10 TRUE:  0m 31s (31680000)     0m 19s (190231828)
+Search 100000 10 TRUE:  0m 15s (15010000)     0m 8s (80176640)
+Search 100000 10 FALSE:  0m 14s (14790000)     0m 8s (89356208)
+Search 100000 10 FALSE:  0m 15s (15330000)     0m 7s (70915130)
+Total time for job execution:  6m 39s (399210000)     10m 33s (6330327512)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 13500000
+Init = 13500001
+Insert 100000 10 FALSE:  0m 31s (31400000)     2m 2s (1229650460)
+Insert 100000 10 TRUE:  0m 30s (30860000)     0m 22s (220579100)
+Search 100000 10 TRUE:  0m 16s (16210000)     0m 8s (89638316)
+Insert 100000 10 FALSE:  0m 29s (29870000)     0m 24s (249672452)
+Search 100000 10 TRUE:  0m 15s (15680000)     0m 8s (80191128)
+Search 100000 10 FALSE:  0m 15s (15710000)     0m 8s (80184738)
+Insert 100000 10 FALSE:  0m 31s (31470000)     0m 36s (360260872)
+Search 100000 10 TRUE:  0m 14s (14940000)     0m 22s (229702468)
+Search 100000 10 FALSE:  0m 15s (15250000)     0m 11s (119562780)
+Search 100000 10 FALSE:  0m 15s (15580000)     0m 8s (80216084)
+Delete 100000 10 TRUE:  0m 20s (20090000)     0m 11s (110555184)
+Delete 100000 10 TRUE:  0m 21s (21810000)     0m 12s (129744156)
+Antisearch 100000 10 TRUE:  0m 15s (15020000)     0m 14s (149848438)
+Search 100000 10 FALSE:  0m 15s (15790000)     0m 8s (80259188)
+Search 100000 10 FALSE:  0m 15s (15680000)     0m 8s (89285096)
+Insert 100000 10 TRUE:  0m 30s (30930000)     0m 20s (200013974)
+Search 100000 10 TRUE:  0m 15s (15840000)     0m 8s (80082792)
+Search 100000 10 FALSE:  0m 15s (15540000)     0m 8s (80191696)
+Search 100000 10 FALSE:  0m 15s (15780000)     0m 8s (80217904)
+Total time for job execution:  6m 49s (409970000)     11m 29s (6890307892)
+bin/release/./ttree map /home/chs/Backup/db/btree 0 Insert,100k,Cont Insert,100k,Reset Search,100k,Reset Insert,100k,Cont Search,100k,Reset Search,100k,Cont Insert,100k,Cont Search,100k,Reset Search,100k,Cont Search,100k,Cont Delete,100k,Reset Delete,100k,Reset Antisearch,100k,Reset Search,100k,Cont Search,100k,Cont Insert,100k,Reset Search,100k,Reset Search,100k,Cont Search,100k,Cont
+map
+Using existing Map /home/chs/Backup/db/btree
+Size = 13800000
+Init = 13800001
+Insert 100000 10 FALSE:  0m 31s (31150000)     2m 42s (1620052334)
+Insert 100000 10 TRUE:  0m 32s (32290000)     0m 24s (240615956)
+Search 100000 10 TRUE:  0m 16s (16080000)     0m 8s (89337416)
+Insert 100000 10 FALSE:  0m 30s (30460000)     0m 25s (250595008)
+Search 100000 10 TRUE:  0m 15s (15710000)     0m 8s (89492008)
+Search 100000 10 FALSE:  0m 15s (15780000)     0m 8s (80260618)
+Insert 100000 10 FALSE:  0m 30s (30780000)     0m 25s (259893590)
+Search 100000 10 TRUE:  0m 15s (15460000)     0m 9s (90067906)
+Search 100000 10 FALSE:  0m 14s (14530000)     0m 15s (159458104)
+Search 100000 10 FALSE:  0m 14s (14430000)     0m 15s (150039938)
+Delete 100000 10 TRUE:  0m 20s (20590000)     0m 19s (190457346)
+Delete 100000 10 TRUE:  0m 22s (22370000)     0m 12s (129625330)
+Antisearch 100000 10 TRUE:  0m 14s (14240000)     0m 18s (180450830)
+Search 100000 10 FALSE:  0m 13s (13610000)     0m 13s (130000716)
+Search 100000 10 FALSE:  0m 14s (14300000)     0m 10s (109911014)
+Insert 100000 10 TRUE:  0m 29s (29030000)     0m 21s (210035374)
+Search 100000 10 TRUE:  0m 14s (14360000)     0m 9s (90130298)
+Search 100000 10 FALSE:  0m 14s (14300000)     0m 9s (99463334)
+Search 100000 10 FALSE:  0m 14s (14770000)     0m 9s (90221540)
+Total time for job execution:  6m 40s (400820000)     12m 54s (7749567662)
+
+Size = 14800000
+log_2(14800000) = 23.8
+log_2.8(14800000) = 16.0
+
+Stats {
+   Level_0: Count  4502721  17588MB  
+   Level_0: Degree  3.19  146  1
+   Level_0: Size  1689.54  4096  105  41.2%
+   Level_0: Waste  2406.45  3991  0  58.7%
+
+   Level_1: Count  1531861  5983MB   
+   Level_1: Degree  2.93  111  2
+   Level_1: Size  1997.80  4096  1645  48.7%
+   Level_1: Waste  2098.19  2451  0  51.2%
+
+   Level_2: Count  604606  2361MB
+   Level_2: Degree  2.53  42  2
+   Level_2: Size  1950.42  4095  1645  47.6%
+   Level_2: Waste  2145.57  2451  1  52.3%
+
+   Level_3: Count  258102  1008MB
+   Level_3: Degree  2.34  19  2
+   Level_3: Size  1934.37  4096  1645  47.2%
+   Level_3: Waste  2161.62  2451  0  52.7%
+
+   Level_4: Count  114824  448MB
+   Level_4: Degree  2.24  13  2
+   Level_4: Size  1937.26  4096  1645  47.2%
+   Level_4: Waste  2158.73  2451  0  52.7%
+
+   Level_5: Count  51480  201MB
+   Level_5: Degree  2.23  10  2
+   Level_5: Size  1976.78  4096  1645  48.2%
+   Level_5: Waste  2119.21  2451  0  51.7%
+
+   Level_6: Count  23066  90MB
+   Level_6: Degree  2.23  7  2
+   Level_6: Size  2015.70  4095  1645  49.2%
+   Level_6: Waste  2080.29  2451  1  50.7%
+
+   Level_7: Count  10136  39MB
+   Level_7: Degree  2.27  6  2
+   Level_7: Size  2073.46  4096  1645  50.6%
+   Level_7: Waste  2022.53  2451  0  49.3%
+
+   Level_8: Count  3908  15MB
+   Level_8: Degree  2.59  5  2
+   Level_8: Size  2372.48  4096  1647  57.9%
+   Level_8: Waste  1723.51  2449  0  42.0%
+
+   Level_9: Count  1239  4MB
+   Level_9: Degree  3.15  5  2
+   Level_9: Size  2885.49  4053  1661  70.4%
+   Level_9: Waste  1210.50  2435  43  29.5%
+
+   Level_10: Count  421  1MB
+   Level_10: Degree  2.94  5  2
+   Level_10: Size  2684.17  4025  1693  65.5%
+   Level_10: Waste  1411.82  2403  71  34.4%
+
+   Level_11: Count  142  0MB
+   Level_11: Degree  2.96  4  2
+   Level_11: Size  2679.48  3939  1787  65.4%
+   Level_11: Waste  1416.51  2309  157  34.5%
+
+   Level_12: Count  47  0MB
+   Level_12: Degree  3.02  4  2
+   Level_12: Size  2718.04  3847  1743  66.3%
+   Level_12: Waste  1377.95  2353  249  33.6%
+
+   Level_13: Count  15  0MB
+   Level_13: Degree  3.13  4  2
+   Level_13: Size  2774.86  3727  1771  67.7%
+   Level_13: Waste  1321.13  2325  369  32.2%
+
+   Level_14: Count  6  0MB
+   Level_14: Degree  2.50  3  2
+   Level_14: Size  2252.83  2738  1881  55.0%
+   Level_14: Waste  1843.16  2215  1358  44.9%
+
+   Level_15: Count  2  0MB
+   Level_15: Degree  3.00  4  2
+   Level_15: Size  2700.50  3486  1915  65.9%
+   Level_15: Waste  1395.50  2181  610  34.0%
+
+   Level_16: Count  1  0MB
+   Level_16: Degree  2.00  2  2
+   Level_16: Size  1891.00  1891  1891  46.1%
+   Level_16: Waste  2205.00  2205  2205  53.8%
+}
+
