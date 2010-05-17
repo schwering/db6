@@ -2,7 +2,7 @@
 IO=map
 BIN=bin/debug/./ttree
 FILE=`cat .temp_path`btree
-GEN="pseudorandom"
+GEN="urls"
 C1=1k
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
