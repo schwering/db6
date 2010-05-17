@@ -1,6 +1,7 @@
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.log4j.BasicConfigurator;
 import org.schwering.crawler.*;
 
 public class Main {
@@ -49,15 +50,16 @@ public class Main {
 	private int count = 0;
 	
 	public static void main(String[] args) {
+		BasicConfigurator.configure();
 		new Main();
 	}
 	
 	private Main() {
-		Collection<DocumentURL> rootUrls = new LinkedList<DocumentURL>();
+		Collection<DocumentUrl> rootUrls = new LinkedList<DocumentUrl>();
 		for (int i = 0; i < rootStrings.length; i++) {
 			try {
-				rootUrls.add(new DocumentURL(rootStrings[i]));
-			} catch (DocumentURLException exc) {
+				rootUrls.add(new DocumentUrl(rootStrings[i]));
+			} catch (DocumentUrlException exc) {
 				System.err.println("Invalid URL: "+ rootStrings[i]);
 				exc.printStackTrace();
 				return;
@@ -66,19 +68,19 @@ public class Main {
 		
 		Crawler crawler = new Crawler(rootUrls);
 		
-		URLFilter fileTypeFilter = new URLGuessedContentTypeFilter(new PatternMatcher("text/.*"));
+		UrlFilter fileTypeFilter = new UrlGuessedContentTypeFilter(new PatternMatcher("text/.*"));
 //		URLFilter hostPatternFilter = new URLHostPatternFilter(new PatternMatcher("schwering.ath.cx"));
 //		URLFilter hostPatternFilter = new URLHostPatternFilter(new PatternMatcher("de.wikipedia.org"));
 //		URLFilter filePatternFilter = new URLFilePatternFilter(new PatternMatcher("(/wiki/.*)|"));
-		URLFilter historyFilter = new URLHistoryFilter(crawler);
-		URLFilter filter = new URLFilterConjunction(new URLFilter[] {
+		UrlFilter historyFilter = new UrlHistoryFilter(crawler);
+		UrlFilter filter = new UrlFilterConjunction(new UrlFilter[] {
 //				hostPatternFilter, 
 //				filePatternFilter,
 				fileTypeFilter, 
 				historyFilter });
 		
 		CrawlerListener listener = new CrawlerListener() {
-			public void found(DocumentURL url) {
+			public void found(DocumentUrl url) {
 				Thread t = Thread.currentThread();
 				System.out.println("["+ t.getName() +"] "+
 						url);
@@ -87,14 +89,13 @@ public class Main {
 				}
 			}
 			
-			public void followed(DocumentURL url, Collection<DocumentURL> links) {
+			public void followed(DocumentUrl url, Collection<DocumentUrl> links) {
 			}
 			
 			public void finished() {
 				System.out.println("Finished, could start a new crawler.");
 			}
 		};
-		Logger.setSensitivity(2);
 		crawler.setFilter(filter);
 		crawler.addListener(listener);
 		crawler.setThreadCount(100);

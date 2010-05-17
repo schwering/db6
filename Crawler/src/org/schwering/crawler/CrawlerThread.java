@@ -2,12 +2,15 @@ package org.schwering.crawler;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
 class CrawlerThread extends Thread {
-	private URLQueue queue;
-	private URLFilter filter;
+	private static final Logger logger = Logger.getLogger(CrawlerThread.class);
+	private final UrlQueue queue;
+	private UrlFilter filter;
 	private CrawlerThreadListener listener;
 	
-	public CrawlerThread(URLQueue queue, URLFilter filter, 
+	public CrawlerThread(UrlQueue queue, UrlFilter filter, 
 			CrawlerThreadListener listener) {
 		this.queue = queue;
 		this.filter = filter;
@@ -15,8 +18,8 @@ class CrawlerThread extends Thread {
 	}
 	
 	public void run() {
-		Logger.notify(this, "Thread started.");
-		DocumentURL url;
+		logger.debug("Thread started.");
+		DocumentUrl url;
 		while ((url = queue.take()) != null) {
 			if (!filter.accept(url)) {
 				continue;
@@ -25,7 +28,7 @@ class CrawlerThread extends Thread {
 			try {
 				docRec = new DocumentReceiver(url);
 			} catch (DocumentException exc) {
-				Logger.notify(this, "Failed: ("+ exc.getMessage() +")");
+				logger.debug("Failed: ("+ exc.getMessage() +")");
 				continue;
 			}
 			/* Filter a second time, doc.getURL() might be different from url. */
@@ -33,18 +36,18 @@ class CrawlerThread extends Thread {
 				continue;
 			}
 			listener.found(this, docRec.getURL());
-			Collection<DocumentURL> links = DocumentParser.extractLinks(docRec);
-			for (DocumentURL link : links) {
+			Collection<DocumentUrl> links = DocumentParser.extractLinks(docRec);
+			for (DocumentUrl link : links) {
 				if (filter.accept(link)) {
 					queue.put(link);
 					yield();
 				}
 			}
 		}
-		Logger.error(this, "Thread terminated.");
+		logger.error("Thread terminated.");
 	}
 	
-	public void setFilter(URLFilter filter) {
+	public void setFilter(UrlFilter filter) {
 		this.filter = filter;
 	}
 	

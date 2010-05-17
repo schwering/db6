@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 class DocumentParser {
-	public static final Collection<DocumentURL> 
-	extractLinks(DocumentURL url) throws DocumentException {
+	public static final Collection<DocumentUrl> extractLinks(DocumentUrl url)
+	throws DocumentException {
 		return extractLinks(new DocumentReceiver(url));
 	}
 	
-	static final Collection<DocumentURL> extractLinks(DocumentReceiver doc) {
+	static final Collection<DocumentUrl> extractLinks(DocumentReceiver doc) {
 		String content = doc.getContent();
 		Set<String> links = new HashSet<String>();
 		int from = 0;
@@ -39,14 +39,14 @@ class DocumentParser {
 			// nothing, might come from invalid documents
 		}
 		
-		Set<DocumentURL> urls = new HashSet<DocumentURL>();
+		Set<DocumentUrl> urls = new HashSet<DocumentUrl>();
 		for (String link : links) {
 			try {
-				DocumentURL newUrl;
-				if (DocumentURL.isURL(link)) {
-					newUrl = new DocumentURL(link);
+				DocumentUrl newUrl;
+				if (DocumentUrl.isURL(link)) {
+					newUrl = new DocumentUrl(link);
 				} else {
-					newUrl = new DocumentURL(doc.getURL(), link);
+					newUrl = new DocumentUrl(doc.getURL(), link);
 				}
 				urls.add(newUrl);
 			} catch (Exception exc) {
@@ -59,5 +59,4 @@ class DocumentParser {
 	private static int min(int i, int j) {
 		return (i < j && i >= 0) ? i : j;
 	}
-	
 }

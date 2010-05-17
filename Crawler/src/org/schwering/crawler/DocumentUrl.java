@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DocumentURL {
+public class DocumentUrl {
 	private static final Map<String, Integer> protocolToPort =
 		new HashMap<String, Integer>();
 		
@@ -20,23 +20,23 @@ public class DocumentURL {
 	private String[] domainLevels;
 	private URL url;
 	
-	public DocumentURL(String url) throws DocumentURLException {
+	public DocumentUrl(String url) throws DocumentUrlException {
 		this(toURL(url));
 	}
 	
-	public DocumentURL(URL url) throws DocumentURLException {
+	public DocumentUrl(URL url) throws DocumentUrlException {
 		this(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 	}
 	
-	public DocumentURL(DocumentURL docUrl, String toFile) throws DocumentURLException {
+	public DocumentUrl(DocumentUrl docUrl, String toFile) throws DocumentUrlException {
 		this(docUrl.getURL().getProtocol(), 
 				docUrl.getURL().getHost(), 
 				docUrl.getURL().getPort(), 
 				navigate(docUrl.getURL().getFile(), toFile));
 	}
 	
-	private DocumentURL(String protocol, String host, int port, String file) 
-	throws DocumentURLException {
+	private DocumentUrl(String protocol, String host, int port, String file) 
+	throws DocumentUrlException {
 		this.protocol = normalizeProtocol(protocol);
 		this.port = port != -1 ? port : protocolToPort.get(getProtocol());
 		this.host = normalizeHost(host);
@@ -51,7 +51,7 @@ public class DocumentURL {
 		try {
 			this.url = new URL(getProtocol(), getHost(), getPort(), getFile());
 		} catch (MalformedURLException exc) {
-			throw new DocumentURLException(exc);
+			throw new DocumentUrlException(exc);
 		}
 	}
 	
@@ -97,8 +97,8 @@ public class DocumentURL {
 	@Override
 	public boolean equals(Object obj) {
 		return obj != null && 
-			obj instanceof DocumentURL && 
-			url.equals(((DocumentURL)obj).getURL());
+			obj instanceof DocumentUrl && 
+			url.equals(((DocumentUrl)obj).getURL());
 	}
 
 	@Override
@@ -118,16 +118,16 @@ public class DocumentURL {
 		try {
 			toURL(url);
 			return true;
-		} catch (DocumentURLException exc) {
+		} catch (DocumentUrlException exc) {
 			return false;
 		}
 	}
 
-	private static URL toURL(String url) throws DocumentURLException {
+	private static URL toURL(String url) throws DocumentUrlException {
 		try {
 			return new URL(url);
 		} catch (MalformedURLException exc) {
-			throw new DocumentURLException(url);
+			throw new DocumentUrlException(url);
 		}
 	}
 	

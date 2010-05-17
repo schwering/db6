@@ -7,40 +7,40 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class URLHistoryFilter implements URLFilter {
+public class UrlHistoryFilter implements UrlFilter {
 	private static class Counter {
 		int cnt = 0;
 	}
 	
-	private Set<DocumentURL> set = 
-		Collections.synchronizedSet(new HashSet<DocumentURL>());
-	private Map<DocumentURL, Counter> map = 
-		Collections.synchronizedMap(new HashMap<DocumentURL, Counter>());
+	private final Set<DocumentUrl> set = 
+		Collections.synchronizedSet(new HashSet<DocumentUrl>());
+	private final Map<DocumentUrl, Counter> map = 
+		Collections.synchronizedMap(new HashMap<DocumentUrl, Counter>());
 	
-	public URLHistoryFilter(Crawler crawler) {
+	public UrlHistoryFilter(Crawler crawler) {
 		crawler.addListener(new CrawlerListener() {
 			@Override
 			public void finished() {
 			}
 
 			@Override
-			public void followed(DocumentURL url, 
-					Collection<DocumentURL> links) {
+			public void followed(DocumentUrl url, 
+					Collection<DocumentUrl> links) {
 			}
 
 			@Override
-			public void found(DocumentURL url) {
+			public void found(DocumentUrl url) {
 				set.add(url);
 			}
 		});
 	}
 	
-	public Set<DocumentURL> getHistory() {
+	public Set<DocumentUrl> getHistory() {
 		return Collections.unmodifiableSet(set);
 	}
 	
 	@Override
-	public boolean accept(DocumentURL url) {
+	public boolean accept(DocumentUrl url) {
 		if (set.contains(url)) {
 			return false;
 		} else {
