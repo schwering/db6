@@ -41,15 +41,29 @@ package body IO_Dispatcher.Args is
    end File_Name;
 
 
+   function Generator return Test_Data.Generator_Type
+   is
+      S : constant String := Ada.Command_Line.Argument(Offset + 2);
+   begin
+      if S = "pseudorandom" then
+         return Test_Data.Pseudo_Random_Gen;
+      elsif S = "urls" then
+         return Test_Data.URL_Gen;
+      else
+         raise Parse_Error;
+      end if;
+   end Generator;
+
+
    procedure Undo_Pop is
    begin
       Offset := Offset - 1;
    end Undo_Pop;
 
 
-   function Init_Offset return Random.Count_Type is
+   function Init_Offset return Test_Data.Count_Type is
    begin
-      return Random.Count_Type(To_Number(Ada.Command_Line.Argument(Offset+2)));
+      return Test_Data.Count_Type(To_Number(Ada.Command_Line.Argument(Offset + 3)));
    end Init_Offset;
 
 
@@ -76,7 +90,7 @@ package body IO_Dispatcher.Args is
          To                        : Natural := 0;
          Description               : Jobs.Description_Type;
          Short_Job                 : Jobs.Short_Job_Type;
-         Short_Job_Execution_Count : Random.Count_Type;
+         Short_Job_Execution_Count : Test_Data.Count_Type;
          Concurrency_Degree        : Positive;
          Reset                     : Boolean;
       begin
@@ -104,11 +118,11 @@ package body IO_Dispatcher.Args is
          end loop;
          Concurrency_Degree := 10;
          if To = 0 then
-            Short_Job_Execution_Count := Random.Count_Type(To_Number
+            Short_Job_Execution_Count := Test_Data.Count_Type(To_Number
                                              (S(From .. S'Last)));
             Reset                     := True;
          else
-            Short_Job_Execution_Count := Random.Count_Type(To_Number
+            Short_Job_Execution_Count := Test_Data.Count_Type(To_Number
                                              (S(From .. To - 1)));
 
             --From := To + 1;
@@ -136,7 +150,7 @@ package body IO_Dispatcher.Args is
                              Concurrency_Degree, Reset);
       end New_Job;
 
-      Long_Job : Jobs.Long_Job_Type(Offset+3..Ada.Command_Line.Argument_Count);
+      Long_Job : Jobs.Long_Job_Type(Offset+4..Ada.Command_Line.Argument_Count);
    begin
       for I in Long_Job'Range loop
          Long_Job(I) := New_Job(Ada.Command_Line.Argument(I));

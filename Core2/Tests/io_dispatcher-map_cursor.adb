@@ -1,6 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
-with IO_Dispatcher.Random;
+with IO_Dispatcher.Test_Data;
 with IO_Dispatcher.Map_Types;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Jobs;
@@ -47,8 +47,8 @@ procedure IO_Dispatcher.Map_Cursor is
    is
       use type Map_Types.Key_Type;
       use type Map_Types.Value_Type;
-      KV          : constant Random.Key_Value_Type := Random.Random_Entry;
-      Key         : constant Map_Types.Key_Type    := KV.Key;
+      KV          : constant Test_Data.Key_Value_Type := Test_Data.Random_Entry;
+      Key         : constant Map_Types.Key_Type       := KV.Key;
       Value       : constant Map_Types.Value_Type 
                   := Map_Types.From_Bounded(KV.Value);
       LC          : constant Maps.Comparison_Type  := Maps.Equal;
@@ -101,13 +101,13 @@ begin
    Ada.Text_IO.Put_Line("Size ="& DB.Tables.Maps.Count_Type'Image(Cnt));
 
    declare
-      use type Random.Count_Type;
-      RC : constant Random.Count_Type := Random.Count_Type(Cnt);
-      IO : constant Random.Count_Type := Args.Init_Offset;
-      I  : constant Random.Count_Type := (RC - Random.Count_Type'Min(RC, IO))+1;
+      use type Test_Data.Count_Type;
+      RC : constant Test_Data.Count_Type := Test_Data.Count_Type(Cnt);
+      IO : constant Test_Data.Count_Type := Args.Init_Offset;
+      I  : constant Test_Data.Count_Type := (RC - Test_Data.Count_Type'Min(RC, IO))+1;
    begin
-      Random.Init_Key_Value_Pairs(I);
-      Ada.Text_IO.Put_Line("Init ="& Random.Count_Type'Image(I));
+      Test_Data.Init_Key_Value_Pairs(Args.Generator, I);
+      Ada.Text_IO.Put_Line("Init ="& Test_Data.Count_Type'Image(I));
    end;
 
    Jobs.Execute_Job(Description               => Jobs.To_Description("Cursor"),

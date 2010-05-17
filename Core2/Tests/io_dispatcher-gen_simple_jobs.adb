@@ -6,7 +6,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
 
    procedure Insert
    is
-      KV    : constant Key_Value_Type := Random_Entry;
+      KV    : constant Key_Value_Type := Next_Entry;
       State : State_Type := Success;
    begin
       Check_Key_Value(KV);
@@ -35,7 +35,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
    procedure Delete
    is
       use type DB.Blocks.Size_Type;
-      KV    : constant Key_Value_Type := Random_Entry;
+      KV    : constant Key_Value_Type := Next_Entry;
       Val   : Value_Type := Null_Value;
       State : State_Type := Success;
    begin
@@ -54,7 +54,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
    procedure Search
    is
       use type DB.Blocks.Size_Type;
-      KV    : constant Key_Value_Type := Random_Entry;
+      KV    : constant Key_Value_Type := Next_Entry;
       Val   : Value_Type := Null_Value;
       State : State_Type := Success;
    begin
@@ -74,7 +74,7 @@ package body IO_Dispatcher.Gen_Simple_Jobs is
    procedure Antisearch
    is
       use type DB.Blocks.Size_Type;
-      KV    : constant Key_Value_Type := Random_Entry;
+      KV    : constant Key_Value_Type := Next_Entry;
       Val   : Value_Type := Null_Value;
       State : State_Type := Failure;
    begin

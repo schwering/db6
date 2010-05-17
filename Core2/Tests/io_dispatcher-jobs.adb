@@ -55,7 +55,7 @@ package body IO_Dispatcher.Jobs is
    function New_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
-      Short_Job_Execution_Count : in Random.Count_Type;
+      Short_Job_Execution_Count : in Test_Data.Count_Type;
       Concurrency_Degree        : in Positive;
       Reset                     : in Boolean)
       return Job_Type is
@@ -85,27 +85,27 @@ package body IO_Dispatcher.Jobs is
    procedure Execute_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
-      Short_Job_Execution_Count : in Random.Count_Type;
+      Short_Job_Execution_Count : in Test_Data.Count_Type;
       Concurrency_Degree        : in Positive;
       Reset                     : in Boolean)
    is
-      use type Random.Count_Type;
+      use type Test_Data.Count_Type;
       Total_Timer : DB.Utils.Timers.Timer_Type;
    begin
       if Reset then
-         Random.Reset_String_Generation;
+         Test_Data.Reset_String_Generation;
       end if;
       DB.Utils.Timers.Start(Total_Timer);
       declare
          task type Task_Type is
-            entry Set_Loop_Count (Count : in Random.Count_Type);
+            entry Set_Loop_Count (Count : in Test_Data.Count_Type);
          end;
 
          task body Task_Type
          is
-            N : Random.Count_Type;
+            N : Test_Data.Count_Type;
          begin
-            accept Set_Loop_Count (Count : in Random.Count_Type) do
+            accept Set_Loop_Count (Count : in Test_Data.Count_Type) do
                N := Count;
             end Set_Loop_Count;
             for I in 1 .. N loop
@@ -131,11 +131,11 @@ package body IO_Dispatcher.Jobs is
          end Task_Type;
 
          Tasks : array (1 .. Concurrency_Degree) of Task_Type;
-         J : constant Random.Count_Type := Short_Job_Execution_Count;
-         T : constant Random.Count_Type
-           := Random.Count_Type(Concurrency_Degree);
-         N : constant Random.Count_Type := J / T;
-         R :          Random.Count_Type := J mod T;
+         J : constant Test_Data.Count_Type := Short_Job_Execution_Count;
+         T : constant Test_Data.Count_Type
+           := Test_Data.Count_Type(Concurrency_Degree);
+         N : constant Test_Data.Count_Type := J / T;
+         R :          Test_Data.Count_Type := J mod T;
       begin
          for I in Tasks'Range loop
             if R > 0 then
@@ -148,7 +148,7 @@ package body IO_Dispatcher.Jobs is
       end;
       DB.Utils.Timers.Stop(Total_Timer);
       DB.Utils.Timers.Print(To_String(Description) &
-                           Random.Count_Type'Image(Short_Job_Execution_Count) &
+                           Test_Data.Count_Type'Image(Short_Job_Execution_Count) &
                            Positive'Image(Concurrency_Degree) & " " &
                            Boolean'Image(Reset), Total_Timer);
    end Execute_Job;

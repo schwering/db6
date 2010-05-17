@@ -2,7 +2,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Unchecked_Conversion;
 
-with IO_Dispatcher.Random; use IO_Dispatcher.Random;
+with IO_Dispatcher.Test_Data; use IO_Dispatcher.Test_Data;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Jobs;
 with IO_Dispatcher.Gen_Simple_Jobs;
@@ -27,18 +27,18 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
    Tree : Blob_Trees.Tree_Type;
 
    function To_Bounded
-     (V : Random.Values.String_Type)
+     (V : Test_Data.Values.String_Type)
       return DB.Types.Values.Bounded.String_Type is
    begin
-      --return DB.Types.Values.Bounded.New_String(Random.Values.To_Buffer(V));
+      --return DB.Types.Values.Bounded.New_String(Test_Data.Values.To_Buffer(V));
       return V;
    end To_Bounded;
 
    function To_Unbounded
-     (V : Random.Values.String_Type)
+     (V : Test_Data.Values.String_Type)
       return DB.Types.Values.Unbounded.String_Type is
    begin
-      return DB.Types.Values.Unbounded.New_String(Random.Values.To_Buffer(V));
+      return DB.Types.Values.Unbounded.New_String(Test_Data.Values.To_Buffer(V));
       --return V;
    end To_Unbounded;
 
@@ -76,7 +76,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       return Convert(K);
    end To_Key;
 
-   function To_Value (V : Random.Values.String_Type)
+   function To_Value (V : Test_Data.Values.String_Type)
       return Blob_Trees.Value_Type
    is
       function Convert is new Ada.Unchecked_Conversion
@@ -124,7 +124,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       return To_Value(Left) = To_Value(Right);
    end "=";
 
-   Null_Value : Blob_Trees.Value_Type := To_Value(Random.Values.Empty_String);
+   Null_Value : Blob_Trees.Value_Type := To_Value(Test_Data.Values.Empty_String);
 
    procedure Stats
      (Tree                   : in out Blob_Trees.Tree_Type;
@@ -147,13 +147,13 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       Value_To_String => Value_To_String,
 
       Key_Value_Type  => Key_Value_Type,
-      Random_Entry    => Random_Entry,
+      Next_Entry      => Random_Entry,
       Get_Key         => Get_Key,
       Get_Value       => Get_Value,
       Check_Key_Value => Check_Key_Value,
 
       Count_Type      => Blob_Trees.Count_Type,
-      State_Type     => Blob_Trees.State_Type,
+      State_Type      => Blob_Trees.State_Type,
 
       Object          => Tree,
       Null_Value      => Null_Value,
@@ -162,7 +162,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
 
       P_Insert        => Blob_Trees.Insert,
       P_Delete        => Blob_Trees.Delete,
-      P_Retrieve       => Blob_Trees.Retrieve,
+      P_Retrieve      => Blob_Trees.Retrieve,
       P_Count         => Blob_Trees.Count,
       P_Stats         => Stats,
       P_Check         => Check);
@@ -185,9 +185,9 @@ begin
    Put_Line("Size ="& Blob_Trees.Count_Type'Image(Cnt));
 
    declare
-      RC : constant Random.Count_Type := Random.Count_Type(Cnt);
-      IO : constant Random.Count_Type := Args.Init_Offset;
-      I  : constant Count_Type := (RC - Random.Count_Type'Min(RC, IO)) + 1;
+      RC : constant Test_Data.Count_Type := Test_Data.Count_Type(Cnt);
+      IO : constant Test_Data.Count_Type := Args.Init_Offset;
+      I  : constant Count_Type := (RC - Test_Data.Count_Type'Min(RC, IO)) + 1;
    begin
       Init_Key_Value_Pairs(I);
       Put_Line("Init ="& Count_Type'Image(I));

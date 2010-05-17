@@ -13,7 +13,7 @@ generic
    with function Value_To_String (V : Value_Type) return String;
 
    type Key_Value_Type is private;
-   with function Random_Entry return Key_Value_Type;
+   with function Next_Entry return Key_Value_Type;
    with function Get_Key (KV : Key_Value_Type) return Key_Type;
    with function Get_Value (KV : Key_Value_Type) return Value_Type;
    with procedure Check_Key_Value (KV : Key_Value_Type);

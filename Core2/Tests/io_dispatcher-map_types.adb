@@ -77,10 +77,10 @@ package body IO_Dispatcher.Map_Types is
 
 
    ----------
-   -- Interface with Random.
+   -- Interface with Test_Data.
 
    function Get_Value
-     (KV : Random.Key_Value_Type)
+     (KV : Test_Data.Key_Value_Type)
       return DB.Tables.Value_Type'Class is
    begin
       return From_Bounded(KV.Value);

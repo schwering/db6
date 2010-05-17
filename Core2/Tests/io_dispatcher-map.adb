@@ -2,7 +2,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Numerics.Generic_Elementary_Functions;
 
-with IO_Dispatcher.Random; use IO_Dispatcher.Random;
+with IO_Dispatcher.Test_Data; use IO_Dispatcher.Test_Data;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Jobs;
 with IO_Dispatcher.Gen_Simple_Jobs;
@@ -22,7 +22,7 @@ procedure IO_Dispatcher.Map is
        := DB.Tables.Maps.New_Map(Map_Types.Max_Key_Size,
                                  Map_Types.Max_Value_Size);
 
-   procedure Check_Key_Value (KV : Random.Key_Value_Type)
+   procedure Check_Key_Value (KV : Test_Data.Key_Value_Type)
    is
       use DB.Blocks;
       use DB.Types.Strings.Bounded;
@@ -142,9 +142,9 @@ procedure IO_Dispatcher.Map is
 
       Check_Key_Value => Check_Key_Value,
 
-      Key_Value_Type  => Random.Key_Value_Type,
-      Random_Entry    => Random.Random_Entry,
-      Get_Key         => Random.Key,
+      Key_Value_Type  => Key_Value_Type,
+      Next_Entry      => Random_Entry,
+      Get_Key         => Key,
       Get_Value       => Map_Types.Get_Value,
 
       Count_Type      => DB.Tables.Maps.Count_Type,
@@ -183,12 +183,12 @@ begin
    Put_Line("Size ="& DB.Tables.Maps.Count_Type'Image(Cnt));
 
    declare
-      RC : constant Random.Count_Type := Random.Count_Type(Cnt);
-      IO : constant Random.Count_Type := Args.Init_Offset;
-      I  : constant Random.Count_Type := (RC - Random.Count_Type'Min(RC, IO)) + 1;
+      RC : constant Test_Data.Count_Type := Test_Data.Count_Type(Cnt);
+      IO : constant Test_Data.Count_Type := Args.Init_Offset;
+      I  : constant Test_Data.Count_Type := (RC - Test_Data.Count_Type'Min(RC, IO)) + 1;
    begin
-      Init_Key_Value_Pairs(I);
-      Put_Line("Init ="& Random.Count_Type'Image(I));
+      Init_Key_Value_Pairs(Args.Generator, I);
+      Put_Line("Init ="& Test_Data.Count_Type'Image(I));
    end;
 
    Jobs.Execute_Jobs(Long_Job);
