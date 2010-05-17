@@ -27,10 +27,11 @@ package body IO_Dispatcher.Test_Data.URLs is
       with function New_String (Buf : Strings.Indefinite_Buffer_Type)
          return String_Type is <>;
       with function "&" (S, T : String_Type) return String_Type is <>;
-   function Make_String (Index : Index_Type) return String_Type;
+   package String_Makers is
+      function Make_String (Index : Index_Type) return String_Type;
+   end String_Makers;
 
-   function Make_String (Index : Index_Type) return String_Type
-   is
+   package body String_Makers is
       TLDs : constant array (Index_Type range <>) of String_Type :=
          (New_String("com"),
           New_String("org"),
@@ -79,32 +80,47 @@ package body IO_Dispatcher.Test_Data.URLs is
           New_String("ftp"),
           New_String("irc"),
           New_String("smtp"));
-      TLD_Index : constant Index_Type :=
-         Index mod TLDs'Length;
-      Domain_Index : constant Index_Type :=
-         (Index / TLDs'Length) mod Domains'Length;
-      Subdomain_Index : constant Index_Type :=
-         (Index / (TLDs'Length * Domains'Length)) mod Subdomains'Length;
-      Protocol_Index : constant Index_Type :=
-         (Index / (TLDs'Length * Domains'Length * Subdomains'Length)) mod
-         Protocols'Length;
-      Dot : constant String_Type := New_String(".");
-      Colon : constant String_Type := New_String(":");
-   begin
-      return TLDs(TLD_Index) & Dot &
-             Domains(Domain_Index) & Dot &
-             Subdomains(Subdomain_Index) & Colon &
-             Protocols(Protocol_Index);
-   end Make_String;
+      Paths : constant array (Index_Type range <>) of String_Type :=
+         (New_String(""),
+          New_String("/"),
+          New_String("/index.html"),
+          New_String("/index.htm"),
+          New_String("/index.php"));
+
+      function Make_String (Index : Index_Type) return String_Type
+      is
+         TLD_Index : constant Index_Type :=
+            Index mod TLDs'Length;
+         Domain_Index : constant Index_Type :=
+            (Index / TLDs'Length) mod Domains'Length;
+         Subdomain_Index : constant Index_Type :=
+            (Index / (TLDs'Length * Domains'Length)) mod Subdomains'Length;
+         Protocol_Index : constant Index_Type :=
+            (Index / (TLDs'Length * Domains'Length * Subdomains'Length)) mod
+            Protocols'Length;
+         Path_Index : constant Index_Type :=
+            (Index / (TLDs'Length * Domains'Length * Subdomains'Length *
+                      Protocols'Length)) mod Paths'Length;
+
+         Dot : constant String_Type := New_String(".");
+         Colon : constant String_Type := New_String(":");
+      begin
+         return TLDs(TLD_Index) & Dot &
+                Domains(Domain_Index) & Dot &
+                Subdomains(Subdomain_Index) & Colon &
+                Protocols(Protocol_Index) &
+                Paths(Path_Index);
+      end Make_String;
+   end String_Makers;
 
 
-   function Make_Row is new Make_String
+   package Row_Makers is new String_Makers
      (Strings     => DB.Types.Strings,
       String_Type => DB.Types.Keys.Rows.String_Type,
       New_String  => DB.Types.Keys.Rows.New_String,
       "&"         => DB.Types.Keys.Rows."&");
 
-   function Make_Column is new Make_String
+   package Column_Makers is new String_Makers
      (Strings     => DB.Types.Strings,
       String_Type => DB.Types.Keys.Rows.String_Type,
       New_String  => DB.Types.Keys.Rows.New_String,
@@ -125,6 +141,7 @@ package body IO_Dispatcher.Test_Data.URLs is
    begin
       return Values.New_String(Buf);
    end Make_Value1;
+
 
    function Make_Value2 (Count : Count_Type) return Values.String_Type
    is
@@ -176,8 +193,8 @@ package body IO_Dispatcher.Test_Data.URLs is
       I  : Index_Type renames Current_KV;
    begin
       DB.Locks.Mutexes.Lock(Mutex);
-      KV.Key.Row := Make_Row(I);
-      KV.Key.Column := Make_Column(I*I);
+      KV.Key.Row := Row_Makers.Make_String(I);
+      KV.Key.Column := Column_Makers.Make_String(I*I);
       KV.Key.Time := DB.Types.Times.Number_Type(I);
       KV.Value := Make_Value(I);
       Current_KV := Current_KV + 1;
