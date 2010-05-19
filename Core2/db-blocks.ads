@@ -183,12 +183,12 @@ private
 
    type Cursor_Type is
       record
+         Pos : Base_Position_Type := Base_Index_Type'First;
          -- Pos = Block'Last + 1 means that the last write was successful,
          -- but no more data can be written, while
          -- Pos = 0 means that the Cursor has become invalid, which can
          -- be the case due to a write of data that does not fit in the
          -- remaining space of the Block.
-         Pos : Base_Position_Type := Base_Index_Type'First;
       end record;
 
    pragma Inline (To_Block);

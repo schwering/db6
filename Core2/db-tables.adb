@@ -8,7 +8,9 @@ with Ada.Tags;
 
 package body DB.Tables is
 
-   function Equal_Values (Left, Right : Value_Type'Class) return Boolean
+   function Equal_Values
+     (Left, Right : Value_Type'Class)
+      return Boolean
    is
       use type Ada.Tags.Tag;
    begin
