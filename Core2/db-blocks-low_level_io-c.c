@@ -63,6 +63,14 @@ const int db_blocks_low_level_io_file_mode = FILE_MODE;
   #define lseek64 lseek
 #endif
 
+
+/* The IO lock is used to ensure that during one read no write can happen.
+ * This would lead to invalid blocks returned from the read operation.
+ * For this purpose, the locks could be more fine-grained.
+ * Maybe the global is even necessary because pread() and pwrite() might be
+ * non-atomic operations, but I guess that they are atomic under Linux / glibc.
+ */
+
 static pthread_mutex_t mutex;
 static bool mutex_initialized = false;
 
@@ -83,6 +91,7 @@ static inline void io_unlock()
 {
 	pthread_mutex_unlock(&mutex);
 }
+
 
 int db_blocks_low_level_io_open(char *path, int flags, int mode)
 {

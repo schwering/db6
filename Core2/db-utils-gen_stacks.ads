@@ -1,6 +1,6 @@
 -- Abstract:
 --
--- A dynamically growing stack. Uses the standard heap.
+-- A generic non-thread-safe dynamic-size stack.
 --
 -- Design Notes:
 --

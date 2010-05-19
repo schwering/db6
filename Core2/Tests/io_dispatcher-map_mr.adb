@@ -8,7 +8,7 @@ with IO_Dispatcher.To_Strings;
 
 with DB.Gen_Map_Reduce;
 with DB.Blocks;
-with DB.Blocks.Memory_IO;
+with DB.Blocks.Local_IO;
 with DB.Tables.Maps;
 with DB.Types.Keys;
 with DB.Types.Gen_Numbers;
@@ -162,7 +162,7 @@ procedure IO_Dispatcher.Map_MR is
          Read_Intermediate_Value         => Intermediate_Values.Read,
          Skip_Intermediate_Value         => Intermediate_Values.Skip,
          Write_Intermediate_Value        => Intermediate_Values.Write,
-         Intermediate_Block_IO           => DB.Blocks.Memory_IO.IO,
+         Intermediate_Block_IO           => DB.Blocks.Local_IO.IO_Signature,
 
          Map                => Map_Proc,
          Out_Key_Type       => Out_Key_Type,

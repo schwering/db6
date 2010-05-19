@@ -1,6 +1,8 @@
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Fixed;
+with Ada.Numerics.Generic_Elementary_Functions;
 
-with IO_Dispatcher.Random; use IO_Dispatcher.Random;
+with IO_Dispatcher.Test_Data; use IO_Dispatcher.Test_Data;
 with IO_Dispatcher.Args;
 with IO_Dispatcher.Jobs;
 with IO_Dispatcher.Gen_Simple_Jobs;
@@ -9,6 +11,7 @@ with IO_Dispatcher.Map_Types;
 with DB.Blocks;
 with DB.Tables.Maps;
 with DB.Tables.Maps.Check;
+with DB.Tables.Maps.Stats;
 with DB.Types.Strings.Bounded;
 with DB.Types.Values.Bounded;
 with DB.Types.Times;
@@ -19,7 +22,7 @@ procedure IO_Dispatcher.Map is
        := DB.Tables.Maps.New_Map(Map_Types.Max_Key_Size,
                                  Map_Types.Max_Value_Size);
 
-   procedure Check_Key_Value (KV : Random.Key_Value_Type)
+   procedure Check_Key_Value (KV : Test_Data.Key_Value_Type)
    is
       use DB.Blocks;
       use DB.Types.Strings.Bounded;
@@ -46,20 +49,86 @@ procedure IO_Dispatcher.Map is
    Null_Value : DB.Tables.Value_Type'Class := Map_Types.Null_Value;
 
    procedure Stats
-     (Map                    : in out DB.Tables.Maps.Map_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   is null;
+     (Object : in out DB.Tables.Maps.Map_Type)
+   is
+      use DB.Tables.Maps.Stats;
 
-   procedure Check
-     (Map : in out DB.Tables.Maps.Map_Type)
-   is null;
+      Last_Level : Level_Type := 0;
+
+      function Sqrt (A : Average_Type) return Average_Type
+      is
+         package Elementary_Functions is new
+         Ada.Numerics.Generic_Elementary_Functions(Float);
+      begin
+         return Average_Type(Elementary_Functions.Sqrt(Float(A)));
+      end Sqrt;
+
+      Avg_Size   : Average_Type := 0.0;
+      Avg_Degree : Average_Type := 0.0;
+
+      procedure Emit (Level : in Level_Type;
+                      Key   : in String;
+                      Value : in Data_Type)
+      is
+         function Trim (S : String) return String is
+         begin return Ada.Strings.Fixed.Trim(S, Ada.Strings.Both); end;
+
+         function Img (L : Level_Type) return String is
+         begin return Trim(L'Img); end;
+
+         function Img (A : Absolute_Type) return String is
+         begin return Trim(A'Img); end;
+
+         function Img (A : Average_Type) return String is
+         begin return Trim(A'Img); end;
+
+         type Percent_Type is delta 0.1 digits 5;
+      begin
+         if Level /= Last_Level then
+            New_Line;
+         end if;
+         Put("   Level_"& Img(Level) &": "& Key);
+         case Value.Compound is
+            when True =>
+               Put("  avg="& Img(Value.Avg) &
+                   "  dev="& Img(Sqrt(Value.Var)) &
+                   "  max="& Img(Value.Max) &
+                   "  min="& Img(Value.Min));
+            when False =>
+               Put("  val="& Img(Value.Val));
+         end case;
+         if Key = "Count" then
+            Put(" "&
+                Absolute_Type'Image(Value.Val *
+                                    Absolute_Type(DB.Blocks.Block_Size) /
+                                    1024**2) &"MB");
+         elsif Key ="Size" or Key = "Waste" then
+            Put(" "&
+                Percent_Type'Image(Percent_Type(
+                  Float(Value.Avg) / Float(DB.Blocks.Block_Size) * 100.0)) &
+                "%");
+         end if;
+
+         New_Line;
+         Last_Level := Level;
+         if Key = "Degree" then
+            Avg_Degree := Value.Avg;
+         end if;
+         if Key = "Size" then
+            Avg_Size := Value.Avg;
+         end if;
+         if Key = "Waste" then
+            Put_Line("   Level_"& Img(Level) &": "&
+                     "EntrySize"&
+                     "  avg="& Img(Avg_Size / Avg_Degree));
+         end if;
+      end Emit;
+
+   begin
+      Put_Line("Stats {");
+      DB.Tables.Maps.Stats.Make_Stats(Object, Emit'Access);
+      Put_Line("}");
+   end Stats;
 
    package Simple_Jobs is new Gen_Simple_Jobs
      (Object_Type     => DB.Tables.Maps.Map_Type,
@@ -73,9 +142,9 @@ procedure IO_Dispatcher.Map is
 
       Check_Key_Value => Check_Key_Value,
 
-      Key_Value_Type  => Random.Key_Value_Type,
-      Random_Entry    => Random.Random_Entry,
-      Get_Key         => Random.Key,
+      Key_Value_Type  => Key_Value_Type,
+      Next_Entry      => Random_Entry,
+      Get_Key         => Key,
       Get_Value       => Map_Types.Get_Value,
 
       Count_Type      => DB.Tables.Maps.Count_Type,
@@ -114,12 +183,12 @@ begin
    Put_Line("Size ="& DB.Tables.Maps.Count_Type'Image(Cnt));
 
    declare
-      RC : constant Random.Count_Type := Random.Count_Type(Cnt);
-      IO : constant Random.Count_Type := Args.Init_Offset;
-      I  : constant Random.Count_Type := (RC - Random.Count_Type'Min(RC, IO)) + 1;
+      RC : constant Test_Data.Count_Type := Test_Data.Count_Type(Cnt);
+      IO : constant Test_Data.Count_Type := Args.Init_Offset;
+      I  : constant Test_Data.Count_Type := (RC - Test_Data.Count_Type'Min(RC, IO)) + 1;
    begin
-      Init_Key_Value_Pairs(I);
-      Put_Line("Init ="& Random.Count_Type'Image(I));
+      Init_Key_Value_Pairs(Args.Generator, I);
+      Put_Line("Init ="& Test_Data.Count_Type'Image(I));
    end;
 
    Jobs.Execute_Jobs(Long_Job);

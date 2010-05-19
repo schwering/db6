@@ -8,58 +8,61 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class URLQueue {
+import org.apache.log4j.Logger;
+
+public class UrlQueue {
+	private static final Logger logger = Logger.getLogger(UrlQueue.class);
 	private static final int QUEUE_SIZE = 8192;
 	private static final long PUT_MILLIS = 500;
 	private static final long TAKE_MILLIS = 10 * 1000;
 	
-	private BlockingQueue<DocumentURL> queue = 
-		new LinkedBlockingQueue<DocumentURL>(QUEUE_SIZE);
-	private Set<DocumentURL> set = 
-		Collections.synchronizedSet(new HashSet<DocumentURL>());
+	private final BlockingQueue<DocumentUrl> queue = 
+		new LinkedBlockingQueue<DocumentUrl>(QUEUE_SIZE);
+	private final Set<DocumentUrl> set = 
+		Collections.synchronizedSet(new HashSet<DocumentUrl>());
 	
-	public URLQueue(Collection<DocumentURL> rootUrls) {
+	public UrlQueue(Collection<DocumentUrl> rootUrls) {
 		if (rootUrls.size() > QUEUE_SIZE) {
 			throw new IllegalArgumentException("Too many root URLs");
 		}
 		put(rootUrls);
 	}
 	
-	public void put(DocumentURL url) {
+	public void put(DocumentUrl url) {
 		put(url, 0);
 	}
 	
-	public void put(Collection<DocumentURL> urls) {
-		for (DocumentURL url : urls) {
+	public void put(Collection<DocumentUrl> urls) {
+		for (DocumentUrl url : urls) {
 			put(url, PUT_MILLIS / urls.size() + 1);
 		}
 	}
 	
-	public void putOneOf(DocumentURL url, int total) {
+	public void putOneOf(DocumentUrl url, int total) {
 		put(url, PUT_MILLIS / total + 1);
 	}
 	
-	private void put(DocumentURL url, long millis) {
+	private void put(DocumentUrl url, long millis) {
 		if (!set.contains(url)) {
 			try {
 				if (queue.offer(url, millis, TimeUnit.MILLISECONDS)) {
 					set.add(url);
 				}
 			} catch (InterruptedException exc) {
-				Logger.error(getClass(), exc);
+				logger.error(getClass(), exc);
 			}
 		}
 	}
 	
-	public DocumentURL take() {
+	public DocumentUrl take() {
 		try {
-			DocumentURL url = queue.poll(TAKE_MILLIS, TimeUnit.MILLISECONDS);
+			DocumentUrl url = queue.poll(TAKE_MILLIS, TimeUnit.MILLISECONDS);
 			if (url != null) {
 				set.remove(url);
 			}
 			return url;
 		} catch (InterruptedException exc) {
-			Logger.error(getClass(), exc);
+			logger.error(getClass(), exc);
 			return null;
 		}
 	}

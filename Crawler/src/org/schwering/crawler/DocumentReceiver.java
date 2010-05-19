@@ -6,7 +6,7 @@ import java.net.ContentHandler;
 import java.net.URLConnection;
 
 class DocumentReceiver {
-	private static PatternMatcher ACCEPTED_CONTENT_TYPE_PATTERN = 
+	private static final PatternMatcher ACCEPTED_CONTENT_TYPE_PATTERN = 
 		new PatternMatcher("text/.*");
 	
 	static {
@@ -15,16 +15,16 @@ class DocumentReceiver {
 		URLConnection.setContentHandlerFactory(fac);
 	}
 	
-	private DocumentURL url;
+	private DocumentUrl url;
 	private String content;
 	
 	public DocumentReceiver(String url) throws DocumentException {
-		this(new DocumentURL(url));
+		this(new DocumentUrl(url));
 	}
 	
-	public DocumentReceiver(DocumentURL url) throws DocumentException {
+	public DocumentReceiver(DocumentUrl url) throws DocumentException {
 		if (url == null) {
-			throw new DocumentURLException();
+			throw new DocumentUrlException();
 		}
 		URLConnection conn;
 		try {
@@ -50,11 +50,11 @@ class DocumentReceiver {
 		if (content == null) {
 			throw new DocumentException("URL handler didn't handle "+ url);
 		}
-		this.url = new DocumentURL(conn.getURL());
+		this.url = new DocumentUrl(conn.getURL());
 		this.content = (String)content;
 	}
 	
-	public DocumentURL getURL() {
+	public DocumentUrl getURL() {
 		return url;
 	}
 	

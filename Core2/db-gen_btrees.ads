@@ -42,7 +42,7 @@
 --
 -- References:
 --
--- [BTree] Lehman and Yao -- Efficient locking for concurrent operations on
+-- [L&Y] Lehman and Yao -- Efficient locking for concurrent operations on
 -- B-trees (http://portal.acm.org/citation.cfm?id=319663)
 --
 -- Design Notes:
@@ -50,6 +50,7 @@
 -- Exceptions should only be raised under really serious circumstances or in
 -- debugging mode.
 -- In productive use, the State_Type should be used.
+-- XXX Really?
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -303,6 +304,7 @@ private
       Invalid_Index   : constant Index_Type := Index_Type'First;
       Invalid_Address : constant Address_Type :=
          Address_Type(Block_IO.Invalid_Address);
+      Leaf_Level      : constant Level_Type := Level_Type'First;
 
       ----------
       -- Address functions.
@@ -331,8 +333,7 @@ private
       -- General and accessor subprograms.
 
       function Root_Node
-        (Is_Leaf : Boolean;
-         Level   : Level_Type)
+        (Level : Level_Type)
          return RW_Node_Type;
       -- Returns a simple root node of degree 0.
 
@@ -378,6 +379,17 @@ private
       -- lastly deleted from Node; if Node never contained a value, Success is
       -- set to False. Otherwise, if Node is not empty, the high is just the
       -- greatest key.
+
+      function Has_High_Key
+        (Node : Nodes.Node_Type)
+         return Boolean;
+      -- Returns True iff Node has a high key.
+
+      function High_Key
+        (Node : Nodes.Node_Type)
+         return Key_Type;
+      -- Returns the high key of Node if it exists. Otherwise Tree_Error is
+      -- raised.
 
       procedure Get_Key
         (Node        : in     Node_Type;

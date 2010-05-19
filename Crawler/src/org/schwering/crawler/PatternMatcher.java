@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class PatternMatcher {
-	private Set<String> allowed = new HashSet<String>();
-	private List<Pattern> patterns = new LinkedList<Pattern>();
+	private final Set<String> allowed = new HashSet<String>();
+	private final List<Pattern> patterns = new LinkedList<Pattern>();
 	
 	public PatternMatcher(String regex) {
 		addPattern(regex);

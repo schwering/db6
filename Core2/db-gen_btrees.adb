@@ -4,7 +4,82 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with DB.Utils.Gen_Stacks;
+with DB.Utils.Global_Pool;
+
 package body DB.Gen_BTrees is
+
+   package Stacks is
+      type Stack_Type is limited private;
+
+      procedure Initialize
+        (Stack : out Stack_Type;
+         Key   : in  Key_Type);
+
+      procedure Finalize
+        (Stack : in out Stack_Type);
+
+      function Is_Empty
+        (Stack : Stack_Type)
+         return Boolean;
+
+      procedure Pop
+        (Stack : in out Stack_Type;
+         N_A   :    out Nodes.Valid_Address_Type);
+
+      procedure Pop
+        (Stack : in out Stack_Type;
+         N_A   :    out Nodes.Valid_Address_Type;
+         Level :    out Nodes.Level_Type);
+
+      procedure Build_Stack
+        (Tree  : in out Tree_Type;
+         Stack : in out Stack_Type;
+         Level : in     Nodes.Level_Type);
+      -- Builds the stack from the root to the outermost-left leaf that might
+      -- contain the Key associated with the stack.
+
+      procedure Move_Right
+        (Tree      : in out          Tree_Type;
+         Stack     : in out          Stack_Type;
+         Level     : in              Nodes.Level_Type;
+         Exit_Cond : not null access function (N : Nodes.Node_Type)
+                                        return Boolean;
+         N_A       : in out          Nodes.Valid_Address_Type;
+         N         :    out          Nodes.Node_Type);
+      -- Moves to the right using Gen_BTrees.Move_Right but handles potential
+      -- splits of the tree correctly. If the nodes read starting from N_A are
+      -- not from the expected Level, the Stack is re-built.
+
+      procedure Write_And_Ascend
+        (Tree  : in out Tree_Type;
+         Stack : in out Stack_Type;
+         N_A   : in     Nodes.Valid_Address_Type;
+         N_Old : in     Nodes.RW_Node_Type;
+         N     : in     Nodes.RW_Node_Type);
+      -- Writes back the node(s) visited of the current level.
+      -- The address N_A must be locked when this procedure is called.
+      -- N_A is unlocked by this procedure.
+
+   private
+      type Item_Type is
+         record
+            Address : Nodes.Valid_Address_Type;
+            Level   : Nodes.Level_Type;
+         end record;
+
+      package Stacks is new Utils.Gen_Stacks
+        (Item_Type    => Item_Type,
+         Initial_Size => 7,
+         Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
+
+      type Stack_Type is
+         record
+            S   : Stacks.Stack_Type;
+            Key : Key_Type;
+         end record;
+   end Stacks;
+
 
    package Initialization is
       procedure Create
@@ -19,7 +94,7 @@ package body DB.Gen_BTrees is
    end Initialization;
 
 
-   package Retrieval is
+   package Searches is
       procedure Search
         (Tree     : in out Tree_Type;
          Key      : in     Key_Type;
@@ -31,7 +106,7 @@ package body DB.Gen_BTrees is
          Key      :    out Key_Type;
          Value    :    out Value_Type;
          State    :    out State_Type);
-   end Retrieval;
+   end Searches;
 
 
    package Cursors is
@@ -291,7 +366,7 @@ package body DB.Gen_BTrees is
       Key   : in     Key_Type;
       Value :    out Value_Type;
       State :    out State_Type)
-   renames Retrieval.Search;
+   renames Searches.Search;
 
 
    procedure Minimum
@@ -299,7 +374,7 @@ package body DB.Gen_BTrees is
       Key   :    out Key_Type;
       Value :    out Value_Type;
       State :    out State_Type)
-   renames Retrieval.Minimum;
+   renames Searches.Minimum;
 
 
    procedure Insert
@@ -392,8 +467,9 @@ package body DB.Gen_BTrees is
 
 
    package body Nodes is separate;
+   package body Stacks is separate;
    package body Initialization is separate;
-   package body Retrieval is separate;
+   package body Searches is separate;
    package body Cursors is separate;
    package body Misc is separate;
 

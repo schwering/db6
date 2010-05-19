@@ -13,7 +13,7 @@ generic
    with function Value_To_String (V : Value_Type) return String;
 
    type Key_Value_Type is private;
-   with function Random_Entry return Key_Value_Type;
+   with function Next_Entry return Key_Value_Type;
    with function Get_Key (KV : Key_Value_Type) return Key_Type;
    with function Get_Value (KV : Key_Value_Type) return Value_Type;
    with procedure Check_Key_Value (KV : Key_Value_Type);
@@ -45,15 +45,7 @@ generic
           (Object : in out Object_Type;
            Count  :    out Count_Type);
    with procedure P_Stats
-          (Object                 : in out Object_Type;
-           Height                 :    out Natural;
-           Blocks                 :    out Natural;
-           Free_Blocks            :    out Natural;
-           Max_Degree             :    out Natural;
-           Avg_Degree             :    out Natural;
-           Min_Degree             :    out Natural;
-           Bytes_Wasted_In_Blocks :    out Long_Integer;
-           Bytes_In_Blocks        :    out Long_Integer);
+          (Object : in out Object_Type);
    with procedure P_Check
           (Object : in out Object_Type);
 package IO_Dispatcher.Gen_Simple_Jobs is

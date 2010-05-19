@@ -1,4 +1,4 @@
-with IO_Dispatcher.Random;
+with IO_Dispatcher.Test_Data;
 
 private
 package IO_Dispatcher.Jobs is
@@ -35,7 +35,7 @@ package IO_Dispatcher.Jobs is
    function New_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
-      Short_Job_Execution_Count : in Random.Count_Type;
+      Short_Job_Execution_Count : in Test_Data.Count_Type;
       Concurrency_Degree        : in Positive;
       Reset                     : in Boolean)
       return Job_Type;
@@ -49,7 +49,7 @@ package IO_Dispatcher.Jobs is
    procedure Execute_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
-      Short_Job_Execution_Count : in Random.Count_Type;
+      Short_Job_Execution_Count : in Test_Data.Count_Type;
       Concurrency_Degree        : in Positive;
       Reset                     : in Boolean);
 
@@ -64,7 +64,7 @@ private
       record
          Description               : Description_Type;
          Short_Job                 : Short_Job_Type;
-         Short_Job_Execution_Count : Random.Count_Type;
+         Short_Job_Execution_Count : Test_Data.Count_Type;
          Concurrency_Degree        : Positive;
          Reset                     : Boolean;
       end record;

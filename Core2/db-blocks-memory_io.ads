@@ -6,8 +6,6 @@
 
 with DB.Blocks.Gen_IO_Signature;
 with DB.Locks.Mutexes;
-with DB.Locks.Gen_Mutex_Sets;
-with DB.Utils;
 
 package DB.Blocks.Memory_IO is
    pragma Preelaborate;
@@ -83,7 +81,7 @@ package DB.Blocks.Memory_IO is
       Address : in     Valid_Address_Type);
 
 
-   package IO is new Gen_IO_Signature
+   package IO_Signature is new Gen_IO_Signature
      (File_Type                  => File_Type,
       Address_Type               => Address_Type,
       Valid_Address_Type         => Valid_Address_Type,
@@ -107,30 +105,37 @@ package DB.Blocks.Memory_IO is
       Unlock                     => Unlock);
 
 private
-   type Block_Ref_Type is access Block_Type;
-   pragma Controlled (Block_Ref_Type);
+   -- We use a protected type to ensure that during a Read no Write can destroy
+   -- the block's integrity.
+   -- Since we need the protected type for this purpose, we can also merge the
+   -- mutex into this protected type, of course.
+   protected type Item_Type is
+      procedure Write (Block : in Blocks.Block_Type);
+      function Read return Blocks.Block_Type;
+      entry Lock;
+      procedure Unlock;
+      function Is_Locked return Boolean;
 
-   type Block_Ref_Array_Type is
-      array (Valid_Address_Type range <>) of Block_Ref_Type;
+   private
+      Block  : Blocks.Block_Type;
+      Locked : Boolean := False;
+   end Item_Type;
 
-   type Block_Ref_Array_Ref_Type is access Block_Ref_Array_Type;
-   pragma Controlled (Block_Ref_Array_Ref_Type);
+   type Item_Ref_Type is access Item_Type;
+   pragma Controlled (Item_Ref_Type);
 
-   function Hash(A : Address_Type) return Utils.Hash_Type;
+   type Item_Ref_Array_Type is
+      array (Valid_Address_Type range <>) of Item_Ref_Type;
 
-   package Mutex_Sets is new Locks.Gen_Mutex_Sets
-     (Item_Type           => Valid_Address_Type,
-      "<"                 => "<",
-      "="                 => "=");
+   type Item_Ref_Array_Ref_Type is access Item_Ref_Array_Type;
+   pragma Controlled (Item_Ref_Array_Ref_Type);
 
    type File_Object_Type is limited
       record
-         Buffer    : Block_Ref_Array_Ref_Type := null;
-         Capacity  : Address_Type := 0;
-         Current   : Address_Type := 0;
-         Maximum   : Address_Type := 0;
-         Mutex     : Locks.Mutexes.Mutex_Type; -- for atom. of seek+read/write
-         Mutex_Set : Mutex_Sets.Mutex_Set_Type;
+         Buffer   : Item_Ref_Array_Ref_Type := null;
+         Capacity : Address_Type := 0;
+         Maximum  : Address_Type := 0;
+         Mutex    : Locks.Mutexes.Mutex_Type; -- for atom. of seek+read/write
       end record;
 
    pragma Inline (Succ);

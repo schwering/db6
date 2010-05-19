@@ -1,4 +1,4 @@
-with IO_Dispatcher.Random;
+with IO_Dispatcher.Test_Data;
 with IO_Dispatcher.To_Strings;
 
 with DB.Tables;
@@ -10,8 +10,8 @@ with DB.Types.Values.Unbounded;
 private
 package IO_Dispatcher.Map_Types is
 
-   Max_Key_Size : constant := Random.Max_Key_Size;
-   Max_Value_Size : constant := Random.Max_Value_Size;
+   Max_Key_Size : constant := Test_Data.Max_Key_Size;
+   Max_Value_Size : constant := Test_Data.Max_Value_Size;
 
    ----------
    -- Key_Type
@@ -60,10 +60,10 @@ package IO_Dispatcher.Map_Types is
    function To_String (V : DB.Tables.Value_Type'Class) return String;
 
    ----------
-   -- Interface with Random.
+   -- Interface with Test_Data.
 
    function Get_Value
-     (KV : Random.Key_Value_Type)
+     (KV : Test_Data.Key_Value_Type)
       return DB.Tables.Value_Type'Class;
 
 private

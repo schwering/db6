@@ -1,5 +1,5 @@
 with IO_Dispatcher.Jobs;
-with IO_Dispatcher.Random;
+with IO_Dispatcher.Test_Data;
 
 private
 package IO_Dispatcher.Args is
@@ -9,8 +9,11 @@ package IO_Dispatcher.Args is
    function File_Name
       return String;
 
+   function Generator
+      return Test_Data.Generator_Type;
+
    function Init_Offset
-      return Random.Count_Type;
+      return Test_Data.Count_Type;
 
    function Create_Jobs_From_Command_Line
      (Map : Jobs.Map_Type)

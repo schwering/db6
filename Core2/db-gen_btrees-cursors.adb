@@ -150,16 +150,11 @@ package body Cursors is
       use type Utils.Comparison_Result_Type;
    begin
       case Comparison is
-         when Less =>
-            return Compare(Left, Right) = Utils.Less;
-         when Less_Or_Equal =>
-            return Compare(Left, Right) /= Utils.Greater;
-         when Equal =>
-            return Compare(Left, Right) = Utils.Equal;
-         when Greater_Or_Equal =>
-            return Compare(Left, Right) /= Utils.Less;
-         when Greater =>
-            return Compare(Left, Right) = Utils.Greater;
+         when Less             => return Compare(Left, Right) = Utils.Less;
+         when Less_Or_Equal    => return Compare(Left, Right) /= Utils.Greater;
+         when Equal            => return Compare(Left, Right) = Utils.Equal;
+         when Greater_Or_Equal => return Compare(Left, Right) /= Utils.Less;
+         when Greater          => return Compare(Left, Right) = Utils.Greater;
       end case;
    end Key_Matches;
 
@@ -198,12 +193,12 @@ package body Cursors is
       Value  :    out Value_Type;
       State  :    out State_Type)
    is
+      pragma Assert (Tree.Initialized);
+      pragma Assert (Cursor.Initialized);
+      pragma Assert (Cursor.Owning_Tree = Tree.Self);
+
       procedure Move_To_Next
-        (Tree        : in out Tree_Type;
-         Cursor      : in out Cursor_Type;
-         State       :    out State_Type)
       is
-         pragma Inline (Move_To_Next);
          use type Nodes.Degree_Type;
       begin
          if Cursor.Index = Nodes.Degree(Cursor.Node) then
@@ -244,12 +239,10 @@ package body Cursors is
       end Move_To_Next;
 
 
-      procedure Retrieve_Node
-        (Tree  : in out Tree_Type;
-         Key   : in     Key_Type;
-         Node  :    out Nodes.RO_Node_Type;
-         Index :    out Nodes.Valid_Index_Type;
-         State :    out State_Type)
+      procedure Search_Node
+        (Key   : in  Key_Type;
+         Node  : out Nodes.RO_Node_Type;
+         Index : out Nodes.Valid_Index_Type)
       is
          N_A : Nodes.Valid_Address_Type := Root_Address;
       begin
@@ -286,14 +279,12 @@ package body Cursors is
             State := Error;
             pragma Warnings (On);
             raise;
-      end Retrieve_Node;
+      end Search_Node;
 
 
-      procedure Retrieve_Minimum_Node
-        (Tree        : in out Tree_Type;
-         Node        :    out Nodes.RO_Node_Type;
-         Index       :    out Nodes.Valid_Index_Type;
-         State       :    out State_Type)
+      procedure Search_Minimum_Node
+        (Node  : out Nodes.RO_Node_Type;
+         Index : out Nodes.Valid_Index_Type)
       is
          N_A : Nodes.Valid_Address_Type := Root_Address;
       begin
@@ -325,14 +316,12 @@ package body Cursors is
             State := Error;
             pragma Warnings (On);
             raise;
-      end Retrieve_Minimum_Node;
+      end Search_Minimum_Node;
 
 
-      procedure Retrieve_Maximum_Node
-        (Tree  : in out Tree_Type;
-         Node  :    out Nodes.RO_Node_Type;
-         Index :    out Nodes.Valid_Index_Type;
-         State :    out State_Type)
+      procedure Search_Maximum_Node
+        (Node  : out Nodes.RO_Node_Type;
+         Index : out Nodes.Valid_Index_Type)
       is
          N_A : Nodes.Valid_Address_Type := Root_Address;
       begin
@@ -364,13 +353,10 @@ package body Cursors is
             State := Error;
             pragma Warnings (On);
             raise;
-      end Retrieve_Maximum_Node;
+      end Search_Maximum_Node;
 
 
-      procedure Recalibrate
-        (Tree        : in out Tree_Type;
-         Cursor      : in out Cursor_Type;
-         State       :    out State_Type) is
+      procedure Recalibrate is
       begin
          if Cursor.Final or not Cursor.Has_Node then
             State := Success;
@@ -380,7 +366,7 @@ package body Cursors is
          declare
             Old_Key : constant Key_Type := Cursor.Key;
          begin
-            Retrieve_Node(Tree, Old_Key, Cursor.Node, Cursor.Index, State);
+            Search_Node(Old_Key, Cursor.Node, Cursor.Index);
             if State /= Success then
                Cursor.Final := True;
                return;
@@ -392,7 +378,7 @@ package body Cursors is
 
             -- Move to next key since we don't what to visit one twice.
             if Cursor.Key <= Old_Key then
-               Move_To_Next(Tree, Cursor, State);
+               Move_To_Next;
                if Cursor.Final then
                   return;
                end if;
@@ -403,7 +389,7 @@ package body Cursors is
                if Is_Satisfied(Cursor, Cursor.Lower_Bound) then
                   return;
                end if;
-               Move_To_Next(Tree, Cursor, State);
+               Move_To_Next;
                if Cursor.Final then
                   return;
                end if;
@@ -416,42 +402,33 @@ package body Cursors is
       end Recalibrate;
 
 
-      procedure Retrieve_Abstract_Lower_Bound
-        (Tree   : in out Tree_Type;
-         Cursor : in out Cursor_Type;
-         State  :    out State_Type)
+      procedure Search_Abstract_Lower_Bound
       is
-         pragma Inline (Retrieve_Abstract_Lower_Bound);
          pragma Assert (not Cursor.Has_Node);
       begin
          case Cursor.Lower_Bound.Location is
             when Negative_Infinity =>
-               Retrieve_Minimum_Node(Tree, Cursor.Node,
-                                    Cursor.Index, State);
+               Search_Minimum_Node(Cursor.Node, Cursor.Index);
                if State /= Success then
                   Cursor.Final := True;
                   return;
                end if;
             when Positive_Infinity =>
-               Retrieve_Maximum_Node(Tree, Cursor.Node, Cursor.Index, State);
+               Search_Maximum_Node(Cursor.Node, Cursor.Index);
                if State /= Success then
                   Cursor.Final := True;
                   return;
                end if;
          end case;
-      end Retrieve_Abstract_Lower_Bound;
+      end Search_Abstract_Lower_Bound;
 
 
-      procedure Retrieve_Concrete_Lower_Bound
-        (Tree   : in out Tree_Type;
-         Cursor : in out Cursor_Type;
-         State  :    out State_Type)
+      procedure Search_Concrete_Lower_Bound
       is
-         pragma Inline (Retrieve_Concrete_Lower_Bound);
          pragma Assert (not Cursor.Has_Node);
          FB : constant Bound_Type := Cursor.Lower_Bound;
       begin
-         Retrieve_Node(Tree, FB.Key, Cursor.Node, Cursor.Index, State);
+         Search_Node(FB.Key, Cursor.Node, Cursor.Index);
          if State /= Success then
             Cursor.Final := True;
             return;
@@ -463,38 +440,15 @@ package body Cursors is
                null;
             when Equal | Greater =>
                if not Key_Matches(Cursor.Key, FB.Comparison, FB.Key) then
-                  Move_To_Next(Tree, Cursor, State);
+                  Move_To_Next;
                else
                   State := Success;
                end if;
             when Greater_Or_Equal =>
                State := Success;
          end case;
-      end Retrieve_Concrete_Lower_Bound;
+      end Search_Concrete_Lower_Bound;
 
-
-      procedure Initialize_Output_If_Successful_And_Bounds_Satisfied
-        (Cursor : in out Cursor_Type;
-         State  : in out State_Type;
-         Key    :    out Key_Type;
-         Value  :    out Value_Type)
-      is
-         pragma Inline (Initialize_Output_If_Successful_And_Bounds_Satisfied);
-      begin
-         if (not Cursor.Final and State = Success) and then
-            Has_Satisfied_Bounds(Cursor) then
-            State := Success;
-            Key   := Cursor.Key;
-            Nodes.Get_Value(Cursor.Node, Cursor.Index, Value,
-                            Cursor.Key_Context, Cursor.Value_Context);
-         elsif State = Success then
-            State := Failure;
-         end if;
-      end Initialize_Output_If_Successful_And_Bounds_Satisfied;
-
-      pragma Assert (Tree.Initialized);
-      pragma Assert (Cursor.Initialized);
-      pragma Assert (Cursor.Owning_Tree = Tree.Self);
       use type Nodes.Degree_Type;
    begin
       Lock_Mutex(Cursor);
@@ -507,24 +461,35 @@ package body Cursors is
       if not Cursor.Has_Node then
          case Cursor.Lower_Bound.Kind is
             when Concrete_Bound =>
-               Retrieve_Concrete_Lower_Bound(Tree, Cursor, State);
+               Search_Concrete_Lower_Bound;
             when Abstract_Bound =>
-               Retrieve_Abstract_Lower_Bound(Tree, Cursor, State);
+               Search_Abstract_Lower_Bound;
          end case;
          Cursor.Has_Node := (State = Success);
       elsif Cursor.Force_Recalibrate then
-         Recalibrate(Tree, Cursor, State);
+         Recalibrate;
          Cursor.Force_Recalibrate := (State = Success);
       else
-         Move_To_Next(Tree, Cursor, State);
+         Move_To_Next;
       end if;
-      Initialize_Output_If_Successful_And_Bounds_Satisfied(Cursor, State,
-                                                           Key, Value);
+
+      if (not Cursor.Final and State = Success) and then
+         Has_Satisfied_Bounds(Cursor) then
+         State := Success;
+         Key   := Cursor.Key;
+         Nodes.Get_Value(Cursor.Node, Cursor.Index, Value,
+                         Cursor.Key_Context, Cursor.Value_Context);
+      elsif State = Success then
+         State := Failure;
+      end if;
       Unlock_Mutex(Cursor);
 
    exception
       when others =>
          Unlock_Mutex(Cursor);
+         pragma Warnings (Off);
+         State        := Error;
+         pragma Warnings (On);
          raise;
    end Next;
 
@@ -556,6 +521,9 @@ package body Cursors is
    exception
       when others =>
          Unlock_Mutex(Cursor);
+         pragma Warnings (Off);
+         State        := Error;
+         pragma Warnings (On);
          raise;
    end Delete;
 

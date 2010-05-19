@@ -1,0 +1,87 @@
+Stats {
+   Level_0: Count  4502721  17588MB  
+   Level_0: Degree  3.19  146  1
+   Level_0: Size  1689.54  4096  105  41.2%
+   Level_0: Waste  2406.45  3991  0  58.7%
+
+   Level_1: Count  1531861  5983MB   
+   Level_1: Degree  2.93  111  2
+   Level_1: Size  1997.80  4096  1645  48.7%
+   Level_1: Waste  2098.19  2451  0  51.2%
+
+   Level_2: Count  604606  2361MB
+   Level_2: Degree  2.53  42  2
+   Level_2: Size  1950.42  4095  1645  47.6%
+   Level_2: Waste  2145.57  2451  1  52.3%
+
+   Level_3: Count  258102  1008MB
+   Level_3: Degree  2.34  19  2
+   Level_3: Size  1934.37  4096  1645  47.2%
+   Level_3: Waste  2161.62  2451  0  52.7%
+
+   Level_4: Count  114824  448MB
+   Level_4: Degree  2.24  13  2
+   Level_4: Size  1937.26  4096  1645  47.2%
+   Level_4: Waste  2158.73  2451  0  52.7%
+
+   Level_5: Count  51480  201MB
+   Level_5: Degree  2.23  10  2
+   Level_5: Size  1976.78  4096  1645  48.2%
+   Level_5: Waste  2119.21  2451  0  51.7%
+
+   Level_6: Count  23066  90MB
+   Level_6: Degree  2.23  7  2
+   Level_6: Size  2015.70  4095  1645  49.2%
+   Level_6: Waste  2080.29  2451  1  50.7%
+
+   Level_7: Count  10136  39MB
+   Level_7: Degree  2.27  6  2
+   Level_7: Size  2073.46  4096  1645  50.6%
+   Level_7: Waste  2022.53  2451  0  49.3%
+
+   Level_8: Count  3908  15MB
+   Level_8: Degree  2.59  5  2
+   Level_8: Size  2372.48  4096  1647  57.9%
+   Level_8: Waste  1723.51  2449  0  42.0%
+
+   Level_9: Count  1239  4MB
+   Level_9: Degree  3.15  5  2
+   Level_9: Size  2885.49  4053  1661  70.4%
+   Level_9: Waste  1210.50  2435  43  29.5%
+
+   Level_10: Count  421  1MB
+   Level_10: Degree  2.94  5  2
+   Level_10: Size  2684.17  4025  1693  65.5%
+   Level_10: Waste  1411.82  2403  71  34.4%
+
+   Level_11: Count  142  0MB
+   Level_11: Degree  2.96  4  2
+   Level_11: Size  2679.48  3939  1787  65.4%
+   Level_11: Waste  1416.51  2309  157  34.5%
+
+   Level_12: Count  47  0MB
+   Level_12: Degree  3.02  4  2
+   Level_12: Size  2718.04  3847  1743  66.3%
+   Level_12: Waste  1377.95  2353  249  33.6%
+
+   Level_13: Count  15  0MB
+   Level_13: Degree  3.13  4  2
+   Level_13: Size  2774.86  3727  1771  67.7%
+   Level_13: Waste  1321.13  2325  369  32.2%
+
+   Level_14: Count  6  0MB
+   Level_14: Degree  2.50  3  2
+   Level_14: Size  2252.83  2738  1881  55.0%
+   Level_14: Waste  1843.16  2215  1358  44.9%
+
+   Level_15: Count  2  0MB
+   Level_15: Degree  3.00  4  2
+   Level_15: Size  2700.50  3486  1915  65.9%
+   Level_15: Waste  1395.50  2181  610  34.0%
+
+   Level_16: Count  1  0MB
+   Level_16: Degree  2.00  2  2
+   Level_16: Size  1891.00  1891  1891  46.1%
+   Level_16: Waste  2205.00  2205  2205  53.8%
+}
+

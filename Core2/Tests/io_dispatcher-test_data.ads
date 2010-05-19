@@ -3,11 +3,10 @@ with DB.Types.Keys;
 with DB.Types.Values.Bounded;
 
 private
-package IO_Dispatcher.Random is
+package IO_Dispatcher.Test_Data is
 
-   Block_Size : constant := DB.Blocks.Block_Size;
-   Max_Key_Size : constant := (Block_Size - 9) * 1/4 - 2 - 4 - 4
-   --                                       ^M     ^B  ^P  ^VL ^VB
+   Max_Key_Size : constant := (DB.Blocks.Block_Size - 9) * 1/4 - 2 - 4 - 4
+   --                                                 ^M     ^B  ^P  ^VL ^VB
                                 ;--+ 1; -- to enforce heaped map
    Max_Value_Size : constant := 4 + 4;
    --                           ^VL ^VB
@@ -41,18 +40,17 @@ package IO_Dispatcher.Random is
    function Key (KV : Key_Value_Type) return DB.Types.Keys.Key_Type;
    function Value (KV : Key_Value_Type) return Values.String_Type;
 
-   Initial_KV : Count_Type;
-   Current_KV : Count_Type := 1;
 
-   procedure Init_Key_Value_Pairs (Init : in Count_Type);
+   type Generator_Type is (Pseudo_Random_Gen, URL_Gen);
+
+   Generator  : Generator_Type;
+
+   procedure Init_Key_Value_Pairs
+     (Generator : in Generator_Type;
+      Count     : in Count_Type);
    procedure Reset_String_Generation;
    function Random_Entry return Key_Value_Type;
-   function Some_Entry return Key_Value_Type;
    procedure Finalize_Key_Value_Pairs;
 
-private
-   Key_Value_Pairs : Key_Value_Array_Access_Type
-                   := new Key_Value_Array_Type(1 .. 10_000);
-
-end IO_Dispatcher.Random;
+end IO_Dispatcher.Test_Data;
 

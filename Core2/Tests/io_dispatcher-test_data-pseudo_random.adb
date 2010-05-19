@@ -18,7 +18,7 @@ with DB.Locks.Mutexes;
 with Ada.Unchecked_Deallocation;
 with Ada.Unchecked_Conversion;
 
-package body IO_Dispatcher.Random is
+package body IO_Dispatcher.Test_Data.Pseudo_Random is
 
    Mutex : DB.Locks.Mutexes.Mutex_Type;
 
@@ -159,24 +159,6 @@ package body IO_Dispatcher.Random is
    end Random_Entry;
 
 
-   function Some_Entry return Key_Value_Type
-   is
-      KV : Key_Value_Type;
-   begin
-      DB.Locks.Mutexes.Lock(Mutex);
-      declare
-         I  : constant Positive
-         := Positive((Current_KV mod Count_Type(Key_Value_Pairs'Length)) + 1);
-      begin
-         Key_Value_Pairs(I).Key.Time := DB.Types.Times.Number_Type(Current_KV);
-         Key_Value_Pairs(I).Value := Make_Value(Current_KV);
-         KV := Key_Value_Pairs(I);
-      end;
-      DB.Locks.Mutexes.Unlock(Mutex);
-      return KV;
-   end Some_Entry;
-
-
    procedure Finalize_Key_Value_Pairs
    is
       procedure Free is new Ada.Unchecked_Deallocation
@@ -185,18 +167,5 @@ package body IO_Dispatcher.Random is
       Free(Key_Value_Pairs);
    end Finalize_Key_Value_Pairs;
 
-
-   function Key (KV : Key_Value_Type) return DB.Types.Keys.Key_Type is
-   begin
-      return KV.Key;
-   end Key;
-
-
-   function Value (KV : Key_Value_Type)
-      return Values.String_Type is
-   begin
-      return KV.Value;
-   end Value;
-
-end IO_Dispatcher.Random;
+end IO_Dispatcher.Test_Data.Pseudo_Random;
 
