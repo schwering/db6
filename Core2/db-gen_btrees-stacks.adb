@@ -95,7 +95,7 @@ package body Stacks is
 
    procedure Initialize
      (Stack : out Stack_Type;
-      Key   : in  Key_Type) is
+      Key   : in  Keys.Key_Type) is
    begin
       Stack := (S => Stacks.New_Stack, Key => Key);
    end Initialize;
@@ -277,7 +277,7 @@ package body Stacks is
       -- Handles the case that the high-key of a node C changed. Then C_A is the
       -- address of C and C_Key is the high-key of C.
       procedure Update_High_Key
-        (C_Key : in Key_Type;
+        (C_Key : in Keys.Key_Type;
          C_A   : in Nodes.Valid_Address_Type) is
       begin
          if Is_Empty(Stack) then
@@ -308,9 +308,9 @@ package body Stacks is
       -- the possibly changed high-key of L and the pointer to R and its
       -- high-key are inserted.
       procedure Insert_Key_And_Update_High_Key
-        (L_Key : in Key_Type;
+        (L_Key : in Keys.Key_Type;
          L_A   : in Nodes.Valid_Address_Type;
-         R_Key : in Key_Type;
+         R_Key : in Keys.Key_Type;
          R_A   : in Nodes.Valid_Address_Type)
       is
          use type Nodes.Valid_Address_Type;

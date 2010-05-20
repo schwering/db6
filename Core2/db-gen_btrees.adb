@@ -14,7 +14,7 @@ package body DB.Gen_BTrees is
 
       procedure Initialize
         (Stack : out Stack_Type;
-         Key   : in  Key_Type);
+         Key   : in  Keys.Key_Type);
 
       procedure Finalize
         (Stack : in out Stack_Type);
@@ -76,7 +76,7 @@ package body DB.Gen_BTrees is
       type Stack_Type is
          record
             S   : Stacks.Stack_Type;
-            Key : Key_Type;
+            Key : Keys.Key_Type;
          end record;
    end Stacks;
 
@@ -97,14 +97,14 @@ package body DB.Gen_BTrees is
    package Searches is
       procedure Search
         (Tree     : in out Tree_Type;
-         Key      : in     Key_Type;
-         Value    :    out Value_Type;
+         Key      : in     Keys.Key_Type;
+         Value    :    out Values.Value_Type;
          State    :    out State_Type);
 
       procedure Minimum
         (Tree     : in out Tree_Type;
-         Key      :    out Key_Type;
-         Value    :    out Value_Type;
+         Key      :    out Keys.Key_Type;
+         Value    :    out Values.Value_Type;
          State    :    out State_Type);
    end Searches;
 
@@ -118,7 +118,7 @@ package body DB.Gen_BTrees is
 
       function New_Bound
         (Comparison : Comparison_Type;
-         Key        : Key_Type)
+         Key        : Keys.Key_Type)
          return Bound_Type;
 
       function New_Cursor
@@ -143,15 +143,15 @@ package body DB.Gen_BTrees is
       procedure Next
         (Tree   : in out Tree_Type;
          Cursor : in out Cursor_Type;
-         Key    :    out Key_Type;
-         Value  :    out Value_Type;
+         Key    :    out Keys.Key_Type;
+         Value  :    out Values.Value_Type;
          State  :    out State_Type);
 
       procedure Delete
         (Tree   : in out Tree_Type;
          Cursor : in out Cursor_Type;
-         Key    :    out Key_Type;
-         Value  :    out Value_Type;
+         Key    :    out Keys.Key_Type;
+         Value  :    out Values.Value_Type;
          State  :    out State_Type);
    end Cursors;
 
@@ -185,39 +185,6 @@ package body DB.Gen_BTrees is
 --         return "Invalid_Address";
 --      end if;
 --   end Image;
-
-
-   function "<"
-     (Left, Right : Key_Type)
-      return Boolean
-   is
-      use type Utils.Comparison_Result_Type;
-      C : constant Utils.Comparison_Result_Type := Compare(Left, Right);
-   begin
-      return C = Utils.Less;
-   end "<";
-
-
-   function "<="
-     (Left, Right : Key_Type)
-      return Boolean
-   is
-      use type Utils.Comparison_Result_Type;
-      C : constant Utils.Comparison_Result_Type := Compare(Left, Right);
-   begin
-      return C = Utils.Less or C = Utils.Equal;
-   end "<=";
-
-
-   function "="
-     (Left, Right : Key_Type)
-      return Boolean
-   is
-      use type Utils.Comparison_Result_Type;
-      C : constant Utils.Comparison_Result_Type := Compare(Left, Right);
-   begin
-      return C = Utils.Equal;
-   end "=";
 
 
    procedure Read_Node
@@ -284,7 +251,7 @@ package body DB.Gen_BTrees is
    -- Note: Only defined for inner nodes!
    function Scan_Node
      (N   : Nodes.Node_Type;
-      Key : Key_Type)
+      Key : Keys.Key_Type)
       return Nodes.Valid_Address_Type
    is
       pragma Assert (Nodes.Is_Inner(N));
@@ -356,39 +323,39 @@ package body DB.Gen_BTrees is
 
    function Max_Key_Size
      (Max_Value_Size : Blocks.Size_Type :=
-        Blocks.Bits_To_Units(Value_Type'Size))
+        Blocks.Bits_To_Units(Values.Value_Type'Size))
       return Blocks.Size_Type
    renames Nodes.Max_Key_Size;
 
 
    procedure Search
      (Tree  : in out Tree_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    renames Searches.Search;
 
 
    procedure Minimum
      (Tree  : in out Tree_Type;
-      Key   :    out Key_Type;
-      Value :    out Value_Type;
+      Key   :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    renames Searches.Minimum;
 
 
    procedure Insert
      (Tree  : in out Tree_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is separate;
 
 
    procedure Delete
      (Tree  : in out Tree_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is separate;
 
@@ -405,7 +372,7 @@ package body DB.Gen_BTrees is
 
    function New_Bound
      (Comparison : Comparison_Type;
-      Key        : Key_Type)
+      Key        : Keys.Key_Type)
       return Bound_Type
    renames Cursors.New_Bound;
 
@@ -440,8 +407,8 @@ package body DB.Gen_BTrees is
    procedure Next
      (Tree   : in out Tree_Type;
       Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type)
    renames Cursors.Next;
 
@@ -449,8 +416,8 @@ package body DB.Gen_BTrees is
    procedure Delete
      (Tree   : in out Tree_Type;
       Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type)
    renames Cursors.Delete;
 

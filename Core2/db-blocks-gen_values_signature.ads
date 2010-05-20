@@ -1,6 +1,13 @@
 -- Abstract:
 --
--- Block serialization signature package.
+-- Key serialization signature package.
+-- A key is the same like a value but has a comparison function.
+--
+-- Design Notes:
+--
+-- The main reason that we distinguish between Keys and Values and this point is
+-- that this allows for types Key_Type and Value_Type instead of some ugly
+-- generic Object_Type or so.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -8,36 +15,36 @@ generic
 
    pragma Warnings (Off); -- Disable `unreferenced' warnings
 
-   type Object_Type is private;
+   type Value_Type is private;
    type Context_Type is private;
 
    with function New_Context
-      return Context_Type;
+      return Context_Type is <>;
 
    with function Size_Bound
-     (Object : Object_Type)
-      return Blocks.Size_Type;
+     (Value : Value_Type)
+      return Blocks.Size_Type is <>;
 
    with procedure Read
      (Context : in out Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
-      Object  :    out Object_Type);
+      Value   :    out Value_Type) is <>;
 
    with procedure Skip
      (Context : in out Context_Type;
       Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type);
+      Cursor  : in out Blocks.Cursor_Type) is <>;
 
    with procedure Write
      (Context : in out Context_Type;
       Block   : in out Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
-      Object  : in     Object_Type);
+      Value   : in     Value_Type) is <>;
 
    pragma Warnings (On);
 
-package DB.Blocks.Gen_Serialization_Signature is
+package DB.Blocks.Gen_Values_Signature is
    pragma Pure;
-end DB.Blocks.Gen_Serialization_Signature;
+end DB.Blocks.Gen_Values_Signature;
 

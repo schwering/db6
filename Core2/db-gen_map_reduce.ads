@@ -34,7 +34,8 @@ with System.Storage_Pools;
 
 with DB.Blocks;
 with DB.Blocks.Gen_IO_Signature;
-with DB.Utils;
+with DB.Blocks.Gen_Keys_Signature;
+with DB.Blocks.Gen_Values_Signature;
 
 generic
    type In_Key_Type is private;
@@ -44,66 +45,22 @@ generic
       Value   : out In_Value_Type;
       Success : out Boolean);
 
-   type Intermediate_Key_Type is private;
-   type Intermediate_Value_Type is private;
-   with function Compare_Intermediate_Key
-     (Left, Right : Intermediate_Key_Type)
-      return Utils.Comparison_Result_Type is <>;
-
-   type Intermediate_Key_Context_Type is private;
-   with function New_Intermediate_Key_Context
-      return Intermediate_Key_Context_Type;
-   with function Intermediate_Key_Size_Bound
-     (Key : Intermediate_Key_Type)
-      return Blocks.Size_Type;
-   with procedure Read_Intermediate_Key
-     (Context : in out Intermediate_Key_Context_Type;
-      Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type;
-      Key     :    out Intermediate_Key_Type);
-   with procedure Skip_Intermediate_Key
-     (Context : in out Intermediate_Key_Context_Type;
-      Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type);
-   with procedure Write_Intermediate_Key
-     (Context : in out Intermediate_Key_Context_Type;
-      Block   : in out Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type;
-      Key     : in     Intermediate_Key_Type);
-
-   type Intermediate_Value_Context_Type is private;
-   with function New_Intermediate_Value_Context
-      return Intermediate_Value_Context_Type;
-   with function Intermediate_Value_Size_Bound
-     (Value : Intermediate_Value_Type)
-      return Blocks.Size_Type;
-   with procedure Read_Intermediate_Value
-     (Context : in out Intermediate_Value_Context_Type;
-      Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type;
-      Value   :    out Intermediate_Value_Type);
-   with procedure Skip_Intermediate_Value
-     (Context : in out Intermediate_Value_Context_Type;
-      Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type);
-   with procedure Write_Intermediate_Value
-     (Context : in out Intermediate_Value_Context_Type;
-      Block   : in out Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type;
-      Value   : in     Intermediate_Value_Type);
+   with package Intermediate_Keys is new Blocks.Gen_Keys_Signature (<>);
+   with package Intermediate_Values is new Blocks.Gen_Values_Signature (<>);
    with package Intermediate_Block_IO is new Blocks.Gen_IO_Signature (<>);
+   Allow_Intermediate_Duplicates : in Boolean := False;
 
    with procedure Map
      (Key   : in     In_Key_Type;
       Value : in     In_Value_Type;
-      Emit  : access procedure (Key   : Intermediate_Key_Type;
-                                Value : Intermediate_Value_Type));
+      Emit  : access procedure (Key : in Intermediate_Keys.Key_Type;
+                                Value : in Intermediate_Values.Value_Type));
 
    type Out_Key_Type is private;
    type Out_Value_Type is private;
    with procedure Reduce
-     (Key        : in     Intermediate_Key_Type;
-      Next_Value : access procedure (Value   : out Intermediate_Value_Type;
+     (Key        : in     Intermediate_Keys.Key_Type;
+      Next_Value : access procedure (Value : out Intermediate_Values.Value_Type;
                                      Success : out Boolean);
       Out_Key    :    out Out_Key_Type;
       Out_Value  :    out Out_Value_Type);

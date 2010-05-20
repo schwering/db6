@@ -2,7 +2,7 @@
 IO=map
 BIN=bin/release/./ttree
 FILE=`cat .temp_path`btree
-GEN=pseudorandom
+GEN=urls
 C1=100k
 # 1. Simple insertions twice and check
 # 2. Some more insertions and check for both
@@ -41,7 +41,9 @@ C="$BIN $IO $FILE $GEN 0\
 	Search,$C1,Cont"
 echo $C
 $C
-C="$BIN $IO $FILE 0 Check,1,Reset"
+#C="$BIN $IO $FILE $GEN 0 Check,1,Reset"
+#echo $C
+#$C
+C="$BIN $IO $FILE $GEN 0 Stats,1,Reset"
 echo $C
 $C
-

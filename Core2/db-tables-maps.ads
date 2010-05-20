@@ -11,6 +11,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with DB.Blocks.Gen_Values_Signature;
 with DB.Gen_BTrees;
 --with DB.Gen_Blob_Trees;
 with DB.Blocks;
@@ -163,41 +164,30 @@ private
    package Block_IO_Impl       renames Blocks.Local_IO;
    package Block_IO            renames Block_IO_Impl.IO_Signature;
 
+   package Values is
+      use Bounded_Values_IO;   -- so that the serialization instances take
+      use Unbounded_Values_IO; -- the default parameters
+
+      package Bounded_Values_Signature is new Blocks.Gen_Values_Signature
+        (Value_Type   => Types.Values.Bounded.String_Type,
+         Context_Type => Bounded_Values_IO.Context_Type);
+
+      package Unbounded_Values_Signature is new Blocks.Gen_Values_Signature
+        (Value_Type   => Types.Values.Unbounded.String_Type,
+         Context_Type => Unbounded_Values_IO.Context_Type);
+   end Values;
+
    package BTrees is new Gen_BTrees
-     (Key_Type           => Types.Keys.Key_Type,
-      Value_Type         => Types.Values.Bounded.String_Type,
-      Compare            => Types.Keys.Compare,
-      Allow_Duplicates   => True,
-      Key_Context_Type   => Types.Keys.Context_Type,
-      New_Key_Context    => Types.Keys.New_Context,
-      Key_Size_Bound     => Types.Keys.Size_Bound,
-      Read_Key           => Types.Keys.Read,
-      Skip_Key           => Types.Keys.Skip,
-      Write_Key          => Types.Keys.Write,
-      Value_Context_Type => Bounded_Values_IO.Context_Type,
-      New_Value_Context  => Bounded_Values_IO.New_Context,
-      Value_Size_Bound   => Bounded_Values_IO.Size_Bound,
-      Read_Value         => Bounded_Values_IO.Read,
-      Skip_Value         => Bounded_Values_IO.Skip,
-      Write_Value        => Bounded_Values_IO.Write,
-      Block_IO           => Block_IO);
+     (Keys             => Types.Keys.Keys_Signature,
+      Values           => Values.Bounded_Values_Signature,
+      Allow_Duplicates => True,
+      Block_IO         => Block_IO);
 
    package Blob_Trees is new Gen_BTrees
-     (Key_Type            => Types.Keys.Key_Type,
-      Value_Type          => Types.Values.Unbounded.String_Type,
-      Compare             => Types.Keys.Compare,
-      Key_Context_Type    => Types.Keys.Context_Type,
-      New_Key_Context     => Types.Keys.New_Context,
-      Key_Size_Bound      => Types.Keys.Size_Bound,
-      Read_Key            => Types.Keys.Read,
-      Skip_Key            => Types.Keys.Skip,
-      Write_Key           => Types.Keys.Write,
-      Value_Context_Type  => Types.Values.Unbounded.Uncompressed.Context_Type,
-      New_Value_Context   => Types.Values.Unbounded.Uncompressed.New_Context,
-      Value_Size_Bound    => Types.Values.Unbounded.Uncompressed.Size_Bound,
-      Read_Value          => Types.Values.Unbounded.Uncompressed.Read,
-      Skip_Value          => Types.Values.Unbounded.Uncompressed.Skip,
-      Write_Value         => Types.Values.Unbounded.Uncompressed.Write,
+     (Keys             => Types.Keys.Keys_Signature,
+      Values           => Values.Unbounded_Values_Signature,
+      Block_IO         => Block_IO,
+      Allow_Duplicates => True);
       --Parted_Value_Context_Type => Types.Values.Unbounded.Parted.Context_Type,
       --New_Parted_Value_Context => Types.Values.Unbounded.Parted.New_Context,
       --Parted_Value_Size_Bound => Types.Values.Unbounded.Parted.Size_Bound,
@@ -208,7 +198,6 @@ private
       --Write_Value_Context => Types.Values.Unbounded.Parted.Write_Context,
       --Read_Part_Of_Value  => Types.Values.Unbounded.Parted.Read_Part_Of_String,
       --Write_Part_Of_Value => Types.Values.Unbounded.Parted.Write_Part_Of_String,
-      Block_IO            => Block_IO);
 
    ----------
    -- Type wrappers. Always Short (=> BTrees) and not Short (=> Blob_Trees).

@@ -41,7 +41,7 @@ package body Cursors is
 
    function New_Bound
      (Comparison : Comparison_Type;
-      Key        : Key_Type)
+      Key        : Keys.Key_Type)
       return Bound_Type is
    begin
       return Bound_Type'(Kind       => Concrete_Bound,
@@ -141,20 +141,20 @@ package body Cursors is
 
 
    function Key_Matches
-     (Left       : Key_Type;
+     (Left       : Keys.Key_Type;
       Comparison : Comparison_Type;
-      Right      : Key_Type)
+      Right      : Keys.Key_Type)
       return Boolean
    is
       pragma Inline (Key_Matches);
       use type Utils.Comparison_Result_Type;
    begin
       case Comparison is
-         when Less             => return Compare(Left, Right) = Utils.Less;
-         when Less_Or_Equal    => return Compare(Left, Right) /= Utils.Greater;
-         when Equal            => return Compare(Left, Right) = Utils.Equal;
-         when Greater_Or_Equal => return Compare(Left, Right) /= Utils.Less;
-         when Greater          => return Compare(Left, Right) = Utils.Greater;
+         when Less             => return Left < Right;
+         when Less_Or_Equal    => return Left <= Right;
+         when Equal            => return Left = Right;
+         when Greater_Or_Equal => return Left >= Right;
+         when Greater          => return Left > Right;
       end case;
    end Key_Matches;
 
@@ -189,8 +189,8 @@ package body Cursors is
    procedure Next
      (Tree   : in out Tree_Type;
       Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
@@ -211,8 +211,8 @@ package body Cursors is
                begin
                   Read_Node(Tree, R_A, R);
                   Cursor.Node          := R;
-                  Cursor.Key_Context   := New_Key_Context;
-                  Cursor.Value_Context := New_Value_Context;
+                  Cursor.Key_Context   := Keys.New_Context;
+                  Cursor.Value_Context := Values.New_Context;
                   Cursor.Index         := 1;
                   Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
                                 Cursor.Key_Context);
@@ -240,7 +240,7 @@ package body Cursors is
 
 
       procedure Search_Node
-        (Key   : in  Key_Type;
+        (Key   : in  Keys.Key_Type;
          Node  : out Nodes.RO_Node_Type;
          Index : out Nodes.Valid_Index_Type)
       is
@@ -364,15 +364,15 @@ package body Cursors is
          end if;
 
          declare
-            Old_Key : constant Key_Type := Cursor.Key;
+            Old_Key : constant Keys.Key_Type := Cursor.Key;
          begin
             Search_Node(Old_Key, Cursor.Node, Cursor.Index);
             if State /= Success then
                Cursor.Final := True;
                return;
             end if;
-            Cursor.Key_Context   := New_Key_Context;
-            Cursor.Value_Context := New_Value_Context;
+            Cursor.Key_Context   := Keys.New_Context;
+            Cursor.Value_Context := Values.New_Context;
             Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
                           Cursor.Key_Context);
 
@@ -497,8 +497,8 @@ package body Cursors is
    procedure Delete
      (Tree   : in out Tree_Type;
       Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type)
    is
       pragma Assert (Tree.Initialized);

@@ -109,8 +109,8 @@ is
    procedure Check_High_Key_Order (N : in Node_Type; N_A : in Valid_Address_Type)
    is
       L : RO_Node_Type;
-      NHK : Key_Type;
-      LHK : Key_Type;
+      NHK : Keys.Key_Type;
+      LHK : Keys.Key_Type;
       Has_NHK : Boolean;
       Has_LHK : Boolean;
    begin
@@ -145,9 +145,9 @@ is
          return;
       end if;
       declare
-         NHK  : Key_Type;
+         NHK  : Keys.Key_Type;
          NHHK : Boolean;
-         CHK  : Key_Type;
+         CHK  : Keys.Key_Type;
          CHHK : Boolean;
       begin
          Get_High_Key(N, NHK, NHHK);
@@ -196,8 +196,8 @@ is
 
    procedure Check_Keys (N : in Node_Type)
    is
-      Key_Context : Key_Context_Type := New_Key_Context;
-      Key         : Key_Type;
+      Key_Context : Keys.Context_Type := Keys.New_Context;
+      Key         : Keys.Key_Type;
    begin
       for I in 1 .. Degree(N) loop
          Get_Key(N, I, Key, Key_Context);
@@ -206,7 +206,7 @@ is
 
    procedure Check_Children (N : in Node_Type)
    is
-      Key_Context : Key_Context_Type := New_Key_Context;
+      Key_Context : Keys.Context_Type := Keys.New_Context;
       Child       : Valid_Address_Type;
    begin
       for I in 1 .. Degree(N) loop
@@ -216,9 +216,9 @@ is
 
    procedure Check_Values (N : in Node_Type)
    is
-      Key_Context   : Key_Context_Type := New_Key_Context;
-      Value_Context : Value_Context_Type := New_Value_Context;
-      Value         : Value_Type;
+      Key_Context   : Keys.Context_Type := Keys.New_Context;
+      Value_Context : Values.Context_Type := Values.New_Context;
+      Value         : Values.Value_Type;
    begin
       for I in 1 .. Degree(N) loop
          Get_Value(N, I, Value, Key_Context, Value_Context);

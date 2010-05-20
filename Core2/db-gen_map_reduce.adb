@@ -8,6 +8,7 @@ with Ada.Unchecked_Deallocation;
 with System.Storage_Pools;
 
 with DB.Gen_BTrees;
+with DB.Utils.Gen_Comparisons;
 with DB.Utils.Gen_Queues;
 
 procedure DB.Gen_Map_Reduce is
@@ -15,28 +16,21 @@ procedure DB.Gen_Map_Reduce is
    ----------
    -- Helpers for intermediate keys/values.
 
+   -- for some reasons, accessing Intermediate_*.*_Type directly raises compiler
+   -- errors
+   subtype Intermediate_Keys_Type is Intermediate_Keys.Key_Type;
+   subtype Intermediate_Values_Type is Intermediate_Values.Value_Type;
+
+   package Key_Comparisons is new Utils.Gen_Comparisons
+     (Item_Type => Intermediate_Keys_Type,
+      Compare   => Intermediate_Keys.Compare);
+   use Key_Comparisons;
+
    package Intermediate_BTrees is new Gen_BTrees
-     (Key_Type           => Intermediate_Key_Type,
-      Value_Type         => Intermediate_Value_Type,
-      Compare            => Compare_Intermediate_Key,
-
-      Allow_Duplicates   => True,
-
-      Key_Context_Type   => Intermediate_Key_Context_Type,
-      New_Key_Context    => New_Intermediate_Key_Context,
-      Key_Size_Bound     => Intermediate_Key_Size_Bound,
-      Read_Key           => Read_Intermediate_Key,
-      Skip_Key           => Skip_Intermediate_Key,
-      Write_Key          => Write_Intermediate_Key,
-
-      Value_Context_Type => Intermediate_Value_Context_Type,
-      New_Value_Context  => New_Intermediate_Value_Context,
-      Value_Size_Bound   => Intermediate_Value_Size_Bound,
-      Read_Value         => Read_Intermediate_Value,
-      Skip_Value         => Skip_Intermediate_Value,
-      Write_Value        => Write_Intermediate_Value,
-
-      Block_IO           => Intermediate_Block_IO);
+     (Keys             => Intermediate_Keys,
+      Values           => Intermediate_Values,
+      Block_IO         => Intermediate_Block_IO,
+      Allow_Duplicates => Allow_Intermediate_Duplicates);
 
    type Context_Type is
       record
@@ -60,11 +54,11 @@ procedure DB.Gen_Map_Reduce is
       task body Map_Task_Type
       is
          procedure Emit
-           (Key     : in Intermediate_Key_Type;
-            Value   : in Intermediate_Value_Type)
+           (Key   : in Intermediate_Keys_Type;
+            Value : in Intermediate_Values_Type)
          is
             use type Intermediate_BTrees.State_Type;
-            State    : Intermediate_BTrees.State_Type;
+            State : Intermediate_BTrees.State_Type;
          begin
             Intermediate_BTrees.Insert(Context.Intermediates, Key, Value,
                                        State);
@@ -126,11 +120,12 @@ procedure DB.Gen_Map_Reduce is
      (Context : in out Context_Type)
    is
       package Value_Queues is new Utils.Gen_Queues
-         (Queue_Size => Value_Queue_Size, Item_Type => Intermediate_Value_Type);
+         (Queue_Size => Value_Queue_Size,
+          Item_Type  => Intermediate_Values_Type);
 
       type Key_Values_Type is
          record
-            Key         : Intermediate_Key_Type;
+            Key         : Intermediate_Keys_Type;
             Value_Queue : Value_Queues.Queue_Type;
          end record;
 
@@ -166,8 +161,8 @@ procedure DB.Gen_Map_Reduce is
             loop
                declare
                   use type Intermediate_BTrees.State_Type;
-                  Key     : Intermediate_Key_Type;
-                  Value   : Intermediate_Value_Type;
+                  Key     : Intermediate_Keys_Type;
+                  Value   : Intermediate_Values_Type;
                   State   : Intermediate_BTrees.State_Type;
                begin
                   Intermediate_BTrees.Next(Context.Intermediates, Cursor,
@@ -221,7 +216,7 @@ procedure DB.Gen_Map_Reduce is
                exit when not Success;
                declare
                   procedure Next_Value
-                    (Value   : out Intermediate_Value_Type;
+                    (Value   : out Intermediate_Values_Type;
                      Success : out Boolean) is
                   begin
                      Value_Queues.Dequeue(Key_Values.Value_Queue, Success,

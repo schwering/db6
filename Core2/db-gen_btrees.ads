@@ -18,7 +18,7 @@
 -- This package guarantees that if the entries E_1 .. E_N are the entries of a
 -- node, E_I is written before E_{I+1} for all I in 1 .. N.
 -- Howevever, entries are read randomly!
--- The Key/Value_Context_Types can be used for compression, for exmaple. In
+-- The Key/Values.Context_Types can be used for compression, for exmaple. In
 -- both, the reading and writing case, it is guaranteed that a context object is
 -- used only for one node, not more, and either for reading or writing, not both
 -- operation types. A context object handed to a Read/Write_Key/Value is either
@@ -27,7 +27,7 @@
 -- sequentially, it is guaranteed that the write operation of E_1 is performed
 -- with a new context object and the following N - 1 write operations are with
 -- the same object.
--- As a consequence, a trivial choice for the Key/Value_Context_Types is just
+-- As a consequence, a trivial choice for the Key/Values.Context_Types is just
 -- null records.
 -- (Remind that in this case `written' does not mean that data is necessarily
 -- written to disk, it just means serialization of data.)
@@ -56,65 +56,18 @@
 
 with DB.Blocks;
 with DB.Blocks.Gen_IO_Signature;
+with DB.Blocks.Gen_Keys_Signature;
+with DB.Blocks.Gen_Values_Signature;
 with DB.Locks.Mutexes;
-with DB.Utils;
+with DB.Utils.Gen_Comparisons;
 
 generic
-   type Key_Type is private;
-   type Value_Type is private;
-
-   with function Compare
-     (Left, Right : Key_Type)
-      return Utils.Comparison_Result_Type;
-
-   Allow_Duplicates : in Boolean := False;
-
-   type Key_Context_Type is private;
-   with function New_Key_Context
-      return Key_Context_Type;
-   with function Key_Size_Bound
-     (Key : Key_Type)
-      return Blocks.Size_Type;
-   with procedure Read_Key
-     (Context : in out Key_Context_Type;
-      Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type;
-      Key     :    out Key_Type);
-   with procedure Skip_Key
-     (Context : in out Key_Context_Type;
-      Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type);
-   with procedure Write_Key
-     (Context : in out Key_Context_Type;
-      Block   : in out Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type;
-      Key     : in     Key_Type);
-
-   type Value_Context_Type is private;
-   with function New_Value_Context
-      return Value_Context_Type;
-   with function Value_Size_Bound
-     (Value : Value_Type)
-      return Blocks.Size_Type;
-   with procedure Read_Value
-     (Context : in out Value_Context_Type;
-      Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type;
-      Value   :    out Value_Type);
-   with procedure Skip_Value
-     (Context : in out Value_Context_Type;
-      Block   : in     Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type);
-   with procedure Write_Value
-     (Context : in out Value_Context_Type;
-      Block   : in out Blocks.Base_Block_Type;
-      Cursor  : in out Blocks.Cursor_Type;
-      Value   : in     Value_Type);
-
+   with package Keys is new Blocks.Gen_Keys_Signature (<>);
+   with package Values is new Blocks.Gen_Values_Signature (<>);
    with package Block_IO is new Blocks.Gen_IO_Signature (<>);
+   Allow_Duplicates : in Boolean := False;
 package DB.Gen_BTrees is
    pragma Preelaborate;
-   pragma Unreferenced (Skip_Value);
 
    ----------
    -- Tree initialization procedures.
@@ -137,7 +90,7 @@ package DB.Gen_BTrees is
 
    function Max_Key_Size
      (Max_Value_Size : Blocks.Size_Type :=
-        Blocks.Bits_To_Units(Value_Type'Size))
+        Blocks.Bits_To_Units(Values.Value_Type'Size))
       return Blocks.Size_Type;
    -- Returns the maximum allowed size of keys if the maximum size of
    -- values is Max_Value_Size.
@@ -150,8 +103,8 @@ package DB.Gen_BTrees is
 
    procedure Search
      (Tree     : in out Tree_Type;
-      Key      : in     Key_Type;
-      Value    :    out Value_Type;
+      Key      : in     Keys.Key_Type;
+      Value    :    out Values.Value_Type;
       State    :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
@@ -160,8 +113,8 @@ package DB.Gen_BTrees is
 
    procedure Minimum
      (Tree     : in out Tree_Type;
-      Key      :    out Key_Type;
-      Value    :    out Value_Type;
+      Key      :    out Keys.Key_Type;
+      Value    :    out Values.Value_Type;
       State    :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
@@ -170,8 +123,8 @@ package DB.Gen_BTrees is
 
    procedure Insert
      (Tree     : in out Tree_Type;
-      Key      : in     Key_Type;
-      Value    : in     Value_Type;
+      Key      : in     Keys.Key_Type;
+      Value    : in     Values.Value_Type;
       State    :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
@@ -180,8 +133,8 @@ package DB.Gen_BTrees is
 
    procedure Delete
      (Tree     : in out Tree_Type;
-      Key      : in     Key_Type;
-      Value    :    out Value_Type;
+      Key      : in     Keys.Key_Type;
+      Value    :    out Values.Value_Type;
       State    :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
@@ -223,7 +176,7 @@ package DB.Gen_BTrees is
 
    function New_Bound
      (Comparison : Comparison_Type;
-      Key        : Key_Type)
+      Key        : Keys.Key_Type)
       return Bound_Type;
    -- Creates a concrete bound. The bound New_Bound(Greater, Min) is a
    -- lower bound, because this means that all keys Key hit by the cursor
@@ -259,8 +212,8 @@ package DB.Gen_BTrees is
    procedure Next
      (Tree   : in out Tree_Type;
       Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type);
    -- Steps forward to the next Key/Value-pair and sets State to Success.
    -- If no such pair exists (with regard to the set bounds), State is set to
@@ -271,8 +224,8 @@ package DB.Gen_BTrees is
    procedure Delete
      (Tree   : in out Tree_Type;
       Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type);
    -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it
@@ -282,6 +235,10 @@ package DB.Gen_BTrees is
    -- key/value-pair that should be visited next.
 
 private
+   package Key_Comparisons is new Utils.Gen_Comparisons
+     (Item_Type => Keys.Key_Type, Compare => Keys.Compare);
+   use Key_Comparisons;
+
    package Nodes is
       RO_Node_Size : constant := Blocks.Block_Size;
       RW_Node_Size : constant := RO_Node_Size * 6 / 4;
@@ -373,7 +330,7 @@ private
 
       procedure Get_High_Key
         (Node     : in  Node_Type;
-         High_Key : out Key_Type;
+         High_Key : out Keys.Key_Type;
          Success  : out Boolean);
       -- Gets the high key of Node. If Node is empty, the high key is the key
       -- lastly deleted from Node; if Node never contained a value, Success is
@@ -387,22 +344,22 @@ private
 
       function High_Key
         (Node : Nodes.Node_Type)
-         return Key_Type;
+         return Keys.Key_Type;
       -- Returns the high key of Node if it exists. Otherwise Tree_Error is
       -- raised.
 
       procedure Get_Key
         (Node        : in     Node_Type;
          Index       : in     Valid_Index_Type;
-         Key         :    out Key_Type;
-         Key_Context : in out Key_Context_Type);
+         Key         :    out Keys.Key_Type;
+         Key_Context : in out Keys.Context_Type);
       -- Gets the Index-th key. This function is defined for both,
       -- leaves and inner nodes.
 
       function Key
         (Node  : Node_Type;
          Index : Valid_Index_Type)
-         return Key_Type;
+         return Keys.Key_Type;
       -- Returns the Index-th key. This function is defined for both,
       -- leaves and inner nodes.
 
@@ -410,7 +367,7 @@ private
         (Node        : in     Node_Type;
          Index       : in     Valid_Index_Type;
          Child       :    out Valid_Address_Type;
-         Key_Context : in out Key_Context_Type);
+         Key_Context : in out Keys.Context_Type);
       -- Gets the Index-th child address. This function is defined for
       -- inner nodes only.
 
@@ -424,20 +381,20 @@ private
       procedure Get_Value
         (Node          : in     Node_Type;
          Index         : in     Valid_Index_Type;
-         Value         :    out Value_Type;
-         Key_Context   : in out Key_Context_Type;
-         Value_Context : in out Value_Context_Type);
+         Value         :    out Values.Value_Type;
+         Key_Context   : in out Keys.Context_Type;
+         Value_Context : in out Values.Context_Type);
       -- Returns the Index-th value. This function is defined for leaves.
 
       function Value
         (Node  : Node_Type;
          Index : Valid_Index_Type)
-         return Value_Type;
+         return Values.Value_Type;
       -- Returns the Index-th value. This function is defined for leaves.
 
       function Key_Position
         (Node : Node_Type;
-         Key  : Key_Type)
+         Key  : Keys.Key_Type)
          return Index_Type;
       -- Returns the (first) position of the given key or returns Invalid_Index.
 
@@ -470,7 +427,7 @@ private
       function Insertion
         (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
-         Key   : Key_Type;
+         Key   : Keys.Key_Type;
          Child : Valid_Address_Type)
          return RW_Node_Type;
       -- Returns the node that results from the insertion of (Key, Child,
@@ -479,8 +436,8 @@ private
       function Insertion
         (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
-         Key   : Key_Type;
-         Value : Value_Type)
+         Key   : Keys.Key_Type;
+         Value : Values.Value_Type)
          return RW_Node_Type;
       -- Returns the node that results from the substitution of (Key, Value) at
       -- position Index. This function is defined for leaves.
@@ -488,7 +445,7 @@ private
       function Substitution
         (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
-         Key   : Key_Type;
+         Key   : Keys.Key_Type;
          Child : Valid_Address_Type)
          return RW_Node_Type;
       -- Returns the node that results from the substitution of (Key, Child,
@@ -497,8 +454,8 @@ private
       function Substitution
         (Node  : RW_Node_Type;
          Index : Valid_Index_Type;
-         Key   : Key_Type;
-         Value : Value_Type)
+         Key   : Keys.Key_Type;
+         Value : Values.Value_Type)
          return RW_Node_Type;
       -- Returns the node that results from the insertion of (Key, Value) at
       -- position Index. This function is defined for leaves.
@@ -588,10 +545,6 @@ private
       pragma Inline (To_Block);
    end Nodes;
 
-   function "<=" (Left, Right : Key_Type) return Boolean;
-   function "=" (Left, Right : Key_Type) return Boolean;
-   pragma Inline ("<=");
-   pragma Inline ("=");
 
    ----------
    -- Tree type.
@@ -640,7 +593,7 @@ private
          case Kind is
             when Concrete_Bound =>
                Comparison : Comparison_Type;
-               Key        : Key_Type;
+               Key        : Keys.Key_Type;
             when Abstract_Bound =>
                Location   : Infinity_Type;
          end case;
@@ -653,10 +606,10 @@ private
          Upper_Bound        : Bound_Type;
          Has_Node           : Boolean                       := False;
          Node               : Nodes.RO_Node_Type;
-         Key_Context        : Key_Context_Type;
-         Value_Context      : Value_Context_Type;
+         Key_Context        : Keys.Context_Type;
+         Value_Context      : Values.Context_Type;
          Index              : Nodes.Valid_Index_Type;
-         Key                : Key_Type;
+         Key                : Keys.Key_Type;
          Force_Recalibrate  : Boolean                       := False;
          Owning_Tree        : Tree_Ref_Type;
          Initialized        : Boolean                       := False;

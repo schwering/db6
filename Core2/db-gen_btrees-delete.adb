@@ -47,8 +47,8 @@
 separate (DB.Gen_BTrees)
 procedure Delete
   (Tree     : in out Tree_Type;
-   Key      : in     Key_Type;
-   Value    :    out Value_Type;
+   Key      : in     Keys.Key_Type;
+   Value    :    out Values.Value_Type;
    State    :    out State_Type)
 is
    pragma Assert (Tree.Initialized);
@@ -65,7 +65,7 @@ begin
          return Boolean
       is
          use type Nodes.Degree_Type;
-         High_Key     : Key_Type;
+         High_Key     : Keys.Key_Type;
          Has_High_Key : Boolean;
       begin
          if not Nodes.Is_Valid(Nodes.Link(N)) then

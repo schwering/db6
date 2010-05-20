@@ -11,8 +11,8 @@ package body Searches is
 
    procedure Search
      (Tree     : in out Tree_Type;
-      Key      : in     Key_Type;
-      Value    :    out Value_Type;
+      Key      : in     Keys.Key_Type;
+      Value    :    out Values.Value_Type;
       State    :    out State_Type)
    is
       procedure Find_Leaf (N : out Nodes.Node_Type)
@@ -37,7 +37,7 @@ package body Searches is
             I : constant Nodes.Index_Type := Nodes.Key_Position(N, Key);
          begin
             if Nodes.Is_Valid(I) then
-               case Compare(Key, Nodes.Key(N, I)) is
+               case Keys.Compare(Key, Nodes.Key(N, I)) is
                   when Utils.Equal =>
                      Value := Nodes.Value(N, I);
                      State := Success;
@@ -56,7 +56,7 @@ package body Searches is
             return;
          end if;
          declare
-            High_Key     : Key_Type;
+            High_Key     : Keys.Key_Type;
             Has_High_Key : Boolean;
          begin
             Nodes.Get_High_Key(N, High_Key, Has_High_Key);
@@ -79,8 +79,8 @@ package body Searches is
 
    procedure Minimum
      (Tree     : in out Tree_Type;
-      Key      :    out Key_Type;
-      Value    :    out Value_Type;
+      Key      :    out Keys.Key_Type;
+      Value    :    out Values.Value_Type;
       State    :    out State_Type)
    is
       pragma Assert (Tree.Initialized);

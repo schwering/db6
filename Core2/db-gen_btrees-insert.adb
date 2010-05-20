@@ -19,8 +19,8 @@
 separate (DB.Gen_BTrees)
 procedure Insert
   (Tree  : in out Tree_Type;
-   Key   : in     Key_Type;
-   Value : in     Value_Type;
+   Key   : in     Keys.Key_Type;
+   Value : in     Values.Value_Type;
    State :    out State_Type)
 is
    pragma Assert (Tree.Initialized);
@@ -32,7 +32,7 @@ is
    N_A   : Nodes.Valid_Address_Type;
    N_Old : Nodes.RW_Node_Type;
 begin
-   if Key_Size_Bound(Key) > Max_Key_Size(Value_Size_Bound(Value)) then
+   if Keys.Size_Bound(Key) > Max_Key_Size(Values.Size_Bound(Value)) then
       State := Failure;
       return;
    end if;
@@ -44,7 +44,10 @@ begin
 
       function Exit_Cond (N : Nodes.Node_Type) return Boolean
       is
-         function Fits_Into_Node (K : Key_Type; V : Value_Type) return Boolean
+         function Fits_Into_Node
+           (K : Keys.Key_Type;
+            V : Values.Value_Type)
+            return Boolean
          is
             use type Nodes.Validation_State_Type;
             I : Nodes.Index_Type;
@@ -63,7 +66,7 @@ begin
          if not Nodes.Is_Valid(Nodes.Link(N)) then
             return True;
          end if;
-         case Compare(Key, Nodes.High_Key(N)) is
+         case Keys.Compare(Key, Nodes.High_Key(N)) is
             when Utils.Less    => return True;
             when Utils.Equal   => return Fits_Into_Node(Key, Value);
             when Utils.Greater => return False;

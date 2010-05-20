@@ -8,6 +8,8 @@ with IO_Dispatcher.To_Strings;
 
 with DB.Gen_Map_Reduce;
 with DB.Blocks;
+with DB.Blocks.Gen_Keys_Signature;
+with DB.Blocks.Gen_Values_Signature;
 with DB.Blocks.Local_IO;
 with DB.Tables.Maps;
 with DB.Types.Keys;
@@ -15,6 +17,7 @@ with DB.Types.Gen_Numbers;
 
 with DB.Locks.Mutexes;
 
+with DB.Utils.Gen_Comparisons;
 with DB.Utils.Global_Pool;
 
 procedure IO_Dispatcher.Map_MR is
@@ -35,24 +38,46 @@ procedure IO_Dispatcher.Map_MR is
                                      Lower_Bound => Lower,
                                      Upper_Bound => Upper);
 
-      subtype In_Key_Type is Map_Types.Key_Type;
-      subtype In_Value_Type is Map_Types.Value_Type;
+      package Ins is
+         subtype In_Key_Type is Map_Types.Key_Type;
+         subtype In_Value_Type is Map_Types.Value_Type;
+      end Ins;
 
-      package Intermediate_Keys renames DB.Types.Keys.Rows;
-      package Intermediate_Key_IO renames Intermediate_Keys.Uncompressed;
-      package Intermediate_Values is new DB.Types.Gen_Numbers(Natural);
-      subtype Intermediate_Key_Type is Intermediate_Keys.String_Type;
-      subtype Intermediate_Value_Type is Intermediate_Values.Number_Type;
+      package Intermediates is
+         use DB.Types.Keys.Rows.Uncompressed;
 
-      package Out_Keys renames Intermediate_Keys;
-      package Out_Values is new DB.Types.Gen_Numbers(Natural);
-      subtype Out_Key_Type is Intermediate_Key_Type;
-      subtype Out_Value_Type is Out_Values.Number_Type;
+         subtype Intermediate_Key_Type is DB.Types.Keys.Rows.String_Type;
+         subtype Intermediate_Value_Type is Natural;
+
+         package Intermediate_Keys is new DB.Blocks.Gen_Keys_Signature
+           (Key_Type     => Intermediate_Key_Type,
+            Context_Type => DB.Types.Keys.Rows.Uncompressed.Context_Type,
+            Compare      => DB.Types.Keys.Rows.Compare);
+
+         package Value_IO is new DB.Types.Gen_Numbers(Intermediate_Value_Type);
+         use Value_IO;
+
+         package Intermediate_Values is new DB.Blocks.Gen_Values_Signature
+           (Value_Type   => Intermediate_Value_Type,
+            Context_Type => Value_IO.Context_Type);
+      end Intermediates;
+
+      package Outs is
+         use DB.Types.Keys.Rows.Uncompressed;
+
+         subtype Out_Key_Type is DB.Types.Keys.Rows.String_Type;
+         subtype Out_Value_Type is Natural;
+
+         package Key_Comparisons is new DB.Utils.Gen_Comparisons
+           (Item_Type => Out_Key_Type, Compare => DB.Types.Keys.Rows.Compare);
+      end Outs;
+
+      use Ins;
+      use Intermediates;
+      use Outs;
 
       use type In_Key_Type;
       use type In_Value_Type;
-      use type Intermediate_Key_Type;
-      use type Intermediate_Value_Type;
       use type Out_Key_Type;
       use type Out_Value_Type;
 
@@ -146,23 +171,10 @@ procedure IO_Dispatcher.Map_MR is
          In_Value_Type      => In_Value_Type,
          Input              => Input,
 
-         Intermediate_Key_Type           => Intermediate_Key_Type,
-         Intermediate_Value_Type         => Intermediate_Value_Type,
-         Compare_Intermediate_Key        => Intermediate_Keys.Compare,
-
-         Intermediate_Key_Context_Type   => Intermediate_Key_IO.Context_Type,
-         New_Intermediate_Key_Context    => Intermediate_Key_IO.New_Context,
-         Intermediate_Key_Size_Bound     => Intermediate_Key_IO.Size_Bound,
-         Read_Intermediate_Key           => Intermediate_Key_IO.Read,
-         Skip_Intermediate_Key           => Intermediate_Key_IO.Skip,
-         Write_Intermediate_Key          => Intermediate_Key_IO.Write,
-         Intermediate_Value_Context_Type => Intermediate_Values.Context_Type,
-         New_Intermediate_Value_Context  => Intermediate_Values.New_Context,
-         Intermediate_Value_Size_Bound   => Intermediate_Values.Size_Bound,
-         Read_Intermediate_Value         => Intermediate_Values.Read,
-         Skip_Intermediate_Value         => Intermediate_Values.Skip,
-         Write_Intermediate_Value        => Intermediate_Values.Write,
-         Intermediate_Block_IO           => DB.Blocks.Local_IO.IO_Signature,
+         Intermediate_Keys     => Intermediate_Keys,
+         Intermediate_Values   => Intermediate_Values,
+         Intermediate_Block_IO => DB.Blocks.Local_IO.IO_Signature,
+         Allow_Intermediate_Duplicates => False,
 
          Map                => Map_Proc,
          Out_Key_Type       => Out_Key_Type,
