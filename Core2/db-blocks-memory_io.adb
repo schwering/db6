@@ -172,10 +172,12 @@ package body DB.Blocks.Memory_IO is
 
 
    procedure Write
-     (File    : in out File_Type;
-      Address : in     Valid_Address_Type;
-      Block   : in     Block_Type)
+     (File           : in out File_Type;
+      Address        : in     Valid_Address_Type;
+      Block          : in     Block_Type;
+      Cache_Priority : in     Natural := Natural'First)
    is
+      pragma Unreferenced (Cache_Priority);
       use type Blocks.Block_Type;
    begin
       if Address > File.Maximum then -- not thread-safe (that's intended)
@@ -202,10 +204,12 @@ package body DB.Blocks.Memory_IO is
 
 
    procedure Write_New_Block
-     (File    : in out File_Type;
-      Address :    out Address_Type;
-      Block   : in     Block_Type)
+     (File           : in out File_Type;
+      Address        :    out Valid_Address_Type;
+      Block          : in     Block_Type;
+      Cache_Priority : in     Natural := Natural'First)
    is
+      pragma Unreferenced (Cache_Priority);
       use type Blocks.Block_Type;
    begin
       Locks.Mutexes.Lock(File.Mutex);

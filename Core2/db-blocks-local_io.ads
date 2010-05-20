@@ -71,14 +71,16 @@ package DB.Blocks.Local_IO is
       Block   :    out Block_Type);
 
    procedure Write
-     (File    : in out File_Type;
-      Address : in     Valid_Address_Type;
-      Block   : in     Block_Type);
+     (File           : in out File_Type;
+      Address        : in     Valid_Address_Type;
+      Block          : in     Block_Type;
+      Cache_Priority : in     Natural := Natural'First);
 
    procedure Write_New_Block
-     (File    : in out File_Type;
-      Address :    out Valid_Address_Type;
-      Block   : in     Block_Type);
+     (File           : in out File_Type;
+      Address        :    out Valid_Address_Type;
+      Block          : in     Block_Type;
+      Cache_Priority : in     Natural := Natural'First);
 
    procedure Try_Lock
      (File    : in out File_Type;

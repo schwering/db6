@@ -144,10 +144,12 @@ package body DB.Blocks.Local_IO is
 
 
    procedure Write
-     (File    : in out File_Type;
-      Address : in     Valid_Address_Type;
-      Block   : in     Block_Type)
+     (File           : in out File_Type;
+      Address        : in     Valid_Address_Type;
+      Block          : in     Block_Type;
+      Cache_Priority : in     Natural := Natural'First)
    is
+      pragma Unreferenced (Cache_Priority);
       procedure LL_Write is new Low_Level_IO.Write(Block_Type);
    begin
       LL_Write(File.FD, To_File_Position(Address), Block);
@@ -155,10 +157,12 @@ package body DB.Blocks.Local_IO is
 
 
    procedure Write_New_Block
-     (File    : in out File_Type;
-      Address :    out Valid_Address_Type;
-      Block   : in     Block_Type)
+     (File           : in out File_Type;
+      Address        :    out Valid_Address_Type;
+      Block          : in     Block_Type;
+      Cache_Priority : in     Natural := Natural'First)
    is
+      pragma Unreferenced (Cache_Priority);
       procedure LL_Write_New is new Low_Level_IO.Write_New(Block_Type);
       Pos : Low_Level_IO.File_Position_Type;
    begin

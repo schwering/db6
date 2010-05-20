@@ -99,18 +99,26 @@ generic
    -- data on Address, otherwise an IO_Error is raised.
 
    with procedure Write
-     (File    : in out File_Type;
-      Address : in     Valid_Address_Type;
-      Block   : in     Block_Type);
+     (File           : in out File_Type;
+      Address        : in     Valid_Address_Type;
+      Block          : in     Block_Type;
+      Cache_Priority : in     Natural := Natural'First);
    -- Reads a Block from File at position Address. There must exist some
    -- data on Address, otherwise an IO_Error is raised.
+   -- The Cache_Priority is an optional hint. The higher Cache_Priority is
+   -- (relative to the history), the higher is the probability that the block
+   -- will be read in near future again.
 
    with procedure Write_New_Block
-     (File    : in out File_Type;
-      Address :    out Valid_Address_Type;
-      Block   : in     Block_Type);
+     (File           : in out File_Type;
+      Address        :    out Valid_Address_Type;
+      Block          : in     Block_Type;
+      Cache_Priority : in     Natural := Natural'First);
    -- Writes Block to some new, previously unused Address.
    -- If this fails for whatever reason, an IO_Error is raised.
+   -- The Cache_Priority is an optional hint. The higher Cache_Priority is
+   -- (relative to the history), the higher is the probability that the block
+   -- will be read in near future again.
 
    with procedure Lock
      (File    : in out File_Type;

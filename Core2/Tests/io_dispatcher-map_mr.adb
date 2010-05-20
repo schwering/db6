@@ -17,7 +17,6 @@ with DB.Types.Gen_Numbers;
 
 with DB.Locks.Mutexes;
 
-with DB.Utils.Gen_Comparisons;
 with DB.Utils.Global_Pool;
 
 procedure IO_Dispatcher.Map_MR is
@@ -67,9 +66,6 @@ procedure IO_Dispatcher.Map_MR is
 
          subtype Out_Key_Type is DB.Types.Keys.Rows.String_Type;
          subtype Out_Value_Type is Natural;
-
-         package Key_Comparisons is new DB.Utils.Gen_Comparisons
-           (Item_Type => Out_Key_Type, Compare => DB.Types.Keys.Rows.Compare);
       end Outs;
 
       use Ins;
