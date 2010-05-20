@@ -71,7 +71,7 @@ package body DB.Gen_BTrees is
       package Stacks is new Utils.Gen_Stacks
         (Item_Type    => Item_Type,
          Initial_Size => 7,
-         Storage_Pool => Utils.Global_Pool.Global'Storage_Pool);
+         Storage_Pool => Utils.Global_Pool.Global_Storage_Pool);
 
       type Stack_Type is
          record

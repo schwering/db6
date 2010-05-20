@@ -180,7 +180,7 @@ procedure IO_Dispatcher.Map_MR is
          Map_Task_Count     => 10,
          Reduce_Task_Count  => 10,
          Value_Queue_Size   => 100,
-         Storage_Pool       => DB.Utils.Global_Pool.Global'Storage_Pool);
+         Storage_Pool       => DB.Utils.Global_Pool.Global_Storage_Pool);
 
    begin
       Map_Reduce;

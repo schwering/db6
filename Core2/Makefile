@@ -54,6 +54,10 @@ statsbl:
 	@echo -n "Sum: "
 	@cat *.adb | grep -c ";"
 
+upload:
+	tar czvf btree.tar.gz db.ads db-blocks.ad? db-blocks-[^m]*.ad? db-gen_btrees* db-locks* db-utils.ads db-utils-binary_search.ad? db-utils-gen_comparisons.ad? db-utils-gen_stacks.ad? db-utils-global_pool.ads
+	scp btree.tar.gz schwering.ath.cx:public_html/db6
+
 clean:
 	$(GPRCLEAN) -f -q tests.gpr -XBUILD=debug || true
 	$(GPRCLEAN) -f -q tests.gpr -XBUILD=release || true
