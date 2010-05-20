@@ -601,18 +601,18 @@ private
 
    type Cursor_Type is limited
       record
-         Final              : Boolean                       := False;
+         Final              : Boolean := False;
          Lower_Bound        : Bound_Type;
          Upper_Bound        : Bound_Type;
-         Has_Node           : Boolean                       := False;
+         Has_Node           : Boolean := False;
          Node               : Nodes.RO_Node_Type;
          Key_Context        : Keys.Context_Type;
          Value_Context      : Values.Context_Type;
          Index              : Nodes.Valid_Index_Type;
          Key                : Keys.Key_Type;
-         Force_Recalibrate  : Boolean                       := False;
+         Force_Recalibrate  : Boolean := False;
          Owning_Tree        : Tree_Ref_Type;
-         Initialized        : Boolean                       := False;
+         Initialized        : Boolean := False;
          Thread_Safe        : Boolean;
          Mutex              : Locks.Mutexes.Mutex_Type;
       end record;
