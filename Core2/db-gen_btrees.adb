@@ -194,8 +194,10 @@ package body DB.Gen_BTrees is
    is
       pragma Inline (Read_Node);
    begin
-      Block_IO.Read(Tree.File, Block_IO.Valid_Address_Type(N_A),
-                    Blocks.Base_Block_Type(N(Nodes.RO_Node_Type'Range)));
+      Block_IO.Read
+         (File    => Tree.File,
+          Address => Block_IO.Valid_Address_Type(N_A),
+          Block   => Blocks.Base_Block_Type(N(Nodes.RO_Node_Type'Range)));
    end Read_Node;
 
 
@@ -208,10 +210,11 @@ package body DB.Gen_BTrees is
       use type Nodes.Valid_Address_Type;
       pragma Assert (Nodes.Is_Safe(N, Is_Root => N_A = Root_Address));
    begin
-      Block_IO.Write(File           => Tree.File,
-                     Address        => Block_IO.Valid_Address_Type(N_A),
-                     Block          => Nodes.To_Block(N),
-                     Cache_Priority => Natural(Nodes.Level(N)));
+      Block_IO.Write
+         (File           => Tree.File,
+          Address        => Block_IO.Valid_Address_Type(N_A),
+          Block          => Nodes.To_Block(N),
+          Cache_Priority => Natural(Nodes.Level(N)));
    end Write_Node;
 
 
@@ -223,10 +226,11 @@ package body DB.Gen_BTrees is
       pragma Inline (Write_New_Node);
       pragma Assert (Nodes.Is_Safe(N, Is_Root => False));
    begin
-      Block_IO.Write_New_Block(File           => Tree.File,
-                               Address        => Block_IO.Valid_Address_Type(N_A),
-                               Block          => Nodes.To_Block(N),
-                               Cache_Priority => Natural(Nodes.Level(N)));
+      Block_IO.Write_New_Block
+         (File           => Tree.File,
+          Address        => Block_IO.Valid_Address_Type(N_A),
+          Block          => Nodes.To_Block(N),
+          Cache_Priority => Natural(Nodes.Level(N)));
    end Write_New_Node;
 
 
