@@ -183,7 +183,7 @@ procedure IO_Dispatcher.Map_MR is
          Storage_Pool       => DB.Utils.Global_Pool.Global_Storage_Pool);
 
    begin
-      Map_Reduce;
+      Map_Reduce("bluhp.intermediates");
       Maps.Finalize_Cursor(Map, Cursor);
 
       Put_Line("Count ="& Out_Count'Img);

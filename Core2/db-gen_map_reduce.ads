@@ -72,6 +72,7 @@ generic
    Reduce_Task_Count : in Positive := 10;
    Value_Queue_Size  : in Positive := 100;
    Storage_Pool      : in out System.Storage_Pools.Root_Storage_Pool'Class;
-procedure DB.Gen_Map_Reduce;
+procedure DB.Gen_Map_Reduce
+  (Intermediates_File_Name : in String);
 pragma Preelaborate (DB.Gen_Map_Reduce);
 

@@ -11,7 +11,9 @@ with DB.Gen_BTrees;
 with DB.Utils.Gen_Comparisons;
 with DB.Utils.Gen_Queues;
 
-procedure DB.Gen_Map_Reduce is
+procedure DB.Gen_Map_Reduce
+  (Intermediates_File_Name : in String)
+is
 
    ----------
    -- Helpers for intermediate keys/values.
@@ -100,21 +102,21 @@ procedure DB.Gen_Map_Reduce is
    ----------
    -- The reduce phase. There are two types tasks:
    -- 1. The first one traverses the intermediate key/value pairs and produces
-   --    Key_Values_Type objects which contains of 1 key and some positive
+   --    Key_Values_Type objects which consists of 1 key and some positive
    --    number of values that are associated with the key.
    --    Only one of these tasks exists.
    -- 2. The second one is the consumer task type. There might be multiple
    --    consumers (Reduce_Task_Count many). Each task chooses one
    --    Key_Values_Type; if there is none at the moment, it waits until it gets
-   --    one. Then it consumes all the values in this Key + Value-Sequence
+   --    one. Then it consumes all the values in this Key + Value-sequence
    --    object and reduces them (by calling the user's Reduce subprogram).
    -- Just a note about the queues we use here: there is one queue that stores
-   -- pointers Key + Value-Sequence objects. It is populated by the cursor
-   -- task. The Key + Value-Sequence objects again are queues, but they live on
-   -- the heap. While the cursor task creates these objects and populates
-   -- them and also marks them as final (this is the case when there are no
-   -- more values for the specific key), their memory is freed by that reduce
-   -- task that consumed the Key + Value-Sequence object.
+   -- Key + Value-sequence objects. It is populated by the cursor task. The
+   -- Value-sequences again are queues, but they live on the heap. While the
+   -- cursor task creates these objects and populates them and also marks them
+   -- as final (this is the case when there are no more values for the specific
+   -- key), their memory is freed by that reduce task that consumed the Key +
+   -- Value-sequence object.
 
    procedure Reduce_Phase
      (Context : in out Context_Type)
@@ -133,7 +135,8 @@ procedure DB.Gen_Map_Reduce is
       for Key_Values_Ref_Type'Storage_Pool use Storage_Pool;
 
       package Queues is new Utils.Gen_Queues
-         (Queue_Size => Reduce_Task_Count, Item_Type => Key_Values_Ref_Type);
+         (Queue_Size => Reduce_Task_Count,
+          Item_Type  => Key_Values_Ref_Type);
 
       Queue : Queues.Queue_Type;
 
@@ -149,10 +152,10 @@ procedure DB.Gen_Map_Reduce is
             Intermediate_BTrees.Positive_Infinity_Bound;
          Cursor  : Intermediate_BTrees.Cursor_Type :=
             Intermediate_BTrees.New_Cursor
-              (Tree              => Context.Intermediates,
-               Thread_Safe       => False,
-               Lower_Bound       => Neg_Inf,
-               Upper_Bound       => Pos_Inf);
+               (Tree        => Context.Intermediates,
+                Thread_Safe => False,
+                Lower_Bound => Neg_Inf,
+                Upper_Bound => Pos_Inf);
       begin
          accept Start;
          declare
@@ -167,22 +170,22 @@ procedure DB.Gen_Map_Reduce is
                begin
                   Intermediate_BTrees.Next(Context.Intermediates, Cursor,
                                            Key, Value, State);
-                  -- Mark Finalize
+                  -- Mark as final.
                   if Key_Values /= null and then
                      (State /= Intermediate_BTrees.Success or else
                      Key_Values.Key /= Key) then
                      Value_Queues.Mark_Final(Key_Values.Value_Queue);
                   end if;
-                  -- Leave loop
+                  -- Leave loop.
                   exit when State /= Intermediate_BTrees.Success;
-                  -- Possibly create a new Key + Value-Sequence queue
+                  -- Possibly create a new Key + Value-sequence queue
                   if Key_Values = null or else Key_Values.Key /= Key then
                      Key_Values := new Key_Values_Type'(Key    => Key,
                                                         others => <>);
                      Queues.Enqueue(Queue, Key_Values);
                   end if;
                   -- What we really wanted: enqueue the value in the
-                  -- Key + Value-Sequence!
+                  -- Key + Value-sequence!
                   Value_Queues.Enqueue(Key_Values.Value_Queue, Value);
                end;
             end loop;
@@ -223,8 +226,8 @@ procedure DB.Gen_Map_Reduce is
                                           Value);
                   end Next_Value;
 
-                  Out_Key          : Out_Key_Type;
-                  Out_Value        : Out_Value_Type;
+                  Out_Key   : Out_Key_Type;
+                  Out_Value : Out_Value_Type;
                begin
                   Reduce(Key_Values.Key, Next_Value'Access, Out_Key, Out_Value);
                   Output(Out_Key, Out_Value);
@@ -243,12 +246,11 @@ procedure DB.Gen_Map_Reduce is
       end loop;
    end Reduce_Phase;
 
-
    Context : Context_Type;
 begin
-   Intermediate_BTrees.Create("bluhp.intermediate");
+   Intermediate_BTrees.Create(Intermediates_File_Name);
    Intermediate_BTrees.Initialize(Context.Intermediates,
-                                  "bluhp.intermediate");
+                                  Intermediates_File_Name);
    Map_Phase(Context);
    Sort_Phase(Context);
    Reduce_Phase(Context);
