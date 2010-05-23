@@ -3,7 +3,7 @@ IO=map
 BIN=bin/release/./ttree
 FILE=`cat .temp_path`btree
 GEN=urls
-C1=100k
+C1=1m
 # 1. Simple insertions twice and check
 # 2. Some more insertions and check for both
 # 3. Some mor insertions and check for all three
@@ -47,3 +47,4 @@ $C
 C="$BIN $IO $FILE $GEN 0 Stats,1,Reset"
 echo $C
 $C
+ls -ahl $FILE
