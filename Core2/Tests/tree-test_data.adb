@@ -1,7 +1,7 @@
-with IO_Dispatcher.Test_Data.Pseudo_Random;
-with IO_Dispatcher.Test_Data.URLs;
+with Tree.Test_Data.Pseudo_Random;
+with Tree.Test_Data.URLs;
 
-package body IO_Dispatcher.Test_Data is
+package body Tree.Test_Data is
 
    function Key (KV : Key_Value_Type) return DB.Types.Keys.Key_Type is
    begin
@@ -62,5 +62,5 @@ package body IO_Dispatcher.Test_Data is
       end case;
    end;
 
-end IO_Dispatcher.Test_Data;
+end Tree.Test_Data;
 

@@ -1,8 +1,8 @@
-with IO_Dispatcher.Jobs;
-with IO_Dispatcher.Test_Data;
+with Tree.Jobs;
+with Tree.Test_Data;
 
 private
-package IO_Dispatcher.Args is
+package Tree.Args is
 
    Parse_Error : exception;
 
@@ -22,5 +22,5 @@ package IO_Dispatcher.Args is
    function Pop_Argument (I : Positive) return String;
    procedure Undo_Pop;
 
-end IO_Dispatcher.Args;
+end Tree.Args;
 

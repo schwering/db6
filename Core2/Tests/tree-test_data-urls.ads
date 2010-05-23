@@ -1,5 +1,5 @@
 private
-package IO_Dispatcher.Test_Data.URLs is
+package Tree.Test_Data.URLs is
 
    procedure Init_Key_Value_Pairs (Init : in Count_Type);
    procedure Reset_String_Generation;
@@ -11,5 +11,5 @@ private
    Initial_KV : Index_Type;
    Current_KV : Index_Type := 1;
 
-end IO_Dispatcher.Test_Data.URLs;
+end Tree.Test_Data.URLs;
 

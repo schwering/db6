@@ -1,6 +1,6 @@
 #!/bin/sh
 IO=memory
-BIN=bin/debug/./ttree
+BIN=bin/debug/./tree
 FILE=`cat .temp_path`btree
 GEN="pseudorandom"
 C1=1k 

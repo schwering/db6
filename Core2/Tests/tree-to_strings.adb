@@ -1,6 +1,6 @@
 with Ada.Unchecked_Conversion;
 
-package body IO_Dispatcher.To_Strings is
+package body Tree.To_Strings is
 
    function To_String (S : DB.Types.Strings.Bounded.String_Type)
       return String is
@@ -73,5 +73,5 @@ package body IO_Dispatcher.To_Strings is
       return DB.Blocks.Memory_IO.Address_Type'Image(Address);
    end To_String;
 
-end IO_Dispatcher.To_Strings;
+end Tree.To_Strings;
 

@@ -18,7 +18,7 @@ with DB.Locks.Mutexes;
 with Ada.Unchecked_Deallocation;
 with Ada.Unchecked_Conversion;
 
-package body IO_Dispatcher.Test_Data.Pseudo_Random is
+package body Tree.Test_Data.Pseudo_Random is
 
    Mutex : DB.Locks.Mutexes.Mutex_Type;
 
@@ -167,5 +167,5 @@ package body IO_Dispatcher.Test_Data.Pseudo_Random is
       Free(Key_Value_Pairs);
    end Finalize_Key_Value_Pairs;
 
-end IO_Dispatcher.Test_Data.Pseudo_Random;
+end Tree.Test_Data.Pseudo_Random;
 

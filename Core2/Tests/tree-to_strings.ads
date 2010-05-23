@@ -11,7 +11,7 @@ with DB.Blocks.Local_IO;
 with DB.Blocks.Memory_IO;
 
 private
-package IO_Dispatcher.To_Strings is
+package Tree.To_Strings is
 
    function To_String (S : DB.Types.Strings.Bounded.String_Type)
       return String;
@@ -37,5 +37,5 @@ package IO_Dispatcher.To_Strings is
    function To_String (Address : DB.Blocks.Memory_IO.Address_Type)
       return String;
 
-end IO_Dispatcher.To_Strings;
+end Tree.To_Strings;
 

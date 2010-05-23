@@ -167,26 +167,6 @@ package body DB.Gen_BTrees is
    end Misc;
 
 
---   function Image
---     (N_A : Nodes.Valid_Address_Type)
---      return String is
---   begin
---      return Block_IO.Image(Block_IO.Valid_Address_Type(N_A));
---   end Image;
-
-
---   function Image
---     (N_A : Nodes.Address_Type)
---      return String is
---   begin
---      if Nodes.Is_Valid(N_A) then
---         return Image(Nodes.To_Valid_Address(N_A));
---      else
---         return "Invalid_Address";
---      end if;
---   end Image;
-
-
    procedure Read_Node
      (Tree : in out Tree_Type;
       N_A  : in     Nodes.Valid_Address_Type;

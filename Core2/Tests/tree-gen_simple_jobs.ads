@@ -1,6 +1,6 @@
 with Ada.Unchecked_Conversion;
 
-with IO_Dispatcher.Jobs;
+with Tree.Jobs;
 
 private
 generic
@@ -48,7 +48,7 @@ generic
           (Object : in out Object_Type);
    with procedure P_Check
           (Object : in out Object_Type);
-package IO_Dispatcher.Gen_Simple_Jobs is
+package Tree.Gen_Simple_Jobs is
 
    Stop_Now : exception;
 
@@ -86,5 +86,5 @@ private
                (Jobs.To_Description("Stats"),      Convert(Stats_Access)),
                (Jobs.To_Description("Check"),      Convert(Check_Access)));
 
-end IO_Dispatcher.Gen_Simple_Jobs;
+end Tree.Gen_Simple_Jobs;
 

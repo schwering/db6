@@ -1,5 +1,5 @@
-with IO_Dispatcher.Test_Data;
-with IO_Dispatcher.To_Strings;
+with Tree.Test_Data;
+with Tree.To_Strings;
 
 with DB.Tables;
 
@@ -8,7 +8,7 @@ with DB.Types.Values.Bounded;
 with DB.Types.Values.Unbounded;
 
 private
-package IO_Dispatcher.Map_Types is
+package Tree.Map_Types is
 
    Max_Key_Size : constant := Test_Data.Max_Key_Size;
    Max_Value_Size : constant := Test_Data.Max_Value_Size;
@@ -74,5 +74,5 @@ private
          S : Values_Impl.String_Type := Values_Impl.Empty_String;
       end record;
 
-end IO_Dispatcher.Map_Types;
+end Tree.Map_Types;
 

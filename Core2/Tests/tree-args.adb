@@ -1,7 +1,7 @@
 with Ada.Command_Line;
 with Ada.Text_IO; use Ada.Text_IO;
 
-package body IO_Dispatcher.Args is
+package body Tree.Args is
 
    function To_Number (S : String) return Long_Long_Integer
    is
@@ -158,5 +158,5 @@ package body IO_Dispatcher.Args is
       return Long_Job;
    end Create_Jobs_From_Command_Line;
 
-end IO_Dispatcher.Args;
+end Tree.Args;
 

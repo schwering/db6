@@ -1,7 +1,7 @@
-with IO_Dispatcher.Test_Data;
+with Tree.Test_Data;
 
 private
-package IO_Dispatcher.Jobs is
+package Tree.Jobs is
 
    type Job_Type is private;
    type Long_Job_Type is array (Positive range <>) of Job_Type;
@@ -69,5 +69,5 @@ private
          Reset                     : Boolean;
       end record;
 
-end IO_Dispatcher.Jobs;
+end Tree.Jobs;
 

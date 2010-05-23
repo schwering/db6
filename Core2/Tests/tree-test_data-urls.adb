@@ -17,7 +17,7 @@ with DB.Locks.Mutexes;
 
 with Ada.Unchecked_Conversion;
 
-package body IO_Dispatcher.Test_Data.URLs is
+package body Tree.Test_Data.URLs is
 
    Mutex : DB.Locks.Mutexes.Mutex_Type;
 
@@ -276,5 +276,5 @@ package body IO_Dispatcher.Test_Data.URLs is
       return KV;
    end Random_Entry;
 
-end IO_Dispatcher.Test_Data.URLs;
+end Tree.Test_Data.URLs;
 

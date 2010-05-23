@@ -1,13 +1,13 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
-with IO_Dispatcher.Test_Data;
-with IO_Dispatcher.Map_Types;
-with IO_Dispatcher.Args;
-with IO_Dispatcher.Jobs;
+with Tree.Test_Data;
+with Tree.Map_Types;
+with Tree.Args;
+with Tree.Jobs;
 
 with DB.Tables.Maps;
 
-procedure IO_Dispatcher.Map_Cursor is
+procedure Tree.Map_Cursor is
 
    package Maps renames DB.Tables.Maps;
    Map : Maps.Map_Type := Maps.New_Map(Map_Types.Max_Key_Size,
@@ -118,5 +118,5 @@ begin
    Ada.Text_IO.Put_Line("Total:"& Count_Container.Total_Count'Img);
 
    DB.Tables.Maps.Finalize(Map);
-end IO_Dispatcher.Map_Cursor;
+end Tree.Map_Cursor;
 

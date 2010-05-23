@@ -3,12 +3,12 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 --with GNAT.Exception_Actions;
 
-with IO_Dispatcher.Args;
---with IO_Dispatcher.Gen_BTrees;
---with IO_Dispatcher.Gen_Blob_Trees;
-with IO_Dispatcher.Map;
-with IO_Dispatcher.Map_Cursor;
-with IO_Dispatcher.Map_MR;
+with Tree.Args;
+--with Tree.Gen_BTrees;
+--with Tree.Gen_Blob_Trees;
+with Tree.Map;
+with Tree.Map_Cursor;
+with Tree.Map_MR;
 
 with DB;
 --with DB.BTrees;
@@ -16,7 +16,7 @@ with DB;
 
 with DB.Utils.Timers;
 
-package body IO_Dispatcher
+package body Tree
 is
    procedure Dispatch
    is
@@ -135,5 +135,5 @@ is
          Set_Exit_Status(Failure);
    end Dispatch;
 
-end IO_Dispatcher;
+end Tree;
 

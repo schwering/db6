@@ -3,7 +3,7 @@ with DB.Types.Keys;
 with DB.Types.Values.Bounded;
 
 private
-package IO_Dispatcher.Test_Data is
+package Tree.Test_Data is
 
    Max_Key_Size : constant := (DB.Blocks.Block_Size - 9) * 1/4 - 2 - 4 - 4
    --                                                 ^M     ^B  ^P  ^VL ^VB
@@ -52,5 +52,5 @@ package IO_Dispatcher.Test_Data is
    function Random_Entry return Key_Value_Type;
    procedure Finalize_Key_Value_Pairs;
 
-end IO_Dispatcher.Test_Data;
+end Tree.Test_Data;
 

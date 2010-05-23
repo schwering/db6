@@ -1,4 +1,4 @@
-package body IO_Dispatcher.Map_Types is
+package body Tree.Map_Types is
 
    overriding function From_Bounded
      (S : DB.Types.Values.Bounded.String_Type)
@@ -86,5 +86,5 @@ package body IO_Dispatcher.Map_Types is
       return From_Bounded(KV.Value);
    end Get_Value;
 
-end IO_Dispatcher.Map_Types;
+end Tree.Map_Types;
 

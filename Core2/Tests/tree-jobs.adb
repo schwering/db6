@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with DB.Utils.Timers;
 
-package body IO_Dispatcher.Jobs is
+package body Tree.Jobs is
 
    function To_Description (S : String) return Description_Type
    is
@@ -153,5 +153,5 @@ package body IO_Dispatcher.Jobs is
                            Boolean'Image(Reset), Total_Timer);
    end Execute_Job;
 
-end IO_Dispatcher.Jobs;
+end Tree.Jobs;
 

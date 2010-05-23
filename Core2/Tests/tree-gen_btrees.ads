@@ -14,5 +14,5 @@ generic
            Min_Degree             :    out Natural;
            Bytes_Wasted_In_Blocks :    out Long_Integer;
            Bytes_In_Blocks        :    out Long_Integer);
-procedure IO_Dispatcher.Gen_BTrees;
+procedure Tree.Gen_BTrees;
 

@@ -2,11 +2,11 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Numerics.Generic_Elementary_Functions;
 
-with IO_Dispatcher.Test_Data; use IO_Dispatcher.Test_Data;
-with IO_Dispatcher.Args;
-with IO_Dispatcher.Jobs;
-with IO_Dispatcher.Gen_Simple_Jobs;
-with IO_Dispatcher.Map_Types;
+with Tree.Test_Data; use Tree.Test_Data;
+with Tree.Args;
+with Tree.Jobs;
+with Tree.Gen_Simple_Jobs;
+with Tree.Map_Types;
 
 with DB.Blocks;
 with DB.Tables.Maps;
@@ -16,7 +16,7 @@ with DB.Types.Strings.Bounded;
 with DB.Types.Values.Bounded;
 with DB.Types.Times;
 
-procedure IO_Dispatcher.Map is
+procedure Tree.Map is
 
    Map : DB.Tables.Maps.Map_Type
        := DB.Tables.Maps.New_Map(Map_Types.Max_Key_Size,
@@ -194,5 +194,5 @@ begin
    Jobs.Execute_Jobs(Long_Job);
 
    DB.Tables.Maps.Finalize(Map);
-end IO_Dispatcher.Map;
+end Tree.Map;
 

@@ -2,29 +2,29 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Unchecked_Conversion;
 
-with IO_Dispatcher.Test_Data; use IO_Dispatcher.Test_Data;
-with IO_Dispatcher.Args;
-with IO_Dispatcher.Jobs;
-with IO_Dispatcher.Gen_Simple_Jobs;
-with IO_Dispatcher.To_Strings; use IO_Dispatcher.To_Strings;
+with Tree.Test_Data; use Tree.Test_Data;
+with Tree.Args;
+with Tree.Jobs;
+with Tree.Gen_Simple_Jobs;
+with Tree.To_Strings; use Tree.To_Strings;
 
 with DB;
 with DB.Blocks;
 
-with DB.Blob_Trees;
+with DB.BTrees;
 
 with DB.Types.Times;
 with DB.Types.Values;
 with DB.Types.Values.Bounded;
 with DB.Types.Values.Unbounded;
 
-procedure IO_Dispatcher.Gen_Blob_Trees is
-   package Keys     renames DB.Blob_Trees.Keys;
+procedure Tree.Gen_BTrees is
+   package Keys     renames DB.BTrees.Keys;
    package Rows     renames Keys.Rows;
    --package Columns  renames Keys.Columns;
-   package Values   renames DB.Blob_Trees.Values;
+   package Values   renames DB.BTrees.Values;
 
-   Tree : Blob_Trees.Tree_Type;
+   Tree : BTrees.Tree_Type;
 
    function To_Bounded
      (V : Test_Data.Values.String_Type)
@@ -41,6 +41,7 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       return DB.Types.Values.Unbounded.New_String(Test_Data.Values.To_Buffer(V));
       --return V;
    end To_Unbounded;
+   pragma Unreferenced (To_Unbounded);
 
    procedure Check_Key_Value (KV : Key_Value_Type)
    is
@@ -53,95 +54,85 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
          := 2 + Size_Type(Rows.Length(KV.Key.Row)) +
           --2 + Size_Type(Columns.Length(KV.Key.Column)) +
             Bits_To_Units(DB.Types.Times.Number_Type'Size);
+      VS : constant DB.Blocks.Size_Type
+         := Size_Type(Test_Data.Values.Length(KV.Value));
    begin
-      if KS > Blob_Trees.Max_Key_Size then
+      if KS > BTrees.Max_Key_Size(VS) then
          raise Key_Value_Error;
       end if;
    end Check_Key_Value;
 
 
-   function To_Key (K : Keys.Key_Type) return Blob_Trees.Key_Type
+   function To_Key (K : Keys.Key_Type) return BTrees.Key_Type
    is
       function Convert is new Ada.Unchecked_Conversion
-         (Keys.Key_Type, Blob_Trees.Key_Type);
+         (Keys.Key_Type, BTrees.Key_Type);
+      --KK : aliased BTrees.Key_Type;
+      --for KK'Address use K'Address;
+      --pragma Import (Ada, KK);
    begin
       return Convert(K);
+      --return KK;
    end To_Key;
 
-   function To_Key (K : Blob_Trees.Key_Type) return Keys.Key_Type
+   function To_Key (K : BTrees.Key_Type) return Keys.Key_Type
    is
       function Convert is new Ada.Unchecked_Conversion
-         (Blob_Trees.Key_Type, Keys.Key_Type);
+         (BTrees.Key_Type, Keys.Key_Type);
    begin
       return Convert(K);
    end To_Key;
 
    function To_Value (V : Test_Data.Values.String_Type)
-      return Blob_Trees.Value_Type
+      return BTrees.Value_Type
    is
       function Convert is new Ada.Unchecked_Conversion
-         (Values.String_Type, Blob_Trees.Value_Type);
-      --VV : aliased Blob_Trees.Value_Type;
-      --for VV'Address use V'Address;
-      --pragma Import (Ada, VV);
+         (Values.String_Type, BTrees.Value_Type);
    begin
-      return Convert(To_Unbounded(V));
-      --return VV;
+      return Convert(To_Bounded(V));
    end To_Value;
 
-   function To_Value (V : Blob_Trees.Value_Type) return Values.String_Type
+   function To_Value (V : BTrees.Value_Type) return Values.String_Type
    is
       function Convert is new Ada.Unchecked_Conversion
-         (Blob_Trees.Value_Type, Values.String_Type);
+         (BTrees.Value_Type, Values.String_Type);
    begin
       return Convert(V);
    end To_Value;
 
-   function Get_Key (KV : Key_Value_Type) return Blob_Trees.Key_Type is
+   function Get_Key (KV : Key_Value_Type) return BTrees.Key_Type is
    begin
       return To_Key(KV.Key);
    end Get_Key;
 
-   function Get_Value (KV : Key_Value_Type) return Blob_Trees.Value_Type is
+   function Get_Value (KV : Key_Value_Type) return BTrees.Value_Type is
    begin
       return To_Value(KV.Value);
    end Get_Value;
 
-   function Key_To_String (K : Blob_Trees.Key_Type) return String is
+   function Key_To_String (K : BTrees.Key_Type) return String is
    begin
       return To_String(To_Key(K));
    end Key_To_String;
 
-   function Value_To_String (V : Blob_Trees.Value_Type) return String is
+   function Value_To_String (V : BTrees.Value_Type) return String is
    begin
       return To_String(To_Value(V));
    end Value_To_String;
 
-   function "=" (Left, Right : Blob_Trees.Value_Type) return Boolean
+   function "=" (Left, Right : BTrees.Value_Type) return Boolean
    is
       use Values;
    begin
       return To_Value(Left) = To_Value(Right);
    end "=";
 
-   Null_Value : Blob_Trees.Value_Type := To_Value(Test_Data.Values.Empty_String);
-
-   procedure Stats
-     (Tree                   : in out Blob_Trees.Tree_Type;
-      Height                 :    out Natural;
-      Blocks                 :    out Natural;
-      Free_Blocks            :    out Natural;
-      Max_Degree             :    out Natural;
-      Avg_Degree             :    out Natural;
-      Min_Degree             :    out Natural;
-      Bytes_Wasted_In_Blocks :    out Long_Integer;
-      Bytes_In_Blocks        :    out Long_Integer)
-   is null;
+   Null_Value : BTrees.Value_Type := To_Value(Test_Data.Values.Empty_String);
 
    package Simple_Jobs is new Gen_Simple_Jobs
-     (Object_Type     => Blob_Trees.Tree_Type,
-      Key_Type        => Blob_Trees.Key_Type,
-      Value_Type      => Blob_Trees.Value_Type,
+     (Object_Type     => BTrees.Tree_Type,
+      Key_Type        => BTrees.Key_Type,
+      Value_Type      => BTrees.Value_Type,
       "="             => "=",
       Key_To_String   => Key_To_String,
       Value_To_String => Value_To_String,
@@ -152,37 +143,37 @@ procedure IO_Dispatcher.Gen_Blob_Trees is
       Get_Value       => Get_Value,
       Check_Key_Value => Check_Key_Value,
 
-      Count_Type      => Blob_Trees.Count_Type,
-      State_Type      => Blob_Trees.State_Type,
+      Count_Type      => BTrees.Count_Type,
+      State_Type      => BTrees.State_Type,
 
       Object          => Tree,
       Null_Value      => Null_Value,
-      Success         => Blob_Trees.Success,
-      Failure         => Blob_Trees.Failure,
+      Success         => BTrees.Success,
+      Failure         => BTrees.Failure,
 
-      P_Insert        => Blob_Trees.Insert,
-      P_Delete        => Blob_Trees.Delete,
-      P_Retrieve      => Blob_Trees.Retrieve,
-      P_Count         => Blob_Trees.Count,
+      P_Insert        => BTrees.Insert,
+      P_Delete        => BTrees.Delete,
+      P_Retrieve      => BTrees.Retrieve,
+      P_Count         => BTrees.Count,
       P_Stats         => Stats,
       P_Check         => Check);
 
 
-   use type Blob_Trees.State_Type;
+   use type BTrees.State_Type;
    Long_Job : constant Jobs.Long_Job_Type
             := Args.Create_Jobs_From_Command_Line(Simple_Jobs.Job_Map);
-   Cnt      : Blob_Trees.Count_Type := 0;
+   Cnt      : BTrees.Count_Type := 0;
 begin
    declare
    begin
-      Blob_Trees.Create(Args.File_Name);
+      BTrees.Create(Args.File_Name);
       Put_Line("Newly created Tree "& Args.File_Name);
    exception
       when DB.IO_Error => Put_Line("Using existing Tree "& Args.File_Name);
    end;
-   Blob_Trees.Initialize(Tree, Args.File_Name);
-   Blob_Trees.Count(Tree, Cnt);
-   Put_Line("Size ="& Blob_Trees.Count_Type'Image(Cnt));
+   BTrees.Initialize(Tree, Args.File_Name);
+   BTrees.Count(Tree, Cnt);
+   Put_Line("Size ="& BTrees.Count_Type'Image(Cnt));
 
    declare
       RC : constant Test_Data.Count_Type := Test_Data.Count_Type(Cnt);
@@ -195,6 +186,6 @@ begin
 
    Jobs.Execute_Jobs(Long_Job);
 
-   Blob_Trees.Finalize(Tree);
-end IO_Dispatcher.Gen_Blob_Trees;
+   BTrees.Finalize(Tree);
+end Tree.Gen_BTrees;
 
