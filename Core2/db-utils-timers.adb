@@ -133,7 +133,7 @@ package body DB.Utils.Timers is
    end Real_String;
 
 
-   procedure Print (S : in String; Timer : in out Timer_Type)
+   procedure Print (S : in String; Timer : in Timer_Type)
    is
       function Trim (S : String) return String is
       begin

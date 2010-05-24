@@ -3,7 +3,7 @@ IO=map
 BIN=bin/release/./tree
 FILE=`cat .temp_path`btree
 GEN=pseudorandom
-C1=100k 
+C1=10k
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
 # 3. Some mor insertions and check for all three
@@ -33,7 +33,9 @@ C="$BIN $IO $FILE $GEN 0\
 	Search,$C1,Cont\
 	Antisearch,$C1,Reset\
 	Search,$C1,Cont\
-	Search,$C1,Cont"
+	Search,$C1,Cont\
+        
+        Check,1,Cont"
 echo $C
 $C
 

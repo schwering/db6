@@ -32,7 +32,7 @@ package DB.Utils.Timers is
    function Real_Time (Timer : Timer_Type) return Time_Type;
    function CPU_String (Timer : Timer_Type) return String;
    function Real_String (Timer : Timer_Type) return String;
-   procedure Print (S : in String; Timer : in out Timer_Type);
+   procedure Print (S : in String; Timer : in Timer_Type);
 
 end DB.Utils.Timers;
 

@@ -53,7 +53,7 @@ procedure Tree.Map is
    is
       use DB.Tables.Maps.Stats;
 
-      Last_Level : Level_Type := 0;
+      Last_Level : Level_Type := Level_Type'Last;
 
       function Sqrt (A : Average_Type) return Average_Type
       is
@@ -62,9 +62,6 @@ procedure Tree.Map is
       begin
          return Average_Type(Elementary_Functions.Sqrt(Float(A)));
       end Sqrt;
-
-      Avg_Size   : Average_Type := 0.0;
-      Avg_Degree : Average_Type := 0.0;
 
       procedure Emit (Level : in Level_Type;
                       Key   : in String;
@@ -85,49 +82,50 @@ procedure Tree.Map is
          type Percent_Type is delta 0.1 digits 5;
       begin
          if Level /= Last_Level then
+            if Last_Level /= Level_Type'Last then
+               Put("    ],");
+               New_Line;
+               Put("  },");
+            end if;
+            New_Line;
+            Put("  {");
+            New_Line;
+            Put("    ""level"": "& Img(Level) &", ");
+            New_Line;
+            Put("    ""values"": [");
             New_Line;
          end if;
-         Put("   Level_"& Img(Level) &": "& Key);
+         Put("      { ""key"": """& Key &""", ");
          case Value.Compound is
             when True =>
-               Put("  avg="& Img(Value.Avg) &
-                   "  dev="& Img(Sqrt(Value.Var)) &
-                   "  max="& Img(Value.Max) &
-                   "  min="& Img(Value.Min));
+               Put("""avg"": "& Img(Value.Avg) &", "&
+                   """dev"": "& Img(Sqrt(Value.Var)) &", "&
+                   """max"": "& Img(Value.Max) &", "&
+                   """min"": "& Img(Value.Min));
             when False =>
-               Put("  val="& Img(Value.Val));
+               Put("""val"": "& Img(Value.Val));
          end case;
          if Key = "Count" then
-            Put(" "&
+            Put(", ""mb"":"&
                 Absolute_Type'Image(Value.Val *
                                     Absolute_Type(DB.Blocks.Block_Size) /
-                                    1024**2) &"MB");
+                                    1024**2));
          elsif Key ="Size" or Key = "Waste" then
-            Put(" "&
+            Put(", ""pct"":"&
                 Percent_Type'Image(Percent_Type(
-                  Float(Value.Avg) / Float(DB.Blocks.Block_Size) * 100.0)) &
-                "%");
+                  Float(Value.Avg) / Float(DB.Blocks.Block_Size) * 100.0)));
          end if;
-
+         Put("},");
          New_Line;
          Last_Level := Level;
-         if Key = "Degree" then
-            Avg_Degree := Value.Avg;
-         end if;
-         if Key = "Size" then
-            Avg_Size := Value.Avg;
-         end if;
-         if Key = "Waste" then
-            Put_Line("   Level_"& Img(Level) &": "&
-                     "EntrySize"&
-                     "  avg="& Img(Avg_Size / Avg_Degree));
-         end if;
       end Emit;
 
    begin
-      Put_Line("Stats {");
+      Put("[");
       DB.Tables.Maps.Stats.Make_Stats(Object, Emit'Access);
-      Put_Line("}");
+      Put_Line("    ]");
+      Put_Line("  }");
+      Put_Line("]");
    end Stats;
 
    package Simple_Jobs is new Gen_Simple_Jobs

@@ -122,6 +122,7 @@ is
                DB.Utils.Timers.Start(Timer);
                Procs(I).Proc.all;
                DB.Utils.Timers.Stop(Timer);
+               Put("// ");
                DB.Utils.Timers.Print("Total time for job execution", Timer);
             end;
             return;

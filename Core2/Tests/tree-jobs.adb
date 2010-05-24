@@ -6,6 +6,57 @@ with DB.Utils.Timers;
 
 package body Tree.Jobs is
 
+   procedure Print
+     (Action   : in String;
+      Count    : in Test_data.Count_Type;
+      Conc_Deg : in Positive;
+      Reset    : in Boolean;
+      Timer    : in DB.Utils.Timers.Timer_Type)
+   is
+      function Trim (S : String) return String is
+      begin
+         if S(S'First) = ' ' then
+            return S(S'First+1 .. S'Last);
+         else
+            return S;
+         end if;
+      end Trim;
+
+      function To_Lower (S : String) return String
+      is
+         T : String := S;
+      begin
+         for I in T'Range loop
+            if T(I) in 'A' .. 'Z' then
+               T(I) := Character'Val(Character'Pos(T(I)) -
+                                     Character'Pos('A') +
+                                     Character'Pos('a'));
+            end if;
+         end loop;
+         return T;
+      end To_Lower;
+
+      use DB.Utils.Timers;
+
+      CPU_Duration  : constant Ticks_Type := CPU_Ticks(Timer);
+      Real_Duration : constant Time_Type := Real_Time(Timer);
+   begin
+      Put("{");
+      Put("""action: """& Action &""", ");
+      Put("""count"": "& Trim(Test_Data.Count_Type'Image(Count)) &", ");
+      Put("""taskCount"": "& Trim(Positive'Image(Conc_Deg)) &", ");
+      Put("""dataReset"": "& To_Lower(Boolean'Image(Reset)) &", ");
+      Put("""cpu"": {""str"": """& Trim(CPU_String(Timer)) &""", "&
+          " ""millis"": "&  Trim(Ticks_Type'Image(CPU_Duration)) &
+          "}, ");
+      Put("""real"": {""str"": """& Trim(Real_String(Timer)) &""", "&
+          " ""millis"": "& Trim(Time_Type'Image(Real_Duration)) &
+          "} ");
+      Put("}");
+      New_Line;
+   end Print;
+
+
    function To_Description (S : String) return Description_Type
    is
       D : Description_Type;
@@ -147,10 +198,8 @@ package body Tree.Jobs is
          end loop;
       end;
       DB.Utils.Timers.Stop(Total_Timer);
-      DB.Utils.Timers.Print(To_String(Description) &
-                           Test_Data.Count_Type'Image(Short_Job_Execution_Count) &
-                           Positive'Image(Concurrency_Degree) & " " &
-                           Boolean'Image(Reset), Total_Timer);
+      Print(To_String(Description), Short_Job_Execution_Count,
+            Concurrency_Degree, Reset, Total_Timer);
    end Execute_Job;
 
 end Tree.Jobs;
