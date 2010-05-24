@@ -18,7 +18,7 @@ with DB.Utils.Timers;
 
 package body Tree
 is
-   procedure Dispatch
+   procedure Run_Tree_Jobs
    is
       ----------
       -- Helper types for procedure map.
@@ -134,7 +134,7 @@ is
       when Error : others =>
          Put_Line(Exception_Information(Error));
          Set_Exit_Status(Failure);
-   end Dispatch;
+   end Run_Tree_Jobs;
 
 end Tree;
 

@@ -1,4 +1,4 @@
 package Tree is
-   procedure Dispatch;
+   procedure Run_Tree_Jobs;
 end Tree;
 
