@@ -5,13 +5,15 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Finalization;
+with Zlib;
 with DB.Blocks;
 with DB.Utils;
 
 generic
    Max_Length : in Positive := 1024;
 package DB.Types.Gen_Strings.Gen_Bounded is
-   pragma Preelaborate;
+   pragma Elaborate_Body;
 
    subtype Length_Type is Gen_Strings.Length_Type range 0 .. Max_Length;
    subtype Index_Type is Gen_Strings.Index_Type range 1 .. Length_Type'Last;
@@ -120,13 +122,58 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          Cursor  : in out Blocks.Cursor_Type);
 
    private
-      type Indefinite_Packed_Buffer_Type is
-         array (Positive range <>) of Item_Type;
-      pragma Pack (Indefinite_Packed_Buffer_Type);
-      subtype Packed_Buffer_Type is Indefinite_Packed_Buffer_Type(Index_Type);
-
       pragma Inline (New_Context);
    end Uncompressed;
+
+   package Deflate is
+      type Context_Type is new Ada.Finalization.Controlled with
+         record
+            null;
+            --Read_Filter  : Zlib.Filter_Type;
+            --Write_Filter : Zlib.Filter_Type;
+         end record;
+
+      overriding procedure Initialize (Context : in out Context_Type);
+      overriding procedure Adjust (Context : in out Context_Type);
+      overriding procedure Finalize (Context : in out Context_Type);
+
+      Is_Context_Free_Serialization : constant Boolean := False;
+
+      function New_Context
+         return Context_Type;
+
+      function Size_Bound
+        (S : String_Type)
+         return Blocks.Size_Type;
+
+      procedure Write
+        (Block   : in out Blocks.Base_Block_Type;
+         Cursor  : in out Blocks.Cursor_Type;
+         S       : in     String_Type);
+
+      procedure Write
+        (Context : in out Context_Type;
+         Block   : in out Blocks.Base_Block_Type;
+         Cursor  : in out Blocks.Cursor_Type;
+         S       : in     String_Type);
+
+      procedure Read
+        (Block   : in     Blocks.Base_Block_Type;
+         Cursor  : in out Blocks.Cursor_Type;
+         S       :    out String_Type);
+
+      procedure Read
+        (Context : in out Context_Type;
+         Block   : in     Blocks.Base_Block_Type;
+         Cursor  : in out Blocks.Cursor_Type;
+         S       :    out String_Type);
+
+      procedure Skip
+        (Context : in out Context_Type;
+         Block   : in     Blocks.Base_Block_Type;
+         Cursor  : in out Blocks.Cursor_Type);
+
+   end Deflate;
 
 private
    subtype Buffer_Type is Indefinite_Buffer_Type(Index_Type);

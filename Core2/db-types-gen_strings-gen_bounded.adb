@@ -4,8 +4,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Utils;
-
 package body DB.Types.Gen_Strings.Gen_Bounded is
 
    function Compare
@@ -223,6 +221,7 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
 
 
    package body Uncompressed is separate;
+   package body Deflate is separate;
 
 end DB.Types.Gen_Strings.Gen_Bounded;
 
