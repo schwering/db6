@@ -16,28 +16,32 @@ generic
    pragma Warnings (Off); -- Disable `unreferenced' warnings
 
    type Value_Type is private;
-   type Context_Type is private;
+   type Read_Context_Type is private;
+   type Write_Context_Type is private;
 
-   with function New_Context
-      return Context_Type is <>;
+   with function New_Read_Context
+      return Read_Context_Type is <>;
+
+   with function New_Write_Context
+      return Write_Context_Type is <>;
 
    with function Size_Bound
      (Value : Value_Type)
       return Blocks.Size_Type is <>;
 
    with procedure Read
-     (Context : in out Context_Type;
+     (Context : in out Read_Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       Value   :    out Value_Type) is <>;
 
    with procedure Skip
-     (Context : in out Context_Type;
+     (Context : in out Read_Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type) is <>;
 
    with procedure Write
-     (Context : in out Context_Type;
+     (Context : in out Write_Context_Type;
       Block   : in out Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       Value   : in     Value_Type) is <>;

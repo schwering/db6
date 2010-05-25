@@ -40,7 +40,7 @@ package body Uncompressed is
 
 
    procedure Write
-     (Context : in out Context_Type;
+     (Context : in out Write_Context_Type;
       Block   : in out Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       S       : in     String_Type)
@@ -64,7 +64,7 @@ package body Uncompressed is
 
 
    procedure Read
-     (Context : in out Context_Type;
+     (Context : in out Read_Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       S       :    out String_Type)
@@ -76,7 +76,7 @@ package body Uncompressed is
 
 
    procedure Skip
-     (Context : in out Context_Type;
+     (Context : in out Read_Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type)
    is

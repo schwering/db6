@@ -18,17 +18,17 @@
 -- This package guarantees that if the entries E_1 .. E_N are the entries of a
 -- node, E_I is written before E_{I+1} for all I in 1 .. N.
 -- Howevever, entries are read randomly!
--- The Key/Values.Context_Types can be used for compression, for exmaple. In
--- both, the reading and writing case, it is guaranteed that a context object is
--- used only for one node, not more, and either for reading or writing, not both
--- operation types. A context object handed to a Read/Write_Key/Value is either
--- initialized with its default values or has been modified by a previous
--- Read/Write_Key/Value call. Since entries E_1 .. E_N are written in a strictly
--- sequentially, it is guaranteed that the write operation of E_1 is performed
--- with a new context object and the following N - 1 write operations are with
--- the same object.
--- As a consequence, a trivial choice for the Key/Values.Context_Types is just
--- null records.
+-- The Key/Values.Read/Write_Context_Types can be used for compression, for
+-- example. In both, the reading and writing case, it is guaranteed that a
+-- context object is used only for one node, not more, and either for reading or
+-- writing, not both operation types. A context object handed to a
+-- Read/Write_Key/Value is either initialized with its default values or has
+-- been modified by a previous Read/Write_Key/Value call.
+-- Since entries E_1 .. E_N are written in a strictly sequentially, it is
+-- guaranteed that the write operation of E_1 is performed with a new context
+-- object and the following N - 1 write operations are with the same object.
+-- As a consequence, a trivial choice for Key/Values.Read/Write_Context_Types
+-- is just null records.
 -- (Remind that in this case `written' does not mean that data is necessarily
 -- written to disk, it just means serialization of data.)
 --
@@ -352,7 +352,7 @@ private
         (Node        : in     Node_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Keys.Key_Type;
-         Key_Context : in out Keys.Context_Type);
+         Key_Context : in out Keys.Read_Context_Type);
       -- Gets the Index-th key. This function is defined for both,
       -- leaves and inner nodes.
 
@@ -367,7 +367,7 @@ private
         (Node        : in     Node_Type;
          Index       : in     Valid_Index_Type;
          Child       :    out Valid_Address_Type;
-         Key_Context : in out Keys.Context_Type);
+         Key_Context : in out Keys.Read_Context_Type);
       -- Gets the Index-th child address. This function is defined for
       -- inner nodes only.
 
@@ -382,8 +382,8 @@ private
         (Node          : in     Node_Type;
          Index         : in     Valid_Index_Type;
          Value         :    out Values.Value_Type;
-         Key_Context   : in out Keys.Context_Type;
-         Value_Context : in out Values.Context_Type);
+         Key_Context   : in out Keys.Read_Context_Type;
+         Value_Context : in out Values.Read_Context_Type);
       -- Returns the Index-th value. This function is defined for leaves.
 
       function Value
@@ -460,13 +460,6 @@ private
       -- Returns the node that results from the insertion of (Key, Value) at
       -- position Index. This function is defined for leaves.
 
-      procedure Set_Child
-        (Node  : in out RW_Node_Type;
-         Index : in     Valid_Index_Type;
-         Child : in     Valid_Address_Type);
-      -- Updates the child address at position Index. This function works for
-      -- inner nodes.
-
       function Deletion
         (Node  : RW_Node_Type;
          Index : Valid_Index_Type)
@@ -539,7 +532,6 @@ private
       pragma Inline (Child_Position);
       pragma Inline (Split_Position);
       pragma Inline (Is_Valid);
-      pragma Inline (Set_Child);
       pragma Inline (To_Valid_Address);
       pragma Inline (To_Address);
       pragma Inline (To_Block);
@@ -606,8 +598,8 @@ private
          Upper_Bound        : Bound_Type;
          Has_Node           : Boolean := False;
          Node               : Nodes.RO_Node_Type;
-         Key_Context        : Keys.Context_Type;
-         Value_Context      : Values.Context_Type;
+         Key_Context        : Keys.Read_Context_Type;
+         Value_Context      : Values.Read_Context_Type;
          Index              : Nodes.Valid_Index_Type;
          Key                : Keys.Key_Type;
          Force_Recalibrate  : Boolean := False;

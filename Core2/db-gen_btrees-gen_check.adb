@@ -196,7 +196,7 @@ is
 
    procedure Check_Keys (N : in Node_Type)
    is
-      Key_Context : Keys.Context_Type := Keys.New_Context;
+      Key_Context : Keys.Read_Context_Type := Keys.New_Read_Context;
       Key         : Keys.Key_Type;
    begin
       for I in 1 .. Degree(N) loop
@@ -206,7 +206,7 @@ is
 
    procedure Check_Children (N : in Node_Type)
    is
-      Key_Context : Keys.Context_Type := Keys.New_Context;
+      Key_Context : Keys.Read_Context_Type := Keys.New_Read_Context;
       Child       : Valid_Address_Type;
    begin
       for I in 1 .. Degree(N) loop
@@ -216,8 +216,8 @@ is
 
    procedure Check_Values (N : in Node_Type)
    is
-      Key_Context   : Keys.Context_Type := Keys.New_Context;
-      Value_Context : Values.Context_Type := Values.New_Context;
+      Key_Context   : Keys.Read_Context_Type := Keys.New_Read_Context;
+      Value_Context : Values.Read_Context_Type := Values.New_Read_Context;
       Value         : Values.Value_Type;
    begin
       for I in 1 .. Degree(N) loop

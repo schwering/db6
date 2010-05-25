@@ -75,11 +75,16 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
 
    package Uncompressed is
       type Context_Type is null record;
+      subtype Read_Context_Type is Context_Type;
+      subtype Write_Context_Type is Context_Type;
 
       Is_Context_Free_Serialization : constant Boolean := True;
 
-      function New_Context
-         return Context_Type;
+      function New_Read_Context
+         return Read_Context_Type;
+
+      function New_Write_Context
+         return Write_Context_Type;
 
       function Size_Bound
         (S : String_Type)
@@ -91,7 +96,7 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
          S       : in     String_Type);
 
       procedure Write
-        (Context : in out Context_Type;
+        (Context : in out Write_Context_Type;
          Block   : in out Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type;
          S       : in     String_Type);
@@ -102,18 +107,19 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
          S       :    out String_Type);
 
       procedure Read
-        (Context : in out Context_Type;
+        (Context : in out Read_Context_Type;
          Block   : in     Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type;
          S       :    out String_Type);
 
       procedure Skip
-        (Context : in out Context_Type;
+        (Context : in out Read_Context_Type;
          Block   : in     Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type);
 
    private
-      pragma Inline (New_Context);
+      pragma Inline (New_Read_Context);
+      pragma Inline (New_Write_Context);
       pragma Inline (Size_Bound);
       pragma Inline (Size_Bound);
       pragma Inline (Write);

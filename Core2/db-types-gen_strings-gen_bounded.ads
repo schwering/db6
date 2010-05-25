@@ -84,11 +84,16 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
    package Uncompressed is
       type Context_Type is null record;
+      subtype Read_Context_Type is Context_Type;
+      subtype Write_Context_Type is Context_Type;
 
       Is_Context_Free_Serialization : constant Boolean := True;
 
       function New_Context
          return Context_Type;
+
+      function New_Read_Context return Read_Context_Type renames New_Context;
+      function New_Write_Context return Write_Context_Type renames New_Context;
 
       function Size_Bound
         (S : String_Type)
@@ -100,7 +105,7 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          S       : in     String_Type);
 
       procedure Write
-        (Context : in out Context_Type;
+        (Context : in out Write_Context_Type;
          Block   : in out Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type;
          S       : in     String_Type);
@@ -111,13 +116,13 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          S       :    out String_Type);
 
       procedure Read
-        (Context : in out Context_Type;
+        (Context : in out Read_Context_Type;
          Block   : in     Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type;
          S       :    out String_Type);
 
       procedure Skip
-        (Context : in out Context_Type;
+        (Context : in out Read_Context_Type;
          Block   : in     Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type);
 
@@ -126,11 +131,14 @@ package DB.Types.Gen_Strings.Gen_Bounded is
    end Uncompressed;
 
    package Deflate is
+      type Zlib_Ref_Type is access Zlib.Filter_Type;
+      type Natural_Ref_Type is access Natural;
+
       type Context_Type is new Ada.Finalization.Controlled with
          record
-            null;
-            --Read_Filter  : Zlib.Filter_Type;
-            --Write_Filter : Zlib.Filter_Type;
+            Read      : Zlib_Ref_Type;
+            Write     : Zlib_Ref_Type;
+            Ref_Count : Natural_Ref_Type;
          end record;
 
       overriding procedure Initialize (Context : in out Context_Type);
@@ -147,20 +155,10 @@ package DB.Types.Gen_Strings.Gen_Bounded is
          return Blocks.Size_Type;
 
       procedure Write
-        (Block   : in out Blocks.Base_Block_Type;
-         Cursor  : in out Blocks.Cursor_Type;
-         S       : in     String_Type);
-
-      procedure Write
         (Context : in out Context_Type;
          Block   : in out Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type;
          S       : in     String_Type);
-
-      procedure Read
-        (Block   : in     Blocks.Base_Block_Type;
-         Cursor  : in out Blocks.Cursor_Type;
-         S       :    out String_Type);
 
       procedure Read
         (Context : in out Context_Type;

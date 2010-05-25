@@ -43,22 +43,25 @@ procedure Tree.Map_MR is
       end Ins;
 
       package Intermediates is
+         use DB.Types.Keys;
          use DB.Types.Keys.Rows.Uncompressed;
 
          subtype Intermediate_Key_Type is DB.Types.Keys.Rows.String_Type;
          subtype Intermediate_Value_Type is Natural;
 
          package Intermediate_Keys is new DB.Blocks.Gen_Keys_Signature
-           (Key_Type     => Intermediate_Key_Type,
-            Context_Type => DB.Types.Keys.Rows.Uncompressed.Context_Type,
-            Compare      => DB.Types.Keys.Rows.Compare);
+           (Key_Type           => Intermediate_Key_Type,
+            Read_Context_Type  => Rows.Uncompressed.Read_Context_Type,
+            Write_Context_Type => Rows.Uncompressed.Write_Context_Type,
+            Compare            => Rows.Compare);
 
          package Value_IO is new DB.Types.Gen_Numbers(Intermediate_Value_Type);
          use Value_IO;
 
          package Intermediate_Values is new DB.Blocks.Gen_Values_Signature
-           (Value_Type   => Intermediate_Value_Type,
-            Context_Type => Value_IO.Context_Type);
+           (Value_Type         => Intermediate_Value_Type,
+            Read_Context_Type  => Value_IO.Read_Context_Type,
+            Write_Context_Type => Value_IO.Write_Context_Type);
       end Intermediates;
 
       package Outs is

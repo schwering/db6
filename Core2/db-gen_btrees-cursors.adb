@@ -211,8 +211,8 @@ package body Cursors is
                begin
                   Read_Node(Tree, R_A, R);
                   Cursor.Node          := R;
-                  Cursor.Key_Context   := Keys.New_Context;
-                  Cursor.Value_Context := Values.New_Context;
+                  Cursor.Key_Context   := Keys.New_Read_Context;
+                  Cursor.Value_Context := Values.New_Read_Context;
                   Cursor.Index         := 1;
                   Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
                                 Cursor.Key_Context);
@@ -297,8 +297,8 @@ package body Cursors is
                Cursor.Final := True;
                return;
             end if;
-            Cursor.Key_Context   := Keys.New_Context;
-            Cursor.Value_Context := Values.New_Context;
+            Cursor.Key_Context   := Keys.New_Read_Context;
+            Cursor.Value_Context := Values.New_Read_Context;
             Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
                           Cursor.Key_Context);
 

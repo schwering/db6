@@ -93,29 +93,29 @@ package body Nodes is
          Address : in     Address_Type);
 
       procedure Read_Key
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Keys.Key_Type;
          Success     :    out Boolean);
 
       procedure Read_Child
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean);
 
       procedure Read_Value
-        (Key_Context   : in out Keys.Context_Type;
-         Value_Context : in out Values.Context_Type;
+        (Key_Context   : in out Keys.Read_Context_Type;
+         Value_Context : in out Values.Read_Context_Type;
          Block         : in     Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Value         :    out Values.Value_Type;
          Success       :    out Boolean);
 
       procedure Read_Entry
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Keys.Key_Type;
@@ -123,8 +123,8 @@ package body Nodes is
          Success     :    out Boolean);
 
       procedure Read_Entry
-        (Key_Context   : in out Keys.Context_Type;
-         Value_Context : in out Values.Context_Type;
+        (Key_Context   : in out Keys.Read_Context_Type;
+         Value_Context : in out Values.Read_Context_Type;
          Block         : in     Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Key           :    out Keys.Key_Type;
@@ -132,34 +132,28 @@ package body Nodes is
          Success       :    out Boolean);
 
       procedure Read_High_Key
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
          High_Key    :    out Keys.Key_Type;
          Success     :    out Boolean);
 
       procedure Write_Entry
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Write_Context_Type;
          Block       : in out Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         : in     Keys.Key_Type;
          Child       : in     Valid_Address_Type);
 
       procedure Write_Entry
-        (Key_Context   : in out Keys.Context_Type;
-         Value_Context : in out Values.Context_Type;
+        (Key_Context   : in out Keys.Write_Context_Type;
+         Value_Context : in out Values.Write_Context_Type;
          Block         : in out Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Key           : in     Keys.Key_Type;
          Value         : in     Values.Value_Type);
 
-      procedure Write_Child
-        (Key_Context : in out Keys.Context_Type;
-         Block       : in out Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
-         Child       : in     Valid_Address_Type);
-
       procedure Write_High_Key
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Write_Context_Type;
          Block       : in out Blocks.Base_Block_Type;
          High_Key    : in     Keys.Key_Type);
 
@@ -179,7 +173,6 @@ package body Nodes is
          pragma Inline (Read_Entry);
          pragma Inline (Read_High_Key);
          pragma Inline (Write_Entry);
-         pragma Inline (Write_Child);
          pragma Inline (Write_High_Key);
    end Phys;
 
@@ -612,7 +605,7 @@ package body Nodes is
 
 
       procedure Read_Key
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Keys.Key_Type;
@@ -630,7 +623,7 @@ package body Nodes is
 
 
       procedure Read_Child
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Child       :    out Valid_Address_Type;
@@ -655,8 +648,8 @@ package body Nodes is
 
 
       procedure Read_Value
-        (Key_Context   : in out Keys.Context_Type;
-         Value_Context : in out Values.Context_Type;
+        (Key_Context   : in out Keys.Read_Context_Type;
+         Value_Context : in out Values.Read_Context_Type;
          Block         : in     Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Value         :    out Values.Value_Type;
@@ -680,7 +673,7 @@ package body Nodes is
 
 
       procedure Read_Entry
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         :    out Keys.Key_Type;
@@ -706,8 +699,8 @@ package body Nodes is
 
 
       procedure Read_Entry
-        (Key_Context   : in out Keys.Context_Type;
-         Value_Context : in out Values.Context_Type;
+        (Key_Context   : in out Keys.Read_Context_Type;
+         Value_Context : in out Values.Read_Context_Type;
          Block         : in     Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Key           :    out Keys.Key_Type;
@@ -732,7 +725,7 @@ package body Nodes is
 
 
       procedure Read_High_Key
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
          High_Key    :    out Keys.Key_Type;
          Success     :    out Boolean)
@@ -758,7 +751,7 @@ package body Nodes is
 
 
       procedure Write_Entry
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Write_Context_Type;
          Block       : in out Blocks.Base_Block_Type;
          Index       : in     Valid_Index_Type;
          Key         : in     Keys.Key_Type;
@@ -792,8 +785,8 @@ package body Nodes is
 
 
       procedure Write_Entry
-        (Key_Context   : in out Keys.Context_Type;
-         Value_Context : in out Values.Context_Type;
+        (Key_Context   : in out Keys.Write_Context_Type;
+         Value_Context : in out Values.Write_Context_Type;
          Block         : in out Blocks.Base_Block_Type;
          Index         : in     Valid_Index_Type;
          Key           : in     Keys.Key_Type;
@@ -825,35 +818,8 @@ package body Nodes is
       end Write_Entry;
 
 
-      procedure Write_Child
-        (Key_Context : in out Keys.Context_Type;
-         Block       : in out Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
-         Child       : in     Valid_Address_Type)
-      is
-         pragma Assert (Level(Block) > Leaf_Level);
-         procedure Write_Child is new Blocks.Write(Valid_Address_Type);
-         Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
-      begin
-         if not Blocks.Is_Valid(Cursor) then
-            Phys.Set_Ok(Block, False);
-            return;
-         end if;
-         Keys.Skip(Key_Context, Block, Cursor);
-         if not Blocks.Is_Valid(Cursor) then
-            Phys.Set_Ok(Block, False);
-            return;
-         end if;
-         Write_Child(Block, Cursor, Child);
-         if not Blocks.Is_Valid(Cursor) then
-            Phys.Set_Ok(Block, False);
-            return;
-         end if;
-      end Write_Child;
-
-
       procedure Write_High_Key
-        (Key_Context : in out Keys.Context_Type;
+        (Key_Context : in out Keys.Write_Context_Type;
          Block       : in out Blocks.Base_Block_Type;
          High_Key    : in     Keys.Key_Type)
       is
@@ -1044,7 +1010,7 @@ package body Nodes is
    begin
       if Degree(Node) = 0 then
          declare
-            Key_Context : Keys.Context_Type := Keys.New_Context;
+            Key_Context : Keys.Read_Context_Type := Keys.New_Read_Context;
          begin
             Phys.Read_High_Key(Key_Context, Blocks.Base_Block_Type(Node),
                                High_Key, Success);
@@ -1062,7 +1028,7 @@ package body Nodes is
    begin
       if Degree(Node) = 0 then
          declare
-            Key_Context  : Keys.Context_Type := Keys.New_Context;
+            Key_Context  : Keys.Read_Context_Type := Keys.New_Read_Context;
             High_Key     : Keys.Key_Type;
             Has_High_Key : Boolean;
          begin
@@ -1095,7 +1061,7 @@ package body Nodes is
      (Node        : in     Node_Type;
       Index       : in     Valid_Index_Type;
       Key         :    out Keys.Key_Type;
-      Key_Context : in out Keys.Context_Type)
+      Key_Context : in out Keys.Read_Context_Type)
    is
       pragma Assert (Is_Ok(Node));
       pragma Assert (Index in 1 .. Degree(Node));
@@ -1116,7 +1082,7 @@ package body Nodes is
       return Keys.Key_Type
    is
       Key         : Keys.Key_Type;
-      Key_Context : Keys.Context_Type := Keys.New_Context;
+      Key_Context : Keys.Read_Context_Type := Keys.New_Read_Context;
    begin
       Get_Key(Node, Index, Key, Key_Context);
       return Key;
@@ -1127,7 +1093,7 @@ package body Nodes is
      (Node        : in     Node_Type;
       Index       : in     Valid_Index_Type;
       Child       :    out Valid_Address_Type;
-      Key_Context : in out Keys.Context_Type)
+      Key_Context : in out Keys.Read_Context_Type)
    is
       pragma Assert (Is_Ok(Node));
       pragma Assert (Is_Inner(Node));
@@ -1150,7 +1116,7 @@ package body Nodes is
       return Valid_Address_Type
    is
       Child       : Valid_Address_Type;
-      Key_Context : Keys.Context_Type := Keys.New_Context;
+      Key_Context : Keys.Read_Context_Type := Keys.New_Read_Context;
    begin
       Get_Child(Node, Index, Child, Key_Context);
       return Child;
@@ -1161,8 +1127,8 @@ package body Nodes is
      (Node          : in     Node_Type;
       Index         : in     Valid_Index_Type;
       Value         :    out Values.Value_Type;
-      Key_Context   : in out Keys.Context_Type;
-      Value_Context : in out Values.Context_Type)
+      Key_Context   : in out Keys.Read_Context_Type;
+      Value_Context : in out Values.Read_Context_Type)
    is
       pragma Assert (Is_Ok(Node));
       pragma Assert (Is_Leaf(Node));
@@ -1188,8 +1154,8 @@ package body Nodes is
       pragma Assert (Index in 1 .. Degree(Node));
 
       Value         : Values.Value_Type;
-      Key_Context   : Keys.Context_Type := Keys.New_Context;
-      Value_Context : Values.Context_Type := Values.New_Context;
+      Key_Context   : Keys.Read_Context_Type   := Keys.New_Read_Context;
+      Value_Context : Values.Read_Context_Type := Values.New_Read_Context;
    begin
       Get_Value(Node, Index, Value, Key_Context, Value_Context);
       return Value;
@@ -1201,7 +1167,7 @@ package body Nodes is
       Key  : Keys.Key_Type)
       return Index_Type
    is
-      Key_Context : Keys.Context_Type := Keys.New_Context;
+      Key_Context : Keys.Read_Context_Type := Keys.New_Read_Context;
 
       function Get_Key
         (Node  : Node_Type;
@@ -1372,31 +1338,12 @@ package body Nodes is
    end Split_Position;
 
 
-   procedure Set_Child
-     (Node  : in out RW_Node_Type;
-      Index : in     Valid_Index_Type;
-      Child : in     Valid_Address_Type)
-   is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Index in 1 .. Degree(Node));
-      pragma Assert (Is_Valid(Child));
-
-      Key_Context : Keys.Context_Type := Keys.New_Context;
-   begin
-      Phys.Write_Child(Key_Context, Blocks.Base_Block_Type(Node), Index,
-                       Child);
-      if not Nodes.Is_Ok(Node) then
-         raise Node_Error;
-      end if;
-   end Set_Child;
-
-
    procedure Copy_Entry
      (Node              : in out RW_Node_Type;
       Source            : in     RW_Node_Type;
       Index             : in     Valid_Index_Type;
-      Key_Read_Context  : in out Keys.Context_Type;
-      Key_Write_Context : in out Keys.Context_Type;
+      Key_Read_Context  : in out Keys.Read_Context_Type;
+      Key_Write_Context : in out Keys.Write_Context_Type;
       Shift_By          : in     Integer := 0)
    is
       pragma Assert (Is_Ok(Node));
@@ -1423,10 +1370,10 @@ package body Nodes is
      (Node                : in out RW_Node_Type;
       Source              : in     RW_Node_Type;
       Index               : in     Valid_Index_Type;
-      Key_Read_Context    : in out Keys.Context_Type;
-      Key_Write_Context   : in out Keys.Context_Type;
-      Value_Read_Context  : in out Values.Context_Type;
-      Value_Write_Context : in out Values.Context_Type;
+      Key_Read_Context    : in out Keys.Read_Context_Type;
+      Key_Write_Context   : in out Keys.Write_Context_Type;
+      Value_Read_Context  : in out Values.Read_Context_Type;
+      Value_Write_Context : in out Values.Write_Context_Type;
       Shift_By            : in     Integer := 0)
    is
       pragma Assert (Is_Ok(Node));
@@ -1463,8 +1410,8 @@ package body Nodes is
                                       Level  => Level(Node),
                                       Degree => Degree(Node) + 1,
                                       Link   => Link(Node));
-      Key_Read_Context  : Keys.Context_Type := Keys.New_Context;
-      Key_Write_Context : Keys.Context_Type := Keys.New_Context;
+      Key_Read_Context  : Keys.Read_Context_Type := Keys.New_Read_Context;
+      Key_Write_Context : Keys.Write_Context_Type := Keys.New_Write_Context;
    begin
       for I in 1 .. Index - 1 loop
          Copy_Entry(N, Node, I, Key_Read_Context, Key_Write_Context);
@@ -1503,10 +1450,14 @@ package body Nodes is
                                       Level  => Level(Node),
                                       Degree => Degree(Node) + 1,
                                       Link   => Link(Node));
-      Key_Read_Context    : Keys.Context_Type   := Keys.New_Context;
-      Key_Write_Context   : Keys.Context_Type   := Keys.New_Context;
-      Value_Read_Context  : Values.Context_Type := Values.New_Context;
-      Value_Write_Context : Values.Context_Type := Values.New_Context;
+      Key_Read_Context    : Keys.Read_Context_Type :=
+         Keys.New_Read_Context;
+      Key_Write_Context   : Keys.Write_Context_Type :=
+         Keys.New_Write_Context;
+      Value_Read_Context  : Values.Read_Context_Type :=
+         Values.New_Read_Context;
+      Value_Write_Context : Values.Write_Context_Type :=
+         Values.New_Write_Context;
    begin
       for I in 1 .. Index - 1 loop
          Copy_Entry(N, Node, I, Key_Read_Context, Key_Write_Context,
@@ -1548,8 +1499,8 @@ package body Nodes is
                                       Level  => Level(Node),
                                       Degree => Degree(Node),
                                       Link   => Link(Node));
-      Key_Read_Context  : Keys.Context_Type := Keys.New_Context;
-      Key_Write_Context : Keys.Context_Type := Keys.New_Context;
+      Key_Read_Context  : Keys.Read_Context_Type  := Keys.New_Read_Context;
+      Key_Write_Context : Keys.Write_Context_Type := Keys.New_Write_Context;
    begin
       for I in 1 .. Index - 1 loop
          Copy_Entry(N, Node, I, Key_Read_Context, Key_Write_Context);
@@ -1588,10 +1539,14 @@ package body Nodes is
                                       Level  => Level(Node),
                                       Degree => Degree(Node),
                                       Link   => Link(Node));
-      Key_Read_Context    : Keys.Context_Type   := Keys.New_Context;
-      Key_Write_Context   : Keys.Context_Type   := Keys.New_Context;
-      Value_Read_Context  : Values.Context_Type := Values.New_Context;
-      Value_Write_Context : Values.Context_Type := Values.New_Context;
+      Key_Read_Context   : Keys.Read_Context_Type :=
+         Keys.New_Read_Context;
+      Key_Write_Context  : Keys.Write_Context_Type :=
+         Keys.New_Write_Context;
+      Value_Read_Context  : Values.Read_Context_Type :=
+         Values.New_Read_Context;
+      Value_Write_Context : Values.Write_Context_Type :=
+         Values.New_Write_Context;
    begin
       for I in 1 .. Index - 1 loop
          Copy_Entry(N, Node, I, Key_Read_Context, Key_Write_Context,
@@ -1632,8 +1587,10 @@ package body Nodes is
    begin
       if Is_Inner(Node) then
          declare
-            Key_Read_Context  : Keys.Context_Type := Keys.New_Context;
-            Key_Write_Context : Keys.Context_Type := Keys.New_Context;
+            Key_Read_Context  : Keys.Read_Context_Type :=
+               Keys.New_Read_Context;
+            Key_Write_Context : Keys.Write_Context_Type :=
+               Keys.New_Write_Context;
          begin
             for I in 1 .. Index - 1 loop
                Copy_Entry(N, Node, I, Key_Read_Context, Key_Write_Context);
@@ -1644,10 +1601,14 @@ package body Nodes is
          end;
       else
          declare
-            Key_Read_Context    : Keys.Context_Type   := Keys.New_Context;
-            Key_Write_Context   : Keys.Context_Type   := Keys.New_Context;
-            Value_Read_Context  : Values.Context_Type := Values.New_Context;
-            Value_Write_Context : Values.Context_Type := Values.New_Context;
+            Key_Read_Context  : Keys.Read_Context_Type :=
+               Keys.New_Read_Context;
+            Key_Write_Context : Keys.Write_Context_Type :=
+               Keys.New_Write_Context;
+            Value_Read_Context  : Values.Read_Context_Type :=
+               Values.New_Read_Context;
+            Value_Write_Context : Values.Write_Context_Type :=
+               Values.New_Write_Context;
          begin
             for I in 1 .. Index - 1 loop
                Copy_Entry(N, Node, I, Key_Read_Context, Key_Write_Context,
@@ -1668,7 +1629,7 @@ package body Nodes is
       if Degree(N) = 0 and Degree(Node) = 1 then
          declare
             High_Key    : constant Keys.Key_Type := Key(Node, 1);
-            Key_Context : Keys.Context_Type := Keys.New_Context;
+            Key_Context : Keys.Write_Context_Type := Keys.New_Write_Context;
          begin
             Phys.Set_Has_High_Key(Blocks.Base_Block_Type(N), True);
             Phys.Write_High_Key(Key_Context, Blocks.Base_Block_Type(N),
@@ -1698,8 +1659,10 @@ package body Nodes is
       begin
          if Is_Inner(Node) then
             declare
-               Key_Read_Context  : Keys.Context_Type := Keys.New_Context;
-               Key_Write_Context : Keys.Context_Type := Keys.New_Context;
+               Key_Read_Context  : Keys.Read_Context_Type :=
+                  Keys.New_Read_Context;
+               Key_Write_Context : Keys.Write_Context_Type :=
+                  Keys.New_Write_Context;
             begin
                for I in From .. To loop
                   Copy_Entry(N, Node, I, Key_Read_Context, Key_Write_Context,
@@ -1711,10 +1674,14 @@ package body Nodes is
             end;
          else
             declare
-               Key_Read_Context    : Keys.Context_Type   := Keys.New_Context;
-               Key_Write_Context   : Keys.Context_Type   := Keys.New_Context;
-               Value_Read_Context  : Values.Context_Type := Values.New_Context;
-               Value_Write_Context : Values.Context_Type := Values.New_Context;
+               Key_Read_Context  : Keys.Read_Context_Type :=
+                  Keys.New_Read_Context;
+               Key_Write_Context : Keys.Write_Context_Type :=
+                  Keys.New_Write_Context;
+               Value_Read_Context  : Values.Read_Context_Type :=
+                  Values.New_Read_Context;
+               Value_Write_Context : Values.Write_Context_Type :=
+                  Values.New_Write_Context;
             begin
                for I in From .. To loop
                   Copy_Entry(N, Node, I, Key_Read_Context, Key_Write_Context,
@@ -1765,8 +1732,10 @@ package body Nodes is
       begin
          if Is_Inner(Right_Node) then
             declare
-               Key_Read_Context  : Keys.Context_Type := Keys.New_Context;
-               Key_Write_Context : Keys.Context_Type := Keys.New_Context;
+               Key_Read_Context  : Keys.Read_Context_Type :=
+                  Keys.New_Read_Context;
+               Key_Write_Context : Keys.Write_Context_Type :=
+                  Keys.New_Write_Context;
             begin
                for I in 1 .. Left_Degree loop
                   Copy_Entry(N, Left_Node, I, Key_Read_Context,
@@ -1785,10 +1754,14 @@ package body Nodes is
             end;
          else
             declare
-               Key_Read_Context    : Keys.Context_Type   := Keys.New_Context;
-               Key_Write_Context   : Keys.Context_Type   := Keys.New_Context;
-               Value_Read_Context  : Values.Context_Type := Values.New_Context;
-               Value_Write_Context : Values.Context_Type := Values.New_Context;
+               Key_Read_Context  : Keys.Read_Context_Type :=
+                  Keys.New_Read_Context;
+               Key_Write_Context : Keys.Write_Context_Type :=
+                  Keys.New_Write_Context;
+               Value_Read_Context  : Values.Read_Context_Type :=
+                  Values.New_Read_Context;
+               Value_Write_Context : Values.Write_Context_Type :=
+                  Values.New_Write_Context;
             begin
                for I in 1 .. Left_Degree loop
                   Copy_Entry(N, Left_Node, I, Key_Read_Context,

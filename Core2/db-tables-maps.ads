@@ -169,12 +169,14 @@ private
       use Unbounded_Values_IO; -- the default parameters
 
       package Bounded_Values_Signature is new Blocks.Gen_Values_Signature
-        (Value_Type   => Types.Values.Bounded.String_Type,
-         Context_Type => Bounded_Values_IO.Context_Type);
+        (Value_Type         => Types.Values.Bounded.String_Type,
+         Read_Context_Type  => Bounded_Values_IO.Read_Context_Type,
+         Write_Context_Type => Bounded_Values_IO.Write_Context_Type);
 
       package Unbounded_Values_Signature is new Blocks.Gen_Values_Signature
-        (Value_Type   => Types.Values.Unbounded.String_Type,
-         Context_Type => Unbounded_Values_IO.Context_Type);
+        (Value_Type         => Types.Values.Unbounded.String_Type,
+         Read_Context_Type  => Unbounded_Values_IO.Read_Context_Type,
+         Write_Context_Type => Unbounded_Values_IO.Write_Context_Type);
    end Values;
 
    package BTrees is new Gen_BTrees

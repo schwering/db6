@@ -29,11 +29,18 @@ package DB.Types.Keys is
          Time   : Times.Number_Type;
       end record;
 
-   type Context_Type is
+   type Read_Context_Type is
       record
-         Row_Context    : Row_Serialization.Context_Type;
-         Column_Context : Column_Serialization.Context_Type;
-         Time_Context   : Times.Context_Type;
+         Row_Context    : Row_Serialization.Read_Context_Type;
+         Column_Context : Column_Serialization.Read_Context_Type;
+         Time_Context   : Times.Read_Context_Type;
+      end record;
+
+   type Write_Context_Type is
+      record
+         Row_Context    : Row_Serialization.Write_Context_Type;
+         Column_Context : Column_Serialization.Write_Context_Type;
+         Time_Context   : Times.Write_Context_Type;
       end record;
 
 
@@ -45,27 +52,30 @@ package DB.Types.Keys is
      (Left, Right : Key_Type)
       return Utils.Comparison_Result_Type;
 
-   function New_Context
-      return Context_Type;
+   function New_Read_Context
+      return Read_Context_Type;
+
+   function New_Write_Context
+      return Write_Context_Type;
 
    function Size_Bound
      (Key : Key_Type)
       return Blocks.Size_Type;
 
    procedure Write
-     (Context : in out Context_Type;
+     (Context : in out Write_Context_Type;
       Block   : in out Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       Key     : in     Key_Type);
 
    procedure Read
-     (Context : in out Context_Type;
+     (Context : in out Read_Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       Key     :    out Key_Type);
 
    procedure Skip
-     (Context : in out Context_Type;
+     (Context : in out Read_Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type);
 
@@ -79,8 +89,9 @@ package DB.Types.Keys is
       return Key_Type;
 
    package Keys_Signature is new Blocks.Gen_Keys_Signature
-     (Key_Type     => Key_Type,
-      Context_Type => Context_Type);
+     (Key_Type           => Key_Type,
+      Read_Context_Type  => Read_Context_Type,
+      Write_Context_Type => Write_Context_Type);
 
 private
    Is_Context_Free_Serialization : constant Boolean
@@ -88,7 +99,8 @@ private
          Column_Serialization.Is_Context_Free_Serialization and
          Times.Is_Context_Free_Serialization;
 
-   pragma Inline (New_Context);
+   pragma Inline (New_Read_Context);
+   pragma Inline (New_Write_Context);
 
 end DB.Types.Keys;
 

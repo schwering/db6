@@ -15,6 +15,8 @@ package DB.Types.Gen_Numbers is
    subtype Number_Type is P_Number_Type;
 
    type Context_Type is private;
+   subtype Read_Context_Type is Context_Type;
+   subtype Write_Context_Type is Context_Type;
 
    Is_Context_Free_Serialization : constant Boolean := True;
 
@@ -22,15 +24,18 @@ package DB.Types.Gen_Numbers is
      (Left, Right : Number_Type)
       return Utils.Comparison_Result_Type;
 
-   function New_Context
-      return Context_Type;
+   function New_Read_Context
+      return Read_Context_Type;
+
+   function New_Write_Context
+      return Write_Context_Type;
 
    function Size_Bound
      (Number : Number_Type)
       return Blocks.Size_Type;
 
    procedure Write
-     (Context : in out Context_Type;
+     (Context : in out Write_Context_Type;
       Block   : in out Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       Number  : in     Number_Type);
@@ -58,7 +63,8 @@ package DB.Types.Gen_Numbers is
 private
    type Context_Type is null record;
 
-   pragma Inline (New_Context);
+   pragma Inline (New_Read_Context);
+   pragma Inline (New_Write_Context);
    pragma Inline (Size_Bound);
    pragma Inline (Write);
    pragma Inline (Read);

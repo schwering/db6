@@ -27,6 +27,16 @@ package body DB.Types.Gen_Numbers is
    end New_Context;
 
 
+   function New_Read_Context
+      return Read_Context_Type
+   renames New_Context;
+
+
+   function New_Write_Context
+      return Write_Context_Type
+   renames New_Context;
+
+
    function Size_Bound
      (Number : Number_Type)
       return Blocks.Size_Type

@@ -114,13 +114,22 @@ package body DB.Types.Keys is
    end Short_Delimiter;
 
 
-   function New_Context
-      return Context_Type is
+   function New_Read_Context
+      return Read_Context_Type is
    begin
-      return Context_Type'(Row_Serialization.New_Context,
-                           Column_Serialization.New_Context,
-                           Times.New_Context);
-   end New_Context;
+      return Read_Context_Type'(Row_Serialization.New_Read_Context,
+                                Column_Serialization.New_Read_Context,
+                                Times.New_Read_Context);
+   end New_Read_Context;
+
+
+   function New_Write_Context
+      return Write_Context_Type is
+   begin
+      return Write_Context_Type'(Row_Serialization.New_Write_Context,
+                                 Column_Serialization.New_Write_Context,
+                                 Times.New_Write_Context);
+   end New_Write_Context;
 
 
    function Size_Bound
@@ -136,7 +145,7 @@ package body DB.Types.Keys is
 
 
    procedure Write
-     (Context : in out Context_Type;
+     (Context : in out Write_Context_Type;
       Block   : in out Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       Key     : in     Key_Type) is
@@ -149,7 +158,7 @@ package body DB.Types.Keys is
 
 
    procedure Read
-     (Context : in out Context_Type;
+     (Context : in out Read_Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type;
       Key     :    out Key_Type) is
@@ -163,7 +172,7 @@ package body DB.Types.Keys is
 
 
    procedure Skip
-     (Context : in out Context_Type;
+     (Context : in out Read_Context_Type;
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type)
    is
