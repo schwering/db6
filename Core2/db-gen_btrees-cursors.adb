@@ -109,8 +109,8 @@ package body Cursors is
 
 
    procedure Finalize_Cursor
-     (Tree        : in     Tree_Type;
-      Cursor      : in out Cursor_Type)
+     (Tree   : in     Tree_Type;
+      Cursor : in out Cursor_Type)
    is
       pragma Assert (Tree.Initialized);
       pragma Assert (Cursor.Owning_Tree = Tree.Self);
@@ -233,7 +233,7 @@ package body Cursors is
          when others =>
             Cursor.Final := True;
             pragma Warnings (Off);
-            State        := Error;
+            State := Error;
             pragma Warnings (On);
             raise;
       end Move_To_Next;
@@ -280,80 +280,6 @@ package body Cursors is
             pragma Warnings (On);
             raise;
       end Search_Node;
-
-
-      procedure Search_Minimum_Node
-        (Node  : out Nodes.RO_Node_Type;
-         Index : out Nodes.Valid_Index_Type)
-      is
-         N_A : Nodes.Valid_Address_Type := Root_Address;
-      begin
-         loop
-            declare
-               use type Nodes.Degree_Type;
-               N : Nodes.RO_Node_Type;
-            begin
-               Read_Node(Tree, N_A, N);
-               if Nodes.Degree(N) = 0 then
-                  Index := 1;
-                  State := Failure;
-                  return;
-               end if;
-               if Nodes.Is_Leaf(N) then
-                  Node  := N;
-                  Index := 1;
-                  State := Success;
-                  return;
-               end if;
-               N_A := Nodes.Child(N, 1);
-            end;
-         end loop;
-
-      exception
-         when others =>
-            Index := 1;
-            pragma Warnings (Off);
-            State := Error;
-            pragma Warnings (On);
-            raise;
-      end Search_Minimum_Node;
-
-
-      procedure Search_Maximum_Node
-        (Node  : out Nodes.RO_Node_Type;
-         Index : out Nodes.Valid_Index_Type)
-      is
-         N_A : Nodes.Valid_Address_Type := Root_Address;
-      begin
-         loop
-            declare
-               use type Nodes.Degree_Type;
-               N : Nodes.RO_Node_Type;
-            begin
-               Read_Node(Tree, N_A, N);
-               if Nodes.Degree(N) = 0 then
-                  Index := 1;
-                  State := Failure;
-                  return;
-               end if;
-               if Nodes.Is_Leaf(N) then
-                  Node  := N;
-                  Index := Nodes.Degree(N);
-                  State := Success;
-                  return;
-               end if;
-               N_A := Nodes.Child(N, Nodes.Degree(N));
-            end;
-         end loop;
-
-      exception
-         when others =>
-            Index := 1;
-            pragma Warnings (Off);
-            State := Error;
-            pragma Warnings (On);
-            raise;
-      end Search_Maximum_Node;
 
 
       procedure Recalibrate is
@@ -404,6 +330,78 @@ package body Cursors is
 
       procedure Search_Abstract_Lower_Bound
       is
+         procedure Search_Minimum_Node
+           (Node  : out Nodes.RO_Node_Type;
+            Index : out Nodes.Valid_Index_Type)
+         is
+            N_A : Nodes.Valid_Address_Type := Root_Address;
+         begin
+            loop
+               declare
+                  use type Nodes.Degree_Type;
+                  N : Nodes.RO_Node_Type;
+               begin
+                  Read_Node(Tree, N_A, N);
+                  if Nodes.Degree(N) = 0 then
+                     Index := 1;
+                     State := Failure;
+                     return;
+                  end if;
+                  if Nodes.Is_Leaf(N) then
+                     Node  := N;
+                     Index := 1;
+                     State := Success;
+                     return;
+                  end if;
+                  N_A := Nodes.Child(N, 1);
+               end;
+            end loop;
+
+         exception
+            when others =>
+               Index := 1;
+               pragma Warnings (Off);
+               State := Error;
+               pragma Warnings (On);
+               raise;
+         end Search_Minimum_Node;
+
+         procedure Search_Maximum_Node
+           (Node  : out Nodes.RO_Node_Type;
+            Index : out Nodes.Valid_Index_Type)
+         is
+            N_A : Nodes.Valid_Address_Type := Root_Address;
+         begin
+            loop
+               declare
+                  use type Nodes.Degree_Type;
+                  N : Nodes.RO_Node_Type;
+               begin
+                  Read_Node(Tree, N_A, N);
+                  if Nodes.Degree(N) = 0 then
+                     Index := 1;
+                     State := Failure;
+                     return;
+                  end if;
+                  if Nodes.Is_Leaf(N) then
+                     Node  := N;
+                     Index := Nodes.Degree(N);
+                     State := Success;
+                     return;
+                  end if;
+                  N_A := Nodes.Child(N, Nodes.Degree(N));
+               end;
+            end loop;
+
+         exception
+            when others =>
+               Index := 1;
+               pragma Warnings (Off);
+               State := Error;
+               pragma Warnings (On);
+               raise;
+         end Search_Maximum_Node;
+
          pragma Assert (not Cursor.Has_Node);
       begin
          case Cursor.Lower_Bound.Location is
@@ -488,7 +486,7 @@ package body Cursors is
       when others =>
          Unlock_Mutex(Cursor);
          pragma Warnings (Off);
-         State        := Error;
+         State := Error;
          pragma Warnings (On);
          raise;
    end Next;
@@ -522,7 +520,7 @@ package body Cursors is
       when others =>
          Unlock_Mutex(Cursor);
          pragma Warnings (Off);
-         State        := Error;
+         State := Error;
          pragma Warnings (On);
          raise;
    end Delete;
