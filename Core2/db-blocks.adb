@@ -248,6 +248,9 @@ package body DB.Blocks is
       procedure Write_Data is new Write(Array_Sub_Type);
    begin
       Write_Index(Block, Cursor, To);
+      if From > To then
+         return;
+      end if;
       if Is_Valid(Cursor) then
          pragma Assert (From <= Index_Type'Base'Succ(To));
          pragma Assert (From in Arr'Range);
@@ -267,6 +270,9 @@ package body DB.Blocks is
       procedure Read_Index is new Read(Index_Type'Base);
    begin
       Read_Index(Block, Cursor, To);
+      if From > To then
+         return;
+      end if;
       if Is_Valid(Cursor) then
          declare
             type Array_Sub_Type is array (From .. To) of Item_Type;
