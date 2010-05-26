@@ -1450,12 +1450,9 @@ package body Nodes is
                                       Level  => Level(Node),
                                       Degree => Degree(Node) + 1,
                                       Link   => Link(Node));
-      Key_Read_Context    : Keys.Read_Context_Type :=
-         Keys.New_Read_Context;
-      Key_Write_Context   : Keys.Write_Context_Type :=
-         Keys.New_Write_Context;
-      Value_Read_Context  : Values.Read_Context_Type :=
-         Values.New_Read_Context;
+      Key_Read_Context    : Keys.Read_Context_Type := Keys.New_Read_Context;
+      Key_Write_Context   : Keys.Write_Context_Type := Keys.New_Write_Context;
+      Value_Read_Context  : Values.Read_Context_Type := Values.New_Read_Context;
       Value_Write_Context : Values.Write_Context_Type :=
          Values.New_Write_Context;
    begin
@@ -1539,12 +1536,9 @@ package body Nodes is
                                       Level  => Level(Node),
                                       Degree => Degree(Node),
                                       Link   => Link(Node));
-      Key_Read_Context   : Keys.Read_Context_Type :=
-         Keys.New_Read_Context;
-      Key_Write_Context  : Keys.Write_Context_Type :=
-         Keys.New_Write_Context;
-      Value_Read_Context  : Values.Read_Context_Type :=
-         Values.New_Read_Context;
+      Key_Read_Context    : Keys.Read_Context_Type := Keys.New_Read_Context;
+      Key_Write_Context   : Keys.Write_Context_Type := Keys.New_Write_Context;
+      Value_Read_Context  : Values.Read_Context_Type := Values.New_Read_Context;
       Value_Write_Context : Values.Write_Context_Type :=
          Values.New_Write_Context;
    begin
@@ -1587,8 +1581,7 @@ package body Nodes is
    begin
       if Is_Inner(Node) then
          declare
-            Key_Read_Context  : Keys.Read_Context_Type :=
-               Keys.New_Read_Context;
+            Key_Read_Context  : Keys.Read_Context_Type := Keys.New_Read_Context;
             Key_Write_Context : Keys.Write_Context_Type :=
                Keys.New_Write_Context;
          begin
@@ -1601,9 +1594,9 @@ package body Nodes is
          end;
       else
          declare
-            Key_Read_Context  : Keys.Read_Context_Type :=
+            Key_Read_Context    : Keys.Read_Context_Type :=
                Keys.New_Read_Context;
-            Key_Write_Context : Keys.Write_Context_Type :=
+            Key_Write_Context   : Keys.Write_Context_Type :=
                Keys.New_Write_Context;
             Value_Read_Context  : Values.Read_Context_Type :=
                Values.New_Read_Context;

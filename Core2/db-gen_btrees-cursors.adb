@@ -87,12 +87,14 @@ package body Cursors is
       pragma Assert (Tree.Initialized);
    begin
       Check_Bounds;
-      return Cursor_Type'(Lower_Bound => Lower_Bound,
-                          Upper_Bound => Upper_Bound,
-                          Owning_Tree => Tree.Self,
-                          Initialized => True,
-                          Thread_Safe => Thread_Safe,
-                          others      => <>);
+      return Cursor_Type'(Lower_Bound   => Lower_Bound,
+                          Upper_Bound   => Upper_Bound,
+                          Owning_Tree   => Tree.Self,
+                          Initialized   => True,
+                          Thread_Safe   => Thread_Safe,
+                          Key_Context   => Keys.New_Read_Context,
+                          Value_Context => Values.New_Read_Context,
+                          others        => <>);
    end New_Cursor;
 
 
