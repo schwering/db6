@@ -1,8 +1,9 @@
 #!/bin/sh
 IO=map
-BIN=bin/debug/./ttree
+BIN=bin/debug/./tree_test
 FILE=`cat .temp_path`btree
 GEN="urls"
+GEN=pseudorandom
 C1=1k
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both

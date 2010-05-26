@@ -1,1 +1,1 @@
-addr2line -e bin/debug/ttree $*
+addr2line -e bin/debug/tree_test $*

@@ -1,6 +1,6 @@
 #!/bin/sh
 IO=map
-BIN=bin/release/./tree
+BIN=bin/release/./tree_test
 FILE=`cat .temp_path`btree
 GEN=pseudorandom
 C1=100k 
