@@ -29,10 +29,10 @@ is
    use Key_Comparisons;
 
    package Intermediate_BTrees is new Gen_BTrees
-     (Keys             => Intermediate_Keys,
-      Values           => Intermediate_Values,
-      Block_IO         => Intermediate_Block_IO,
-      Allow_Duplicates => Allow_Intermediate_Duplicates);
+     (Keys                     => Intermediate_Keys,
+      Values                   => Intermediate_Values,
+      Block_IO                 => Intermediate_Block_IO,
+      Default_Allow_Duplicates => Allow_Intermediate_Duplicates);
 
    type Context_Type is
       record

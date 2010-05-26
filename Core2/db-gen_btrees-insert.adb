@@ -18,10 +18,11 @@
 
 separate (DB.Gen_BTrees)
 procedure Insert
-  (Tree  : in out Tree_Type;
-   Key   : in     Keys.Key_Type;
-   Value : in     Values.Value_Type;
-   State :    out State_Type)
+  (Tree             : in out Tree_Type;
+   Key              : in     Keys.Key_Type;
+   Value            : in     Values.Value_Type;
+   Allow_Duplicates : in     Boolean;
+   State            :    out State_Type)
 is
    pragma Assert (Tree.Initialized);
 

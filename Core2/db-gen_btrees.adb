@@ -336,7 +336,18 @@ package body DB.Gen_BTrees is
      (Tree  : in out Tree_Type;
       Key   : in     Keys.Key_Type;
       Value : in     Values.Value_Type;
-      State :    out State_Type)
+      State :    out State_Type) is
+   begin
+      Insert(Tree, Key, Value, Default_Allow_Duplicates, State);
+   end Insert;
+
+
+   procedure Insert
+     (Tree             : in out Tree_Type;
+      Key              : in     Keys.Key_Type;
+      Value            : in     Values.Value_Type;
+      Allow_Duplicates : in     Boolean;
+      State            :    out State_Type)
    is separate;
 
 

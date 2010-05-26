@@ -59,29 +59,38 @@ package DB.Tables.Maps is
 
    type State_Type is (Success, Failure, Error);
 
+   Default_Allow_Duplicates : constant Boolean := True;
+
    procedure Search
-     (Map      : in out Map_Type;
-      Key      : in     Key_Type;
-      Value    :    out Value_Type'Class;
-      State    :    out State_Type);
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value :    out Value_Type'Class;
+      State :    out State_Type);
 
    procedure Minimum
-     (Map      : in out Map_Type;
-      Key      :    out Key_Type;
-      Value    :    out Value_Type'Class;
-      State    :    out State_Type);
+     (Map   : in out Map_Type;
+      Key   :    out Key_Type;
+      Value :    out Value_Type'Class;
+      State :    out State_Type);
 
    procedure Insert
-     (Map      : in out Map_Type;
-      Key      : in     Key_Type;
-      Value    : in     Value_Type'Class;
-      State    :    out State_Type);
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type);
+
+   procedure Insert
+     (Map              : in out Map_Type;
+      Key              : in     Key_Type;
+      Value            : in     Value_Type'Class;
+      Allow_Duplicates : in     Boolean;
+      State            :    out State_Type);
 
    procedure Delete
-     (Map      : in out Map_Type;
-      Key      : in     Key_Type;
-      Value    :    out Value_Type'Class;
-      State    :    out State_Type);
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value :    out Value_Type'Class;
+      State :    out State_Type);
 
 
    ----------
@@ -180,16 +189,16 @@ private
    end Values;
 
    package BTrees is new Gen_BTrees
-     (Keys             => Types.Keys.Keys_Signature,
-      Values           => Values.Bounded_Values_Signature,
-      Allow_Duplicates => True,
-      Block_IO         => Block_IO);
+     (Keys                     => Types.Keys.Keys_Signature,
+      Values                   => Values.Bounded_Values_Signature,
+      Default_Allow_Duplicates => Default_Allow_Duplicates,
+      Block_IO                 => Block_IO);
 
    package Blob_Trees is new Gen_BTrees
-     (Keys             => Types.Keys.Keys_Signature,
-      Values           => Values.Unbounded_Values_Signature,
-      Block_IO         => Block_IO,
-      Allow_Duplicates => True);
+     (Keys                     => Types.Keys.Keys_Signature,
+      Values                   => Values.Unbounded_Values_Signature,
+      Block_IO                 => Block_IO,
+      Default_Allow_Duplicates => Default_Allow_Duplicates);
       --Parted_Value_Context_Type => Types.Values.Unbounded.Parted.Context_Type,
       --New_Parted_Value_Context => Types.Values.Unbounded.Parted.New_Context,
       --Parted_Value_Size_Bound => Types.Values.Unbounded.Parted.Size_Bound,

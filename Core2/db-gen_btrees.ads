@@ -65,7 +65,7 @@ generic
    with package Keys is new Blocks.Gen_Keys_Signature (<>);
    with package Values is new Blocks.Gen_Values_Signature (<>);
    with package Block_IO is new Blocks.Gen_IO_Signature (<>);
-   Allow_Duplicates : in Boolean := False;
+   Default_Allow_Duplicates : in Boolean := False;
 package DB.Gen_BTrees is
    pragma Preelaborate;
 
@@ -102,40 +102,49 @@ package DB.Gen_BTrees is
    type State_Type is (Success, Failure, Error);
 
    procedure Search
-     (Tree     : in out Tree_Type;
-      Key      : in     Keys.Key_Type;
-      Value    :    out Values.Value_Type;
-      State    :    out State_Type);
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type);
    -- Searches the Value associated with Key or sets State = Failure if
    -- no such key exists.
    -- This procedure never blocks because it uses no locks (as long as
    -- Block_IO.Read and Block_IO.Write do not block).
 
    procedure Minimum
-     (Tree     : in out Tree_Type;
-      Key      :    out Keys.Key_Type;
-      Value    :    out Values.Value_Type;
-      State    :    out State_Type);
+     (Tree  : in out Tree_Type;
+      Key   :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type);
    -- Searches the minimum Key / Value pair or sets State = Failure if no
    -- such key exists.
    -- This procedure never blocks because it uses no locks (as long as
    -- Block_IO.Read and Block_IO.Write do not block).
 
    procedure Insert
-     (Tree     : in out Tree_Type;
-      Key      : in     Keys.Key_Type;
-      Value    : in     Values.Value_Type;
-      State    :    out State_Type);
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
+      State :    out State_Type);
+   -- Synonym for Insert(Tree, Key, Value, Default_Allow_Duplicates, State).
+   -- (A default argument for Allow_Duplicates doesn't work well.)
+
+   procedure Insert
+     (Tree             : in out Tree_Type;
+      Key              : in     Keys.Key_Type;
+      Value            : in     Values.Value_Type;
+      Allow_Duplicates : in     Boolean;
+      State            :    out State_Type);
    -- Inserts a Key / Value pair or sets State = Failure if such a key already
    -- exists.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
-   -- availble.
+   -- available.
 
    procedure Delete
-     (Tree     : in out Tree_Type;
-      Key      : in     Keys.Key_Type;
-      Value    :    out Values.Value_Type;
-      State    :    out State_Type);
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type);
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
    -- This procedure might block because of Block_IO.Lock until the lock becomes

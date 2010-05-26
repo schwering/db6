@@ -165,23 +165,36 @@ package body DB.Tables.Maps is
 
 
    procedure Insert
-     (Map      : in out Map_Type;
-      Key      : in     Key_Type;
-      Value    : in     Value_Type'Class;
-      State    :    out State_Type) is
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type) is
+   begin
+      Insert(Map, Key, Value, Default_Allow_Duplicates, State);
+   end Insert;
+
+
+   procedure Insert
+     (Map              : in out Map_Type;
+      Key              : in     Key_Type;
+      Value            : in     Value_Type'Class;
+      Allow_Duplicates : in     Boolean;
+      State            :    out State_Type) is
    begin
       if Map.Short then
          declare
             S : BTrees.State_Type;
          begin
-            BTrees.Insert(Map.Short_Tree, Key, To_Bounded(Value), S);
+            BTrees.Insert(Map.Short_Tree, Key, To_Bounded(Value),
+                          Allow_Duplicates, S);
             State := To_State(S);
          end;
       else
          declare
             S : Blob_Trees.State_Type;
          begin
-            Blob_Trees.Insert(Map.Long_Tree, Key, To_Unbounded(Value), S);
+            Blob_Trees.Insert(Map.Long_Tree, Key, To_Unbounded(Value),
+                              Allow_Duplicates, S);
             State := To_State(S);
          end;
       end if;
