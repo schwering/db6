@@ -160,6 +160,15 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
 
 
    function Substring
+     (S    : String_Type;
+      From : Index_Type)
+      return String_Type is
+   begin
+      return Substring(S, From, S.Length - From + 1);
+   end Substring;
+
+
+   function Substring
      (S      : String_Type;
       From   : Index_Type;
       Length : Length_Type)
@@ -221,7 +230,7 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
 
 
    package body Uncompressed is separate;
-   package body Deflate is separate;
+   package body Prefix is separate;
 
 end DB.Types.Gen_Strings.Gen_Bounded;
 

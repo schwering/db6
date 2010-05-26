@@ -18,7 +18,7 @@ package DB.Types.Keys is
 
    package Rows                 renames Strings.Bounded;
    package Columns              renames Strings.Bounded;
-   package Row_Serialization    renames Rows.Uncompressed;
+   package Row_Serialization    renames Rows.Prefix;
    package Column_Serialization renames Columns.Uncompressed;
 
 

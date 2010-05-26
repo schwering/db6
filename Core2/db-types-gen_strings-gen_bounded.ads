@@ -5,8 +5,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Finalization;
-with Zlib;
 with DB.Blocks;
 with DB.Utils;
 
@@ -61,6 +59,11 @@ package DB.Types.Gen_Strings.Gen_Bounded is
      (S : String_Type;
       I : Index_Type)
       return Item_Type;
+
+   function Substring
+     (S    : String_Type;
+      From : Index_Type)
+      return String_Type;
 
    function Substring
      (S      : String_Type;
@@ -130,48 +133,44 @@ package DB.Types.Gen_Strings.Gen_Bounded is
       pragma Inline (New_Context);
    end Uncompressed;
 
-   package Deflate is
-      type Zlib_Ref_Type is access Zlib.Filter_Type;
-      type Natural_Ref_Type is access Natural;
-
-      type Context_Type is new Ada.Finalization.Controlled with
+   package Prefix is
+      type Read_Context_Type is null record;
+      type Write_Context_Type is
          record
-            Read      : Zlib_Ref_Type;
-            Write     : Zlib_Ref_Type;
-            Ref_Count : Natural_Ref_Type;
+            Has_Pred : Boolean;
+            Position : Blocks.Base_Position_Type;
+            Pred     : String_Type;
          end record;
-
-      overriding procedure Initialize (Context : in out Context_Type);
-      overriding procedure Adjust (Context : in out Context_Type);
-      overriding procedure Finalize (Context : in out Context_Type);
 
       Is_Context_Free_Serialization : constant Boolean := False;
 
-      function New_Context
-         return Context_Type;
+      function New_Read_Context
+         return Read_Context_Type;
+
+      function New_Write_Context
+         return Write_Context_Type;
 
       function Size_Bound
         (S : String_Type)
          return Blocks.Size_Type;
 
       procedure Write
-        (Context : in out Context_Type;
+        (Context : in out Write_Context_Type;
          Block   : in out Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type;
          S       : in     String_Type);
 
       procedure Read
-        (Context : in out Context_Type;
+        (Context : in out Read_Context_Type;
          Block   : in     Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type;
          S       :    out String_Type);
 
       procedure Skip
-        (Context : in out Context_Type;
+        (Context : in out Read_Context_Type;
          Block   : in     Blocks.Base_Block_Type;
          Cursor  : in out Blocks.Cursor_Type);
-
-   end Deflate;
+   end Prefix;
 
 private
    subtype Buffer_Type is Indefinite_Buffer_Type(Index_Type);
