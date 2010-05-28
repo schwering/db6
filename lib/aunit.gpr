@@ -1,0 +1,6 @@
+with "aunit/aunit/aunit_build.gpr";
+
+--library
+project AUnit is
+end AUnit;
+

@@ -1,4 +1,4 @@
-with "zlib_ref";
+with "zlib/zlib_ref";
 
 --library
 project ZLib is

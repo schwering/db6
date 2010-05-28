@@ -2,10 +2,11 @@
 
 with "libdb";
 with "attributes";
+with "../lib/aunit";
 
 project Tests is
 
-   Test_Dir          := "bin/";
+   Test_Dir := "bin/";
 
    for Main use ("tree_test", "write_new_test", "pwrite_test");
    for Source_Dirs use ("Tests");

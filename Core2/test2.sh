@@ -1,5 +1,5 @@
 #!/bin/sh
-IO=memory
+IO=map
 BIN=bin/debug/./tree_test
 FILE=`cat .temp_path`btree
 GEN="pseudorandom"
