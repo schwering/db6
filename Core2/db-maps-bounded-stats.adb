@@ -7,7 +7,7 @@
 with DB.Gen_BTrees.Gen_Stats;
 --with DB.Gen_Blob_Trees.Gen_Stats;
 
-package body DB.Tables.Maps.Unbounded.Stats is
+package body DB.Maps.Bounded.Stats is
 
    procedure Make_Stats
      (Map  : in out Map_Type;
@@ -15,7 +15,7 @@ package body DB.Tables.Maps.Unbounded.Stats is
                                         Key   : in String;
                                         Value : in Data_Type))
    is
-      package Stats is new Blob_Trees.Gen_Stats; -- XXX remove
+      package Stats is new BTrees.Gen_Stats;
       procedure My_Emit
         (Level : in Stats.Level_Type;
          Key   : in String;
@@ -38,7 +38,7 @@ package body DB.Tables.Maps.Unbounded.Stats is
          end case;
       end;
    begin
-      Stats.Make_Stats(Map.Long_Tree, My_Emit'Access);
+      Stats.Make_Stats(Map.Short_Tree, My_Emit'Access);
    end Make_Stats;
 
-end DB.Tables.Maps.Unbounded.Stats;
+end DB.Maps.Bounded.Stats;

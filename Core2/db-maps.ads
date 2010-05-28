@@ -11,14 +11,39 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Streams;
 with DB.Blocks.Gen_Values_Signature;
 with DB.Gen_BTrees;
 --with DB.Gen_Blob_Trees;
 with DB.Blocks;
 with DB.Blocks.Local_IO;
 
-package DB.Tables.Maps.Unbounded is
+package DB.Maps is
    pragma Elaborate_Body;
+
+   type Serializable_Type;
+
+   procedure Write
+     (Stream : in out Ada.Streams.Root_Stream_Type;
+      Object : in     Serializable_Type)
+   is abstract;
+
+   procedure Read
+     (Stream : in out Ada.Streams.Root_Stream_Type;
+      Data   : in     Serializable_Type)
+   is abstract;
+
+
+   type Comparable_Type;
+
+   function Equals
+     (A, B : Comparable_Type)
+      return Boolean;
+
+
+   type Key_Type is interface Comparable and Serializable_Type;
+
+   type Value_Type is interface;
 
    ----------
    -- Map initialization operations.
@@ -237,5 +262,5 @@ private
          end case;
       end record;
 
-end DB.Tables.Maps.Unbounded;
+end DB.Maps;
 

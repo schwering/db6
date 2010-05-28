@@ -8,7 +8,7 @@ with DB.Gen_BTrees.Gen_Check;
 --with DB.Gen_Blob_Trees.Gen_Check;
 with DB.Utils.Gen_Integer_Image;
 
-procedure DB.Tables.Maps.Unbounded.Check
+procedure DB.Maps.Bounded.Check
   (Map : in out Map_Type)
 is
    function Key_To_String (Key : Key_Type) return String
@@ -28,22 +28,22 @@ is
    end Key_To_String;
 
    function Value_To_String
-     (Value : Types.Values.Unbounded.String_Type)
+     (Value : Types.Values.Bounded.String_Type)
       return String
    is
       pragma Unreferenced (Value);
    begin
-      return "(UnboundedString)";
+      return "(BoundedString)";
    end Value_To_String;
 
    function Address_To_String is new
       Utils.Gen_Integer_Image(Block_IO_Impl.Address_Type);
 
-   procedure Check is new Blob_Trees.Gen_Check
-     (Key_To_String   => Key_To_String,
-      Value_To_String => Value_To_String,
-      Address_To_String  => Address_To_String); -- XXX remove
+   procedure Check is new BTrees.Gen_Check
+     (Key_To_String      => Key_To_String,
+      Value_To_String    => Value_To_String,
+      Address_To_String  => Address_To_String);
 begin
-   Check(Map.Long_Tree);
-end DB.Tables.Maps.Unbounded.Check;
+   Check(Map.Short_Tree);
+end DB.Maps.Bounded.Check;
 

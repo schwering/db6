@@ -17,7 +17,7 @@ with DB.Gen_BTrees;
 with DB.Blocks;
 with DB.Blocks.Local_IO;
 
-package DB.Tables.Maps.Bounded is
+package DB.Maps.Bounded is
    pragma Elaborate_Body;
 
    ----------
@@ -25,16 +25,9 @@ package DB.Tables.Maps.Bounded is
 
    type Map_Type is limited private;
 
-   function New_Map
-     (Max_Key_Size   : in Blocks.Size_Type;
-      Max_Value_Size : in Blocks.Size_Type)
-      return Map_Type;
-   -- Initializes a map object.
-
    procedure Create
-     (ID             : in String;
-      Max_Key_Size   : in Blocks.Size_Type;
-      Max_Value_Size : in Blocks.Size_Type);
+     (Map : in Map_Type;
+      ID  : in String);
    -- Creates a new map named ID or raises a DB.IO_Error when creation
    -- fails.
 
@@ -237,5 +230,5 @@ private
          end case;
       end record;
 
-end DB.Tables.Maps.Bounded;
+end DB.Maps.Bounded;
 

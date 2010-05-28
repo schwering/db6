@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-package DB.Tables.Maps.Bounded.Stats is
+package DB.Maps.Unbounded.Stats is
    --pragma Preelaborate;
 
    subtype Level_Type is Natural;
@@ -29,5 +29,5 @@ package DB.Tables.Maps.Bounded.Stats is
                                         Key   : in String;
                                         Value : in Data_Type));
 
-end DB.Tables.Maps.Bounded.Stats;
+end DB.Maps.Unbounded.Stats;
 

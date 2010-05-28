@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-package body DB.Tables.Maps.Unbounded is
+package body DB.Maps.Unbounded is
 
    function New_Map
      (Max_Key_Size   : in Blocks.Size_Type;
@@ -468,5 +468,5 @@ package body DB.Tables.Maps.Unbounded is
       end if;
    end Reorganize;
 
-end DB.Tables.Maps.Unbounded;
+end DB.Maps.Unbounded;
 
