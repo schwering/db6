@@ -1,13 +1,8 @@
 -- Abstract:
 --
--- Wrapper for BTree and Blob_Tree. Decides which to use depending on the
--- maximum value size.
---
--- Design Notes:
---
--- Experimentally, I have removed the (<>) in the public type declarations and
--- given all Short discriminants the default value True. The idea is that this
--- allows to have objects of the types defined here as component in records.
+-- A general, object-oriented map API.
+-- The keys of the maps are Types.Keys whereas the values must implement the
+-- Value_Type interface.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 

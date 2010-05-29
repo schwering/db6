@@ -1,13 +1,7 @@
 -- Abstract:
 --
--- Wrapper for BTree and Blob_Tree. Decides which to use depending on the
--- maximum value size.
---
--- Design Notes:
---
--- Experimentally, I have removed the (<>) in the public type declarations and
--- given all Short discriminants the default value True. The idea is that this
--- allows to have objects of the types defined here as component in records.
+-- Maps implementation using normal Gen_BTrees with Types.Keys and
+-- Types.Values.Bounded.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
