@@ -1,6 +1,5 @@
 with DB.Blocks;
-with DB.Types.Keys;
-with DB.Types.Values.Bounded;
+with Tree.Types;
 
 private
 package Tree.Test_Data is
@@ -22,34 +21,13 @@ package Tree.Test_Data is
    -- VL = Value_Length_Size for value
    -- VB = Value_Buffer_Size for value
 
-   package Keys    renames DB.Types.Keys;
-   package Rows    renames DB.Types.Keys.Rows;
-   package Columns renames DB.Types.Keys.Columns;
-   package Values  renames DB.Types.Values.Bounded;
-
-   type Count_Type is mod 2**64;
-   type Key_Value_Type is
-      record
-         Key   : DB.Types.Keys.Key_Type;
-         Value : Values.String_Type;
-      end record;
-   type Key_Value_Array_Type is array (Positive range <>) of Key_Value_Type;
-   type Key_Value_Array_Access_Type is access Key_Value_Array_Type;
-   subtype Char_Type is Character;
-
-   function Key (KV : Key_Value_Type) return DB.Types.Keys.Key_Type;
-   function Value (KV : Key_Value_Type) return Values.String_Type;
-
-
-   type Generator_Type is (Pseudo_Random_Gen, URL_Gen);
-
-   Generator  : Generator_Type;
+   Generator : Types.Generator_Type;
 
    procedure Init_Key_Value_Pairs
-     (Generator : in Generator_Type;
-      Count     : in Count_Type);
+     (Generator : in Types.Generator_Type;
+      Count     : in Types.Count_Type);
    procedure Reset_String_Generation;
-   function Random_Entry return Key_Value_Type;
+   function Random_Entry return Types.Key_Value_Type;
    procedure Finalize_Key_Value_Pairs;
 
 end Tree.Test_Data;

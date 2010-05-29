@@ -13,6 +13,9 @@ generic
 package DB.Types.Gen_Strings.Gen_Unbounded is
    pragma Preelaborate;
 
+   subtype Indefinite_Buffer_Type is Gen_Strings.Indefinite_Buffer_Type;
+   subtype Length_Type is Gen_Strings.Length_Type;
+   subtype Index_Type is Gen_Strings.Index_Type;
    type String_Type is new Ada.Finalization.Controlled with private;
 
    Empty_String : constant String_Type;

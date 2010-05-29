@@ -36,12 +36,16 @@ package DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams is
      (Stream : in out Stream_Type;
       Pos    : in     Ada.Streams.Stream_Element_Offset);
 
+   function Remaining
+      (Stream : Stream_Type)
+       return Length_Type;
+
 
 private
    type Stream_Type is new Ada.Streams.Root_Stream_Type with
       record
          String : String_Ref_Type;
-         Pos    : Natural;
+         Pos    : Length_Type;
       end record;
 
 end DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams;

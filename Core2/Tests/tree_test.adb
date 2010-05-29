@@ -1,7 +1,7 @@
-with Tree;
+with Tree.Start;
 
 procedure Tree_Test is
 begin
-   Tree.Run_Tree_Jobs;
+   Tree.Start;
 end Tree_Test;
 

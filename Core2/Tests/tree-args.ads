@@ -1,5 +1,5 @@
 with Tree.Jobs;
-with Tree.Test_Data;
+with Tree.Types;
 
 private
 package Tree.Args is
@@ -10,10 +10,10 @@ package Tree.Args is
       return String;
 
    function Generator
-      return Test_Data.Generator_Type;
+      return Types.Generator_Type;
 
    function Init_Offset
-      return Test_Data.Count_Type;
+      return Types.Count_Type;
 
    function Create_Jobs_From_Command_Line
      (Map : Jobs.Map_Type)

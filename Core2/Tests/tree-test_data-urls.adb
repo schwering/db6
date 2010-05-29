@@ -1,4 +1,5 @@
 with DB.Types;
+with DB.Types.Keys;
 with DB.Types.Times;
 
 with DB.Types.Gen_Strings;
@@ -22,7 +23,7 @@ package body Tree.Test_Data.URLs is
    Mutex : DB.Locks.Mutexes.Mutex_Type;
 
    generic
-      with package Strings is new DB.Types.Gen_Strings(Char_Type);
+      with package Strings is new DB.Types.Gen_Strings(Tree.Types.Char_Type);
       type String_Type is private;
       with function New_String (Buf : Strings.Indefinite_Buffer_Type)
          return String_Type is <>;
@@ -163,6 +164,7 @@ package body Tree.Test_Data.URLs is
 
       function Make_String (Index : Index_Type) return String_Type
       is
+         use type Types.Count_Type;
          TLD_Index : constant Index_Type :=
             Index mod TLDs'Length;
          Domain_Index : constant Index_Type :=
@@ -200,7 +202,7 @@ package body Tree.Test_Data.URLs is
       New_String  => DB.Types.Keys.Rows.New_String,
       "&"         => DB.Types.Keys.Rows."&");
 
-   function Make_Value1 (Count : Count_Type) return Values.String_Type
+   function Make_Value1 (Count : Types.Count_Type) return Types.Value_Type
    is
       type Uint32 is mod 2**32;
       type Definite_Buffer_Type is
@@ -208,19 +210,20 @@ package body Tree.Test_Data.URLs is
       function Convert is new Ada.Unchecked_Conversion
         (Uint32, Definite_Buffer_Type);
 
+      use type Types.Count_Type;
       I   : constant Uint32 
           := Uint32(Count mod Uint32'Modulus);
       Buf : constant DB.Types.Values.Indefinite_Buffer_Type
           := DB.Types.Values.Indefinite_Buffer_Type(Convert(I));
    begin
-      return Values.New_String(Buf);
+      return Types.New_Value(Buf);
    end Make_Value1;
 
 
-   function Make_Value2 (Count : Count_Type) return Values.String_Type
+   function Make_Value2 (Count : Types.Count_Type) return Types.Value_Type
    is
       Max_Len : constant := 4;
-      Img  : constant String   := Count_Type'Image(Count);
+      Img  : constant String   := Types.Count_Type'Image(Count);
       From : constant Positive := Integer'Max(Img'Last - Max_Len+1, Img'First);
       Sub  : constant String   := Img(From .. Img'Last);
 
@@ -235,16 +238,16 @@ package body Tree.Test_Data.URLs is
           := DB.Types.Values.Indefinite_Buffer_Type
                 (Convert(Definite_String_Type(Sub)));
    begin
-      return Values.New_String(Buf);
+      return Types.New_Value(Buf);
    end Make_Value2;
 
 
    pragma Unreferenced (Make_Value1);
-   function Make_Value (Count : Count_Type) return Values.String_Type
+   function Make_Value (Count : Types.Count_Type) return Types.Value_Type
    renames Make_Value2;
 
 
-   procedure Init_Key_Value_Pairs (Init : in Count_Type) is
+   procedure Init_Key_Value_Pairs (Init : in Types.Count_Type) is
    begin
       DB.Locks.Mutexes.Lock(Mutex);
       Initial_KV := Init;
@@ -261,9 +264,10 @@ package body Tree.Test_Data.URLs is
    end Reset_String_Generation;
 
 
-   function Random_Entry return Key_Value_Type
+   function Random_Entry return Types.Key_Value_Type
    is
-      KV : Key_Value_Type;
+      use type Types.Count_Type;
+      KV : Types.Key_Value_Type;
       I  : Index_Type renames Current_KV;
    begin
       DB.Locks.Mutexes.Lock(Mutex);

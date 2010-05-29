@@ -4,11 +4,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with DB.Utils.Timers;
 
+with Tree.Test_Data;
+
 package body Tree.Jobs is
 
    procedure Print
      (Action   : in String;
-      Count    : in Test_data.Count_Type;
+      Count    : in Types.Count_Type;
       Conc_Deg : in Positive;
       Reset    : in Boolean;
       Timer    : in DB.Utils.Timers.Timer_Type)
@@ -43,7 +45,7 @@ package body Tree.Jobs is
    begin
       Put("{");
       Put("""action: """& Action &""", ");
-      Put("""count"": "& Trim(Test_Data.Count_Type'Image(Count)) &", ");
+      Put("""count"": "& Trim(Types.Count_Type'Image(Count)) &", ");
       Put("""taskCount"": "& Trim(Positive'Image(Conc_Deg)) &", ");
       Put("""dataReset"": "& To_Lower(Boolean'Image(Reset)) &", ");
       Put("""cpu"": {""str"": """& Trim(CPU_String(Timer)) &""", "&
@@ -106,7 +108,7 @@ package body Tree.Jobs is
    function New_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
-      Short_Job_Execution_Count : in Test_Data.Count_Type;
+      Short_Job_Execution_Count : in Types.Count_Type;
       Concurrency_Degree        : in Positive;
       Reset                     : in Boolean)
       return Job_Type is
@@ -136,11 +138,11 @@ package body Tree.Jobs is
    procedure Execute_Job
      (Description               : in Description_Type;
       Short_Job                 : in Short_Job_Type;
-      Short_Job_Execution_Count : in Test_Data.Count_Type;
+      Short_Job_Execution_Count : in Types.Count_Type;
       Concurrency_Degree        : in Positive;
       Reset                     : in Boolean)
    is
-      use type Test_Data.Count_Type;
+      use type Types.Count_Type;
       Total_Timer : DB.Utils.Timers.Timer_Type;
    begin
       if Reset then
@@ -149,14 +151,14 @@ package body Tree.Jobs is
       DB.Utils.Timers.Start(Total_Timer);
       declare
          task type Task_Type is
-            entry Set_Loop_Count (Count : in Test_Data.Count_Type);
+            entry Set_Loop_Count (Count : in Types.Count_Type);
          end;
 
          task body Task_Type
          is
-            N : Test_Data.Count_Type;
+            N : Types.Count_Type;
          begin
-            accept Set_Loop_Count (Count : in Test_Data.Count_Type) do
+            accept Set_Loop_Count (Count : in Types.Count_Type) do
                N := Count;
             end Set_Loop_Count;
             for I in 1 .. N loop
@@ -182,11 +184,11 @@ package body Tree.Jobs is
          end Task_Type;
 
          Tasks : array (1 .. Concurrency_Degree) of Task_Type;
-         J : constant Test_Data.Count_Type := Short_Job_Execution_Count;
-         T : constant Test_Data.Count_Type
-           := Test_Data.Count_Type(Concurrency_Degree);
-         N : constant Test_Data.Count_Type := J / T;
-         R :          Test_Data.Count_Type := J mod T;
+         J : constant Types.Count_Type := Short_Job_Execution_Count;
+         T : constant Types.Count_Type
+           := Types.Count_Type(Concurrency_Degree);
+         N : constant Types.Count_Type := J / T;
+         R :          Types.Count_Type := J mod T;
       begin
          for I in Tasks'Range loop
             if R > 0 then

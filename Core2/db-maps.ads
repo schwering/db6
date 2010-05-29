@@ -11,22 +11,21 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Streams;
 with DB.Blocks;
 with DB.Types.Keys;
+with DB.Types.Values.Bounded.Streams;
 
 package DB.Maps is
-   pragma Elaborate_Body;
 
    type Serializable_Type is interface;
 
    procedure Write
-     (Stream : in out Ada.Streams.Root_Stream_Type'Class;
+     (Stream : in out Types.Values.Bounded.Streams.Stream_Type'Class;
       Object : in     Serializable_Type)
    is abstract;
 
    procedure Read
-     (Stream : in out Ada.Streams.Root_Stream_Type'Class;
+     (Stream : in out Types.Values.Bounded.Streams.Stream_Type'Class;
       Object :    out Serializable_Type)
    is abstract;
 
@@ -38,11 +37,20 @@ package DB.Maps is
       return Boolean
    is abstract;
 
+   function Equals
+     (Left, Right : Comparable_Type'Class)
+      return Boolean;
+
 
    subtype Key_Type is DB.Types.Keys.Key_Type;
    use type Key_Type;
 
    type Value_Type is interface and Serializable_Type and Comparable_Type;
+
+   function Image
+     (Value : Value_Type)
+      return String
+   is abstract;
 
    ----------
    -- Map initialization operations.
@@ -129,6 +137,21 @@ package DB.Maps is
    -- Miscellaneous procedures.
 
    subtype Count_Type is Long_Integer;
+   subtype Level_Type is Natural;
+   subtype Absolute_Type is Long_Integer;
+   type Average_Type is delta 10.0**(-1) digits 17;
+   type Data_Type (Compound : Boolean) is
+      record
+         case Compound is
+            when True =>
+               Avg : Average_Type;
+               Var : Average_Type;
+               Min : Absolute_Type;
+               Max : Absolute_Type;
+            when False =>
+               Val : Absolute_Type;
+         end case;
+      end record;
 
    procedure Count
      (Map   : in out Map_Type;
@@ -138,6 +161,17 @@ package DB.Maps is
    procedure Reorganize
      (Map   : in out Map_Type;
       State :    out State_Type)
+   is abstract;
+
+   procedure Check
+     (Map : in out Map_Type)
+   is abstract;
+
+   procedure Stats
+     (Map  : in out Map_Type;
+      Emit : not null access procedure (Level : in Level_Type;
+                                        Key   : in String;
+                                        Value : in Data_Type))
    is abstract;
 
 

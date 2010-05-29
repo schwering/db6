@@ -3,28 +3,15 @@ with Tree.Test_Data.URLs;
 
 package body Tree.Test_Data is
 
-   function Key (KV : Key_Value_Type) return DB.Types.Keys.Key_Type is
-   begin
-      return KV.Key;
-   end;
-
-
-   function Value (KV : Key_Value_Type)
-      return Values.String_Type is
-   begin
-      return KV.Value;
-   end;
-
-
    procedure Init_Key_Value_Pairs
-     (Generator : in Generator_Type;
-      Count     : in Count_Type) is
+     (Generator : in Types.Generator_Type;
+      Count     : in Types.Count_Type) is
    begin
       Test_Data.Generator := Generator;
       case Generator is
-         when Pseudo_Random_Gen =>
+         when Types.Pseudo_Random_Gen =>
             Test_Data.Pseudo_Random.Init_Key_Value_Pairs(Count);
-         when URL_Gen =>
+         when Types.URL_Gen =>
             Test_Data.URLs.Init_Key_Value_Pairs(Count);
       end case;
    end;
@@ -33,20 +20,20 @@ package body Tree.Test_Data is
    procedure Reset_String_Generation is
    begin
       case Generator is
-         when Pseudo_Random_Gen =>
+         when Types.Pseudo_Random_Gen =>
             Test_Data.Pseudo_Random.Reset_String_Generation;
-         when URL_Gen =>
+         when Types.URL_Gen =>
             Test_Data.URLs.Reset_String_Generation;
       end case;
    end;
 
 
-   function Random_Entry return Key_Value_Type is
+   function Random_Entry return Types.Key_Value_Type is
    begin
       case Generator is
-         when Pseudo_Random_Gen =>
+         when Types.Pseudo_Random_Gen =>
             return Test_Data.Pseudo_Random.Random_Entry;
-         when URL_Gen =>
+         when Types.URL_Gen =>
             return Test_Data.URLs.Random_Entry;
       end case;
    end;
@@ -55,9 +42,9 @@ package body Tree.Test_Data is
    procedure Finalize_Key_Value_Pairs is
    begin
       case Generator is
-         when Pseudo_Random_Gen =>
+         when Types.Pseudo_Random_Gen =>
             Test_Data.Pseudo_Random.Finalize_Key_Value_Pairs;
-         when URL_Gen =>
+         when Types.URL_Gen =>
             Test_Data.URLs.Finalize_Key_Value_Pairs;
       end case;
    end;

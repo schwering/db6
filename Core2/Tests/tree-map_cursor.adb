@@ -1,17 +1,17 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Tree.Test_Data;
-with Tree.Map_Types;
+with Tree.Types;
 with Tree.Args;
 with Tree.Jobs;
 
-with DB.Tables.Maps;
+with DB.Maps;
 
 procedure Tree.Map_Cursor is
 
-   package Maps renames DB.Tables.Maps;
-   Map : Maps.Map_Type := Maps.New_Map(Map_Types.Max_Key_Size,
-                                       Map_Types.Max_Value_Size);
+   Map : DB.Maps.Map_Type'Class
+       := DB.Maps.New_Map(Test_Data.Max_Key_Size,
+                          Test_Data.Max_Value_Size);
 
    protected Count_Container is
       procedure Found (C : in Natural);
@@ -45,69 +45,67 @@ procedure Tree.Map_Cursor is
 
    procedure Job
    is
-      use type Map_Types.Key_Type;
-      use type Map_Types.Value_Type;
-      KV          : constant Test_Data.Key_Value_Type := Test_Data.Random_Entry;
-      Key         : constant Map_Types.Key_Type       := KV.Key;
-      Value       : constant Map_Types.Value_Type 
-                  := Map_Types.From_Bounded(KV.Value);
-      LC          : constant Maps.Comparison_Type  := Maps.Equal;
-      UC          : constant Maps.Comparison_Type  := Maps.Equal;
-      Lower       : constant Maps.Bound_Type := Maps.New_Bound(Map, LC, Key);
-      Upper       : constant Maps.Bound_Type := Maps.New_Bound(Map, UC, Key);
-      Cursor      : Maps.Cursor_Type
-                  := Maps.New_Cursor(Map         => Map,
-                                     Thread_Safe => False,
-                                     Lower_Bound => Lower,
-                                     Upper_Bound => Upper);
-      State       : Maps.State_Type;
-      Count       : Natural := 0;
+      use type Types.Key_Type;
+      use type Types.Value_Type;
+      KV     : constant Types.Key_Value_Type := Test_Data.Random_Entry;
+      Key    : constant Types.Key_Type   := KV.Key;
+      Value  : constant Types.Value_Type := Types.Value(KV);
+      LC     : constant DB.Maps.Comparison_Type  := DB.Maps.Equal;
+      UC     : constant DB.Maps.Comparison_Type  := DB.Maps.Equal;
+      Lower  : constant DB.Maps.Bound_Type := DB.Maps.New_Bound(LC, Key);
+      Upper  : constant DB.Maps.Bound_Type := DB.Maps.New_Bound(UC, Key);
+      Cursor : DB.Maps.Cursor_Type'Class
+             := Map.New_Cursor(Thread_Safe => False,
+                               Lower_Bound => Lower,
+                               Upper_Bound => Upper);
+      State  : DB.Maps.State_Type;
+      Count  : Natural := 0;
    begin
       loop
          declare
-            This_Key   : Map_Types.Key_Type;
-            This_Value : Map_Types.Value_Type;
+            This_Key   : Types.Key_Type;
+            This_Value : Types.Value_Type;
          begin
-            Maps.Next(Map, Cursor, This_Key, This_Value, State);
+            Cursor.Next(This_Key, This_Value, State);
             case State is
-               when Maps.Success =>
+               when DB.Maps.Success =>
                   pragma Assert (Key = This_Key);
                   pragma Assert (Value = This_Value);
                   Count := Count + 1;
-               when Maps.Failure =>
+               when DB.Maps.Failure =>
                   exit;
-               when Maps.Error =>
+               when DB.Maps.Error =>
                   Ada.Text_IO.Put_Line("Error");
                   exit;
             end case;
          end;
       end loop;
-      Maps.Finalize_Cursor(Map, Cursor);
+      Cursor.Finalize_Cursor;
       Count_Container.Found(Count);
    end Job;
 
-   Cnt : DB.Tables.Maps.Count_Type;
+   Cnt : DB.Maps.Count_Type;
 begin
    declare
    begin
-      DB.Tables.Maps.Create(Args.File_Name, Map_Types.Max_Key_Size,
-                            Map_Types.Max_Value_Size);
+      Map.Create(Args.File_Name);
       Ada.Text_IO.Put_Line("Newly created Map "& Args.File_Name);
    exception
-      when DB.IO_Error => Put_Line("Using existing Map "& Args.File_Name);
+      when DB.IO_Error =>
+         Map.Initialize(Args.File_Name);
+         Put_Line("Using existing Map "& Args.File_Name);
    end;
-   Maps.Initialize(Map, Args.File_Name);
-   DB.Tables.Maps.Count(Map, Cnt);
-   Ada.Text_IO.Put_Line("Size ="& DB.Tables.Maps.Count_Type'Image(Cnt));
+   Map.Count(Cnt);
+   Ada.Text_IO.Put_Line("Size ="& DB.Maps.Count_Type'Image(Cnt));
 
    declare
-      use type Test_Data.Count_Type;
-      RC : constant Test_Data.Count_Type := Test_Data.Count_Type(Cnt);
-      IO : constant Test_Data.Count_Type := Args.Init_Offset;
-      I  : constant Test_Data.Count_Type := (RC - Test_Data.Count_Type'Min(RC, IO))+1;
+      use type Types.Count_Type;
+      RC : constant Types.Count_Type := Types.Count_Type(Cnt);
+      IO : constant Types.Count_Type := Args.Init_Offset;
+      I  : constant Types.Count_Type := (RC - Types.Count_Type'Min(RC, IO))+1;
    begin
       Test_Data.Init_Key_Value_Pairs(Args.Generator, I);
-      Ada.Text_IO.Put_Line("Init ="& Test_Data.Count_Type'Image(I));
+      Ada.Text_IO.Put_Line("Init ="& Types.Count_Type'Image(I));
    end;
 
    Jobs.Execute_Job(Description               => Jobs.To_Description("Cursor"),
@@ -117,6 +115,6 @@ begin
                     Reset                     => False);
    Ada.Text_IO.Put_Line("Total:"& Count_Container.Total_Count'Img);
 
-   DB.Tables.Maps.Finalize(Map);
+   Map.Finalize;
 end Tree.Map_Cursor;
 

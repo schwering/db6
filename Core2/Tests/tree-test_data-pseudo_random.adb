@@ -1,8 +1,12 @@
+with Ada.Unchecked_Deallocation;
+with Ada.Unchecked_Conversion;
+
 with DB.Types;
+with DB.Types.Keys;
 with DB.Types.Times;
 
-with DB.Types.Gen_Strings;
 with DB.Types.Strings;
+with DB.Types.Gen_Strings;
 with DB.Types.Values;
 
 pragma Warnings (Off);
@@ -15,15 +19,14 @@ pragma Warnings (On);
 
 with DB.Locks.Mutexes;
 
-with Ada.Unchecked_Deallocation;
-with Ada.Unchecked_Conversion;
+with Tree.Types;
 
 package body Tree.Test_Data.Pseudo_Random is
 
    Mutex : DB.Locks.Mutexes.Mutex_Type;
 
    generic
-      with package Strings is new DB.Types.Gen_Strings(Char_Type);
+      with package Strings is new DB.Types.Gen_Strings(Tree.Types.Char_Type);
       type String_Type is private;
       with function New_String (Buf : Strings.Indefinite_Buffer_Type)
          return String_Type;
@@ -33,7 +36,7 @@ package body Tree.Test_Data.Pseudo_Random is
    function Make_String (Index : Natural) return String_Type
    is
       Alphabet_Length : constant
-                      := Char_Type'Pos('z') - Char_Type'Pos('a') + 1;
+                      := Types.Char_Type'Pos('z') - Types.Char_Type'Pos('a') + 1;
       Total_KV_Count  : constant Positive
                       := Key_Value_Pairs'Length;
       Random_Factor   : constant Strings.Length_Type'Base
@@ -49,11 +52,11 @@ package body Tree.Test_Data.Pseudo_Random is
                      := (Random_Factor * J) mod Alphabet_Length;
          begin
             if (String_Length + J) mod 2 = 0 then
-               Char_Pos := Char_Type'Pos('a') + Offset;
+               Char_Pos := Types.Char_Type'Pos('a') + Offset;
             else
-               Char_Pos := Char_Type'Pos('A') + Offset;
+               Char_Pos := Types.Char_Type'Pos('A') + Offset;
             end if;
-            String_Buffer(J) := Char_Type'Val(Char_Pos);
+            String_Buffer(J) := Types.Char_Type'Val(Char_Pos);
          end;
       end loop;
       return New_String(String_Buffer);
@@ -74,7 +77,7 @@ package body Tree.Test_Data.Pseudo_Random is
       Random_Weight => 3);
 
 
-   function Make_Value1 (Count : Count_Type) return Values.String_Type
+   function Make_Value1 (Count : Types.Count_Type) return Types.Value_Type
    is
       type Uint32 is mod 2**32;
       type Definite_Buffer_Type is
@@ -82,18 +85,19 @@ package body Tree.Test_Data.Pseudo_Random is
       function Convert is new Ada.Unchecked_Conversion
         (Uint32, Definite_Buffer_Type);
 
+      use type Types.Count_Type;
       I   : constant Uint32 
           := Uint32(Count mod Uint32'Modulus);
       Buf : constant DB.Types.Values.Indefinite_Buffer_Type
           := DB.Types.Values.Indefinite_Buffer_Type(Convert(I));
    begin
-      return Values.New_String(Buf);
+      return Types.New_Value(Buf);
    end Make_Value1;
 
-   function Make_Value2 (Count : Count_Type) return Values.String_Type
+   function Make_Value2 (Count : Types.Count_Type) return Types.Value_Type
    is
       Max_Len : constant := 4;
-      Img  : constant String   := Count_Type'Image(Count);
+      Img  : constant String   := Types.Count_Type'Image(Count);
       From : constant Positive := Integer'Max(Img'Last - Max_Len+1, Img'First);
       Sub  : constant String   := Img(From .. Img'Last);
 
@@ -108,16 +112,16 @@ package body Tree.Test_Data.Pseudo_Random is
           := DB.Types.Values.Indefinite_Buffer_Type
                 (Convert(Definite_String_Type(Sub)));
    begin
-      return Values.New_String(Buf);
+      return Types.New_Value(Buf);
    end Make_Value2;
 
 
    pragma Unreferenced (Make_Value1);
-   function Make_Value (Count : Count_Type) return Values.String_Type
+   function Make_Value (Count : Types.Count_Type) return Types.Value_Type
    renames Make_Value2;
 
 
-   procedure Init_Key_Value_Pairs (Init : in Count_Type) is
+   procedure Init_Key_Value_Pairs (Init : in Types.Count_Type) is
    begin
       DB.Locks.Mutexes.Lock(Mutex);
       Initial_KV := Init;
@@ -126,7 +130,7 @@ package body Tree.Test_Data.Pseudo_Random is
          Key_Value_Pairs(I).Key.Row    := Make_Row(I);
          Key_Value_Pairs(I).Key.Column := Make_Column(I);
          Key_Value_Pairs(I).Key.Time   := 0;
-         Key_Value_Pairs(I).Value      := Make_Value(Count_Type(I));
+         Key_Value_Pairs(I).Value      := Make_Value(Types.Count_Type(I));
       end loop;
       DB.Locks.Mutexes.Unlock(Mutex);
    end Init_Key_Value_Pairs;
@@ -140,14 +144,15 @@ package body Tree.Test_Data.Pseudo_Random is
    end Reset_String_Generation;
 
 
-   function Random_Entry return Key_Value_Type
+   function Random_Entry return Types.Key_Value_Type
    is
-      KV : Key_Value_Type;
+      KV : Types.Key_Value_Type;
    begin
       DB.Locks.Mutexes.Lock(Mutex);
       declare
-         I : constant Positive
-         := Positive((Current_KV mod Count_Type(Key_Value_Pairs'Length)) + 1);
+         use type Types.Count_Type;
+         I : constant Positive :=
+            Positive((Current_KV mod Types.Count_Type(Key_Value_Pairs'Length)) + 1);
       begin
          Key_Value_Pairs(I).Key.Time := DB.Types.Times.Number_Type(Current_KV);
          Key_Value_Pairs(I).Value := Make_Value(Current_KV);
@@ -162,7 +167,7 @@ package body Tree.Test_Data.Pseudo_Random is
    procedure Finalize_Key_Value_Pairs
    is
       procedure Free is new Ada.Unchecked_Deallocation
-        (Key_Value_Array_Type, Key_Value_Array_Access_Type);
+        (Types.Key_Value_Array_Type, Types.Key_Value_Array_Access_Type);
    begin
       Free(Key_Value_Pairs);
    end Finalize_Key_Value_Pairs;

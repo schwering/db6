@@ -35,8 +35,10 @@ package body Tree.To_Strings is
    is
       use DB.Types.Values;
       use DB.Types.Values.Bounded;
-      Buf : constant Indefinite_Buffer_Type := To_Buffer(Value);
-      type Buffer_Type is new Indefinite_Buffer_Type(Buf'Range);
+      Buf : constant DB.Types.Values.Bounded.Indefinite_Buffer_Type :=
+         To_Buffer(Value);
+      type Buffer_Type is
+         new DB.Types.Values.Bounded.Indefinite_Buffer_Type(Buf'Range);
       type Fixed_String_Type is new String(Buf'Range);
       function Convert is new Ada.Unchecked_Conversion
         (Buffer_Type, Fixed_String_Type);
@@ -50,8 +52,10 @@ package body Tree.To_Strings is
    is
       use DB.Types.Values;
       use DB.Types.Values.Unbounded;
-      Buf : constant Indefinite_Buffer_Type := To_Buffer(Value);
-      type Buffer_Type is new Indefinite_Buffer_Type(Buf'Range);
+      Buf : constant DB.Types.Values.Bounded.Indefinite_Buffer_Type :=
+         To_Buffer(Value);
+      type Buffer_Type is
+         new DB.Types.Values.Bounded.Indefinite_Buffer_Type(Buf'Range);
       type Fixed_String_Type is new String(Buf'Range);
       function Convert is new Ada.Unchecked_Conversion
         (Buffer_Type, Fixed_String_Type);

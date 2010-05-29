@@ -18,8 +18,8 @@ with DB.Blocks.Local_IO;
 with DB.Types.Values;
 with DB.Types.Values.Bounded;
 
+private
 package DB.Maps.Bounded is
-   pragma Elaborate_Body;
 
    ----------
    -- Map initialization operations.
@@ -98,8 +98,6 @@ package DB.Maps.Bounded is
    ----------
    -- Miscellaneous procedures.
 
-   subtype Count_Type is Long_Integer;
-
    overriding
    procedure Count
      (Map   : in out Map_Type;
@@ -109,6 +107,17 @@ package DB.Maps.Bounded is
    procedure Reorganize
      (Map   : in out Map_Type;
       State :    out State_Type);
+
+   overriding
+   procedure Check
+     (Map : in out Map_Type);
+
+   overriding
+   procedure Stats
+     (Map  : in out Map_Type;
+      Emit : not null access procedure (Level : in Level_Type;
+                                        Key   : in String;
+                                        Value : in Data_Type));
 
 
    ----------

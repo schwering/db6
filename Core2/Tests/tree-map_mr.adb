@@ -1,7 +1,8 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 
-with Tree.Map_Types;
+with Tree.Test_Data;
+with Tree.Types;
 with Tree.Args;
 with Tree.Jobs;
 with Tree.To_Strings;
@@ -11,7 +12,7 @@ with DB.Blocks;
 with DB.Blocks.Gen_Keys_Signature;
 with DB.Blocks.Gen_Values_Signature;
 with DB.Blocks.Local_IO;
-with DB.Tables.Maps;
+with DB.Maps;
 with DB.Types.Keys;
 with DB.Types.Gen_Numbers;
 
@@ -21,25 +22,24 @@ with DB.Utils.Global_Pool;
 
 procedure Tree.Map_MR is
 
-   package Maps renames DB.Tables.Maps;
-   Map : Maps.Map_Type := Maps.New_Map(Map_Types.Max_Key_Size,
-                                       Map_Types.Max_Value_Size);
+   Map : DB.Maps.Map_Type'Class
+       := DB.Maps.New_Map(Test_Data.Max_Key_Size,
+                          Test_Data.Max_Value_Size);
 
    procedure Job
    is
-      Lower       : constant Maps.Bound_Type
-                  := Maps.Negative_Infinity_Bound(Map);
-      Upper       : constant Maps.Bound_Type
-                  := Maps.Positive_Infinity_Bound(Map);
-      Cursor      : Maps.Cursor_Type
-                  := Maps.New_Cursor(Map         => Map,
-                                     Thread_Safe => True,
-                                     Lower_Bound => Lower,
-                                     Upper_Bound => Upper);
+      Lower       : constant DB.Maps.Bound_Type
+                  := DB.Maps.Negative_Infinity_Bound;
+      Upper       : constant DB.Maps.Bound_Type
+                  := DB.Maps.Positive_Infinity_Bound;
+      Cursor      : DB.Maps.Cursor_Type'Class
+                  := Map.New_Cursor(Thread_Safe => True,
+                                    Lower_Bound => Lower,
+                                    Upper_Bound => Upper);
 
       package Ins is
-         subtype In_Key_Type is Map_Types.Key_Type;
-         subtype In_Value_Type is Map_Types.Value_Type;
+         subtype In_Key_Type is Types.Key_Type;
+         subtype In_Value_Type is Types.Value_Type;
       end Ins;
 
       package Intermediates is
@@ -85,12 +85,12 @@ procedure Tree.Map_MR is
          Value   : out In_Value_Type;
          Success : out Boolean)
       is
-         use type Maps.State_Type;
-         State : Maps.State_Type;
+         use type DB.Maps.State_Type;
+         State : DB.Maps.State_Type;
       begin
-         Maps.Next(Map, Cursor, Key, Value, State);
-         Success := State = Maps.Success;
-         if State = Maps.Error then
+         Cursor.Next(Key, Value, State);
+         Success := State = DB.Maps.Success;
+         if State = DB.Maps.Error then
             Put_Line("ERROR CURSOR");
          end if;
       end Input;
@@ -157,7 +157,7 @@ procedure Tree.Map_MR is
          Last_Out_Key   := Key;
          Last_Out_Value := Value;
          Out_Count := Out_Count + 1;
-         --Put_Line(Map_Types.To_String(Key) &" =>"& Value'Img);
+         --Put_Line(Types.To_String(Key) &" =>"& Value'Img);
          DB.Locks.Mutexes.Unlock(Out_Mutex);
       exception
          when others =>
@@ -187,25 +187,25 @@ procedure Tree.Map_MR is
 
    begin
       Map_Reduce("bluhp.intermediates");
-      Maps.Finalize_Cursor(Map, Cursor);
+      Cursor.Finalize_Cursor;
 
       Put_Line("Count ="& Out_Count'Img);
       Put_Line("Value ="& Last_Out_Value'Img);
    end Job;
 
-   Cnt : DB.Tables.Maps.Count_Type;
+   Cnt : DB.Maps.Count_Type;
 begin
    declare
    begin
-      DB.Tables.Maps.Create(Args.File_Name, Map_Types.Max_Key_Size,
-                            Map_Types.Max_Value_Size);
+      Map.Create(Args.File_Name);
       Ada.Text_IO.Put_Line("Newly created Map "& Args.File_Name);
    exception
-      when DB.IO_Error => Put_Line("Using existing Map "& Args.File_Name);
+      when DB.IO_Error =>
+         Map.Initialize(Args.File_Name);
+         Put_Line("Using existing Map "& Args.File_Name);
    end;
-   Maps.Initialize(Map, Args.File_Name);
-   DB.Tables.Maps.Count(Map, Cnt);
-   Ada.Text_IO.Put_Line("Size ="& DB.Tables.Maps.Count_Type'Image(Cnt));
+   Map.Count(Cnt);
+   Ada.Text_IO.Put_Line("Size ="& DB.Maps.Count_Type'Image(Cnt));
 
    Jobs.Execute_Job(Description             => Jobs.To_Description("MapReduce"),
                     Short_Job               => Job'Unrestricted_Access,
@@ -213,6 +213,6 @@ begin
                     Concurrency_Degree      => 1,
                     Reset                   => False);
 
-   DB.Tables.Maps.Finalize(Map);
+   Map.Finalize;
 end Tree.Map_MR;
 

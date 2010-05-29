@@ -1,53 +1,16 @@
 with Ada.Unchecked_Conversion;
 
 with Tree.Jobs;
+with Tree.Types; use Tree.Types;
+
+with DB.Maps;
 
 private
 generic
-   type Object_Type (<>) is limited private;
-   type Key_Type is private;
-   type Value_Type (<>) is private;
-
-   with function Equal_Values (Left, Right : Value_Type) return Boolean;
-   with function Key_To_String (K : Key_Type) return String;
-   with function Value_To_String (V : Value_Type) return String;
-
-   type Key_Value_Type is private;
    with function Next_Entry return Key_Value_Type;
-   with function Get_Key (KV : Key_Value_Type) return Key_Type;
-   with function Get_Value (KV : Key_Value_Type) return Value_Type;
-   with procedure Check_Key_Value (KV : Key_Value_Type);
 
-   type Count_Type is range <>;
-   type State_Type is (<>);
-
-   Object     : in out Object_Type;
+   Map        : in out DB.Maps.Map_Type'Class;
    Null_value : in out Value_Type;
-   Success    : in State_Type;
-   Failure    : in State_Type;
-
-   with procedure P_Insert
-          (Object   : in out Object_Type; 
-           Key      : in     Key_Type;
-           Value    : in     Value_Type;
-           State    :    out State_Type);
-   with procedure P_Delete
-          (Object   : in out Object_Type; 
-           Key      : in     Key_Type;
-           Value    :    out Value_Type;
-           State    :    out State_Type);
-   with procedure P_Search
-          (Object   : in out Object_Type; 
-           Key      : in     Key_Type;
-           Value    :    out Value_Type;
-           State    :    out State_Type);
-   with procedure P_Count
-          (Object : in out Object_Type;
-           Count  :    out Count_Type);
-   with procedure P_Stats
-          (Object : in out Object_Type);
-   with procedure P_Check
-          (Object : in out Object_Type);
 package Tree.Gen_Simple_Jobs is
 
    Stop_Now : exception;

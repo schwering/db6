@@ -4,7 +4,10 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with DB.Gen_BTrees.Gen_Check;
+with DB.Gen_BTrees.Gen_Stats;
 with DB.Types.Values.Bounded.Streams;
+with DB.Utils.Gen_Integer_Image;
 
 package body DB.Maps.Bounded is
 
@@ -123,7 +126,7 @@ package body DB.Maps.Bounded is
    is
       S      : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type := 
-         Types.Values.Bounded.Empty_String; 
+         Types.Values.Bounded.Empty_String;
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
          Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
    begin
@@ -159,22 +162,6 @@ package body DB.Maps.Bounded is
       Upper_Bound : Bound_Type)
       return Maps.Cursor_Type'Class
    is
-      function Positive_Infinity_Bound
-        (Map : Map_Type)
-         return BTrees.Bound_Type is
-      begin
-         return BTrees.Positive_Infinity_Bound;
-      end Positive_Infinity_Bound;
-
-
-      function Negative_Infinity_Bound
-        (Map : Map_Type)
-         return BTrees.Bound_Type is
-      begin
-         return BTrees.Negative_Infinity_Bound;
-      end Negative_Infinity_Bound;
-
-
       function New_Bound
         (Comparison : Comparison_Type;
          Key        : Key_Type)
@@ -207,8 +194,8 @@ package body DB.Maps.Bounded is
          end case;
       end To_Bound;
 
-      B_Lower_Bound : BTrees.Bound_Type := To_Bound(Lower_Bound);
-      B_Upper_Bound : BTrees.Bound_Type := To_Bound(Upper_Bound);
+      B_Lower_Bound : constant BTrees.Bound_Type := To_Bound(Lower_Bound);
+      B_Upper_Bound : constant BTrees.Bound_Type := To_Bound(Upper_Bound);
    begin
       return Cursor_Type'(Map.Self,
                           BTrees.New_Cursor(Map.Tree,
@@ -295,6 +282,82 @@ package body DB.Maps.Bounded is
       BTrees.Reorganize(Map.Tree, S);
       State := To_State(S);
    end Reorganize;
+
+
+   overriding
+   procedure Check
+     (Map : in out Map_Type)
+   is
+      function Key_To_String (Key : Key_Type) return String
+      is
+         function Row_Image (S : Types.Keys.Rows.String_Type) return String is
+         begin
+            return String(Types.Keys.Rows.To_Buffer(S));
+         end Row_Image;
+
+         function Column_Image (S : Types.Keys.Columns.String_Type) return String is
+         begin
+            return String(Types.Keys.Columns.To_Buffer(S));
+         end Column_Image;
+      begin
+         return "("& Row_Image(Key.Row) &", "& Column_Image(Key.Column) &", "&
+                Key.Time'Img &")";
+      end Key_To_String;
+
+      function Value_To_String
+        (Value : Types.Values.Bounded.String_Type)
+         return String
+      is
+         pragma Unreferenced (Value);
+      begin
+         return "(BoundedString)";
+      end Value_To_String;
+
+      function Address_To_String is new
+         Utils.Gen_Integer_Image(Block_IO_Impl.Address_Type);
+
+      procedure Check is new BTrees.Gen_Check
+        (Key_To_String      => Key_To_String,
+         Value_To_String    => Value_To_String,
+         Address_To_String  => Address_To_String);
+   begin
+      Check(Map.Tree);
+   end Check;
+
+
+   overriding
+   procedure Stats
+     (Map  : in out Map_Type;
+      Emit : not null access procedure (Level : in Level_Type;
+                                        Key   : in String;
+                                        Value : in Data_Type))
+   is
+      package Stats is new BTrees.Gen_Stats;
+      procedure My_Emit
+        (Level : in Stats.Level_Type;
+         Key   : in String;
+         Value : in Stats.Data_Type) is
+      begin
+         case Value.Compound is
+            when True =>
+               Emit(Level_Type(Level),
+                    Key,
+                    Data_Type'(Compound => True,
+                               Avg => Average_Type(Value.Avg),
+                               Var => Average_Type(Value.Var),
+                               Min => Absolute_Type(Value.Min),
+                               Max => Absolute_Type(Value.Max)));
+            when False =>
+               Emit(Level_Type(Level),
+                    Key,
+                    Data_Type'(Compound => False,
+                               Val => Absolute_Type(Value.Val)));
+         end case;
+      end;
+   begin
+      Stats.Make_Stats(Map.Tree, My_Emit'Access);
+   end Stats;
+
 
 end DB.Maps.Bounded;
 

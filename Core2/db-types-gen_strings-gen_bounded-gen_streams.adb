@@ -68,5 +68,13 @@ package body DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams is
       Stream.Pos := Length_Type(Pos);
    end Seek;
 
+
+   function Remaining
+      (Stream : Stream_Type)
+       return Length_Type is
+   begin
+      return Length(Stream.String.all) - Stream.Pos + 1;
+   end Remaining;
+
 end DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams;
 

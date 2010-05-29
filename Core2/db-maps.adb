@@ -4,9 +4,22 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Tags;
+
 with DB.Maps.Bounded;
 
 package body DB.Maps is
+
+   function Equals
+     (Left, Right : Comparable_Type'Class)
+      return Boolean
+   is
+      use type Ada.Tags.Tag;
+   begin
+      return Left'Tag = Right'Tag and then
+             Left.Equals(Right);
+   end Equals;
+
 
    function New_Map
      (Max_Key_Size   : in Blocks.Size_Type;
