@@ -12,70 +12,72 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Streams;
-with DB.Blocks.Gen_Values_Signature;
-with DB.Gen_BTrees;
---with DB.Gen_Blob_Trees;
 with DB.Blocks;
-with DB.Blocks.Local_IO;
+with DB.Types.Keys;
 
 package DB.Maps is
    pragma Elaborate_Body;
 
-   type Serializable_Type;
+   type Serializable_Type is interface;
 
    procedure Write
-     (Stream : in out Ada.Streams.Root_Stream_Type;
+     (Stream : in out Ada.Streams.Root_Stream_Type'Class;
       Object : in     Serializable_Type)
    is abstract;
 
    procedure Read
-     (Stream : in out Ada.Streams.Root_Stream_Type;
-      Data   : in     Serializable_Type)
+     (Stream : in out Ada.Streams.Root_Stream_Type'Class;
+      Object :    out Serializable_Type)
    is abstract;
 
 
-   type Comparable_Type;
+   type Comparable_Type is interface;
 
    function Equals
      (A, B : Comparable_Type)
-      return Boolean;
+      return Boolean
+   is abstract;
 
 
-   type Key_Type is interface Comparable and Serializable_Type;
+   subtype Key_Type is DB.Types.Keys.Key_Type;
+   use type Key_Type;
 
-   type Value_Type is interface;
+   type Value_Type is interface and Serializable_Type and Comparable_Type;
 
    ----------
    -- Map initialization operations.
 
-   type Map_Type is limited private;
+   type Map_Type is limited interface;
 
    function New_Map
      (Max_Key_Size   : in Blocks.Size_Type;
       Max_Value_Size : in Blocks.Size_Type)
-      return Map_Type;
+      return Map_Type'Class;
    -- Initializes a map object.
 
    procedure Create
-     (ID             : in String;
-      Max_Key_Size   : in Blocks.Size_Type;
-      Max_Value_Size : in Blocks.Size_Type);
+     (Map : in out Map_Type;
+      ID  : in     String)
+   is abstract;
    -- Creates a new map named ID or raises a DB.IO_Error when creation
    -- fails.
 
    procedure Initialize
      (Map  : out Map_Type;
-      ID   : in  String);
+      ID   : in  String)
+   is abstract;
    -- Initializes Map with the map named ID.
 
    procedure Finalize
-     (Map  : in out Map_Type);
+     (Map  : in out Map_Type)
+   is abstract;
    -- Finalizes Map, i.e. closes opened files.
 
    function Max_Key_Size
      (Map            : Map_Type;
       Max_Value_Size : Blocks.Size_Type)
-      return Blocks.Size_Type;
+      return Blocks.Size_Type
+   is abstract;
    -- Returns the maximum allowed size of keys.
 
 
@@ -90,32 +92,37 @@ package DB.Maps is
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
       Value :    out Value_Type'Class;
-      State :    out State_Type);
+      State :    out State_Type)
+   is abstract;
 
    procedure Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
       Value :    out Value_Type'Class;
-      State :    out State_Type);
+      State :    out State_Type)
+   is abstract;
 
    procedure Insert
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
       Value : in     Value_Type'Class;
-      State :    out State_Type);
+      State :    out State_Type)
+   is abstract;
 
    procedure Insert
      (Map              : in out Map_Type;
       Key              : in     Key_Type;
       Value            : in     Value_Type'Class;
       Allow_Duplicates : in     Boolean;
-      State            :    out State_Type);
+      State            :    out State_Type)
+   is abstract;
 
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
       Value :    out Value_Type'Class;
-      State :    out State_Type);
+      State :    out State_Type)
+   is abstract;
 
 
    ----------
@@ -125,11 +132,13 @@ package DB.Maps is
 
    procedure Count
      (Map   : in out Map_Type;
-      Count :    out Count_Type);
+      Count :    out Count_Type)
+   is abstract;
 
    procedure Reorganize
      (Map   : in out Map_Type;
-      State :    out State_Type);
+      State :    out State_Type)
+   is abstract;
 
 
    ----------
@@ -138,21 +147,18 @@ package DB.Maps is
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
    type Bound_Type is private;
-   type Cursor_Type is limited private;
+   type Cursor_Type is limited interface;
 
    function Positive_Infinity_Bound
-     (Map : Map_Type)
       return Bound_Type;
    -- Returns an abstract bound that means positive infinity.
 
    function Negative_Infinity_Bound
-     (Map : Map_Type)
       return Bound_Type;
    -- Returns an abstract bound that means negative infinity.
 
    function New_Bound
-     (Map        : Map_Type;
-      Comparison : Comparison_Type;
+     (Comparison : Comparison_Type;
       Key        : Key_Type)
       return Bound_Type;
    -- Creates a concrete bound. The bound New_Bound(Greater, Min) is a
@@ -164,103 +170,54 @@ package DB.Maps is
       Thread_Safe : Boolean;
       Lower_Bound : Bound_Type;
       Upper_Bound : Bound_Type)
-      return Cursor_Type;
+      return Cursor_Type'Class
+   is abstract;
 
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
-      Enabled : in     Boolean);
+      Enabled : in     Boolean)
+   is abstract;
 
    procedure Finalize_Cursor
-     (Map    : in     Map_Type;
-      Cursor : in out Cursor_Type);
+     (Cursor : in out Cursor_Type)
+   is abstract;
 
    procedure Pause
-     (Map    : in out Map_Type;
-      Cursor : in out Cursor_Type);
+     (Cursor : in out Cursor_Type)
+   is abstract;
 
    procedure Next
-     (Map    : in out Map_Type;
-      Cursor : in out Cursor_Type;
+     (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
-      State  :    out State_Type);
+      State  :    out State_Type)
+   is abstract;
 
    procedure Delete
-     (Map    : in out Map_Type;
-      Cursor : in out Cursor_Type;
+     (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
-      State  :    out State_Type);
+      State  :    out State_Type)
+   is abstract;
 
 private
-   package Bounded_Values_IO   renames Types.Values.Bounded.Uncompressed;
-   package Unbounded_Values_IO renames Types.Values.Unbounded.Uncompressed;
-   package Block_IO_Impl       renames Blocks.Local_IO;
-   package Block_IO            renames Block_IO_Impl.IO_Signature;
+   type Infinity_Type is (Positive_Infinity, Negative_Infinity);
 
-   package Values is
-      use Bounded_Values_IO;   -- so that the serialization instances take
-      use Unbounded_Values_IO; -- the default parameters
-
-      package Bounded_Values_Signature is new Blocks.Gen_Values_Signature
-        (Value_Type         => Types.Values.Bounded.String_Type,
-         Read_Context_Type  => Bounded_Values_IO.Read_Context_Type,
-         Write_Context_Type => Bounded_Values_IO.Write_Context_Type);
-
-      package Unbounded_Values_Signature is new Blocks.Gen_Values_Signature
-        (Value_Type         => Types.Values.Unbounded.String_Type,
-         Read_Context_Type  => Unbounded_Values_IO.Read_Context_Type,
-         Write_Context_Type => Unbounded_Values_IO.Write_Context_Type);
-   end Values;
-
-   package BTrees is new Gen_BTrees
-     (Keys                     => Types.Keys.Keys_Signature,
-      Values                   => Values.Bounded_Values_Signature,
-      Default_Allow_Duplicates => Default_Allow_Duplicates,
-      Block_IO                 => Block_IO);
-
-   package Blob_Trees is new Gen_BTrees
-     (Keys                     => Types.Keys.Keys_Signature,
-      Values                   => Values.Unbounded_Values_Signature,
-      Block_IO                 => Block_IO,
-      Default_Allow_Duplicates => Default_Allow_Duplicates);
-      --Parted_Value_Context_Type => Types.Values.Unbounded.Parted.Context_Type,
-      --New_Parted_Value_Context => Types.Values.Unbounded.Parted.New_Context,
-      --Parted_Value_Size_Bound => Types.Values.Unbounded.Parted.Size_Bound,
-      --Fold_Value_Contexts => Types.Values.Unbounded.Parted.Fold_Contexts,
-      --Value_Context_Size_Bound =>
-                             --Types.Values.Unbounded.Parted.Context_Size_Bound,
-      --Read_Value_Context  => Types.Values.Unbounded.Parted.Read_Context,
-      --Write_Value_Context => Types.Values.Unbounded.Parted.Write_Context,
-      --Read_Part_Of_Value  => Types.Values.Unbounded.Parted.Read_Part_Of_String,
-      --Write_Part_Of_Value => Types.Values.Unbounded.Parted.Write_Part_Of_String,
-
-   ----------
-   -- Type wrappers. Always Short (=> BTrees) and not Short (=> Blob_Trees).
-
-   type Map_Type (Short : Boolean := True) is limited
+   type Bound_Type (Concrete : Boolean := True) is
       record
-         case Short is
-            when True =>  Short_Tree : BTrees.Tree_Type;
-            when False => Long_Tree  : Blob_Trees.Tree_Type;
+         case Concrete is
+            when True =>
+               Comparison : Comparison_Type;
+               Key        : Key_Type;
+            when False =>
+               Infinity   : Infinity_Type;
          end case;
       end record;
 
-   type Bound_Type (Short : Boolean := True) is
-      record
-         case Short is
-            when True =>  Short_Bound : BTrees.Bound_Type;
-            when False => Long_Bound : Blob_Trees.Bound_Type;
-         end case;
-      end record;
-
-   type Cursor_Type (Short : Boolean := True) is limited
-      record
-         case Short is
-            when True =>  Short_Cursor : BTrees.Cursor_Type;
-            when False => Long_Cursor  : Blob_Trees.Cursor_Type;
-         end case;
-      end record;
+   pragma Inline (New_Map);
+   pragma Inline (Positive_Infinity_Bound);
+   pragma Inline (Negative_Infinity_Bound);
+   pragma Inline (New_Bound);
 
 end DB.Maps;
 

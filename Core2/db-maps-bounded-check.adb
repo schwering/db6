@@ -44,6 +44,6 @@ is
       Value_To_String    => Value_To_String,
       Address_To_String  => Address_To_String);
 begin
-   Check(Map.Short_Tree);
+   Check(Map.Tree);
 end DB.Maps.Bounded.Check;
 

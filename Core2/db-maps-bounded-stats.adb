@@ -38,7 +38,7 @@ package body DB.Maps.Bounded.Stats is
          end case;
       end;
    begin
-      Stats.Make_Stats(Map.Short_Tree, My_Emit'Access);
+      Stats.Make_Stats(Map.Tree, My_Emit'Access);
    end Make_Stats;
 
 end DB.Maps.Bounded.Stats;

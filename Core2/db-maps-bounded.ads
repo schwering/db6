@@ -13,9 +13,10 @@
 
 with DB.Blocks.Gen_Values_Signature;
 with DB.Gen_BTrees;
---with DB.Gen_Blob_Trees;
 with DB.Blocks;
 with DB.Blocks.Local_IO;
+with DB.Types.Values;
+with DB.Types.Values.Bounded;
 
 package DB.Maps.Bounded is
    pragma Elaborate_Body;
@@ -23,23 +24,30 @@ package DB.Maps.Bounded is
    ----------
    -- Map initialization operations.
 
-   type Map_Type is limited private;
+   type Map_Type is limited new Maps.Map_Type with private;
 
+   function New_Map
+      return Map_Type;
+
+   overriding
    procedure Create
-     (Map : in Map_Type;
-      ID  : in String);
+     (Map : in out Map_Type;
+      ID  : in     String);
    -- Creates a new map named ID or raises a DB.IO_Error when creation
    -- fails.
 
+   overriding
    procedure Initialize
      (Map  : out Map_Type;
       ID   : in  String);
    -- Initializes Map with the map named ID.
 
+   overriding
    procedure Finalize
      (Map  : in out Map_Type);
    -- Finalizes Map, i.e. closes opened files.
 
+   overriding
    function Max_Key_Size
      (Map            : Map_Type;
       Max_Value_Size : Blocks.Size_Type)
@@ -50,28 +58,28 @@ package DB.Maps.Bounded is
    ----------
    -- Core operations: Search, Insertion, Deletion.
 
-   type State_Type is (Success, Failure, Error);
-
-   Default_Allow_Duplicates : constant Boolean := True;
-
+   overriding
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
       Value :    out Value_Type'Class;
       State :    out State_Type);
 
+   overriding
    procedure Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
       Value :    out Value_Type'Class;
       State :    out State_Type);
 
+   overriding
    procedure Insert
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
       Value : in     Value_Type'Class;
       State :    out State_Type);
 
+   overriding
    procedure Insert
      (Map              : in out Map_Type;
       Key              : in     Key_Type;
@@ -79,6 +87,7 @@ package DB.Maps.Bounded is
       Allow_Duplicates : in     Boolean;
       State            :    out State_Type);
 
+   overriding
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
@@ -91,10 +100,12 @@ package DB.Maps.Bounded is
 
    subtype Count_Type is Long_Integer;
 
+   overriding
    procedure Count
      (Map   : in out Map_Type;
       Count :    out Count_Type);
 
+   overriding
    procedure Reorganize
      (Map   : in out Map_Type;
       State :    out State_Type);
@@ -103,131 +114,79 @@ package DB.Maps.Bounded is
    ----------
    -- Cursor operations.
 
-   type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
-      Greater);
-   type Bound_Type is private;
-   type Cursor_Type is limited private;
+   type Cursor_Type is limited new Maps.Cursor_Type with private;
 
-   function Positive_Infinity_Bound
-     (Map : Map_Type)
-      return Bound_Type;
-   -- Returns an abstract bound that means positive infinity.
-
-   function Negative_Infinity_Bound
-     (Map : Map_Type)
-      return Bound_Type;
-   -- Returns an abstract bound that means negative infinity.
-
-   function New_Bound
-     (Map        : Map_Type;
-      Comparison : Comparison_Type;
-      Key        : Key_Type)
-      return Bound_Type;
-   -- Creates a concrete bound. The bound New_Bound(Greater, Min) is a
-   -- lower bound, because this means that all keys Key hit by the cursor
-   -- must satisfy: Key > Min.
-
+   overriding
    function New_Cursor
      (Map         : Map_Type;
       Thread_Safe : Boolean;
       Lower_Bound : Bound_Type;
       Upper_Bound : Bound_Type)
-      return Cursor_Type;
+      return Maps.Cursor_Type'Class;
 
+   overriding
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
       Enabled : in     Boolean);
 
+   overriding
    procedure Finalize_Cursor
-     (Map    : in     Map_Type;
-      Cursor : in out Cursor_Type);
+     (Cursor : in out Cursor_Type);
 
+   overriding
    procedure Pause
-     (Map    : in out Map_Type;
-      Cursor : in out Cursor_Type);
+     (Cursor : in out Cursor_Type);
 
+   overriding
    procedure Next
-     (Map    : in out Map_Type;
-      Cursor : in out Cursor_Type;
+     (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
       State  :    out State_Type);
 
+   overriding
    procedure Delete
-     (Map    : in out Map_Type;
-      Cursor : in out Cursor_Type;
+     (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
       State  :    out State_Type);
 
 private
    package Bounded_Values_IO   renames Types.Values.Bounded.Uncompressed;
-   package Unbounded_Values_IO renames Types.Values.Unbounded.Uncompressed;
    package Block_IO_Impl       renames Blocks.Local_IO;
    package Block_IO            renames Block_IO_Impl.IO_Signature;
 
    package Values is
       use Bounded_Values_IO;   -- so that the serialization instances take
-      use Unbounded_Values_IO; -- the default parameters
 
       package Bounded_Values_Signature is new Blocks.Gen_Values_Signature
         (Value_Type         => Types.Values.Bounded.String_Type,
          Read_Context_Type  => Bounded_Values_IO.Read_Context_Type,
          Write_Context_Type => Bounded_Values_IO.Write_Context_Type);
-
-      package Unbounded_Values_Signature is new Blocks.Gen_Values_Signature
-        (Value_Type         => Types.Values.Unbounded.String_Type,
-         Read_Context_Type  => Unbounded_Values_IO.Read_Context_Type,
-         Write_Context_Type => Unbounded_Values_IO.Write_Context_Type);
    end Values;
+   use Values;
 
    package BTrees is new Gen_BTrees
      (Keys                     => Types.Keys.Keys_Signature,
-      Values                   => Values.Bounded_Values_Signature,
+      Values                   => Bounded_Values_Signature,
       Default_Allow_Duplicates => Default_Allow_Duplicates,
       Block_IO                 => Block_IO);
 
-   package Blob_Trees is new Gen_BTrees
-     (Keys                     => Types.Keys.Keys_Signature,
-      Values                   => Values.Unbounded_Values_Signature,
-      Block_IO                 => Block_IO,
-      Default_Allow_Duplicates => Default_Allow_Duplicates);
-      --Parted_Value_Context_Type => Types.Values.Unbounded.Parted.Context_Type,
-      --New_Parted_Value_Context => Types.Values.Unbounded.Parted.New_Context,
-      --Parted_Value_Size_Bound => Types.Values.Unbounded.Parted.Size_Bound,
-      --Fold_Value_Contexts => Types.Values.Unbounded.Parted.Fold_Contexts,
-      --Value_Context_Size_Bound =>
-                             --Types.Values.Unbounded.Parted.Context_Size_Bound,
-      --Read_Value_Context  => Types.Values.Unbounded.Parted.Read_Context,
-      --Write_Value_Context => Types.Values.Unbounded.Parted.Write_Context,
-      --Read_Part_Of_Value  => Types.Values.Unbounded.Parted.Read_Part_Of_String,
-      --Write_Part_Of_Value => Types.Values.Unbounded.Parted.Write_Part_Of_String,
+   type Map_Ref_Type is access all Map_Type;
+   pragma Controlled (Map_Ref_Type);
+   for Map_Ref_Type'Storage_Size use 0;
 
-   ----------
-   -- Type wrappers. Always Short (=> BTrees) and not Short (=> Blob_Trees).
-
-   type Map_Type (Short : Boolean := True) is limited
+   type Map_Type is limited new Maps.Map_Type with
       record
-         case Short is
-            when True =>  Short_Tree : BTrees.Tree_Type;
-            when False => Long_Tree  : Blob_Trees.Tree_Type;
-         end case;
+         Self : Map_Ref_Type := Map_Type'Unchecked_Access;
+         Tree : BTrees.Tree_Type;
       end record;
 
-   type Bound_Type (Short : Boolean := True) is
-      record
-         case Short is
-            when True =>  Short_Bound : BTrees.Bound_Type;
-            when False => Long_Bound : Blob_Trees.Bound_Type;
-         end case;
-      end record;
 
-   type Cursor_Type (Short : Boolean := True) is limited
+   type Cursor_Type is limited new Maps.Cursor_Type with
       record
-         case Short is
-            when True =>  Short_Cursor : BTrees.Cursor_Type;
-            when False => Long_Cursor  : Blob_Trees.Cursor_Type;
-         end case;
+         Map    : Map_Ref_Type;
+         Cursor : BTrees.Cursor_Type;
       end record;
 
 end DB.Maps.Bounded;

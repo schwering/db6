@@ -11,7 +11,7 @@ with DB.Utils;
 generic
    Max_Length : in Positive := 1024;
 package DB.Types.Gen_Strings.Gen_Bounded is
-   pragma Elaborate_Body;
+   pragma Preelaborate;
 
    subtype Length_Type is Gen_Strings.Length_Type range 0 .. Max_Length;
    subtype Index_Type is Gen_Strings.Index_Type range 1 .. Length_Type'Last;
