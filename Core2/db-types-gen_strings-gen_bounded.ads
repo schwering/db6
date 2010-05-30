@@ -11,7 +11,7 @@ with DB.Utils;
 generic
    Max_Length : in Positive := 1024;
 package DB.Types.Gen_Strings.Gen_Bounded is
-   pragma Preelaborate;
+   pragma Pure;
 
    subtype Indefinite_Buffer_Type is Gen_Strings.Indefinite_Buffer_Type;
    subtype Length_Type is Gen_Strings.Length_Type range 0 .. Max_Length;

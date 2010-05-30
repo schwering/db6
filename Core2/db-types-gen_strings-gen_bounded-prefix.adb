@@ -4,7 +4,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Utils.Print; use DB.Utils;
 with DB.Blocks;
 
 separate (DB.Types.Gen_Strings.Gen_Bounded)
