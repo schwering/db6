@@ -28,10 +28,6 @@ package DB is
    -- nodes.
    -- Raised in DB.Gen_BTrees and DB.Gen_Blob_Trees.
 
-   Node_Error : exception renames Tree_Error;
-   -- Raised for errors that occur in the node management of a tree.
-   -- Raised in DB.Gen_BTrees private nested package Nodes.
-
    Heap_Error : exception;
    -- This exception is only raised when there are extremely serious
    -- errors in the heap such as dangling references to child or neighbor

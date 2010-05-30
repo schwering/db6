@@ -21,7 +21,6 @@ package body DB.Maps.Bounded is
       case State is
          when BTrees.Success => S := Success;
          when BTrees.Failure => S := Failure;
-         when BTrees.Error   => S := Error;
       end case;
       return S;
    end To_State;
@@ -30,7 +29,7 @@ package body DB.Maps.Bounded is
    function New_Map
       return Map_Type is
    begin
-      return Map_Type'(others => <>);
+      return Map_Type'(AF.Limited_Controlled with others => <>);
    end New_Map;
 
 
@@ -38,23 +37,30 @@ package body DB.Maps.Bounded is
      (Map : in out Map_Type;
       ID  : in     String) is
    begin
+      pragma Assert (not Map.Initialized);
       BTrees.Create(ID);
       BTrees.Initialize(Map.Tree, ID);
+      Map.Initialized := True;
    end Create;
 
 
    procedure Initialize
-     (Map : out Map_Type;
-      ID  : in  String) is
+     (Map : in out Map_Type;
+      ID  : in     String) is
    begin
+      pragma Assert (not Map.Initialized);
       BTrees.Initialize(Map.Tree, ID);
+      Map.Initialized := True;
    end Initialize;
 
 
    procedure Finalize
      (Map : in out Map_Type) is
    begin
-      BTrees.Finalize(Map.Tree);
+      if Map.Initialized then
+         BTrees.Finalize(Map.Tree);
+         Map.Initialized := False;
+      end if;
    end Finalize;
 
 
@@ -67,6 +73,22 @@ package body DB.Maps.Bounded is
    begin
       return BTrees.Max_Key_Size(Max_Value_Size);
    end Max_Key_Size;
+
+
+   function Contains
+     (Map : Map_Type;
+      Key : Key_Type)
+      return Boolean
+   is
+      use type BTrees.State_Type;
+      State  : BTrees.State_Type;
+      String : aliased Types.Values.Bounded.String_Type;
+      Stream : Types.Values.Bounded.Streams.Stream_Type :=
+         Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
+   begin
+      BTrees.Search(Map.Self.Tree, Key, String, State);
+      return State = BTrees.Success;
+   end Contains;
 
 
    procedure Search
@@ -197,11 +219,14 @@ package body DB.Maps.Bounded is
       B_Lower_Bound : constant BTrees.Bound_Type := To_Bound(Lower_Bound);
       B_Upper_Bound : constant BTrees.Bound_Type := To_Bound(Upper_Bound);
    begin
-      return Cursor_Type'(Map.Self,
-                          BTrees.New_Cursor(Map.Tree,
-                                            Thread_Safe,
-                                            B_Lower_Bound,
-                                            B_Upper_Bound));
+      pragma Assert (Map.Initialized);
+      return Cursor_Type'(AF.Limited_Controlled with
+                          Initialized => True,
+                          Map         => Map.Self,
+                          Cursor      => BTrees.New_Cursor(Map.Tree,
+                                                           Thread_Safe,
+                                                           B_Lower_Bound,
+                                                           B_Upper_Bound));
    end New_Cursor;
 
 
@@ -213,11 +238,14 @@ package body DB.Maps.Bounded is
    end Set_Thread_Safety;
 
 
-   procedure Finalize_Cursor
+   procedure Finalize
      (Cursor : in out Cursor_Type) is
    begin
-      BTrees.Finalize_Cursor(Cursor.Map.Tree, Cursor.Cursor);
-   end Finalize_Cursor;
+      if Cursor.Initialized then
+         BTrees.Finalize_Cursor(Cursor.Map.Tree, Cursor.Cursor);
+         Cursor.Initialized := False;
+      end if;
+   end Finalize;
 
 
    procedure Pause

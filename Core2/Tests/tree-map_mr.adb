@@ -90,9 +90,6 @@ procedure Tree.Map_MR is
       begin
          Cursor.Next(Key, Value, State);
          Success := State = DB.Maps.Success;
-         if State = DB.Maps.Error then
-            Put_Line("ERROR CURSOR");
-         end if;
       end Input;
 
       procedure Map_Proc
@@ -187,7 +184,7 @@ procedure Tree.Map_MR is
 
    begin
       Map_Reduce("bluhp.intermediates");
-      Cursor.Finalize_Cursor;
+      Cursor.Finalize;
 
       Put_Line("Count ="& Out_Count'Img);
       Put_Line("Value ="& Last_Out_Value'Img);

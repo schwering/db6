@@ -6,11 +6,15 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Finalization;
+
 with DB.Blocks;
 with DB.Types.Keys;
 with DB.Types.Values.Bounded.Streams;
 
 package DB.Maps is
+
+   package AF renames Ada.Finalization;
 
    type Serializable_Type is interface;
 
@@ -50,7 +54,7 @@ package DB.Maps is
    ----------
    -- Map initialization operations.
 
-   type Map_Type is limited interface;
+   type Map_Type is abstract new AF.Limited_Controlled with private;
 
    function New_Map
      (Max_Key_Size   : in Blocks.Size_Type;
@@ -66,11 +70,12 @@ package DB.Maps is
    -- fails.
 
    procedure Initialize
-     (Map  : out Map_Type;
-      ID   : in  String)
+     (Map  : in out Map_Type;
+      ID   : in     String)
    is abstract;
    -- Initializes Map with the map named ID.
 
+   overriding
    procedure Finalize
      (Map  : in out Map_Type)
    is abstract;
@@ -87,9 +92,15 @@ package DB.Maps is
    ----------
    -- Core operations: Search, Insertion, Deletion.
 
-   type State_Type is (Success, Failure, Error);
+   type State_Type is (Success, Failure);
 
    Default_Allow_Duplicates : constant Boolean := True;
+
+   function Contains
+     (Map : Map_Type;
+      Key : Key_Type)
+      return Boolean
+   is abstract;
 
    procedure Search
      (Map   : in out Map_Type;
@@ -176,7 +187,7 @@ package DB.Maps is
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
    type Bound_Type is private;
-   type Cursor_Type is limited interface;
+   type Cursor_Type is abstract new AF.Limited_Controlled with private;
 
    function Positive_Infinity_Bound
       return Bound_Type;
@@ -207,7 +218,8 @@ package DB.Maps is
       Enabled : in     Boolean)
    is abstract;
 
-   procedure Finalize_Cursor
+   overriding
+   procedure Finalize
      (Cursor : in out Cursor_Type)
    is abstract;
 
@@ -242,6 +254,17 @@ private
                Infinity   : Infinity_Type;
          end case;
       end record;
+
+   type Map_Type is abstract new AF.Limited_Controlled with
+      record
+         Initialized : Boolean := False;
+      end record;
+
+   type Cursor_Type is abstract new AF.Limited_Controlled with
+      record
+         Initialized : Boolean := False;
+      end record;
+
 
    pragma Inline (New_Map);
    pragma Inline (Positive_Infinity_Bound);

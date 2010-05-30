@@ -32,8 +32,8 @@ package DB.Maps.Bounded is
 
    overriding
    procedure Initialize
-     (Map  : out Map_Type;
-      ID   : in  String);
+     (Map  : in out Map_Type;
+      ID   : in     String);
    -- Initializes Map with the map named ID.
 
    overriding
@@ -51,6 +51,12 @@ package DB.Maps.Bounded is
 
    ----------
    -- Core operations: Search, Insertion, Deletion.
+
+   overriding
+   function Contains
+     (Map : Map_Type;
+      Key : Key_Type)
+      return Boolean;
 
    overriding
    procedure Search
@@ -133,7 +139,7 @@ package DB.Maps.Bounded is
       Enabled : in     Boolean);
 
    overriding
-   procedure Finalize_Cursor
+   procedure Finalize
      (Cursor : in out Cursor_Type);
 
    overriding

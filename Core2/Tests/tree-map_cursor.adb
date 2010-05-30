@@ -74,13 +74,10 @@ procedure Tree.Map_Cursor is
                   Count := Count + 1;
                when DB.Maps.Failure =>
                   exit;
-               when DB.Maps.Error =>
-                  Ada.Text_IO.Put_Line("Error");
-                  exit;
             end case;
          end;
       end loop;
-      Cursor.Finalize_Cursor;
+      Cursor.Finalize;
       Count_Container.Found(Count);
    end Job;
 
