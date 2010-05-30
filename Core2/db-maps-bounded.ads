@@ -31,6 +31,13 @@ package DB.Maps.Bounded is
    -- fails.
 
    overriding
+   procedure Create_Temporary
+     (Map : in out Map_Type;
+      ID  : in     String);
+   -- Creates a new temporary map named ID or raises a DB.IO_Error when creation
+   -- fails.
+
+   overriding
    procedure Open
      (Map  : in out Map_Type;
       ID   : in     String);

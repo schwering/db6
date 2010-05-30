@@ -69,6 +69,13 @@ package DB.Maps is
    -- Creates a new map named ID or raises a DB.IO_Error when creation
    -- fails.
 
+   procedure Create_Temporary
+     (Map : in out Map_Type;
+      ID  : in     String)
+   is abstract;
+   -- Creates a new temporary map named ID or raises a DB.IO_Error when creation
+   -- fails.
+
    procedure Open
      (Map  : in out Map_Type;
       ID   : in     String)

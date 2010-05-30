@@ -38,10 +38,19 @@ package body DB.Maps.Bounded is
       ID  : in     String) is
    begin
       pragma Assert (not Map.Initialized);
-      BTrees.Create(ID);
-      BTrees.Initialize(Map.Tree, ID);
+      BTrees.Create(Map.Tree, ID);
       Map.Initialized := True;
    end Create;
+
+
+   procedure Create_Temporary
+     (Map : in out Map_Type;
+      ID  : in     String) is
+   begin
+      pragma Assert (not Map.Initialized);
+      BTrees.Create_Temporary(Map.Tree, ID);
+      Map.Initialized := True;
+   end Create_Temporary;
 
 
    procedure Open
@@ -49,7 +58,7 @@ package body DB.Maps.Bounded is
       ID  : in     String) is
    begin
       pragma Assert (not Map.Initialized);
-      BTrees.Initialize(Map.Tree, ID);
+      BTrees.Open(Map.Tree, ID);
       Map.Initialized := True;
    end Open;
 

@@ -83,11 +83,16 @@ package body DB.Gen_BTrees is
 
    package Initialization is
       procedure Create
-        (ID : in  String);
+        (Tree : in out Tree_Type;
+         ID   : in     String);
 
-      procedure Initialize
-        (Tree : out Tree_Type;
-         ID   : in  String);
+      procedure Create_Temporary
+        (Tree : in out Tree_Type;
+         ID   : in     String);
+
+      procedure Open
+        (Tree : in out Tree_Type;
+         ID   : in     String);
 
       procedure Finalize
         (Tree : in out Tree_Type);
@@ -294,14 +299,21 @@ package body DB.Gen_BTrees is
 
 
    procedure Create
-     (ID : in String)
+     (Tree : in out Tree_Type;
+      ID   : in     String)
    renames Initialization.Create;
 
 
-   procedure Initialize
-     (Tree : out Tree_Type;
-      ID   : in  String)
-   renames Initialization.Initialize;
+   procedure Create_Temporary
+     (Tree : in out Tree_Type;
+      ID   : in     String)
+   renames Initialization.Create_Temporary;
+
+
+   procedure Open
+     (Tree : in out Tree_Type;
+      ID   : in     String)
+   renames Initialization.Open;
 
 
    procedure Finalize

@@ -170,7 +170,7 @@ procedure Tree.Map_MR is
          Intermediate_Keys     => Intermediate_Keys,
          Intermediate_Values   => Intermediate_Values,
          Intermediate_Block_IO => DB.Blocks.Local_IO.IO_Signature,
-         Allow_Intermediate_Duplicates => False,
+         Allow_Intermediate_Duplicates => True,
 
          Map                => Map_Proc,
          Out_Key_Type       => Out_Key_Type,

@@ -75,14 +75,21 @@ package DB.Gen_BTrees is
    type Tree_Type is limited private;
 
    procedure Create
-     (ID : in String);
+     (Tree : in out Tree_Type;
+      ID   : in     String);
    -- Creates a new tree named ID or raises a DB.IO_Error when creation
    -- fails.
 
-   procedure Initialize
-     (Tree : out Tree_Type;
-      ID   : in  String);
-   -- Initializes Tree with the tree named ID.
+   procedure Create_Temporary
+     (Tree : in out Tree_Type;
+      ID   : in     String);
+   -- Creates a new tree named ID or raises a DB.IO_Error when creation
+   -- fails.
+
+   procedure Open
+     (Tree : in out Tree_Type;
+      ID   : in     String);
+   -- Opens Tree with the tree named ID.
 
    procedure Finalize
      (Tree : in out Tree_Type);

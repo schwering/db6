@@ -248,9 +248,8 @@ is
 
    Context : Context_Type;
 begin
-   Intermediate_BTrees.Create(Intermediates_File_Name);
-   Intermediate_BTrees.Initialize(Context.Intermediates,
-                                  Intermediates_File_Name);
+   Intermediate_BTrees.Create_Temporary(Context.Intermediates,
+                                        Intermediates_File_Name);
    Map_Phase(Context);
    Sort_Phase(Context);
    Reduce_Phase(Context);
