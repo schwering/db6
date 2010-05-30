@@ -137,10 +137,6 @@ package body DB.Gen_BTrees is
         (Cursor  : in out Cursor_Type;
          Enabled : in     Boolean);
 
-      procedure Finalize_Cursor
-        (Tree   : in     Tree_Type;
-         Cursor : in out Cursor_Type);
-
       procedure Pause
         (Tree   : in     Tree_Type;
          Cursor : in out Cursor_Type);
@@ -401,12 +397,6 @@ package body DB.Gen_BTrees is
      (Cursor  : in out Cursor_Type;
       Enabled : in     Boolean)
    renames Cursors.Set_Thread_Safety;
-
-
-   procedure Finalize_Cursor
-     (Tree   : in     Tree_Type;
-      Cursor : in out Cursor_Type)
-   renames Cursors.Finalize_Cursor;
 
 
    procedure Pause

@@ -77,7 +77,6 @@ procedure Tree.Map_Cursor is
             end case;
          end;
       end loop;
-      Cursor.Finalize;
       Count_Container.Found(Count);
    end Job;
 

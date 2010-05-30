@@ -229,8 +229,7 @@ package body DB.Maps.Bounded is
       B_Upper_Bound : constant BTrees.Bound_Type := To_Bound(Upper_Bound);
    begin
       pragma Assert (Map.Initialized);
-      return Cursor_Type'(AF.Limited_Controlled with
-                          Initialized => True,
+      return Cursor_Type'(Initialized => True,
                           Map         => Map.Self,
                           Cursor      => BTrees.New_Cursor(Map.Tree,
                                                            Thread_Safe,
@@ -245,16 +244,6 @@ package body DB.Maps.Bounded is
    begin
       BTrees.Set_Thread_Safety(Cursor.Cursor, Enabled);
    end Set_Thread_Safety;
-
-
-   procedure Finalize
-     (Cursor : in out Cursor_Type) is
-   begin
-      if Cursor.Initialized then
-         BTrees.Finalize_Cursor(Cursor.Map.Tree, Cursor.Cursor);
-         Cursor.Initialized := False;
-      end if;
-   end Finalize;
 
 
    procedure Pause

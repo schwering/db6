@@ -110,19 +110,6 @@ package body Cursors is
    end Set_Thread_Safety;
 
 
-   procedure Finalize_Cursor
-     (Tree   : in     Tree_Type;
-      Cursor : in out Cursor_Type)
-   is
-      pragma Assert (Tree.Initialized);
-      pragma Assert (Cursor.Owning_Tree = Tree.Self);
-   begin
-      if Cursor.Initialized then
-         Cursor.Initialized := False;
-      end if;
-   end Finalize_Cursor;
-
-
    procedure Pause
      (Tree   : in     Tree_Type;
       Cursor : in out Cursor_Type)

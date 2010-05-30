@@ -215,11 +215,6 @@ package DB.Gen_BTrees is
    -- If thread safety is enabled, all operations of the cursor are mutually
    -- exclusive.
 
-   procedure Finalize_Cursor
-     (Tree   : in     Tree_Type;
-      Cursor : in out Cursor_Type);
-   -- Releases all resources hold be the cursor.
-
    procedure Pause
      (Tree   : in     Tree_Type;
       Cursor : in out Cursor_Type);

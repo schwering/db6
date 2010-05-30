@@ -184,7 +184,6 @@ procedure Tree.Map_MR is
 
    begin
       Map_Reduce("bluhp.intermediates");
-      Cursor.Finalize;
 
       Put_Line("Count ="& Out_Count'Img);
       Put_Line("Value ="& Last_Out_Value'Img);

@@ -190,11 +190,9 @@ is
                end;
             end loop;
          end;
-         Intermediate_BTrees.Finalize_Cursor(Context.Intermediates, Cursor);
          Queues.Mark_Final(Queue);
       exception
          when others =>
-            Intermediate_BTrees.Finalize_Cursor(Context.Intermediates, Cursor);
             Queues.Mark_Final(Queue);
             raise;
       end Cursor_Task_Type;

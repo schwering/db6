@@ -194,7 +194,7 @@ package DB.Maps is
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
    type Bound_Type is private;
-   type Cursor_Type is abstract new AF.Limited_Controlled with private;
+   type Cursor_Type is abstract tagged limited private;
 
    function Positive_Infinity_Bound
       return Bound_Type;
@@ -223,11 +223,6 @@ package DB.Maps is
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
       Enabled : in     Boolean)
-   is abstract;
-
-   overriding
-   procedure Finalize
-     (Cursor : in out Cursor_Type)
    is abstract;
 
    procedure Pause
@@ -267,7 +262,7 @@ private
          Initialized : Boolean := False;
       end record;
 
-   type Cursor_Type is abstract new AF.Limited_Controlled with
+   type Cursor_Type is abstract tagged limited
       record
          Initialized : Boolean := False;
       end record;

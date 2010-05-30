@@ -146,10 +146,6 @@ package DB.Maps.Bounded is
       Enabled : in     Boolean);
 
    overriding
-   procedure Finalize
-     (Cursor : in out Cursor_Type);
-
-   overriding
    procedure Pause
      (Cursor : in out Cursor_Type);
 
