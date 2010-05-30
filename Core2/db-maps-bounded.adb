@@ -44,14 +44,14 @@ package body DB.Maps.Bounded is
    end Create;
 
 
-   procedure Initialize
+   procedure Open
      (Map : in out Map_Type;
       ID  : in     String) is
    begin
       pragma Assert (not Map.Initialized);
       BTrees.Initialize(Map.Tree, ID);
       Map.Initialized := True;
-   end Initialize;
+   end Open;
 
 
    procedure Finalize

@@ -69,7 +69,7 @@ package DB.Maps is
    -- Creates a new map named ID or raises a DB.IO_Error when creation
    -- fails.
 
-   procedure Initialize
+   procedure Open
      (Map  : in out Map_Type;
       ID   : in     String)
    is abstract;

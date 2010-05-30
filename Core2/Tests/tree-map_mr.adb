@@ -198,7 +198,7 @@ begin
       Ada.Text_IO.Put_Line("Newly created Map "& Args.File_Name);
    exception
       when DB.IO_Error =>
-         Map.Initialize(Args.File_Name);
+         Map.Open(Args.File_Name);
          Put_Line("Using existing Map "& Args.File_Name);
    end;
    Map.Count(Cnt);

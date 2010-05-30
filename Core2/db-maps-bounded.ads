@@ -31,10 +31,10 @@ package DB.Maps.Bounded is
    -- fails.
 
    overriding
-   procedure Initialize
+   procedure Open
      (Map  : in out Map_Type;
       ID   : in     String);
-   -- Initializes Map with the map named ID.
+   -- Opens Map with the map named ID.
 
    overriding
    procedure Finalize
