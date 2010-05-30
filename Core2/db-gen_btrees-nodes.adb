@@ -1071,7 +1071,7 @@ package body Nodes is
       Phys.Read_Key(Key_Context, Blocks.Base_Block_Type(Node), Index, Key,
                     Success);
       if not Success then
-         raise Node_Error;
+         raise Tree_Error;
       end if;
    end Get_Key;
 
@@ -1105,7 +1105,7 @@ package body Nodes is
                       Child, Success);
       pragma Assert (Is_Valid(Child));
       if not Success then
-         raise Node_Error;
+         raise Tree_Error;
       end if;
    end Get_Child;
 
@@ -1139,7 +1139,7 @@ package body Nodes is
       Phys.Read_Value(Key_Context, Value_Context,
                       Blocks.Base_Block_Type(Node), Index, Value, Success);
       if not Success then
-         raise Node_Error;
+         raise Tree_Error;
       end if;
    end Get_Value;
 
@@ -1358,7 +1358,7 @@ package body Nodes is
       Phys.Read_Entry(Key_Read_Context, Blocks.Base_Block_Type(Source),
                       Index, Key, Child, Success);
       if not Success then
-         raise Node_Error;
+         raise Tree_Error;
       end if;
       pragma Assert (Is_Valid(Child));
       Phys.Write_Entry(Key_Write_Context, Blocks.Base_Block_Type(Node),
@@ -1389,7 +1389,7 @@ package body Nodes is
                       Blocks.Base_Block_Type(Source), Index, Key, Value,
                       Success);
       if not Success then
-         raise Node_Error;
+         raise Tree_Error;
       end if;
       Phys.Write_Entry(Key_Write_Context, Value_Write_Context,
                        Blocks.Base_Block_Type(Node), New_Index, Key, Value);

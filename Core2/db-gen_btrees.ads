@@ -99,7 +99,7 @@ package DB.Gen_BTrees is
    ----------
    -- Core operations: Retrieve, Insertion, Deletion.
 
-   type State_Type is (Success, Failure, Error);
+   type State_Type is (Success, Failure);
 
    procedure Search
      (Tree  : in out Tree_Type;

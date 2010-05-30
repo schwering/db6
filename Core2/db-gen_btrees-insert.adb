@@ -102,9 +102,6 @@ begin
 exception
    when others =>
       Stacks.Finalize(Stack);
-      pragma Warnings (Off);
-      State := Error;
-      pragma Warnings (On);
       raise;
 end Insert;
 

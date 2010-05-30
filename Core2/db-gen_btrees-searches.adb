@@ -46,8 +46,7 @@ package body Searches is
                      State := Failure;
                      return;
                   when Utils.Greater =>
-                     State := Error;
-                     return;
+                     raise Tree_Error;
                end case;
             end if;
          end;
@@ -67,13 +66,6 @@ package body Searches is
          end;
          Read_Node(Tree, Nodes.Valid_Link(N), N);
       end loop;
-
-   exception
-      when others =>
-         pragma Warnings (Off);
-         State := Error;
-         pragma Warnings (On);
-         raise;
    end Search;
 
 
@@ -102,13 +94,6 @@ package body Searches is
          end if;
          N_A := Nodes.Child(N, 1);
       end loop;
-
-   exception
-      when others =>
-         pragma Warnings (Off);
-         State := Error;
-         pragma Warnings (On);
-         raise;
    end Minimum;
 
 end Searches;

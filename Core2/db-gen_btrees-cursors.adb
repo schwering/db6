@@ -234,9 +234,6 @@ package body Cursors is
       exception
          when others =>
             Cursor.Final := True;
-            pragma Warnings (Off);
-            State := Error;
-            pragma Warnings (On);
             raise;
       end Move_To_Next;
 
@@ -273,14 +270,6 @@ package body Cursors is
                N_A := Nodes.Child(N, I);
             end;
          end loop;
-
-      exception
-         when others =>
-            Index := 1;
-            pragma Warnings (Off);
-            State := Error;
-            pragma Warnings (On);
-            raise;
       end Search_Node;
 
 
@@ -358,14 +347,6 @@ package body Cursors is
                   N_A := Nodes.Child(N, 1);
                end;
             end loop;
-
-         exception
-            when others =>
-               Index := 1;
-               pragma Warnings (Off);
-               State := Error;
-               pragma Warnings (On);
-               raise;
          end Search_Minimum_Node;
 
          procedure Search_Maximum_Node
@@ -394,14 +375,6 @@ package body Cursors is
                   N_A := Nodes.Child(N, Nodes.Degree(N));
                end;
             end loop;
-
-         exception
-            when others =>
-               Index := 1;
-               pragma Warnings (Off);
-               State := Error;
-               pragma Warnings (On);
-               raise;
          end Search_Maximum_Node;
 
          pragma Assert (not Cursor.Has_Node);
@@ -487,9 +460,6 @@ package body Cursors is
    exception
       when others =>
          Unlock_Mutex(Cursor);
-         pragma Warnings (Off);
-         State := Error;
-         pragma Warnings (On);
          raise;
    end Next;
 
@@ -521,9 +491,6 @@ package body Cursors is
    exception
       when others =>
          Unlock_Mutex(Cursor);
-         pragma Warnings (Off);
-         State := Error;
-         pragma Warnings (On);
          raise;
    end Delete;
 
