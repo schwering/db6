@@ -195,35 +195,24 @@ package body Cursors is
 
       procedure Move_To_Next
       is
-         procedure Move_Right is
-         begin
-            if Nodes.Is_Valid(Nodes.Link(Cursor.Node)) then
-               declare
-                  R_A : constant Nodes.Valid_Address_Type :=
-                     Nodes.To_Valid_Address(Nodes.Link(Cursor.Node));
-                  R   : Nodes.RO_Node_Type;
-               begin
-                  Read_Node(Tree, R_A, R);
-                  Cursor.Node  := R;
-                  Cursor.Index := 1;
-                  State        := Success;
-               end;
-            else
-               Cursor.Final := True;
-               State        := Success;
-            end if;
-         end Move_Right;
-
          use type Nodes.Degree_Type;
       begin
          if Cursor.Index = Nodes.Degree(Cursor.Node) then
             loop
-               Move_Right;
-               exit when Cursor.Final or else Nodes.Degree(Cursor.Node) > 0;
+               if Nodes.Is_Valid(Nodes.Link(Cursor.Node)) then
+                  Read_Node(Tree, Nodes.Valid_Link(Cursor.Node), Cursor.Node);
+                  if Nodes.Degree(Cursor.Node) > 0 then
+                     Cursor.Index := 1;
+                     Init_Contexts_And_Key;
+                     State := Success;
+                     exit;
+                  end if;
+               else
+                  Cursor.Final := True;
+                  State := Success;
+                  exit;
+               end if;
             end loop;
-            if Nodes.Degree(Cursor.Node) > 0 then
-               Init_Contexts_And_Key;
-            end if;
          else
             Cursor.Index := Cursor.Index + 1;
             Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
