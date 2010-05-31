@@ -118,7 +118,7 @@ package DB.Gen_BTrees is
    -- This procedure never blocks because it uses no locks (as long as
    -- Block_IO.Read and Block_IO.Write do not block).
 
-   procedure Minimum
+   procedure Search_Minimum
      (Tree  : in out Tree_Type;
       Key   :    out Keys.Key_Type;
       Value :    out Values.Value_Type;

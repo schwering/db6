@@ -73,7 +73,7 @@ package DB.Maps.Bounded is
       State :    out State_Type);
 
    overriding
-   procedure Minimum
+   procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
       Value :    out Value_Type'Class;

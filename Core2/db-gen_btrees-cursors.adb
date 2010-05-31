@@ -87,14 +87,12 @@ package body Cursors is
       pragma Assert (Tree.Initialized);
    begin
       Check_Bounds;
-      return Cursor_Type'(Lower_Bound   => Lower_Bound,
-                          Upper_Bound   => Upper_Bound,
-                          Owning_Tree   => Tree.Self,
-                          Initialized   => True,
-                          Thread_Safe   => Thread_Safe,
-                          Key_Context   => Keys.New_Read_Context,
-                          Value_Context => Values.New_Read_Context,
-                          others        => <>);
+      return Cursor_Type'(Lower_Bound => Lower_Bound,
+                          Upper_Bound => Upper_Bound,
+                          Owning_Tree => Tree.Self,
+                          Initialized => True,
+                          Thread_Safe => Thread_Safe,
+                          others      => <>);
    end New_Cursor;
 
 
@@ -186,30 +184,45 @@ package body Cursors is
       pragma Assert (Cursor.Initialized);
       pragma Assert (Cursor.Owning_Tree = Tree.Self);
 
+      procedure Init_Contexts_And_Key is
+      begin
+         Cursor.Key_Context   := Keys.New_Read_Context;
+         Cursor.Value_Context := Values.New_Read_Context;
+         Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
+                       Cursor.Key_Context);
+      end Init_Contexts_And_Key;
+
+
       procedure Move_To_Next
       is
-         use type Nodes.Degree_Type;
-      begin
-         if Cursor.Index = Nodes.Degree(Cursor.Node) then
+         procedure Move_Right is
+         begin
             if Nodes.Is_Valid(Nodes.Link(Cursor.Node)) then
                declare
-                  N   : Nodes.RO_Node_Type renames Cursor.Node;
                   R_A : constant Nodes.Valid_Address_Type :=
-                     Nodes.To_Valid_Address(Nodes.Link(N));
+                     Nodes.To_Valid_Address(Nodes.Link(Cursor.Node));
                   R   : Nodes.RO_Node_Type;
                begin
                   Read_Node(Tree, R_A, R);
-                  Cursor.Node          := R;
-                  Cursor.Key_Context   := Keys.New_Read_Context;
-                  Cursor.Value_Context := Values.New_Read_Context;
-                  Cursor.Index         := 1;
-                  Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
-                                Cursor.Key_Context);
-                  State := Success;
+                  Cursor.Node  := R;
+                  Cursor.Index := 1;
+                  State        := Success;
                end;
             else
                Cursor.Final := True;
                State        := Success;
+            end if;
+         end Move_Right;
+
+         use type Nodes.Degree_Type;
+      begin
+         if Cursor.Index = Nodes.Degree(Cursor.Node) then
+            loop
+               Move_Right;
+               exit when Cursor.Final or else Nodes.Degree(Cursor.Node) > 0;
+            end loop;
+            if Nodes.Degree(Cursor.Node) > 0 then
+               Init_Contexts_And_Key;
             end if;
          else
             Cursor.Index := Cursor.Index + 1;
@@ -217,47 +230,11 @@ package body Cursors is
                           Cursor.Key_Context);
             State := Success;
          end if;
-
       exception
          when others =>
             Cursor.Final := True;
             raise;
       end Move_To_Next;
-
-
-      procedure Search_Node
-        (Key   : in  Keys.Key_Type;
-         Node  : out Nodes.RO_Node_Type;
-         Index : out Nodes.Valid_Index_Type)
-      is
-         N_A : Nodes.Valid_Address_Type := Root_Address;
-      begin
-         loop
-            declare
-               use type Nodes.Degree_Type;
-               N : Nodes.RO_Node_Type;
-               I : Nodes.Index_Type;
-            begin
-               Read_Node(Tree, N_A, N);
-               if Nodes.Degree(N) = 0 then
-                  Index := 1;
-                  State := Failure;
-                  return;
-               end if;
-               I := Nodes.Key_Position(N, Key);
-               if not Nodes.Is_Valid(I) then
-                  I := Nodes.Degree(N);
-               end if;
-               if Nodes.Is_Leaf(N) then
-                  Node  := N;
-                  Index := I;
-                  State := Success;
-                  return;
-               end if;
-               N_A := Nodes.Child(N, I);
-            end;
-         end loop;
-      end Search_Node;
 
 
       procedure Recalibrate is
@@ -270,15 +247,13 @@ package body Cursors is
          declare
             Old_Key : constant Keys.Key_Type := Cursor.Key;
          begin
-            Search_Node(Old_Key, Cursor.Node, Cursor.Index);
+            Searches.Search_Node(Tree, Old_Key, Cursor.Node, Cursor.Index,
+                                 State);
             if State /= Success then
                Cursor.Final := True;
                return;
             end if;
-            Cursor.Key_Context   := Keys.New_Read_Context;
-            Cursor.Value_Context := Values.New_Read_Context;
-            Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
-                          Cursor.Key_Context);
+            Init_Contexts_And_Key;
 
             -- Move to next key since we don't what to visit one twice.
             if Cursor.Key <= Old_Key then
@@ -306,80 +281,21 @@ package body Cursors is
       end Recalibrate;
 
 
-      procedure Search_Abstract_Lower_Bound
-      is
-         procedure Search_Minimum_Node
-           (Node  : out Nodes.RO_Node_Type;
-            Index : out Nodes.Valid_Index_Type)
-         is
-            N_A : Nodes.Valid_Address_Type := Root_Address;
-         begin
-            loop
-               declare
-                  use type Nodes.Degree_Type;
-                  N : Nodes.RO_Node_Type;
-               begin
-                  Read_Node(Tree, N_A, N);
-                  if Nodes.Degree(N) = 0 then
-                     Index := 1;
-                     State := Failure;
-                     return;
-                  end if;
-                  if Nodes.Is_Leaf(N) then
-                     Node  := N;
-                     Index := 1;
-                     State := Success;
-                     return;
-                  end if;
-                  N_A := Nodes.Child(N, 1);
-               end;
-            end loop;
-         end Search_Minimum_Node;
-
-         procedure Search_Maximum_Node
-           (Node  : out Nodes.RO_Node_Type;
-            Index : out Nodes.Valid_Index_Type)
-         is
-            N_A : Nodes.Valid_Address_Type := Root_Address;
-         begin
-            loop
-               declare
-                  use type Nodes.Degree_Type;
-                  N : Nodes.RO_Node_Type;
-               begin
-                  Read_Node(Tree, N_A, N);
-                  if Nodes.Degree(N) = 0 then
-                     Index := 1;
-                     State := Failure;
-                     return;
-                  end if;
-                  if Nodes.Is_Leaf(N) then
-                     Node  := N;
-                     Index := Nodes.Degree(N);
-                     State := Success;
-                     return;
-                  end if;
-                  N_A := Nodes.Child(N, Nodes.Degree(N));
-               end;
-            end loop;
-         end Search_Maximum_Node;
-
-         pragma Assert (not Cursor.Has_Node);
+      procedure Search_Abstract_Lower_Bound is
       begin
+         pragma Assert (not Cursor.Has_Node);
          case Cursor.Lower_Bound.Location is
             when Negative_Infinity =>
-               Search_Minimum_Node(Cursor.Node, Cursor.Index);
+               Searches.Search_Minimum_Node(Tree, Cursor.Node, Cursor.Index,
+                                            State);
                if State /= Success then
                   Cursor.Final := True;
                   return;
                end if;
             when Positive_Infinity =>
-               Search_Maximum_Node(Cursor.Node, Cursor.Index);
-               if State /= Success then
-                  Cursor.Final := True;
-                  return;
-               end if;
+               raise Tree_Error;
          end case;
+         Init_Contexts_And_Key;
       end Search_Abstract_Lower_Bound;
 
 
@@ -388,11 +304,12 @@ package body Cursors is
          pragma Assert (not Cursor.Has_Node);
          FB : constant Bound_Type := Cursor.Lower_Bound;
       begin
-         Search_Node(FB.Key, Cursor.Node, Cursor.Index);
+         Searches.Search_Node(Tree, FB.Key, Cursor.Node, Cursor.Index, State);
          if State /= Success then
             Cursor.Final := True;
             return;
          end if;
+         Init_Contexts_And_Key;
 
          case FB.Comparison is
             when Less | Less_Or_Equal =>

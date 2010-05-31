@@ -126,12 +126,14 @@ procedure Tree.Map_MR is
                Out_Value := Out_Value + Intermediate_Value;
             end;
          end loop;
+         pragma Assert (Out_Value > 0);
       end Reduce;
 
       Out_Mutex       : DB.Locks.Mutexes.Mutex_Type;
       Out_Initialized : Boolean := False;
       Last_Out_Key    : Out_Key_Type;
       Last_Out_Value  : Out_Value_Type;
+      Out_Value_Sum   : Out_Value_Type := 0;
       Out_Count       : Natural := 0;
 
       procedure Output
@@ -149,11 +151,12 @@ procedure Tree.Map_MR is
                Put_Line("Differing output values:"&
                         Last_Out_Value'Img &" /="& Value'Img);
             end if;
-            Out_Initialized := True;
          end if;
-         Last_Out_Key   := Key;
-         Last_Out_Value := Value;
-         Out_Count := Out_Count + 1;
+         Out_Initialized := True;
+         Last_Out_Key    := Key;
+         Last_Out_Value  := Value;
+         Out_Value_Sum   := Out_Value_Sum + Value;
+         Out_Count       := Out_Count + 1;
          --Put_Line(Types.To_String(Key) &" =>"& Value'Img);
          DB.Locks.Mutexes.Unlock(Out_Mutex);
       exception
@@ -186,6 +189,7 @@ procedure Tree.Map_MR is
       Map_Reduce("bluhp.intermediates");
 
       Put_Line("Count ="& Out_Count'Img);
+      Put_Line("Value Sum ="& Out_Value_Sum'Img);
       Put_Line("Value ="& Last_Out_Value'Img);
    end Job;
 

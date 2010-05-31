@@ -100,17 +100,30 @@ package body DB.Gen_BTrees is
 
 
    package Searches is
-      procedure Search
-        (Tree     : in out Tree_Type;
-         Key      : in     Keys.Key_Type;
-         Value    :    out Values.Value_Type;
-         State    :    out State_Type);
+      procedure Search_Node
+        (Tree  : in out Tree_Type;
+         Key   : in     Keys.Key_Type;
+         N     :    out Nodes.Node_Type;
+         Index :    out Nodes.Valid_Index_Type;
+         State :    out State_Type);
 
-      procedure Minimum
-        (Tree     : in out Tree_Type;
-         Key      :    out Keys.Key_Type;
-         Value    :    out Values.Value_Type;
-         State    :    out State_Type);
+      procedure Search
+        (Tree  : in out Tree_Type;
+         Key   : in     Keys.Key_Type;
+         Value :    out Values.Value_Type;
+         State :    out State_Type);
+
+      procedure Search_Minimum_Node
+        (Tree  : in out Tree_Type;
+         N     :    out Nodes.Node_Type;
+         Index :    out Nodes.Valid_Index_Type;
+         State :    out State_Type);
+
+      procedure Search_Minimum
+        (Tree  : in out Tree_Type;
+         Key   :    out Keys.Key_Type;
+         Value :    out Values.Value_Type;
+         State :    out State_Type);
    end Searches;
 
 
@@ -332,12 +345,12 @@ package body DB.Gen_BTrees is
    renames Searches.Search;
 
 
-   procedure Minimum
+   procedure Search_Minimum
      (Tree  : in out Tree_Type;
       Key   :    out Keys.Key_Type;
       Value :    out Values.Value_Type;
       State :    out State_Type)
-   renames Searches.Minimum;
+   renames Searches.Search_Minimum;
 
 
    procedure Insert

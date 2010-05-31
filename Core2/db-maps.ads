@@ -116,7 +116,7 @@ package DB.Maps is
       State :    out State_Type)
    is abstract;
 
-   procedure Minimum
+   procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
       Value :    out Value_Type'Class;

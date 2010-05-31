@@ -9,14 +9,16 @@
 separate (DB.Gen_BTrees)
 package body Searches is
 
-   procedure Search
-     (Tree     : in out Tree_Type;
-      Key      : in     Keys.Key_Type;
-      Value    :    out Values.Value_Type;
-      State    :    out State_Type)
+   procedure Search_Node
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      N     :    out Nodes.Node_Type;
+      Index :    out Nodes.Valid_Index_Type;
+      State :    out State_Type)
    is
-      procedure Find_Leaf (N : out Nodes.Node_Type)
+      procedure Find_Leaf
       is
+         pragma Inline (Find_Leaf);
          N_A : Nodes.Valid_Address_Type := Root_Address;
       begin
          loop
@@ -27,9 +29,8 @@ package body Searches is
       end Find_Leaf;
 
       pragma Assert (Tree.Initialized);
-      N : Nodes.RO_Node_Type;
    begin
-      Find_Leaf(N);
+      Find_Leaf;
       loop
          pragma Assert (Nodes.Is_Leaf(N));
          declare
@@ -39,7 +40,7 @@ package body Searches is
             if Nodes.Is_Valid(I) then
                case Keys.Compare(Key, Nodes.Key(N, I)) is
                   when Utils.Equal =>
-                     Value := Nodes.Value(N, I);
+                     Index := I;
                      State := Success;
                      return;
                   when Utils.Less =>
@@ -66,35 +67,70 @@ package body Searches is
          end;
          Read_Node(Tree, Nodes.Valid_Link(N), N);
       end loop;
+   end Search_Node;
+
+
+   procedure Search
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type)
+   is
+      N : Nodes.RO_Node_Type;
+      I : Nodes.Valid_Index_Type;
+   begin
+      Search_Node(Tree, Key, N, I, State);
+      if State = Success then
+         Value := Nodes.Value(N, I);
+      end if;
    end Search;
 
 
-   procedure Minimum
-     (Tree     : in out Tree_Type;
-      Key      :    out Keys.Key_Type;
-      Value    :    out Values.Value_Type;
-      State    :    out State_Type)
+   procedure Search_Minimum_Node
+     (Tree  : in out Tree_Type;
+      N     :    out Nodes.Node_Type;
+      Index :    out Nodes.Valid_Index_Type;
+      State :    out State_Type)
    is
       pragma Assert (Tree.Initialized);
       use type Nodes.Degree_Type;
       N_A : Nodes.Valid_Address_Type := Root_Address;
-      N   : Nodes.RO_Node_Type;
    begin
       loop
          Read_Node(Tree, N_A, N);
-         if Nodes.Degree(N) = 0 then
-            State := Failure;
-            return;
+         if Nodes.Is_Inner(N) then
+            N_A := Nodes.Child(N, 1);
+         else
+            if Nodes.Degree(N) > 0 then
+               Index := 1;
+               State := Success;
+            elsif Nodes.Is_Valid(Nodes.Link(N)) then
+               N_A := Nodes.Valid_Link(N);
+            else
+               State := Failure;
+               return;
+            end if;
          end if;
-         if Nodes.Is_Leaf(N) then
-            Key   := Nodes.Key(N, 1);
-            Value := Nodes.Value(N, 1);
-            State := Success;
-            return;
-         end if;
-         N_A := Nodes.Child(N, 1);
       end loop;
-   end Minimum;
+   end Search_Minimum_Node;
+
+
+   procedure Search_Minimum
+     (Tree  : in out Tree_Type;
+      Key   :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type)
+   is
+      N : Nodes.RO_Node_Type;
+      I : Nodes.Valid_Index_Type;
+   begin
+      Search_Minimum_Node(Tree, N, I, State);
+      if State = Success then
+         Key   := Nodes.Key(N, I);
+         Value := Nodes.Value(N, I);
+      end if;
+   end Search_Minimum;
+
 
 end Searches;
 

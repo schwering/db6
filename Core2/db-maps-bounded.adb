@@ -119,7 +119,7 @@ package body DB.Maps.Bounded is
    end Search;
 
 
-   procedure Minimum
+   procedure Search_Minimum
      (Map      : in out Map_Type;
       Key      :    out Key_Type;
       Value    :    out Value_Type'Class;
@@ -130,12 +130,12 @@ package body DB.Maps.Bounded is
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
          Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
    begin
-      BTrees.Minimum(Map.Tree, Key, String, S);
+      BTrees.Search_Minimum(Map.Tree, Key, String, S);
       State := To_State(S);
       if State = Success then
          Read(Stream, Value);
       end if;
-   end Minimum;
+   end Search_Minimum;
 
 
    procedure Insert
@@ -219,8 +219,10 @@ package body DB.Maps.Bounded is
                return New_Bound(Bound.Comparison, Bound.Key);
             when False =>
                case Bound.Infinity is
-                  when Negative_Infinity => return BTrees.Negative_Infinity_Bound;
-                  when Positive_Infinity => return BTrees.Positive_Infinity_Bound;
+                  when Negative_Infinity =>
+                     return BTrees.Negative_Infinity_Bound;
+                  when Positive_Infinity =>
+                     return BTrees.Positive_Infinity_Bound;
                end case;
          end case;
       end To_Bound;
@@ -231,10 +233,11 @@ package body DB.Maps.Bounded is
       pragma Assert (Map.Initialized);
       return Cursor_Type'(Initialized => True,
                           Map         => Map.Self,
-                          Cursor      => BTrees.New_Cursor(Map.Tree,
-                                                           Thread_Safe,
-                                                           B_Lower_Bound,
-                                                           B_Upper_Bound));
+                          Cursor      => BTrees.New_Cursor
+                                          (Tree        => Map.Tree,
+                                           Thread_Safe => Thread_Safe,
+                                           Lower_Bound => B_Lower_Bound,
+                                           Upper_Bound => B_Upper_Bound));
    end New_Cursor;
 
 

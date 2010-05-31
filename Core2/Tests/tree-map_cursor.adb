@@ -1,9 +1,10 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Tree.Test_Data;
-with Tree.Types;
 with Tree.Args;
 with Tree.Jobs;
+with Tree.Test_Data;
+with Tree.Types;
+with Tree.To_Strings;
 
 with DB.Maps;
 
@@ -50,8 +51,8 @@ procedure Tree.Map_Cursor is
       KV     : constant Types.Key_Value_Type := Test_Data.Random_Entry;
       Key    : constant Types.Key_Type   := KV.Key;
       Value  : constant Types.Value_Type := Types.Value(KV);
-      LC     : constant DB.Maps.Comparison_Type  := DB.Maps.Equal;
-      UC     : constant DB.Maps.Comparison_Type  := DB.Maps.Equal;
+      LC     : constant DB.Maps.Comparison_Type := DB.Maps.Equal;
+      UC     : constant DB.Maps.Comparison_Type := DB.Maps.Equal;
       Lower  : constant DB.Maps.Bound_Type := DB.Maps.New_Bound(LC, Key);
       Upper  : constant DB.Maps.Bound_Type := DB.Maps.New_Bound(UC, Key);
       Cursor : DB.Maps.Cursor_Type'Class
@@ -61,6 +62,7 @@ procedure Tree.Map_Cursor is
       State  : DB.Maps.State_Type;
       Count  : Natural := 0;
    begin
+      --pragma Assert (Map.Contains(Key));
       loop
          declare
             This_Key   : Types.Key_Type;
@@ -93,6 +95,7 @@ begin
    end;
    Map.Count(Cnt);
    Ada.Text_IO.Put_Line("Size ="& DB.Maps.Count_Type'Image(Cnt));
+   Cnt := 0;
 
    declare
       use type Types.Count_Type;
@@ -108,7 +111,7 @@ begin
                     Short_Job                 => Job'Unrestricted_Access,
                     Short_Job_Execution_Count => 1000,
                     Concurrency_Degree        => 10,
-                    Reset                     => False);
+                    Reset                     => True);
    Ada.Text_IO.Put_Line("Total:"& Count_Container.Total_Count'Img);
 
    Map.Finalize;
