@@ -402,8 +402,15 @@ package body Stacks is
                Nodes.Set_Link(R, Nodes.Link(N));
                Write_New_Node(Tree, R_A, R);
                Lock(Tree, R_A);
-               Nodes.Set_Link(L, R_A);
-               Write_Node(Tree, L_A, L);
+               declare
+               begin
+                  Nodes.Set_Link(L, R_A);
+                  Write_Node(Tree, L_A, L);
+               exception
+                  when others =>
+                     Unlock(Tree, R_A);
+                     raise;
+               end;
                Insert_Key_And_Update_High_Key(Nodes.High_Key(L), L_A,
                                               Nodes.High_Key(R), R_A);
             end;
