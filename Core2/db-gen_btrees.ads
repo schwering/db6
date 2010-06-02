@@ -259,8 +259,10 @@ private
       subtype Index_Type is Degree_Type range 0 .. Degree_Type'Last;
       subtype Valid_Index_Type is Index_Type range 1 .. Index_Type'Last;
 
-      type Address_Type is new Block_IO.Address_Type;
-      type Valid_Address_Type is new Block_IO.Valid_Address_Type;
+      subtype Address_Type is Block_IO.Address_Type;
+      subtype Valid_Address_Type is Block_IO.Valid_Address_Type;
+      use type Address_Type;
+      use type Valid_Address_Type;
 
       type Node_Type is new Blocks.Base_Block_Type;
       subtype RO_Node_Type is Node_Type(1 .. RO_Node_Size);
@@ -276,6 +278,16 @@ private
 
       ----------
       -- Address functions.
+
+      function "<"
+        (A, B : Valid_Address_Type)
+         return Boolean
+      renames Block_IO."<";
+
+      function "="
+        (A, B : Valid_Address_Type)
+         return Boolean
+      renames Block_IO."=";
 
       function Is_Valid
         (Address : Address_Type)
@@ -556,7 +568,7 @@ private
       Nodes.Address_Type(Block_IO.Invalid_Address);
 
    Root_Address : constant Nodes.Valid_Address_Type :=
-      Nodes.Valid_Address_Type(Block_IO.First);
+      Nodes.Valid_Address_Type(Block_IO.First_Address);
 
    type Tree_Ref_Type is not null access all Tree_Type;
    pragma Controlled (Tree_Ref_Type);

@@ -5,7 +5,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 package DB.Locks.Mutexes is
-   pragma Preelaborate;
+   pragma Pure;
 
    type Mutex_Type is limited private;
 

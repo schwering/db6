@@ -17,6 +17,7 @@ package DB.Blocks.Memory_IO is
    pragma Controlled (File_Type);
 
    Invalid_Address : constant Address_Type := 0;
+   First_Address   : constant Address_Type := 1;
 
    procedure Create
      (ID   : in  String;
@@ -33,9 +34,6 @@ package DB.Blocks.Memory_IO is
    procedure Close
      (File : in out File_Type)
    is null;
-
-   function First
-      return Valid_Address_Type;
 
    function Succ
      (Address : Valid_Address_Type)
@@ -88,18 +86,18 @@ package DB.Blocks.Memory_IO is
       Address_Type               => Address_Type,
       Valid_Address_Type         => Valid_Address_Type,
       Invalid_Address            => Invalid_Address,
-      Create                     => Create,
-      Create_And_Open_Temporary  => Create_And_Open_Temporary,
-      Open                       => Open,
-      Close                      => Close,
+      First_Address              => First_Address,
       Succ                       => Succ,
       "<"                        => "<",
       "="                        => "=",
       Image                      => Image,
-      First                      => First,
       To_Address                 => To_Address,
       To_Valid_Address           => To_Valid_Address,
       Is_Valid_Address           => Is_Valid_Address,
+      Create                     => Create,
+      Create_And_Open_Temporary  => Create_And_Open_Temporary,
+      Open                       => Open,
+      Close                      => Close,
       Read                       => Read,
       Write                      => Write,
       Write_New_Block            => Write_New_Block,
@@ -142,7 +140,6 @@ private
 
    pragma Inline (Succ);
    pragma Inline (Image);
-   pragma Inline (First);
    pragma Inline (To_Address);
    pragma Inline (To_Valid_Address);
    pragma Inline (Is_Valid_Address);

@@ -13,6 +13,7 @@ with DB.Types.Keys;
 with DB.Types.Values.Bounded.Streams;
 
 package DB.Maps is
+   pragma Preelaborate;
 
    package AF renames Ada.Finalization;
 
@@ -56,9 +57,18 @@ package DB.Maps is
 
    type Map_Type is abstract new AF.Limited_Controlled with private;
 
+   Default_Allow_Duplicates : constant Boolean := True;
+
    function New_Map
-     (Max_Key_Size   : in Blocks.Size_Type;
-      Max_Value_Size : in Blocks.Size_Type)
+     (Implementation   : in String;
+      Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
+      return Map_Type'Class;
+   -- Initializes a map object.
+
+   function New_Map
+     (Max_Key_Size     : in Blocks.Size_Type;
+      Max_Value_Size   : in Blocks.Size_Type;
+      Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
       return Map_Type'Class;
    -- Initializes a map object.
 
@@ -100,8 +110,6 @@ package DB.Maps is
    -- Core operations: Search, Insertion, Deletion.
 
    type State_Type is (Success, Failure);
-
-   Default_Allow_Duplicates : constant Boolean := True;
 
    function Contains
      (Map : Map_Type;

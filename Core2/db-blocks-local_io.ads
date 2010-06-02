@@ -9,12 +9,13 @@ with DB.Blocks.Gen_IO_Signature;
 with DB.Locks.Gen_Mutex_Sets;
 
 package DB.Blocks.Local_IO is
-   pragma Elaborate_Body;
+   pragma Preelaborate;
 
    type Address_Type is new Natural;
    subtype Valid_Address_Type is Address_Type range 1 .. Address_Type'Last;
 
    Invalid_Address : constant Address_Type := 0;
+   First_Address   : constant Address_Type := 1;
 
    package Mutex_Sets is new Locks.Gen_Mutex_Sets
      (Item_Type           => Valid_Address_Type,
@@ -41,9 +42,6 @@ package DB.Blocks.Local_IO is
 
    procedure Close
      (File : in out File_Type);
-
-   function First
-      return Valid_Address_Type;
 
    function Succ
      (Address : Valid_Address_Type)
@@ -105,18 +103,18 @@ package DB.Blocks.Local_IO is
       Address_Type               => Address_Type,
       Valid_Address_Type         => Valid_Address_Type,
       Invalid_Address            => Invalid_Address,
-      Create                     => Create,
-      Create_And_Open_Temporary  => Create_And_Open_Temporary,
-      Open                       => Open,
-      Close                      => Close,
+      First_Address              => First_Address,
       Succ                       => Succ,
       "<"                        => "<",
       "="                        => "=",
       Image                      => Image,
-      First                      => First,
       To_Address                 => To_Address,
       To_Valid_Address           => To_Valid_Address,
       Is_Valid_Address           => Is_Valid_Address,
+      Create                     => Create,
+      Create_And_Open_Temporary  => Create_And_Open_Temporary,
+      Open                       => Open,
+      Close                      => Close,
       Read                       => Read,
       Write                      => Write,
       Write_New_Block            => Write_New_Block,
@@ -126,7 +124,6 @@ package DB.Blocks.Local_IO is
 private
    pragma Inline (Succ);
    pragma Inline (Image);
-   pragma Inline (First);
    pragma Inline (To_Address);
    pragma Inline (To_Valid_Address);
    pragma Inline (Is_Valid_Address);

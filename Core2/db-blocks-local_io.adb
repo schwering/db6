@@ -54,13 +54,6 @@ package body DB.Blocks.Local_IO is
    end Close;
 
 
-   function First
-      return Valid_Address_Type is
-   begin
-      return 1;
-   end First;
-
-
    function Succ
      (Address : Valid_Address_Type)
       return Valid_Address_Type is

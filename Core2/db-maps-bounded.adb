@@ -27,9 +27,12 @@ package body DB.Maps.Bounded is
 
 
    function New_Map
+     (Allow_Duplicates : in Boolean)
       return Map_Type is
    begin
-      return Map_Type'(AF.Limited_Controlled with others => <>);
+      return Map_Type'(AF.Limited_Controlled with
+                       Allow_Duplicates => Allow_Duplicates,
+                       others => <>);
    end New_Map;
 
 
@@ -74,13 +77,21 @@ package body DB.Maps.Bounded is
 
 
    function Max_Key_Size
+     (Max_Value_Size : Blocks.Size_Type)
+      return Blocks.Size_Type is
+   begin
+      return BTrees.Max_Key_Size(Max_Value_Size);
+   end Max_Key_Size;
+
+
+   function Max_Key_Size
      (Map            : Map_Type;
       Max_Value_Size : Blocks.Size_Type)
       return Blocks.Size_Type
    is
       pragma Unreferenced (Map);
    begin
-      return BTrees.Max_Key_Size(Max_Value_Size);
+      return Max_Key_Size(Max_Value_Size);
    end Max_Key_Size;
 
 
@@ -92,8 +103,6 @@ package body DB.Maps.Bounded is
       use type BTrees.State_Type;
       State  : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
-      Stream : Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
    begin
       BTrees.Search(Map.Self.Tree, Key, String, State);
       return State = BTrees.Success;
@@ -101,10 +110,10 @@ package body DB.Maps.Bounded is
 
 
    procedure Search
-     (Map      : in out Map_Type;
-      Key      : in     Key_Type;
-      Value    :    out Value_Type'Class;
-      State    :    out State_Type)
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value :    out Value_Type'Class;
+      State :    out State_Type)
    is
       S      : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
@@ -120,10 +129,10 @@ package body DB.Maps.Bounded is
 
 
    procedure Search_Minimum
-     (Map      : in out Map_Type;
-      Key      :    out Key_Type;
-      Value    :    out Value_Type'Class;
-      State    :    out State_Type)
+     (Map   : in out Map_Type;
+      Key   :    out Key_Type;
+      Value :    out Value_Type'Class;
+      State :    out State_Type)
    is
       S      : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
@@ -144,7 +153,7 @@ package body DB.Maps.Bounded is
       Value : in     Value_Type'Class;
       State :    out State_Type) is
    begin
-      Insert(Map, Key, Value, Default_Allow_Duplicates, State);
+      Insert(Map, Key, Value, Map.Allow_Duplicates, State);
    end Insert;
 
 

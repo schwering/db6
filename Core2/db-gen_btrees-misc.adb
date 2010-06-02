@@ -14,7 +14,7 @@ package body Misc is
       pragma Assert (Tree.Initialized);
 
       N_A : Nodes.Valid_Address_Type :=
-         Nodes.Valid_Address_Type(Block_IO.First);
+         Nodes.Valid_Address_Type(Block_IO.First_Address);
    begin
       Count := 0;
       loop

@@ -15,6 +15,8 @@ package DB.Blocks is
 
    Block_Size : constant := 4 * 1024;
 
+   Storage_Unit : constant Size_Type := System.Storage_Unit;
+
    Last_Position : constant := 2**14 - 1;
    type Base_Position_Type is range 0 .. Last_Position;
    for Base_Position_Type'Size use 15;
@@ -91,6 +93,7 @@ package DB.Blocks is
    function Bits_To_Units
      (Bits : Size_Type)
       return Size_Type;
+   pragma Pure_Function (Bits_To_Units);
 
    procedure Reset
      (Block : in out Base_Block_Type);

@@ -5,8 +5,8 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Blocks.Gen_Values_Signature;
 with DB.Gen_BTrees;
+with DB.Blocks.Gen_Values_Signature;
 with DB.Blocks;
 with DB.Blocks.Local_IO;
 with DB.Types.Values;
@@ -14,6 +14,7 @@ with DB.Types.Values.Bounded;
 
 private
 package DB.Maps.Bounded is
+   pragma Preelaborate;
 
    ----------
    -- Map initialization operations.
@@ -21,6 +22,7 @@ package DB.Maps.Bounded is
    type Map_Type is limited new Maps.Map_Type with private;
 
    function New_Map
+     (Allow_Duplicates : in Boolean)
       return Map_Type;
 
    overriding
@@ -47,6 +49,11 @@ package DB.Maps.Bounded is
    procedure Finalize
      (Map  : in out Map_Type);
    -- Finalizes Map, i.e. closes opened files.
+
+   function Max_Key_Size
+     (Max_Value_Size : Blocks.Size_Type)
+      return Blocks.Size_Type;
+   -- Returns the maximum allowed size of keys.
 
    overriding
    function Max_Key_Size
@@ -190,8 +197,9 @@ private
 
    type Map_Type is limited new Maps.Map_Type with
       record
-         Self : Map_Ref_Type := Map_Type'Unchecked_Access;
-         Tree : BTrees.Tree_Type;
+         Allow_Duplicates : Boolean;
+         Self             : Map_Ref_Type := Map_Type'Unchecked_Access;
+         Tree             : BTrees.Tree_Type;
       end record;
 
 

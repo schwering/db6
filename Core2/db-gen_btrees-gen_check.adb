@@ -16,10 +16,8 @@ is
    use Ada.Text_IO;
    use Nodes;
 
-   function Image (N_A : Valid_Address_Type) return String is
-   begin
-      return Block_IO.Image(Block_IO.Valid_Address_Type(N_A));
-   end Image;
+   function Image (N_A : Valid_Address_Type) return String
+   renames Block_IO.Image;
 
    function Image (N_A : Address_Type) return String is
    begin
@@ -226,6 +224,7 @@ is
    end Check_Values;
 
    procedure Draw is new Gen_Draw(Address_To_String);
+   pragma Unreferenced (Draw);
 
    N_A : Valid_Address_Type;
    N   : RO_Node_Type;

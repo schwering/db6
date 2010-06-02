@@ -187,44 +187,66 @@ package body Nodes is
          end record;
       pragma Pack (Booleans_Type);
 
-      function Size_Of is new Blocks.Size_Of(Booleans_Type);
-      function Size_Of is new Blocks.Size_Of(Level_Type);
-      function Size_Of is new Blocks.Size_Of(Degree_Type);
-      function Size_Of is new Blocks.Size_Of(Address_Type);
-      function Size_Of is new Blocks.Size_Of(Blocks.Position_Type);
-      function Size_Of is new Blocks.Size_Of(Valid_Address_Type);
+      function Size_Of_Booleans return Blocks.Base_Position_Type is
+      begin
+         return Blocks.Base_Position_Type
+            (Blocks.Bits_To_Units(Booleans_Type'Size));
+      end Size_Of_Booleans;
 
-      Size_Of_Booleans  : constant Blocks.Base_Position_Type :=
-         Blocks.Base_Position_Type(Size_Of(Booleans_Type'(others => <>)));
+      function Size_Of_Level return Blocks.Base_Position_Type is
+      begin
+         return Blocks.Base_Position_Type
+            (Blocks.Bits_To_Units(Level_Type'Size));
+      end Size_Of_Level;
 
-      Size_Of_Level     : constant Blocks.Base_Position_Type :=
-         Blocks.Base_Position_Type(Size_Of(Level_Type'First));
+      function Size_Of_Degree return Blocks.Base_Position_Type is
+      begin
+         return Blocks.Base_Position_Type
+            (Blocks.Bits_To_Units(Degree_Type'Size));
+      end Size_Of_Degree;
 
-      Size_Of_Degree    : constant Blocks.Base_Position_Type :=
-         Blocks.Base_Position_Type(Size_Of(Degree_Type'First));
+      function Size_Of_Address return Blocks.Base_Position_Type is
+      begin
+         return Blocks.Base_Position_Type
+            (Blocks.Bits_To_Units(Address_Type'Size));
+      end Size_Of_Address;
 
-      Size_Of_Address   : constant Blocks.Base_Position_Type :=
-         Blocks.Base_Position_Type(Size_Of(Invalid_Address));
+      function Size_Of_Position return Blocks.Base_Position_Type is
+      begin
+         return Blocks.Base_Position_Type
+            (Blocks.Bits_To_Units(Blocks.Base_Position_Type'Size));
+      end Size_Of_Position;
 
-      Size_Of_Position  : constant  Blocks.Base_Position_Type :=
-         Blocks.Base_Position_Type(Size_Of(Blocks.Position_Type'Last));
+      function Size_Of_Child return Blocks.Base_Position_Type is
+      begin
+         return Blocks.Base_Position_Type
+            (Blocks.Bits_To_Units(Valid_Address_Type'Size));
+      end Size_Of_Child;
 
-      Size_Of_Child     : constant Blocks.Base_Position_Type :=
-         Blocks.Base_Position_Type(Size_Of(Valid_Address_Type(Block_IO.First)));
+      function Size_Of_Meta_Data return Blocks.Base_Position_Type is
+      begin
+         return Size_Of_Booleans + Size_Of_Level + Size_Of_Degree +
+                Size_Of_Address;
+      end Size_Of_Meta_Data;
 
-      Size_Of_Meta_Data : constant Blocks.Base_Position_Type :=
-         Size_Of_Booleans + Size_Of_Level + Size_Of_Degree + Size_Of_Address;
+      pragma Inline (Size_of_Booleans);
+      pragma Inline (Size_of_Level);
+      pragma Inline (Size_of_Degree);
+      pragma Inline (Size_of_Address);
+      pragma Inline (Size_of_Position);
+      pragma Inline (Size_of_Child);
+      pragma Inline (Size_of_Meta_Data);
 
       -- Layout of Node Blocks is as follows:
-      -- 1. Is_Ok/Has_High_Key             (Size_Of_Booleans)
-      -- 2. Level                          (Size_Of_Level)
-      -- 3. Degree                         (Size_Of_Degree)
-      -- 4. Link                           (Size_Of_Address)
-      -- 5. Indexes                        (|Degree| * Size_Of_Position)
-      -- 6. Entries                        (Size_Of(Key_1) + Size_Of_Child ..
-      --                                    Size_Of(Key_N) + Size_Of_Child)
-      --                                or (Size_Of(Key_1) + Size_Of(Value_1) ..
-      --                                    Size_Of(Key_N) + Size_Of(Value_N))
+      -- 1. Is_Ok/Has_High_Key    (Size_Of_Booleans) ----------+
+      -- 2. Level                 (Size_Of_Level)              |_ Size_Of_
+      -- 3. Degree                (Size_Of_Degree)             |  Meta_Data
+      -- 4. Link                  (Size_Of_Address) -----------+
+      -- 5. Indexes               (|Degree| * Size_Of_Position)
+      -- 6. Entries               (Size_Of(Key_1) + Size_Of_Child ..
+      --                           Size_Of(Key_N) + Size_Of_Child)
+      --                       or (Size_Of(Key_1) + Size_Of(Value_1) ..
+      --                           Size_Of(Key_N) + Size_Of(Value_N))
 
 
       function "*"
@@ -590,8 +612,7 @@ package body Nodes is
          end Set_Booleans;
 
          Booleans : constant Booleans_Type :=
-            Booleans_Type'(Is_Ok        => Is_Ok,
-                           Has_High_Key => False);
+            (Is_Ok => Is_Ok, Has_High_Key => False);
       begin
          Set_Booleans(Block, Booleans);
          Set_Level(Block, Level);

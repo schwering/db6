@@ -20,37 +20,8 @@ generic
    Invalid_Address : in Address_Type;
    -- The invalid address usable at many places similar to a null-pointer.
 
-   with procedure Create
-     (ID   : in  String;
-      File : out File_Type);
-   -- Creates a File. If this fails, an IO_Error is raised. The File is opened
-   -- in read/write-mode.
-
-   with procedure Create_And_Open_Temporary
-     (ID   : in  String;
-      File : out File_Type);
-   -- Creates a temporary File. The exact semantic is that the file cannot be
-   -- opened ever again, after the return of Create_And_Open_Temporary next
-   -- calls with the same ID should succeed and File becomes invalid after the
-   -- next Close.
-   -- If this procedure fails, an IO_Error is raised. The File is opened in
-   -- read/write-mode.
-   -- This operation might be unsupported in which case IO_Error must be raised.
-
-   with procedure Open
-     (ID   : in  String;
-      File : out File_Type);
-   -- Opens a File. If this fails, an IO_Error is raised. The File is opened
-   -- in read/write-mode in general (this might not be needed if the implementor
-   -- is sure that nobody ever calls Write of his Gen_IO implementation).
-
-   with procedure Close
-     (File : in out File_Type);
-   -- Properly closes a File. If this fails, an IO_Error is raised.
-
-   with function First
-      return Valid_Address_Type;
-   -- Returns the first valid address of all files.
+   First_Address : in Valid_Address_Type;
+   -- The first valid address of all files.
 
    with function Succ
      (Address : Valid_Address_Type)
@@ -90,6 +61,34 @@ generic
      (Address : Address_Type)
       return Boolean;
    -- Checks whether Address is valid or not.
+
+   with procedure Create
+     (ID   : in  String;
+      File : out File_Type);
+   -- Creates a File. If this fails, an IO_Error is raised. The File is opened
+   -- in read/write-mode.
+
+   with procedure Create_And_Open_Temporary
+     (ID   : in  String;
+      File : out File_Type);
+   -- Creates a temporary File. The exact semantic is that the file cannot be
+   -- opened ever again, after the return of Create_And_Open_Temporary next
+   -- calls with the same ID should succeed and File becomes invalid after the
+   -- next Close.
+   -- If this procedure fails, an IO_Error is raised. The File is opened in
+   -- read/write-mode.
+   -- This operation might be unsupported in which case IO_Error must be raised.
+
+   with procedure Open
+     (ID   : in  String;
+      File : out File_Type);
+   -- Opens a File. If this fails, an IO_Error is raised. The File is opened
+   -- in read/write-mode in general (this might not be needed if the implementor
+   -- is sure that nobody ever calls Write of his Gen_IO implementation).
+
+   with procedure Close
+     (File : in out File_Type);
+   -- Properly closes a File. If this fails, an IO_Error is raised.
 
    with procedure Read
      (File    : in out File_Type;

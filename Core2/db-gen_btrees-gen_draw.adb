@@ -16,29 +16,13 @@ is
    use Ada.Text_IO;
    use Nodes;
 
-   function "<" (A, B : Valid_Address_Type) return Boolean
-   is
-      use Block_IO;
-   begin
-      return Block_IO.Valid_Address_Type(A) < Block_IO.Valid_Address_Type(B);
-   end;
-
-   function "=" (A, B : Valid_Address_Type) return Boolean
-   is
-      use Block_IO;
-   begin
-      return Block_IO.Valid_Address_Type(A) = Block_IO.Valid_Address_Type(B);
-   end;
-
    package Sets is new Ada.Containers.Ordered_Sets
      (Valid_Address_Type, "<", "=");
 
    Set : Sets.Set;
 
-   function Image (N_A : Valid_Address_Type) return String is
-   begin
-      return Block_IO.Image(Block_IO.Valid_Address_Type(N_A));
-   end Image;
+   function Image (N_A : Valid_Address_Type) return String
+   renames Block_IO.Image;
 
    function Image (N_A : Address_Type) return String is
    begin
@@ -82,7 +66,7 @@ is
       end Style;
       Deg  : constant String := Degree_Type'Image(Degree(N));
       Addr : constant String := Address_To_String(Block_IO.Address_Type(To_Address(N_A)));
-      Lev  : constant String := Level_Type'Image(Level(N));
+      Lev  : constant String := Level_Type'Image(Nodes.Level(N));
    begin
       Put(""""& Addr &"""");
       Put(" [label="""& Addr &": "& Deg &", "& Lev &""",shape="""& Style &"""]");

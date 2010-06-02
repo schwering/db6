@@ -14,7 +14,7 @@ with DB.Types.Times;
 with DB.Utils;
 
 package DB.Types.Keys is
-   pragma Elaborate_Body;
+   pragma Preelaborate;
 
    package Rows                 renames Strings.Bounded;
    package Columns              renames Strings.Bounded;

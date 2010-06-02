@@ -89,13 +89,6 @@ package body DB.Blocks.Memory_IO is
    end Open;
 
 
-   function First
-      return Valid_Address_Type is
-   begin
-      return 1;
-   end First;
-
-
    function Succ
      (Address : Valid_Address_Type)
       return Valid_Address_Type is

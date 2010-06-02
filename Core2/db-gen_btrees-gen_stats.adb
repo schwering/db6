@@ -82,7 +82,7 @@ package body DB.Gen_BTrees.Gen_Stats is
       end Handle;
 
       N_A : Nodes.Valid_Address_Type :=
-         Nodes.Valid_Address_Type(Block_IO.First);
+         Nodes.Valid_Address_Type(Block_IO.First_Address);
    begin
       loop
          declare
