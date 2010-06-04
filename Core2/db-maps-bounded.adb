@@ -38,9 +38,10 @@ package body DB.Maps.Bounded is
 
    procedure Create
      (Map : in out Map_Type;
-      ID  : in     String) is
+      ID  : in     String)
+   is
+      pragma Precondition (not Map.Initialized);
    begin
-      pragma Assert (not Map.Initialized);
       BTrees.Create(Map.Tree, ID);
       Map.Initialized := True;
    end Create;
@@ -48,9 +49,10 @@ package body DB.Maps.Bounded is
 
    procedure Create_Temporary
      (Map : in out Map_Type;
-      ID  : in     String) is
+      ID  : in     String)
+   is
+      pragma Precondition (not Map.Initialized);
    begin
-      pragma Assert (not Map.Initialized);
       BTrees.Create_Temporary(Map.Tree, ID);
       Map.Initialized := True;
    end Create_Temporary;
@@ -58,9 +60,10 @@ package body DB.Maps.Bounded is
 
    procedure Open
      (Map : in out Map_Type;
-      ID  : in     String) is
+      ID  : in     String)
+   is
+      pragma Precondition (not Map.Initialized);
    begin
-      pragma Assert (not Map.Initialized);
       BTrees.Open(Map.Tree, ID);
       Map.Initialized := True;
    end Open;
@@ -202,6 +205,8 @@ package body DB.Maps.Bounded is
       Upper_Bound : Bound_Type)
       return Maps.Cursor_Type'Class
    is
+      pragma Precondition (Map.Initialized);
+
       function New_Bound
         (Comparison : Comparison_Type;
          Key        : Key_Type)
@@ -239,7 +244,6 @@ package body DB.Maps.Bounded is
       B_Lower_Bound : constant BTrees.Bound_Type := To_Bound(Lower_Bound);
       B_Upper_Bound : constant BTrees.Bound_Type := To_Bound(Upper_Bound);
    begin
-      pragma Assert (Map.Initialized);
       return Cursor_Type'(Initialized => True,
                           Map         => Map.Self,
                           Cursor      => BTrees.New_Cursor

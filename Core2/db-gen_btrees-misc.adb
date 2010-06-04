@@ -11,7 +11,7 @@ package body Misc is
      (Tree  : in out Tree_Type;
       Count :    out Count_Type)
    is
-      pragma Assert (Tree.Initialized);
+      pragma Precondition (Tree.Initialized);
 
       N_A : Nodes.Valid_Address_Type :=
          Nodes.Valid_Address_Type(Block_IO.First_Address);
@@ -40,7 +40,7 @@ package body Misc is
 --     (Tree  : in out Tree_Type;
 --      Count :    out Count_Type)
 --   is
---      pragma Assert (Tree.Initialized);
+--      pragma Precondition (Tree.Initialized);
 --
 --      N_A : Nodes.Valid_Address_Type := Root_Address;
 --   begin

@@ -24,7 +24,7 @@ procedure Insert
    Allow_Duplicates : in     Boolean;
    State            :    out State_Type)
 is
-   pragma Assert (Tree.Initialized);
+   pragma Precondition (Tree.Initialized);
 
    Stack : Stacks.Stack_Type;
 

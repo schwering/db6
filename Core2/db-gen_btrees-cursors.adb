@@ -57,6 +57,8 @@ package body Cursors is
       Upper_Bound : Bound_Type)
       return Cursor_Type
    is
+      pragma Precondition (Tree.Initialized);
+
       procedure Check_Bounds is
       begin
          case Lower_Bound.Kind is
@@ -83,8 +85,6 @@ package body Cursors is
                end if;
          end case;
       end Check_Bounds;
-
-      pragma Assert (Tree.Initialized);
    begin
       Check_Bounds;
       return Cursor_Type'(Lower_Bound => Lower_Bound,
@@ -100,7 +100,7 @@ package body Cursors is
      (Cursor  : in out Cursor_Type;
       Enabled : in     Boolean)
    is
-      pragma Assert (Cursor.Initialized);
+      pragma Precondition (Cursor.Initialized);
    begin
       Lock_Mutex(Cursor);
       Cursor.Thread_Safe := Enabled;
@@ -112,9 +112,9 @@ package body Cursors is
      (Tree   : in     Tree_Type;
       Cursor : in out Cursor_Type)
    is
-      pragma Assert (Tree.Initialized);
-      pragma Assert (Cursor.Initialized);
-      pragma Assert (Cursor.Owning_Tree = Tree.Self);
+      pragma Precondition (Tree.Initialized);
+      pragma Precondition (Cursor.Initialized);
+      pragma Precondition (Cursor.Owning_Tree = Tree.Self);
    begin
       Lock_Mutex(Cursor);
       Cursor.Force_Recalibrate := True;
@@ -180,9 +180,9 @@ package body Cursors is
       Value  :    out Values.Value_Type;
       State  :    out State_Type)
    is
-      pragma Assert (Tree.Initialized);
-      pragma Assert (Cursor.Initialized);
-      pragma Assert (Cursor.Owning_Tree = Tree.Self);
+      pragma Precondition (Tree.Initialized);
+      pragma Precondition (Cursor.Initialized);
+      pragma Precondition (Cursor.Owning_Tree = Tree.Self);
 
       procedure Init_Contexts_And_Key is
       begin
@@ -270,9 +270,10 @@ package body Cursors is
       end Recalibrate;
 
 
-      procedure Search_Abstract_Lower_Bound is
+      procedure Search_Abstract_Lower_Bound
+      is
+         pragma Precondition (not Cursor.Has_Node);
       begin
-         pragma Assert (not Cursor.Has_Node);
          case Cursor.Lower_Bound.Location is
             when Negative_Infinity =>
                Searches.Search_Minimum_Node(Tree, Cursor.Node, Cursor.Index,
@@ -290,7 +291,7 @@ package body Cursors is
 
       procedure Search_Concrete_Lower_Bound
       is
-         pragma Assert (not Cursor.Has_Node);
+         pragma Precondition (not Cursor.Has_Node);
          FB : constant Bound_Type := Cursor.Lower_Bound;
       begin
          Searches.Search_Node(Tree, FB.Key, Cursor.Node, Cursor.Index, State);
@@ -364,9 +365,9 @@ package body Cursors is
       Value  :    out Values.Value_Type;
       State  :    out State_Type)
    is
-      pragma Assert (Tree.Initialized);
-      pragma Assert (Cursor.Initialized);
-      pragma Assert (Cursor.Owning_Tree = Tree.Self);
+      pragma Precondition (Tree.Initialized);
+      pragma Precondition (Cursor.Initialized);
+      pragma Precondition (Cursor.Owning_Tree = Tree.Self);
    begin
       Lock_Mutex(Cursor);
       if not Cursor.Has_Node then

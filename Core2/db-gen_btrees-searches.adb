@@ -16,8 +16,13 @@ package body Searches is
       Index :    out Nodes.Valid_Index_Type;
       State :    out State_Type)
    is
+      pragma Precondition (Tree.Initialized);
+
+      procedure Find_Leaf;
+
       procedure Find_Leaf
       is
+         pragma Postcondition (Nodes.Is_Leaf(N));
          pragma Inline (Find_Leaf);
          N_A : Nodes.Valid_Address_Type := Root_Address;
       begin
@@ -28,11 +33,9 @@ package body Searches is
          end loop;
       end Find_Leaf;
 
-      pragma Assert (Tree.Initialized);
    begin
       Find_Leaf;
       loop
-         pragma Assert (Nodes.Is_Leaf(N));
          declare
             use type Utils.Comparison_Result_Type;
             I : constant Nodes.Index_Type := Nodes.Key_Position(N, Key);
@@ -92,7 +95,7 @@ package body Searches is
       Index :    out Nodes.Valid_Index_Type;
       State :    out State_Type)
    is
-      pragma Assert (Tree.Initialized);
+      pragma Precondition (Tree.Initialized);
       use type Nodes.Degree_Type;
       N_A : Nodes.Valid_Address_Type := Root_Address;
    begin
@@ -130,7 +133,6 @@ package body Searches is
          Value := Nodes.Value(N, I);
       end if;
    end Search_Minimum;
-
 
 end Searches;
 

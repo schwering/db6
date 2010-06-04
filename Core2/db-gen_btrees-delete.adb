@@ -51,7 +51,7 @@ procedure Delete
    Value    :    out Values.Value_Type;
    State    :    out State_Type)
 is
-   pragma Assert (Tree.Initialized);
+   pragma Precondition (Tree.Initialized);
 
    Stack : Stacks.Stack_Type;
    N_A   : Nodes.Valid_Address_Type;

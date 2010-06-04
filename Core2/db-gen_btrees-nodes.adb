@@ -290,8 +290,8 @@ package body Nodes is
          return Blocks.Base_Index_Type
       is
          pragma Inline (Entry_To_Pos);
-         pragma Assert ((Entry_Index = 1 and Degree(Block) = 0) or
-                        Entry_Index in 1 .. Degree(Block));
+         pragma Precondition ((Entry_Index = 1 and Degree(Block) = 0) or
+                              Entry_Index in 1 .. Degree(Block));
          procedure Read is new Blocks.Read_At(Blocks.Base_Index_Type);
          Index : Blocks.Base_Index_Type;
       begin
@@ -307,8 +307,8 @@ package body Nodes is
          return Blocks.Base_Position_Type
       is
          pragma Inline (Entry_From_Pos);
-         pragma Assert ((Entry_Index = 1 and Degree(Block) = 0) or
-                        Entry_Index in 1 .. Degree(Block));
+         pragma Precondition ((Entry_Index = 1 and Degree(Block) = 0) or
+                              Entry_Index in 1 .. Degree(Block));
       begin
          if Degree(Block) = 0 then
             return Size_Of_Meta_Data + Size_Of_Position + 1;
@@ -337,8 +337,8 @@ package body Nodes is
          Raw_Data_Size : in     Blocks.Base_Position_Type)
       is
          pragma Inline (Set_Entry_Size);
-         pragma Assert ((Entry_Index = 1 and Degree(Block) = 0) or
-                        Entry_Index in 1 .. Degree(Block));
+         pragma Precondition ((Entry_Index = 1 and Degree(Block) = 0) or
+                              Entry_Index in 1 .. Degree(Block));
          procedure Write is new Blocks.Write_At(Blocks.Base_Index_Type);
          From : constant Blocks.Base_Index_Type :=
             Entry_From_Pos(Block, Entry_Index);
@@ -483,7 +483,7 @@ package body Nodes is
         (Block        : in out Blocks.Base_Block_Type;
          Has_High_Key : in     Boolean)
       is
-         pragma Assert (not Has_High_Key or Degree(Block) = 0);
+         pragma Precondition (not Has_High_Key or Degree(Block) = 0);
          procedure Read is new Blocks.Read_At(Booleans_Type);
          procedure Write is new Blocks.Write_At(Booleans_Type);
          Offset   : constant Blocks.Base_Position_Type := 0;
@@ -650,7 +650,7 @@ package body Nodes is
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
       is
-         pragma Assert (Level(Block) > Leaf_Level);
+         pragma Precondition (Level(Block) > Leaf_Level);
          procedure Read_Child is new Blocks.Read(Valid_Address_Type);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
@@ -676,7 +676,7 @@ package body Nodes is
          Value         :    out Values.Value_Type;
          Success       :    out Boolean)
       is
-         pragma Assert (Level(Block) = Leaf_Level);
+         pragma Precondition (Level(Block) = Leaf_Level);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          Success := Blocks.Is_Valid(Cursor);
@@ -701,7 +701,7 @@ package body Nodes is
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
       is
-         pragma Assert (Level(Block) > Leaf_Level);
+         pragma Precondition (Level(Block) > Leaf_Level);
          procedure Read_Child is new Blocks.Read(Valid_Address_Type);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
@@ -728,7 +728,7 @@ package body Nodes is
          Value         :    out Values.Value_Type;
          Success       :    out Boolean)
       is
-         pragma Assert (Level(Block) = Leaf_Level);
+         pragma Precondition (Level(Block) = Leaf_Level);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          Success := Blocks.Is_Valid(Cursor);
@@ -751,7 +751,7 @@ package body Nodes is
          High_Key    :    out Keys.Key_Type;
          Success     :    out Boolean)
       is
-         pragma Assert (Degree(Block) = 0);
+         pragma Precondition (Degree(Block) = 0);
       begin
          if not Has_High_Key(Block) then
             Success := False;
@@ -778,7 +778,7 @@ package body Nodes is
          Key         : in     Keys.Key_Type;
          Child       : in     Valid_Address_Type)
       is
-         pragma Assert (Level(Block) > Leaf_Level);
+         pragma Precondition (Level(Block) > Leaf_Level);
          procedure Write_Child is new Blocks.Write(Valid_Address_Type);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
@@ -813,7 +813,7 @@ package body Nodes is
          Key           : in     Keys.Key_Type;
          Value         : in     Values.Value_Type)
       is
-         pragma Assert (Level(Block) = Leaf_Level);
+         pragma Precondition (Level(Block) = Leaf_Level);
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
          if not Blocks.Is_Valid(Cursor) then
@@ -844,8 +844,8 @@ package body Nodes is
          Block       : in out Blocks.Base_Block_Type;
          High_Key    : in     Keys.Key_Type)
       is
-         pragma Assert (Degree(Block) = 0);
-         pragma Assert (Has_High_Key(Block));
+         pragma Precondition (Degree(Block) = 0);
+         pragma Precondition (Has_High_Key(Block));
          Index  : constant Valid_Index_Type := 1;
          Cursor : Blocks.Cursor_Type := New_Cursor_From(Block, Index);
       begin
@@ -968,7 +968,7 @@ package body Nodes is
      (Node : Node_Type)
       return Level_Type
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       return Phys.Level(Blocks.Base_Block_Type(Node));
    end Level;
@@ -978,7 +978,7 @@ package body Nodes is
      (Node : Node_Type)
       return Degree_Type
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       return Phys.Degree(Blocks.Base_Block_Type(Node));
    end Degree;
@@ -988,7 +988,7 @@ package body Nodes is
      (Node : Node_Type)
       return Boolean
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       return Phys.Level(Blocks.Base_Block_Type(Node)) = Leaf_Level;
    end Is_Leaf;
@@ -998,7 +998,7 @@ package body Nodes is
      (Node : Node_Type)
       return Boolean
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       return not Is_Leaf(Node);
    end Is_Inner;
@@ -1008,7 +1008,7 @@ package body Nodes is
      (Node : Node_Type)
       return Address_Type
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       return Phys.Link(Blocks.Base_Block_Type(Node));
    end Link;
@@ -1018,7 +1018,7 @@ package body Nodes is
      (Node : Node_Type)
       return Valid_Address_Type
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       return To_Valid_Address(Phys.Link(Blocks.Base_Block_Type(Node)));
    end Valid_Link;
@@ -1084,8 +1084,8 @@ package body Nodes is
       Key         :    out Keys.Key_Type;
       Key_Context : in out Keys.Read_Context_Type)
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Index in 1 .. Degree(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Index in 1 .. Degree(Node));
 
       Success : Boolean;
    begin
@@ -1116,9 +1116,9 @@ package body Nodes is
       Child       :    out Valid_Address_Type;
       Key_Context : in out Keys.Read_Context_Type)
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Inner(Node));
-      pragma Assert (Index in 1 .. Degree(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Inner(Node));
+      pragma Precondition (Index in 1 .. Degree(Node));
 
       Success : Boolean;
    begin
@@ -1151,9 +1151,9 @@ package body Nodes is
       Key_Context   : in out Keys.Read_Context_Type;
       Value_Context : in out Values.Read_Context_Type)
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Leaf(Node));
-      pragma Assert (Index in 1 .. Degree(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Leaf(Node));
+      pragma Precondition (Index in 1 .. Degree(Node));
 
       Success : Boolean;
    begin
@@ -1170,9 +1170,9 @@ package body Nodes is
       Index : Valid_Index_Type)
       return Values.Value_Type
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Leaf(Node));
-      pragma Assert (Index in 1 .. Degree(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Leaf(Node));
+      pragma Precondition (Index in 1 .. Degree(Node));
 
       Value         : Values.Value_Type;
       Key_Context   : Keys.Read_Context_Type   := Keys.New_Read_Context;
@@ -1208,7 +1208,7 @@ package body Nodes is
          return Index_Type
       is
          pragma Inline (Key_Position_Uniform_Binary);
-         pragma Assert (Is_Ok(Node));
+         pragma Precondition (Is_Ok(Node));
       begin
          if Degree(Node) > 0 then
             declare
@@ -1241,7 +1241,7 @@ package body Nodes is
          return Index_Type
       is
          pragma Inline (Key_Position_Binary);
-         pragma Assert (Is_Ok(Node));
+         pragma Precondition (Is_Ok(Node));
       begin
          if Degree(Node) > 0 then
             declare
@@ -1274,7 +1274,7 @@ package body Nodes is
          return Index_Type
       is
          pragma Inline (Key_Position_Linear);
-         pragma Assert (Is_Ok(Node));
+         pragma Precondition (Is_Ok(Node));
       begin
          for I in 1 .. Degree(Node) loop
             if Key <= Nodes.Key(Node, I) then
@@ -1296,7 +1296,7 @@ package body Nodes is
       Child : Valid_Address_Type)
       return Index_Type
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       for I in 1 .. Degree(Node) loop
          if Child = Nodes.Child(Node, I) then
@@ -1314,7 +1314,7 @@ package body Nodes is
      (Node     : in out RW_Node_Type;
       Neighbor : in     Address_Type)
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       Phys.Set_Link(Blocks.Base_Block_Type(Node), Neighbor);
    end Set_Link;
@@ -1324,7 +1324,7 @@ package body Nodes is
      (Node     : in out RW_Node_Type;
       Neighbor : in     Valid_Address_Type)
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
    begin
       Phys.Set_Link(Blocks.Base_Block_Type(Node), To_Address(Neighbor));
    end Set_Link;
@@ -1334,9 +1334,9 @@ package body Nodes is
      (Node : RW_Node_Type)
       return Valid_Index_Type
    is
-      use type Blocks.Base_Position_Type;
+      pragma Precondition (Is_Ok(Node));
 
-      pragma Assert (Is_Ok(Node));
+      use type Blocks.Base_Position_Type;
 
       Total    : constant Blocks.Base_Position_Type :=
          Phys.Entries_Size(Blocks.Base_Block_Type(Node));
@@ -1367,8 +1367,8 @@ package body Nodes is
       Key_Write_Context : in out Keys.Write_Context_Type;
       Shift_By          : in     Integer := 0)
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Inner(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Inner(Node));
 
       New_Index : constant Valid_Index_Type :=
          Valid_Index_Type(Integer(Index) + Shift_By);
@@ -1397,8 +1397,8 @@ package body Nodes is
       Value_Write_Context : in out Values.Write_Context_Type;
       Shift_By            : in     Integer := 0)
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Leaf(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Leaf(Node));
 
       New_Index : constant Valid_Index_Type :=
          Valid_Index_Type(Integer(Index) + Shift_By);
@@ -1424,8 +1424,8 @@ package body Nodes is
       Child : Valid_Address_Type)
       return RW_Node_Type
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Inner(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Inner(Node));
 
       N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
                                       Level  => Level(Node),
@@ -1464,8 +1464,8 @@ package body Nodes is
       Value : Values.Value_Type)
       return RW_Node_Type
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Leaf(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Leaf(Node));
 
       N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
                                       Level  => Level(Node),
@@ -1509,9 +1509,9 @@ package body Nodes is
       Child : Valid_Address_Type)
       return RW_Node_Type
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Inner(Node));
-      pragma Assert (Is_Valid(Child));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Inner(Node));
+      pragma Precondition (Is_Valid(Child));
 
       N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
                                       Level  => Level(Node),
@@ -1550,8 +1550,8 @@ package body Nodes is
       Value : Values.Value_Type)
       return RW_Node_Type
    is
-      pragma Assert (Is_Ok(Node));
-      pragma Assert (Is_Leaf(Node));
+      pragma Precondition (Is_Ok(Node));
+      pragma Precondition (Is_Leaf(Node));
 
       N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
                                       Level  => Level(Node),
@@ -1593,7 +1593,7 @@ package body Nodes is
       Index : Valid_Index_Type)
       return RW_Node_Type
    is
-      pragma Assert (Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
 
       N : RW_Node_Type := New_RW_Node(Is_Ok  => True,
                                       Level  => Level(Node),
@@ -1807,7 +1807,7 @@ package body Nodes is
      (Node : Node_Type)
       return Blocks.Size_Type
    is
-      pragma Assert (Nodes.Is_Ok(Node));
+      pragma Precondition (Nodes.Is_Ok(Node));
       Last_Used : constant Blocks.Base_Position_Type :=
          Phys.Total_Size(Blocks.Base_Block_Type(Node));
    begin
@@ -1880,12 +1880,12 @@ package body Nodes is
      (Node : Node_Type)
       return Blocks.Block_Type
    is
-      pragma Assert (Nodes.Is_Ok(Node));
+      pragma Precondition (Nodes.Is_Ok(Node));
+      pragma Precondition (Validation(Node) = Valid);
       use type Blocks.Base_Position_Type;
-   begin
       pragma Assert (Phys.Total_Size(Blocks.Base_Block_Type(Node)) <=
                      Blocks.Block_Size);
-      pragma Assert (Validation(Node) = Valid);
+   begin
       return Blocks.To_Block
                (Block     => Blocks.Base_Block_Type(Node),
                 Last_Used => Phys.Total_Size(Blocks.Base_Block_Type(Node)));

@@ -24,10 +24,11 @@ package body Initialization is
 
    procedure Create
      (Tree : in out Tree_Type;
-      ID   : in     String) is
+      ID   : in     String)
+   is
+      pragma Precondition (not Tree.Initialized);
+      pragma Precondition (not Tree.Finalized);
    begin
-      pragma Assert (not Tree.Initialized);
-      pragma Assert (not Tree.Finalized);
       Tree.Initialized := False;
       Block_IO.Create(ID, Tree.File);
       Prepare_File(Tree.File);
@@ -37,10 +38,11 @@ package body Initialization is
 
    procedure Create_Temporary
      (Tree : in out Tree_Type;
-      ID   : in     String) is
+      ID   : in     String)
+   is
+      pragma Precondition (not Tree.Initialized);
+      pragma Precondition (not Tree.Finalized);
    begin
-      pragma Assert (not Tree.Initialized);
-      pragma Assert (not Tree.Finalized);
       Tree.Initialized := False;
       Block_IO.Create_And_Open_Temporary(ID, Tree.File);
       Prepare_File(Tree.File);
@@ -50,10 +52,11 @@ package body Initialization is
 
    procedure Open
      (Tree : in out Tree_Type;
-      ID   : in     String) is
+      ID   : in     String)
+   is
+      pragma Precondition (not Tree.Initialized);
+      pragma Precondition (not Tree.Finalized);
    begin
-      pragma Assert (not Tree.Initialized);
-      pragma Assert (not Tree.Finalized);
       Tree.Initialized := False;
       Block_IO.Open(ID, Tree.File);
       Tree.Initialized := True;

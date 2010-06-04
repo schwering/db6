@@ -243,6 +243,7 @@ package body Stacks is
       N_Old : in     Nodes.RW_Node_Type;
       N     : in     Nodes.RW_Node_Type)
    is
+
       procedure Pop_Inner
         (C_A : in  Nodes.Valid_Address_Type;
          N_A : out Nodes.Valid_Address_Type;

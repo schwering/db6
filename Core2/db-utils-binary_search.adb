@@ -114,6 +114,16 @@ package body DB.Utils.Binary_Search is
       Item        : in  Item_Type;
       Index       : out Extended_Index_Type)
    is
+-- Triggers compiler crash:
+--pragma Postcondition
+--   ((Index = Invalid_Index and then
+--     (First_Index > Last_Index or else
+--      Compare(Item, Get(Container, Last_Index)) = Utils.Greater))
+--    or else
+--    (Compare(Item, Get(Container, Index)) in Utils.Less .. Utils.Equal and then
+--     (Index = First_Index or else
+--      Compare(Item, Get(Container, Index - 1)) = Utils.Greater)));
+
       One : constant Integer := 1;
       N   : constant Natural := Natural(Last_Index - First_Index + 1);
 
@@ -149,21 +159,21 @@ package body DB.Utils.Binary_Search is
       function Compare
         (Item : Item_Type;
          I    : Extended_Index_Type)
-         return Utils.Comparison_Result_Type is
+         return Comparison_Result_Type is
       begin
          if I = Invalid_Index then
             return Greater;
          else
             declare
-               C : constant Utils.Comparison_Result_Type
+               C : constant Comparison_Result_Type
                  := Compare(Item, Get(Container, I));
             begin
-               if C = Utils.Less or C = Utils.Equal then
+               if C = Less or C = Equal then
                   if I = First_Index or else
-                     Compare(Get(Container, I - One), Item) = Utils.Less then
-                     return Utils.Equal;
+                     Compare(Get(Container, I - One), Item) = Less then
+                     return Equal;
                   else
-                     return Utils.Less;
+                     return Less;
                   end if;
                else
                   return C;
@@ -179,10 +189,10 @@ package body DB.Utils.Binary_Search is
       loop
          C := Compare(Item, I);
          case C is
-            when Utils.Equal =>
+            when Equal =>
                Index := I;
                return;
-            when Utils.Less =>
+            when Less =>
                declare
                   DJ : constant Natural := Delta_Table(J);
                begin
@@ -193,7 +203,7 @@ package body DB.Utils.Binary_Search is
                   I := I - DJ;
                   J := J + 1;
                end;
-            when Utils.Greater =>
+            when Greater =>
                declare
                   DJ : constant Natural := Delta_Table(J);
                begin
@@ -231,7 +241,7 @@ package body DB.Utils.Binary_Search is
       function Compare
         (Item : Item_Type;
          I    : Extended_Index_Type)
-         return Utils.Comparison_Result_Type is
+         return Comparison_Result_Type is
       begin
          if I = Invalid_Index then
             return Greater;
@@ -267,7 +277,7 @@ package body DB.Utils.Binary_Search is
       loop
          C := Compare(Item, I);
          case C is
-            when Utils.Equal =>
+            when Equal =>
                declare
                   DJ : constant Natural := Delta_Table(J);
                begin
@@ -275,7 +285,7 @@ package body DB.Utils.Binary_Search is
                      Index := I;
                      return;
                   elsif I > First_Index and then
-                        Compare(Item, Get(Container, I - One)) = Utils.Greater
+                        Compare(Item, Get(Container, I - One)) = Greater
                   then
                      Index := I;
                      return;
@@ -283,7 +293,7 @@ package body DB.Utils.Binary_Search is
                   I := I - DJ;
                   J := J + 1;
                end;
-            when Utils.Less =>
+            when Less =>
                declare
                   DJ : constant Natural := Delta_Table(J);
                begin
@@ -291,7 +301,7 @@ package body DB.Utils.Binary_Search is
                      Index := I;
                      return;
                   elsif I > First_Index and then
-                        Compare(Item, Get(Container, I - One)) = Utils.Greater
+                        Compare(Item, Get(Container, I - One)) = Greater
                   then
                      Index := I;
                      return;
@@ -299,17 +309,17 @@ package body DB.Utils.Binary_Search is
                   I := I - DJ;
                   J := J + 1;
                end;
-            when Utils.Greater =>
+            when Greater =>
                declare
                   DJ : constant Natural := Delta_Table(J);
-                  C  : Comparison_Result_Type := Utils.Greater;
+                  C  : Comparison_Result_Type := Greater;
                begin
                   if DJ = 0 then
-                     if I < Last_Index and C = Utils.Greater then
+                     if I < Last_Index and C = Greater then
                         I := I + One;
                         C := Compare(Item, Get(Container, I));
                      end if;
-                     if C /= Utils.Greater then
+                     if C /= Greater then
                         Index := I;
                      else
                         Index := Invalid_Index;

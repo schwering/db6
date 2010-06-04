@@ -45,9 +45,10 @@ package body DB.Blocks is
 
    function New_Cursor
      (Start : Base_Position_Type)
-      return Cursor_Type is
+      return Cursor_Type
+   is
+      pragma Precondition (Start /= Invalid_Position);
    begin
-      pragma Assert (Start /= Invalid_Position);
       return Cursor_Type'(Pos => Start);
    end New_Cursor;
 
@@ -79,9 +80,10 @@ package body DB.Blocks is
    function Remaining_Space
      (Block  : Base_Block_Type;
       Cursor : Cursor_Type)
-      return Size_Type is
+      return Size_Type
+   is
+      pragma Precondition (Is_Valid(Cursor));
    begin
-      pragma Assert (Is_Valid(Cursor));
       return Size_Type(Block'Last - Cursor.Pos + 1);
    end Remaining_Space;
 
@@ -89,9 +91,10 @@ package body DB.Blocks is
    function Moved_Since
      (Cursor : Cursor_Type;
       Since  : Base_Position_Type)
-      return Size_Type is
+      return Size_Type
+   is
+      pragma Precondition (Is_Valid(Cursor));
    begin
-      pragma Assert (Is_Valid(Cursor));
       return Size_Type(Cursor.Pos) - Size_Type(Since);
    end Moved_Since;
 
@@ -220,17 +223,17 @@ package body DB.Blocks is
 
 
    function Size_Of_Array
-     (Arr : Array_Type;
+     (Arr  : Array_Type;
       From : Index_Type;
       To   : Index_Type'Base)
       return Size_Type
    is
+      pragma Precondition (From <= Index_Type'Base'Succ(To));
+      pragma Precondition (From in Arr'Range);
       function Size_Of_Index is new Size_Of(Index_Type'Base);
       type Array_Sub_Type is array (From .. To) of Item_Type;
       function Size_Of_Data is new Size_Of(Array_Sub_Type);
    begin
-      pragma Assert (From <= Index_Type'Base'Succ(To));
-      pragma Assert (From in Arr'Range);
       if From > To then
          return Size_Of_Index(To);
       end if;
@@ -246,12 +249,12 @@ package body DB.Blocks is
       From   : in     Index_Type;
       To     : in     Index_Type'Base)
    is
+      pragma Precondition (From <= Index_Type'Base'Succ(To));
+      pragma Precondition (From in Arr'Range);
       procedure Write_Index is new Write(Index_Type'Base);
       type Array_Sub_Type is array (From .. To) of Item_Type;
       procedure Write_Data is new Write(Array_Sub_Type);
    begin
-      pragma Assert (From <= Index_Type'Base'Succ(To));
-      pragma Assert (From in Arr'Range);
       Write_Index(Block, Cursor, To);
       if From > To then
          return;
