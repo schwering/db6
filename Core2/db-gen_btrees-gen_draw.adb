@@ -65,7 +65,7 @@ is
          end if;
       end Style;
       Deg  : constant String := Degree_Type'Image(Degree(N));
-      Addr : constant String := Address_To_String(Block_IO.Address_Type(To_Address(N_A)));
+      Addr : constant String := Image(To_Address(N_A));
       Lev  : constant String := Level_Type'Image(Nodes.Level(N));
    begin
       Put(""""& Addr &"""");
@@ -75,9 +75,9 @@ is
 
    procedure Draw_Arrow (From, To : Valid_Address_Type; Is_Link : Boolean) is
    begin
-      Put(""""& Address_To_String(Block_IO.Address_Type(To_Address(From))) &"""");
+      Put(""""& Image(To_Address(From)) &"""");
       Put(" -> ");
-      Put(""""& Address_To_String(Block_IO.Address_Type(To_Address(To))) &"""");
+      Put(""""& Image(To_Address(To)) &"""");
       if Is_Link then
          Put(" [arrowhead=diamond]");
       end if;

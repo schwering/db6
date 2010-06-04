@@ -28,9 +28,11 @@ package body DB.Types.Keys is
 
    function "=" (Left, Right : Key_Type) return Boolean
    is
+      pragma Warnings (Off);
       use type Rows.String_Type;
       use type Columns.String_Type;
       use type Times.Number_Type;
+      pragma Warnings (On);
    begin
       return Left.Row = Right.Row
          --and Left.Column = Right.Column

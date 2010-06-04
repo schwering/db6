@@ -7,7 +7,6 @@
 with DB.Gen_BTrees.Gen_Check;
 with DB.Gen_BTrees.Gen_Stats;
 with DB.Types.Values.Bounded.Streams;
-with DB.Utils.Gen_Integer_Image;
 
 package body DB.Maps.Bounded is
 
@@ -355,13 +354,9 @@ package body DB.Maps.Bounded is
          return "(BoundedString)";
       end Value_To_String;
 
-      function Address_To_String is new
-         Utils.Gen_Integer_Image(Block_IO_Impl.Address_Type);
-
       procedure Check is new BTrees.Gen_Check
-        (Key_To_String      => Key_To_String,
-         Value_To_String    => Value_To_String,
-         Address_To_String  => Address_To_String);
+        (Key_To_String   => Key_To_String,
+         Value_To_String => Value_To_String);
    begin
       Check(Map.Tree);
    end Check;

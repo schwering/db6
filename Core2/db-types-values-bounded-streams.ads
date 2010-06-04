@@ -7,5 +7,5 @@
 with DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams;
 
 package DB.Types.Values.Bounded.Streams is new Bounded.Gen_Streams;
-pragma Preelaborate (DB.Types.Values.Bounded.Streams);
+pragma Pure (DB.Types.Values.Bounded.Streams);
 

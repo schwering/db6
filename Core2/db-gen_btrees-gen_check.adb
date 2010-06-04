@@ -223,7 +223,7 @@ is
       end loop;
    end Check_Values;
 
-   procedure Draw is new Gen_Draw(Address_To_String);
+   procedure Draw is new Gen_BTrees.Gen_Draw;
    pragma Unreferenced (Draw);
 
    N_A : Valid_Address_Type;

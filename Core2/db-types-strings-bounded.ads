@@ -7,5 +7,5 @@
 with DB.Types.Gen_Strings.Gen_Bounded;
 
 package DB.Types.Strings.Bounded is new Strings.Gen_Bounded(Max_Length => 1024);
-pragma Preelaborate (DB.Types.Strings.Bounded);
+pragma Pure (DB.Types.Strings.Bounded);
 
