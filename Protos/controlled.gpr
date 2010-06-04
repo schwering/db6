@@ -1,0 +1,25 @@
+-- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
+
+project Controlled is
+
+   for Main use ("controlled");
+   for Languages use ("Ada", "C");
+   for Source_Files use ("controlled.adb", "timers.adb", "timers-c.c");
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-O3", "-gnatp");
+      --for Default_Switches ("Ada") use ("-gnata");
+      for Default_Switches ("C") use ("-Wall", "-D_FILE_OFFSET_BITS=64", "-D_GNU_SOURCE");
+   end Compiler;
+
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-d8m"); -- stack size per thread
+   end Binder;
+
+
+   package Linker is
+   end Linker;
+
+end Controlled;
+
