@@ -1366,9 +1366,7 @@ package body DB.Utils.Regular_Expressions is
    end Set;
 
 
-   function Is_Subset
-     (L, R : Regexp)
-      return Boolean
+   function Is_Subset (L, R : Regexp) return Boolean
    --  We want to check whether Lang(L) is a subset (or equal to) Lang(R).
    --      A is a subset of B 
    --  iff  for all a: a in A => a in B
@@ -1388,8 +1386,8 @@ package body DB.Utils.Regular_Expressions is
    --  If no final state is marked, the automaton recognizes the empty language.
    is
       type Mark is (Unmarked, Marked, Visited);
-      --  States are marked either as Unmarked or Marked or, for performance
-      --  reasons, as Visited.
+      --  States are either Unmarked or Marked or, for performance reasons,
+      --  Visited.
 
       function Make_Alphabet return String;
       --  Computes the common alphabet of L and R. This is done for performance
@@ -1410,27 +1408,18 @@ package body DB.Utils.Regular_Expressions is
 
       function Make_Alphabet return String
       is
-         Cnt : Natural := 0;
+         S : String(1 .. Mapping'Length);
+         I : Positive := 1;
       begin
          for Char in Mapping'Range loop
             if L.R.Map (Char) > 0 or
-               R.R.Map (Char) > 0 then
-               Cnt := Cnt + 1;
+               R.R.Map (Char) > 0
+            then
+               S (I) := Char;
+               I := I + 1;
             end if;
          end loop;
-         declare
-            S : String(1 .. Cnt);
-            I : Positive := 1;
-         begin
-            for Char in Mapping'Range loop
-               if L.R.Map(Char) > 0 or
-                  R.R.Map(Char) > 0 then
-                  S(I) := Char;
-                  I := I + 1;
-               end if;
-            end loop;
-            return S;
-         end;
+         return S (1 .. I - 1);
       end Make_Alphabet;
 
       Marks : array (1 .. L.R.Num_States, 1 .. R.R.Num_States) of Mark :=
@@ -1451,7 +1440,8 @@ package body DB.Utils.Regular_Expressions is
             R.R.States (R_State, R.R.Map (Char));
       begin
          if (N_L_State > 0 and N_R_State > 0) and then
-            Marks (N_L_State, N_R_State) = Unmarked then
+            Marks (N_L_State, N_R_State) = Unmarked
+         then
             Marks (N_L_State, N_R_State) := Marked;
             Have_Marked := True;
             Is_Final := L.R.Is_Final(N_L_State) and
