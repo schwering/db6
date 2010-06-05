@@ -1396,7 +1396,7 @@ package body DB.Utils.Regular_Expressions is
       --  reasons to avoid scanning all available characters in the inner-most
       --  loop.
 
-      procedure Set_Mark
+      procedure Mark_Next_State
         (L_State     : State_Index;
          R_State     : State_Index;
          Char        : Character;
@@ -1438,7 +1438,7 @@ package body DB.Utils.Regular_Expressions is
          end;
       end Make_Alphabet;
 
-      procedure Set_Mark
+      procedure Mark_Next_State
         (L_State     : State_Index;
          R_State     : State_Index;
          Char        : Character;
@@ -1459,7 +1459,7 @@ package body DB.Utils.Regular_Expressions is
          else
             Have_Marked := False;
          end if;
-      end Set_Mark;
+      end Mark_Next_State;
    begin
       Marks (1, 1) := Marked;
       loop
@@ -1475,7 +1475,7 @@ package body DB.Utils.Regular_Expressions is
                            Have_Marked : Boolean;
                            Is_Final    : Boolean;
                         begin
-                           Set_Mark
+                           Mark_Next_State
                               (L_State     => L_State,
                                R_State     => R_State,
                                Char        => Alphabet (I),
