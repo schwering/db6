@@ -1369,24 +1369,50 @@ package body DB.Utils.Regular_Expressions is
    function Is_Subset
      (L, R : Regexp)
       return Boolean
-   --  We want to check whether L(Left) is a subset (or equal to) L(Right).
+   --  We want to check whether Lang(L) is a subset (or equal to) Lang(R).
    --      A is a subset of B 
    --  iff  for all a: a in A => a in B
    --  iff  (A \ B) is empty
-   --  Hence we need to check whether the difference-automaton of Left and Right
-   --  has no final state (exactly then Left recognizes a subset of Right).
+   --  Hence we need to check whether the difference-automaton of L and R
+   --  has no final state (exactly then L recognizes a subset of R).
    --
    --  The difference-automaton is the same like the product-automaton but with
    --  different set of final states: a state is final iff it is final in A but
    --  not in B.
    --
    --  In fact, we don't build this automaton explicitly but do it implicitly
-   --  while we look for a final state in (Left \ Right).
+   --  while we look for a final state in (L \ R).
    --  The marking works as follows: start from (q_0^L, q_0^R) and mark it.
    --  Repeat until no additional state is marked: check whether from any marked
    --  state an unmarked state could be reached.
    --  If no final state is marked, the automaton recognizes the empty language.
    is
+      type Mark is (Unmarked, Marked, Visited);
+      --  States are marked either as Unmarked or Marked or, for performance
+      --  reasons, as Visited.
+
+      function Make_Alphabet return String;
+      --  Computes the common alphabet of L and R. This is done for performance
+      --  reasons to avoid scanning all available characters in the inner-most
+      --  loop.
+
+      procedure Set_Mark
+        (L_State     : State_Index;
+         R_State     : State_Index;
+         Char        : Character;
+         Have_Marked : out Boolean;
+         Is_Final    : out Boolean);
+      --  Marks the state (L_State, R_State) if it is Unmarked at the moment.
+      --  Have_Marked is set to True iff the state was Unmarked previously.
+      --  Is_Final is set to True iff L_State is final in L but R_State is not
+      --  final in R: in exactly this case (L_State, R_State) is final in the
+      --  difference-automaton (L \ R).
+
+      Marks : array (1 .. L.R.Num_States, 1 .. R.R.Num_States) of Mark :=
+         (others => (others => Unmarked));
+
+      Alphabet : constant String := Make_Alphabet;
+
       function Make_Alphabet return String
       is
          Cnt : Natural := 0;
@@ -1412,13 +1438,7 @@ package body DB.Utils.Regular_Expressions is
          end;
       end Make_Alphabet;
 
-      type Mark is (Unmarked, Marked, Visited);
-      Marks : array (1 .. L.R.Num_States, 1 .. R.R.Num_States) of Mark :=
-         (others => (others => Unmarked));
-
-      Alphabet : constant String := Make_Alphabet;
-
-      procedure Try_Mark
+      procedure Set_Mark
         (L_State     : State_Index;
          R_State     : State_Index;
          Char        : Character;
@@ -1439,7 +1459,7 @@ package body DB.Utils.Regular_Expressions is
          else
             Have_Marked := False;
          end if;
-      end Try_Mark;
+      end Set_Mark;
    begin
       Marks (1, 1) := Marked;
       loop
@@ -1449,12 +1469,13 @@ package body DB.Utils.Regular_Expressions is
             for L_State in Marks'Range (1) loop
                for R_State in Marks'Range (2) loop
                   if Marks (L_State, R_State) = Marked then
+                     Marks (L_State, R_State) := Visited;
                      for I in Alphabet'Range loop
                         declare
                            Have_Marked : Boolean;
                            Is_Final    : Boolean;
                         begin
-                           Try_Mark
+                           Set_Mark
                               (L_State     => L_State,
                                R_State     => R_State,
                                Char        => Alphabet (I),
@@ -1462,16 +1483,21 @@ package body DB.Utils.Regular_Expressions is
                                Is_Final    => Is_Final);
                            Something_Marked := Something_Marked or Have_Marked;
                            if Have_Marked and Is_Final then
+                              --  We have found a state that's final in (L \ R),
+                              --  => there is a word that is in L and R,
+                              --  => L is not a subset of R.
                               return False;
                            end if;
                         end;
                      end loop;
-                     Marks (L_State, R_State) := Visited;
                   end if;
                end loop;
             end loop;
 
-            --  No further states can be reached, in particular no final.
+            --  No further states can be reached, in particular no final,
+            --  => there is no final state in (L \ R),
+            --  => there is no word that is in L and R,
+            --  => L is a subset of R.
             if not Something_Marked then
                return True;
             end if;
