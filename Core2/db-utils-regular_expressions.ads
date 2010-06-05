@@ -1,6 +1,13 @@
 -- Abstract:
 --
--- A copy of GNAT.Regexp with the addition of the Is_Subset function.
+-- A copy of GNAT.Regexp from AdaCore.
+-- The only modification of mine is the addition of the Is_Subset function
+-- which determines whether the language recognized by a regexp L is a subset of
+-- the language recognized by a regexp R.
+--
+-- I had to copy the whole package because one cannot (and shouldn't) make child
+-- packages of system packages (System.Regexp) nor renamed packages
+-- (GNAT.Regexp).
 --
 -- Copyright (C) 1998-2008, AdaCore
 -- Copyright 2008, 2009, 2010 Christoph Schwering
@@ -128,6 +135,7 @@ package DB.Utils.Regular_Expressions is
    function Is_Subset (L, R : Regexp) return Boolean;
    --  Determines whether the language recognized by L is a subset of
    --  (or equal to) the language recognized by R.
+   --  For details, check the documentation in the subprogram body.
 
 private
    type Regexp_Value;
