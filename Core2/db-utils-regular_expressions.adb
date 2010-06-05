@@ -1408,11 +1408,6 @@ package body DB.Utils.Regular_Expressions is
       --  final in R: in exactly this case (L_State, R_State) is final in the
       --  difference-automaton (L \ R).
 
-      Marks : array (1 .. L.R.Num_States, 1 .. R.R.Num_States) of Mark :=
-         (others => (others => Unmarked));
-
-      Alphabet : constant String := Make_Alphabet;
-
       function Make_Alphabet return String
       is
          Cnt : Natural := 0;
@@ -1437,6 +1432,11 @@ package body DB.Utils.Regular_Expressions is
             return S;
          end;
       end Make_Alphabet;
+
+      Marks : array (1 .. L.R.Num_States, 1 .. R.R.Num_States) of Mark :=
+         (others => (others => Unmarked));
+
+      Alphabet : constant String := Make_Alphabet;
 
       procedure Mark_Next_State
         (L_State     : State_Index;
