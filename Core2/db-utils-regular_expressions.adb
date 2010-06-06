@@ -1412,21 +1412,21 @@ package body DB.Utils.Regular_Expressions is
       --  is not final in R: in exactly this case (delta_L(p,a), delta_R(q,a))
       --  is final in the difference-automaton (L \ R).
 
+
       function Make_Alphabet return String
       is
-         S : String(1 .. Mapping'Length);
-         I : Positive := 1;
+         S : String (1 .. Mapping'Length);
+         J : Positive := 1;
       begin
          for Char in Mapping'Range loop
-            if L.R.Map (Char) > 0 or
-               R.R.Map (Char) > 0
-            then
-               S (I) := Char;
-               I := I + 1;
+            if L.R.Map (Char) > 0 or R.R.Map (Char) > 0 then
+               S (J) := Char;
+               J := J + 1;
             end if;
          end loop;
-         return S (1 .. I - 1);
+         return S (1 .. J - 1);
       end Make_Alphabet;
+
 
       Sink_State  : constant State_Index := 0;
       Start_State : constant State_Index := 1;
@@ -1435,7 +1435,6 @@ package body DB.Utils.Regular_Expressions is
                      Sink_State .. R.R.Num_States) of Mark :=
                         (others => (others => Unmarked));
 
-      Alphabet : constant String := Make_Alphabet;
 
       procedure Mark_Next_State
         (L_State     : State_Index;
@@ -1449,7 +1448,7 @@ package body DB.Utils.Regular_Expressions is
 
          function Is_Final (R : Regexp; S : State_Index) return Boolean is
          begin
-            return S /= Sink_State and then R.R.Is_Final(S);
+            return S /= Sink_State and then R.R.Is_Final (S);
          end Is_Final;
 
          N_L_State : constant State_Index :=
@@ -1462,12 +1461,14 @@ package body DB.Utils.Regular_Expressions is
             Have_Marked := True;
             --  In the difference-automaton (L \ R), the (N_L_State, N_R_State)
             --  is final iff N_L_State is final and N_R_State is not.
-            Final := Is_Final(L, N_L_State) and not Is_Final(R, N_R_State);
+            Final := Is_Final (L, N_L_State) and not Is_Final (R, N_R_State);
          else
             Have_Marked := False;
          end if;
       end Mark_Next_State;
 
+
+      Alphabet : constant String := Make_Alphabet;
    begin
       Marks (Start_State, Start_State) := Marked;
       loop
@@ -1478,7 +1479,7 @@ package body DB.Utils.Regular_Expressions is
                for R_State in Start_State .. Marks'Last (2) loop
                   if Marks (L_State, R_State) = Marked then
                      Marks (L_State, R_State) := Visited;
-                     for I in Alphabet'Range loop
+                     for J in Alphabet'Range loop
                         declare
                            Have_Marked : Boolean;
                            Final       : Boolean;
@@ -1486,7 +1487,7 @@ package body DB.Utils.Regular_Expressions is
                            Mark_Next_State
                               (L_State     => L_State,
                                R_State     => R_State,
-                               Char        => Alphabet (I),
+                               Char        => Alphabet (J),
                                Have_Marked => Have_Marked,
                                Final       => Final);
                            Something_Marked := Something_Marked or Have_Marked;
