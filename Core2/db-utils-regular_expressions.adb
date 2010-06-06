@@ -1371,7 +1371,7 @@ package body DB.Utils.Regular_Expressions is
 
    function Is_Subset (L, R : Regexp) return Boolean
    --  We want to check whether Lang(L) is a subset (or equal to) Lang(R).
-   --      A is a subset of B 
+   --       A is a subset of B 
    --  iff  for all a: a in A => a in B
    --  iff  (A \ B) is empty
    --  Hence we need to check whether the difference-automaton of L and R
