@@ -1405,7 +1405,7 @@ package body DB.Utils.Regular_Expressions is
          Final       : out Boolean);
       --  Marks the state (L_State, R_State) if it is Unmarked at the moment.
       --  Have_Marked is set to True iff the state was Unmarked previously.
-      --  Is_Final is set to True iff L_State is final in L but R_State is not
+      --  Final is set to True iff L_State is final in L but R_State is not
       --  final in R: in exactly this case (L_State, R_State) is final in the
       --  difference-automaton (L \ R).
 
