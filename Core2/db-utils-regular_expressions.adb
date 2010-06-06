@@ -1403,14 +1403,14 @@ package body DB.Utils.Regular_Expressions is
          Char        : Character;
          Have_Marked : out Boolean;
          Final       : out Boolean);
-      --  Marks the successor of (L_State, R_State) in the difference-automaton,
-      --  i.e. (delta_L(L_State, Char), delta_R(R_State, Char)), if it is
+      --  For brevity, let's call L_State p, R_State q and Char a. Then this
+      --  procedure marks marks the successor of (p, q) in the
+      --  difference-automaton, i.e. (delta_L(p,a), delta_R(q,a)), if it is
       --  Unmarked at the moment.
       --  Have_Marked is set to True iff the state was Unmarked previously.
-      --  Final is set to True iff delta_L(L_State, Char) is final in L but
-      --  delta_R(R_State, Char) is not final in R: in exactly this case
-      --  (delta_L(L_State, Char), delta_R(R_State, Char)) is final in the
-      --  difference-automaton (L \ R).
+      --  Final is set to True iff delta_L(p,a) is final in L but delta_R(q,a)
+      --  is not final in R: in exactly this case (delta_L(p,a), delta_R(q,a))
+      --  is final in the difference-automaton (L \ R).
 
       function Make_Alphabet return String
       is
