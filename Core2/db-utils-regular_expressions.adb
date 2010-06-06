@@ -1365,6 +1365,9 @@ package body DB.Utils.Regular_Expressions is
       end if;
    end Set;
 
+   ---------------
+   -- Is_Subset --
+   ---------------
 
    function Is_Subset (L, R : Regexp) return Boolean
    --  We want to check whether Lang(L) is a subset (or equal to) Lang(R).
@@ -1399,7 +1402,7 @@ package body DB.Utils.Regular_Expressions is
          R_State     : State_Index;
          Char        : Character;
          Have_Marked : out Boolean;
-         Is_Final    : out Boolean);
+         Final       : out Boolean);
       --  Marks the state (L_State, R_State) if it is Unmarked at the moment.
       --  Have_Marked is set to True iff the state was Unmarked previously.
       --  Is_Final is set to True iff L_State is final in L but R_State is not
@@ -1422,8 +1425,12 @@ package body DB.Utils.Regular_Expressions is
          return S (1 .. I - 1);
       end Make_Alphabet;
 
-      Marks : array (1 .. L.R.Num_States, 1 .. R.R.Num_States) of Mark :=
-         (others => (others => Unmarked));
+      Sink_State  : constant State_Index := 0;
+      Start_State : constant State_Index := 1;
+
+      Marks : array (Sink_State .. L.R.Num_States,
+                     Sink_State .. R.R.Num_States) of Mark :=
+                        (others => (others => Unmarked));
 
       Alphabet : constant String := Make_Alphabet;
 
@@ -1432,47 +1439,55 @@ package body DB.Utils.Regular_Expressions is
          R_State     : State_Index;
          Char        : Character;
          Have_Marked : out Boolean;
-         Is_Final    : out Boolean)
+         Final       : out Boolean)
       is
+         function Is_Final (R : Regexp; S : State_Index) return Boolean;
+         pragma Inline (Is_Final);
+
+         function Is_Final (R : Regexp; S : State_Index) return Boolean is
+         begin
+            return S /= Sink_State and then R.R.Is_Final(S);
+         end Is_Final;
+
          N_L_State : constant State_Index :=
             L.R.States (L_State, L.R.Map (Char));
          N_R_State : constant State_Index :=
             R.R.States (R_State, R.R.Map (Char));
       begin
-         if (N_L_State > 0 and N_R_State > 0) and then
-            Marks (N_L_State, N_R_State) = Unmarked
-         then
+         if Marks (N_L_State, N_R_State) = Unmarked then
             Marks (N_L_State, N_R_State) := Marked;
             Have_Marked := True;
-            Is_Final := L.R.Is_Final(N_L_State) and
-                        not R.R.Is_Final(N_R_State);
+            --  In the difference-automaton (L \ R), the (N_L_State, N_R_State)
+            --  is final iff N_L_State is final and N_R_State is not.
+            Final := Is_Final(L, N_L_State) and not Is_Final(R, N_R_State);
          else
             Have_Marked := False;
          end if;
       end Mark_Next_State;
+
    begin
-      Marks (1, 1) := Marked;
+      Marks (Start_State, Start_State) := Marked;
       loop
          declare
             Something_Marked : Boolean := False;
          begin
-            for L_State in Marks'Range (1) loop
-               for R_State in Marks'Range (2) loop
+            for L_State in Start_State .. Marks'Last (1) loop
+               for R_State in Start_State .. Marks'Last (2) loop
                   if Marks (L_State, R_State) = Marked then
                      Marks (L_State, R_State) := Visited;
                      for I in Alphabet'Range loop
                         declare
                            Have_Marked : Boolean;
-                           Is_Final    : Boolean;
+                           Final       : Boolean;
                         begin
                            Mark_Next_State
                               (L_State     => L_State,
                                R_State     => R_State,
                                Char        => Alphabet (I),
                                Have_Marked => Have_Marked,
-                               Is_Final    => Is_Final);
+                               Final       => Final);
                            Something_Marked := Something_Marked or Have_Marked;
-                           if Have_Marked and Is_Final then
+                           if Have_Marked and Final then
                               --  We have found a state that's final in (L \ R),
                               --  => there is a word that is in L and R,
                               --  => L is not a subset of R.
