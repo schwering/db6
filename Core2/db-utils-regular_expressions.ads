@@ -138,7 +138,7 @@ package DB.Utils.Regular_Expressions is
    --  For details, check the documentation in the subprogram body.
 
    function Intersection_Is_Empty (L, R : Regexp) return Boolean;
-   --  Determines whether there are words that are accepted by both, L and R.
+   --  Determines whether there is no word that is accepted by both, L and R.
 
 private
    type Regexp_Value;

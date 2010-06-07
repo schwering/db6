@@ -1550,14 +1550,14 @@ package body DB.Utils.Regular_Expressions is
 
    function Intersection_Is_Empty (L, R : Regexp) return Boolean
    --  We want to check whether the intersection of Lang(L) and Lang(R) is
-   --  non-empty. This is exactly the case if the product DFA accepts nothing.
+   --  empty. This is exactly the case if the product DFA accepts nothing.
    is
       function Intersection_DFA_Accepts_Nothing is new
       Product_DFA_Accepts_Nothing
         (Left_Is_Final  => Is_Final,
          Right_Is_Final => Is_Final);
    begin
-      return not Intersection_DFA_Accepts_Nothing (L, R);
+      return Intersection_DFA_Accepts_Nothing (L, R);
    end Intersection_Is_Empty;
 
 end DB.Utils.Regular_Expressions;
