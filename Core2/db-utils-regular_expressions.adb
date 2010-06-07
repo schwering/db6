@@ -44,6 +44,9 @@ package body DB.Utils.Regular_Expressions is
    type State_Index is new Natural;
    type Column_Index is new Natural;
 
+   Sink_State  : constant State_Index := 0;
+   Start_State : constant State_Index := 1;
+
    type Regexp_Array is array
      (State_Index range <>, Column_Index range <>) of State_Index;
    --  First index is for the state number
@@ -91,6 +94,20 @@ package body DB.Utils.Regular_Expressions is
 
    procedure Free is new Ada.Unchecked_Deallocation
      (Regexp_Array, Regexp_Array_Access);
+
+   function Is_Final (R : Regexp; S : State_Index) return Boolean;
+   pragma Inline (Is_Final);
+   --  Checks whether S is not the sink and final in R.
+
+   function Product_DFA_Accepts_Nothing
+     (L, R           : Regexp;
+      Left_Is_Final  : not null access function
+                                (L : Regexp; S : State_Index) return Boolean;
+      Right_Is_Final : not null access function
+                                (R : Regexp; S : State_Index) return Boolean)
+      return Boolean;
+   --  Checks whether the product DFA of L and R with the given Left_Is_Final
+   --  and Right_Is_Final relations relation accepts nothing at all.
 
    ------------
    -- Adjust --
@@ -1365,28 +1382,27 @@ package body DB.Utils.Regular_Expressions is
       end if;
    end Set;
 
-   ---------------
-   -- Is_Subset --
-   ---------------
+   ---------------------------------
+   -- Product_DFA_Accepts_Nothing --
+   ---------------------------------
 
-   function Is_Subset (L, R : Regexp) return Boolean
-   --  We want to check whether Lang(L) is a subset (or equal to) Lang(R).
-   --       A is a subset of B 
-   --  iff  for all a: a in A => a in B
-   --  iff  (A \ B) is empty
-   --  Hence we need to check whether the difference-automaton of L and R
-   --  has no final state (exactly then L recognizes a subset of R).
+   function Product_DFA_Accepts_Nothing
+     (L, R           : Regexp;
+      Left_Is_Final  : not null access function
+                                (L : Regexp; S : State_Index) return Boolean;
+      Right_Is_Final : not null access function
+                                (R : Regexp; S : State_Index) return Boolean)
+      return Boolean
+   --  Checks whether the product DFA of L and R with the given Left_Is_Final
+   --  and Right_Is_Final relations relation accepts nothing at all.
    --
-   --  The difference-automaton is the same like the product-automaton but with
-   --  different set of final states: a state is final iff it is final in A but
-   --  not in B.
-   --
-   --  In fact, we don't build this automaton explicitly but do it implicitly
-   --  while we look for a final state in (L \ R).
+   --  We don't build the product DFA explicitly but do it implicitly while we
+   --  look for a final state in (L x R).
    --  The marking works as follows: start from (q_0^L, q_0^R) and mark it.
    --  Repeat until no additional state is marked: check whether from any marked
    --  state an unmarked state could be reached.
-   --  If no final state is marked, the automaton recognizes the empty language.
+   --  If no final state is marked, the automaton accepts nothing but the empty
+   --  language.
    is
       type Mark is (Unmarked, Marked, Visited);
       --  States are either Unmarked or Marked or, for performance reasons,
@@ -1404,13 +1420,11 @@ package body DB.Utils.Regular_Expressions is
          Have_Marked : out Boolean;
          Final       : out Boolean);
       --  For brevity, let's call L_State p, R_State q and Char a. Then this
-      --  procedure marks marks the successor of (p, q) in the
-      --  difference-automaton, i.e. (delta_L(p,a), delta_R(q,a)), if it is
-      --  Unmarked at the moment.
+      --  procedure marks marks the successor of (p, q) in the product DFA,
+      --  i.e. (delta_L(p,a), delta_R(q,a)), if it is Unmarked at the moment.
       --  Have_Marked is set to True iff the state was Unmarked previously.
-      --  Final is set to True iff delta_L(p,a) is final in L but delta_R(q,a)
-      --  is not final in R: in exactly this case (delta_L(p,a), delta_R(q,a))
-      --  is final in the difference-automaton (L \ R).
+      --  Final is set to True iff delta_L(p,a) is final in L (Left_Is_Final)
+      --  and delta_R(q,a) is final in R (Right_Is_Final).
 
 
       function Make_Alphabet return String
@@ -1428,9 +1442,6 @@ package body DB.Utils.Regular_Expressions is
       end Make_Alphabet;
 
 
-      Sink_State  : constant State_Index := 0;
-      Start_State : constant State_Index := 1;
-
       Marks : array (Sink_State .. L.R.Num_States,
                      Sink_State .. R.R.Num_States) of Mark :=
                         (others => (others => Unmarked));
@@ -1443,14 +1454,6 @@ package body DB.Utils.Regular_Expressions is
          Have_Marked : out Boolean;
          Final       : out Boolean)
       is
-         function Is_Final (R : Regexp; S : State_Index) return Boolean;
-         pragma Inline (Is_Final);
-
-         function Is_Final (R : Regexp; S : State_Index) return Boolean is
-         begin
-            return S /= Sink_State and then R.R.Is_Final (S);
-         end Is_Final;
-
          N_L_State : constant State_Index :=
             L.R.States (L_State, L.R.Map (Char));
          N_R_State : constant State_Index :=
@@ -1459,14 +1462,12 @@ package body DB.Utils.Regular_Expressions is
          if Marks (N_L_State, N_R_State) = Unmarked then
             Marks (N_L_State, N_R_State) := Marked;
             Have_Marked := True;
-            --  In the difference-automaton (L \ R), the (N_L_State, N_R_State)
-            --  is final iff N_L_State is final and N_R_State is not.
-            Final := Is_Final (L, N_L_State) and not Is_Final (R, N_R_State);
+            Final := Left_Is_Final (L, N_L_State) and
+                     Right_Is_Final (R, N_R_State);
          else
             Have_Marked := False;
          end if;
       end Mark_Next_State;
-
 
       Alphabet : constant String := Make_Alphabet;
    begin
@@ -1492,9 +1493,8 @@ package body DB.Utils.Regular_Expressions is
                                Final       => Final);
                            Something_Marked := Something_Marked or Have_Marked;
                            if Have_Marked and Final then
-                              --  We have found a state that's final in (L \ R),
-                              --  => there is a word that is in L and R,
-                              --  => L is not a subset of R.
+                              --  We have found a state that's final, hence the
+                              --  product DFA accepts a word and is not empty.
                               return False;
                            end if;
                         end;
@@ -1504,14 +1504,64 @@ package body DB.Utils.Regular_Expressions is
             end loop;
 
             --  No further states can be reached, in particular no final,
-            --  => there is no final state in (L \ R),
-            --  => there is no word that is in L and R,
-            --  => L is a subset of R.
+            --  therefore the product DFA accepts nothing at all.
             if not Something_Marked then
                return True;
             end if;
          end;
       end loop;
+   end Product_DFA_Accepts_Nothing;
+
+   --------------
+   -- Is_Final --
+   --------------
+
+   function Is_Final (R : Regexp; S : State_Index) return Boolean is
+   begin
+      return S /= Sink_State and then R.R.Is_Final (S);
+   end Is_Final;
+
+   ---------------
+   -- Is_Subset --
+   ---------------
+
+   function Is_Subset (L, R : Regexp) return Boolean
+   --  We want to check whether Lang(L) is a subset (or equal to) Lang(R).
+   --       A is a subset of B 
+   --  iff  for all a: a in A => a in B
+   --  iff  (A \ B) is empty
+   --  Hence we need to check whether the difference-automaton of L and R
+   --  has no final state (exactly then L accepts exaclty a subset of R).
+   --
+   --  The difference-automaton is the same like the product-automaton but with
+   --  different set of final states: a state is final iff it is final in A but
+   --  not in B.
+   is
+      function Is_Not_Final (R : Regexp; S : State_Index) return Boolean is
+      begin
+         return not Is_Final(R, S);
+      end Is_Not_Final;
+   begin
+      return Product_DFA_Accepts_Nothing
+         (L,
+          R,
+          Left_Is_Final  => Is_Final'Access,
+          Right_Is_Final => Is_Not_Final'Access);
    end Is_Subset;
+
+   -----------------------
+   -- Have_Intersection --
+   -----------------------
+
+   function Have_Intersection (L, R : Regexp) return Boolean is
+   --  We want to check whether the intersection of Lang(L) and Lang(R) is
+   --  non-empty. This is exactly the case if the product DFA accepts nothing.
+   begin
+      return not Product_DFA_Accepts_Nothing
+         (L,
+          R,
+          Left_Is_Final  => Is_Final'Access,
+          Right_Is_Final => Is_Final'Access);
+   end Have_Intersection;
 
 end DB.Utils.Regular_Expressions;

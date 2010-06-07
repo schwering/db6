@@ -1,16 +1,16 @@
 -- Abstract:
 --
 -- A copy of GNAT.Regexp from AdaCore.
--- The only modification of mine is the addition of the Is_Subset function
--- which determines whether the language recognized by a regexp L is a subset of
--- the language recognized by a regexp R.
+-- The only modification of mine is the addition of the Is_Subset and
+-- Have_Intersection functions. These functions can be used to investigate the
+-- relation of the languages accepted by two regular expressions.
 --
 -- I had to copy the whole package because one cannot (and shouldn't) make child
 -- packages of system packages (System.Regexp) nor renamed packages
 -- (GNAT.Regexp).
 --
--- Copyright (C) 1998-2008, AdaCore
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 1998-2008, AdaCore
+-- Copyright 2010 Christoph Schwering
 
 ------------------------------------------------------------------------------
 --                                                                          --
@@ -133,9 +133,12 @@ package DB.Utils.Regular_Expressions is
    --  R is an uninitialized regular expression value.
 
    function Is_Subset (L, R : Regexp) return Boolean;
-   --  Determines whether the language recognized by L is a subset of
-   --  (or equal to) the language recognized by R.
+   --  Determines whether the language accepted by L is a subset of
+   --  (or equal to) the language accepted by R.
    --  For details, check the documentation in the subprogram body.
+
+   function Have_Intersection (L, R : Regexp) return Boolean;
+   --  Determines whether there are words that are accepted by both, L and R.
 
 private
    type Regexp_Value;
