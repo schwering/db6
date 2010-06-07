@@ -1384,9 +1384,6 @@ package body DB.Utils.Regular_Expressions is
    ---------------------------------
 
    function Product_DFA_Accepts_Nothing (L, R : Regexp) return Boolean
-   --  Checks whether the product DFA of L and R with the given Left_Is_Final
-   --  and Right_Is_Final relations relation accepts nothing at all.
-   --
    --  We don't build the product DFA explicitly but do it implicitly while we
    --  look for a final state in (L x R).
    --  The marking works as follows: start from (q_0^L, q_0^R) and mark it.
