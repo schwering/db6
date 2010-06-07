@@ -25,11 +25,11 @@ begin
    Put_Line(E2&" subset "&E2&" = "& Boolean'Image(Is_Subset(RE2, RE2)));
    Put_Line(E2&" subset "&E1&" = "& Boolean'Image(Is_Subset(RE2, RE1)));
    New_Line;
-   Put_Line(E1&" intersect "&E1&" = "& Boolean'Image(Have_Intersection(RE1, RE1)));
-   Put_Line(E1&" intersect "&E2&" = "& Boolean'Image(Have_Intersection(RE1, RE2)));
-   Put_Line(E2&" intersect "&E2&" = "& Boolean'Image(Have_Intersection(RE2, RE2)));
-   Put_Line(E2&" intersect "&E1&" = "& Boolean'Image(Have_Intersection(RE2, RE1)));
-   Put_Line(E1&" intersect "&E3&" = "& Boolean'Image(Have_Intersection(RE1, RE3)));
-   Put_Line(E2&" intersect "&E3&" = "& Boolean'Image(Have_Intersection(RE2, RE3)));
+   Put_Line(E1&" intersect "&E1&" = "& Boolean'Image(Intersection_Is_Empty(RE1, RE1)));
+   Put_Line(E1&" intersect "&E2&" = "& Boolean'Image(Intersection_Is_Empty(RE1, RE2)));
+   Put_Line(E2&" intersect "&E2&" = "& Boolean'Image(Intersection_Is_Empty(RE2, RE2)));
+   Put_Line(E2&" intersect "&E1&" = "& Boolean'Image(Intersection_Is_Empty(RE2, RE1)));
+   Put_Line(E1&" intersect "&E3&" = "& Boolean'Image(Intersection_Is_Empty(RE1, RE3)));
+   Put_Line(E2&" intersect "&E3&" = "& Boolean'Image(Intersection_Is_Empty(RE2, RE3)));
 end Regexp_Test;
 

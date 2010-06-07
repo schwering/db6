@@ -2,8 +2,8 @@
 --
 -- A copy of GNAT.Regexp from AdaCore.
 -- The only modification of mine is the addition of the Is_Subset and
--- Have_Intersection functions. These functions can be used to investigate the
--- relation of the languages accepted by two regular expressions.
+-- Intersection_Is_Empty functions. These functions can be used to investigate
+-- the relation of the languages accepted by two regular expressions.
 --
 -- I had to copy the whole package because one cannot (and shouldn't) make child
 -- packages of system packages (System.Regexp) nor renamed packages
@@ -137,7 +137,7 @@ package DB.Utils.Regular_Expressions is
    --  (or equal to) the language accepted by R.
    --  For details, check the documentation in the subprogram body.
 
-   function Have_Intersection (L, R : Regexp) return Boolean;
+   function Intersection_Is_Empty (L, R : Regexp) return Boolean;
    --  Determines whether there are words that are accepted by both, L and R.
 
 private

@@ -99,13 +99,10 @@ package body DB.Utils.Regular_Expressions is
    pragma Inline (Is_Final);
    --  Checks whether S is not the sink and final in R.
 
-   function Product_DFA_Accepts_Nothing
-     (L, R           : Regexp;
-      Left_Is_Final  : not null access function
-                                (L : Regexp; S : State_Index) return Boolean;
-      Right_Is_Final : not null access function
-                                (R : Regexp; S : State_Index) return Boolean)
-      return Boolean;
+   generic
+      with function Left_Is_Final (L : Regexp; S : State_Index) return Boolean;
+      with function Right_Is_Final (R : Regexp; S : State_Index) return Boolean;
+   function Product_DFA_Accepts_Nothing (L, R : Regexp) return Boolean;
    --  Checks whether the product DFA of L and R with the given Left_Is_Final
    --  and Right_Is_Final relations relation accepts nothing at all.
 
@@ -1386,13 +1383,7 @@ package body DB.Utils.Regular_Expressions is
    -- Product_DFA_Accepts_Nothing --
    ---------------------------------
 
-   function Product_DFA_Accepts_Nothing
-     (L, R           : Regexp;
-      Left_Is_Final  : not null access function
-                                (L : Regexp; S : State_Index) return Boolean;
-      Right_Is_Final : not null access function
-                                (R : Regexp; S : State_Index) return Boolean)
-      return Boolean
+   function Product_DFA_Accepts_Nothing (L, R : Regexp) return Boolean
    --  Checks whether the product DFA of L and R with the given Left_Is_Final
    --  and Right_Is_Final relations relation accepts nothing at all.
    --
@@ -1466,6 +1457,7 @@ package body DB.Utils.Regular_Expressions is
                      Right_Is_Final (R, N_R_State);
          else
             Have_Marked := False;
+            Final := False;
          end if;
       end Mark_Next_State;
 
@@ -1537,31 +1529,35 @@ package body DB.Utils.Regular_Expressions is
    --  different set of final states: a state is final iff it is final in A but
    --  not in B.
    is
+      function Is_Not_Final (R : Regexp; S : State_Index) return Boolean;
+      pragma Inline (Is_Not_Final);
+
       function Is_Not_Final (R : Regexp; S : State_Index) return Boolean is
       begin
-         return not Is_Final(R, S);
+         return not Is_Final (R, S);
       end Is_Not_Final;
+
+      function Difference_DFA_Accepts_Nothing is new Product_DFA_Accepts_Nothing
+        (Left_Is_Final  => Is_Final,
+         Right_Is_Final => Is_Not_Final);
    begin
-      return Product_DFA_Accepts_Nothing
-         (L,
-          R,
-          Left_Is_Final  => Is_Final'Access,
-          Right_Is_Final => Is_Not_Final'Access);
+      return Difference_DFA_Accepts_Nothing (L, R);
    end Is_Subset;
 
-   -----------------------
-   -- Have_Intersection --
-   -----------------------
+   ---------------------------
+   -- Intersection_Is_Empty --
+   ---------------------------
 
-   function Have_Intersection (L, R : Regexp) return Boolean is
+   function Intersection_Is_Empty (L, R : Regexp) return Boolean
    --  We want to check whether the intersection of Lang(L) and Lang(R) is
    --  non-empty. This is exactly the case if the product DFA accepts nothing.
+   is
+      function Intersection_DFA_Accepts_Nothing is new
+      Product_DFA_Accepts_Nothing
+        (Left_Is_Final  => Is_Final,
+         Right_Is_Final => Is_Final);
    begin
-      return not Product_DFA_Accepts_Nothing
-         (L,
-          R,
-          Left_Is_Final  => Is_Final'Access,
-          Right_Is_Final => Is_Final'Access);
-   end Have_Intersection;
+      return not Intersection_DFA_Accepts_Nothing (L, R);
+   end Intersection_Is_Empty;
 
 end DB.Utils.Regular_Expressions;
