@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-package body DB.Utils.Gen_Comparisons is
+package body DB.DSA.Utils.Gen_Comparisons is
 
    function "=" (A, B : Item_Type) return Boolean is
    begin
@@ -39,5 +39,5 @@ package body DB.Utils.Gen_Comparisons is
       return C = Equal or C = Greater;
    end ">=";
 
-end DB.Utils.Gen_Comparisons;
+end DB.DSA.Utils.Gen_Comparisons;
 

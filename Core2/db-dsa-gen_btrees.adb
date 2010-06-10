@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Utils.Gen_Stacks;
+with DB.DSA.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
 
 package body DB.DSA.Gen_BTrees is
@@ -71,7 +71,7 @@ package body DB.DSA.Gen_BTrees is
       package Stacks is new Utils.Gen_Stacks
         (Item_Type    => Item_Type,
          Initial_Size => 7,
-         Storage_Pool => Utils.Global_Pool.Global_Storage_Pool);
+         Storage_Pool => DB.Utils.Global_Pool.Global_Storage_Pool);
 
       type Stack_Type is
          record

@@ -6,7 +6,7 @@
 
 with Ada.Unchecked_Deallocation;
 
-package body DB.Utils.Gen_Stacks is
+package body DB.DSA.Utils.Gen_Stacks is
 
    procedure Free is new Ada.Unchecked_Deallocation
      (Item_Array_Type, Item_Array_Ref_Type);
@@ -168,5 +168,5 @@ package body DB.Utils.Gen_Stacks is
       end loop;
    end Flip;
 
-end DB.Utils.Gen_Stacks;
+end DB.DSA.Utils.Gen_Stacks;
 

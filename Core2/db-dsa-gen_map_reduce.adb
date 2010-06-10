@@ -7,8 +7,8 @@
 with Ada.Unchecked_Deallocation;
 
 with DB.DSA.Gen_BTrees;
-with DB.Utils.Gen_Comparisons;
-with DB.Utils.Gen_Queues;
+with DB.DSA.Utils.Gen_Comparisons;
+with DB.DSA.Utils.Gen_Queues;
 
 procedure DB.DSA.Gen_Map_Reduce
   (Intermediates_File_Name : in String)

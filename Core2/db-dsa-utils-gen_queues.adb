@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-package body DB.Utils.Gen_Queues is
+package body DB.DSA.Utils.Gen_Queues is
 
    function Succ (I : Index_Type) return Index_Type is
    begin
@@ -99,5 +99,5 @@ package body DB.Utils.Gen_Queues is
       end Size;
    end Queue_Type;
 
-end DB.Utils.Gen_Queues;
+end DB.DSA.Utils.Gen_Queues;
 

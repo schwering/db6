@@ -7,7 +7,7 @@
 with Ada.Text_IO;
 
 with DB.DSA.Gen_BTrees.Gen_Draw;
-with DB.Utils.Gen_Stacks;
+with DB.DSA.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
 
 procedure DB.DSA.Gen_BTrees.Gen_Check
@@ -31,7 +31,7 @@ is
    package Stacks is new Utils.Gen_Stacks
      (Item_Type    => Valid_Address_Type,
       Initial_Size => 7,
-      Storage_Pool => Utils.Global_Pool.Global_Storage_Pool);
+      Storage_Pool => DB.Utils.Global_Pool.Global_Storage_Pool);
 
 
    -- The stack contains the outermost left nodes of each level.

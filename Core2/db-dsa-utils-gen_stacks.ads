@@ -19,7 +19,7 @@ generic
    type Item_Type is private;
    Initial_Size : in Natural;
    Storage_Pool : in out System.Storage_Pools.Root_Storage_Pool'Class;
-package DB.Utils.Gen_Stacks is
+package DB.DSA.Utils.Gen_Stacks is
    pragma Preelaborate;
 
    type Stack_Type is private;
@@ -82,5 +82,5 @@ private
    pragma Inline (Get);
    pragma Inline (Set);
 
-end DB.Utils.Gen_Stacks;
+end DB.DSA.Utils.Gen_Stacks;
 

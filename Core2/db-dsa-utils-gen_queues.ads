@@ -7,7 +7,7 @@
 generic
    Queue_Size : in Positive;
    type Item_Type is private;
-package DB.Utils.Gen_Queues is
+package DB.DSA.Utils.Gen_Queues is
    pragma Pure;
 
    type Queue_Type is limited private;
@@ -52,5 +52,5 @@ private
       Tail  : Index_Type := Index_Type'First;
       Final : Boolean    := False;
    end Queue_Type;
-end DB.Utils.Gen_Queues;
+end DB.DSA.Utils.Gen_Queues;
 

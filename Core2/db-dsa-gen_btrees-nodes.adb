@@ -14,7 +14,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Utils.Binary_Search;
+with DB.DSA.Utils.Binary_Search;
 
 separate (DB.DSA.Gen_BTrees)
 package body Nodes is

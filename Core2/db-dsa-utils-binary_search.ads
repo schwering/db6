@@ -19,9 +19,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Utils;
-
-package DB.Utils.Binary_Search is
+package DB.DSA.Utils.Binary_Search is
    pragma Pure;
 
    generic
@@ -60,8 +58,8 @@ package DB.Utils.Binary_Search is
               I : Extended_Index_Type)
               return Item_Type;
       with function Compare
-             (A, B : Item_Type)
-              return Comparison_Result_Type;
+        (A, B : Item_Type)
+         return DB.Utils.Comparison_Result_Type;
    procedure Uniform_Find_Less_Or_Equal
      (Container   : in  Container_Type;
       First_Index : in  Extended_Index_Type;
@@ -75,12 +73,12 @@ package DB.Utils.Binary_Search is
       Invalid_Index : in Extended_Index_Type;
       type Item_Type is limited private;
       with function Get
-             (C : Container_Type;
-              I : Extended_Index_Type)
-              return Item_Type;
+        (C : Container_Type;
+         I : Extended_Index_Type)
+         return Item_Type;
       with function Compare
-             (A, B : Item_Type)
-              return Comparison_Result_Type;
+        (A, B : Item_Type)
+         return DB.Utils.Comparison_Result_Type;
    procedure Uniform_Find_Less_Or_Equal2
      (Container   : in  Container_Type;
       First_Index : in  Extended_Index_Type;
@@ -93,5 +91,5 @@ private
    pragma Inline (Find_Less_Or_Equal);
    pragma Inline (Find_Less_Or_Equal);
 
-end DB.Utils.Binary_Search;
+end DB.DSA.Utils.Binary_Search;
 

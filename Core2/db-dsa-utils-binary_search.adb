@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-package body DB.Utils.Binary_Search is
+package body DB.DSA.Utils.Binary_Search is
 
    procedure Find_Equal
      (Arr   : in  Array_Type;
@@ -297,5 +297,5 @@ package body DB.Utils.Binary_Search is
       end loop;
    end Uniform_Find_Less_Or_Equal2;
 
-end DB.Utils.Binary_Search;
+end DB.DSA.Utils.Binary_Search;
 

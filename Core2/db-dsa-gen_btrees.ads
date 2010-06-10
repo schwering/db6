@@ -58,8 +58,8 @@ with DB.Blocks;
 with DB.Blocks.Gen_IO_Signature;
 with DB.Blocks.Gen_Keys_Signature;
 with DB.Blocks.Gen_Values_Signature;
+with DB.DSA.Utils.Gen_Comparisons;
 with DB.Locks.Mutexes;
-with DB.Utils.Gen_Comparisons;
 
 generic
    with package Keys is new Blocks.Gen_Keys_Signature (<>);

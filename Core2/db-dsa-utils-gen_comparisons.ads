@@ -7,7 +7,7 @@
 generic
    type Item_Type (<>) is limited private;
    with function Compare (A, B : Item_Type) return Comparison_Result_Type;
-package DB.Utils.Gen_Comparisons is
+package DB.DSA.Utils.Gen_Comparisons is
    pragma Pure;
 
    function "=" (A, B : Item_Type) return Boolean;
@@ -16,5 +16,5 @@ package DB.Utils.Gen_Comparisons is
    function "<=" (A, B : Item_Type) return Boolean;
    function ">=" (A, B : Item_Type) return Boolean;
 
-end DB.Utils.Gen_Comparisons;
+end DB.DSA.Utils.Gen_Comparisons;
 
