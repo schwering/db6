@@ -2,16 +2,21 @@
 --
 -- The root package. Here's a quick overview of the most important packages:
 --
--- DB.DSA             -- Generic first-class data structures and algorithms.
--- DB.DSA.Gen_BTrees  -- A generic B-tree structure.
--- DB.Blocks          -- Serialization of data and block IO.
--- DB.Maps            -- A general object-oriented maps API.
--- DB.Types           -- Key and value types for the Gen_BTrees instance used in
---                       DB.Maps. Would be child package of DB.Maps if the
---                       compiler would accept it (he complains about circular
---                       dependencies).
--- DB.Utils           -- Data structures that are rather trivial and other
---                       helpers.
+-- DB.Blocks             -- Serialization of data and block IO.
+--
+-- DB.DSA                -- Generic first-class data structures and algorithms.
+-- DB.DSA.Gen_BTrees     -- Generic B-tree structure.
+-- DB.DSA.Gen_Map_Reduce -- Generic simple MapReduce implementation.
+-- DB.DSA.Utils          -- Helpers needed by the stuff in DB.DSA.
+--
+-- DB.Maps               -- A general object-oriented maps API.
+-- DB.Types              -- Key and value types for the Gen_BTrees instance used
+--                          in DB.Maps. Would be child package of DB.Maps if the
+--                          compiler would accept it (he complains about
+--                          circular dependencies).
+--
+-- DB.Utils              -- Data structures that are rather trivial and other
+--                          helpers.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
