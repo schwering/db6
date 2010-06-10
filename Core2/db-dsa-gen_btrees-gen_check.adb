@@ -6,11 +6,11 @@
 
 with Ada.Text_IO;
 
-with DB.Gen_BTrees.Gen_Draw;
+with DB.DSA.Gen_BTrees.Gen_Draw;
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
 
-procedure DB.Gen_BTrees.Gen_Check
+procedure DB.DSA.Gen_BTrees.Gen_Check
   (Tree : in out Tree_Type)
 is
    use Ada.Text_IO;
@@ -258,5 +258,5 @@ begin
          N_A := Valid_Link(N);
       end loop;
    end loop;
-end DB.Gen_BTrees.Gen_Check;
+end DB.DSA.Gen_BTrees.Gen_Check;
 

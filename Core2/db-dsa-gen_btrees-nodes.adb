@@ -16,7 +16,7 @@
 
 with DB.Utils.Binary_Search;
 
-separate (DB.Gen_BTrees)
+separate (DB.DSA.Gen_BTrees)
 package body Nodes is
 
    -- The layout of a Block, i.e. a byte sequence is the following:
@@ -1212,14 +1212,14 @@ package body Nodes is
       begin
          if Degree(Node) > 0 then
             declare
-               procedure Find is
-                  new Utils.Binary_Search.Uniform_Find_Best_In_Container
-                        (Container_Type      => Node_Type,
-                         Extended_Index_Type => Index_Type,
-                         Invalid_Index       => Invalid_Index,
-                         Item_Type           => Keys.Key_Type,
-                         Get                 => Get_Key,
-                         Compare             => Keys.Compare);
+               procedure Find is new
+               Utils.Binary_Search.Uniform_Find_Less_Or_Equal
+                 (Container_Type      => Node_Type,
+                  Extended_Index_Type => Index_Type,
+                  Invalid_Index       => Invalid_Index,
+                  Item_Type           => Keys.Key_Type,
+                  Get                 => Get_Key,
+                  Compare             => Keys.Compare);
                Index : Index_Type;
             begin
                Find(Node, 1, Degree(Node), Key, Index);
@@ -1245,13 +1245,12 @@ package body Nodes is
       begin
          if Degree(Node) > 0 then
             declare
-               procedure Find is
-                  new Utils.Binary_Search.Find_Best_In_Container
-                        (Container_Type => Node_Type,
-                         Index_Type     => Valid_Index_Type,
-                         Item_Type      => Keys.Key_Type,
-                         Get            => Get_Key,
-                         "<="           => "<=");
+               procedure Find is new Utils.Binary_Search.Find_Less_Or_Equal
+                 (Container_Type => Node_Type,
+                  Index_Type     => Valid_Index_Type,
+                  Item_Type      => Keys.Key_Type,
+                  Get            => Get_Key,
+                  "<="           => "<=");
                Index : Index_Type;
                Found : Boolean;
             begin

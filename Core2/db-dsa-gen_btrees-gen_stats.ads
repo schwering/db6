@@ -6,7 +6,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 generic
-package DB.Gen_BTrees.Gen_Stats is
+package DB.DSA.Gen_BTrees.Gen_Stats is
    pragma Preelaborate;
 
    subtype Level_Type is Natural;
@@ -31,5 +31,5 @@ package DB.Gen_BTrees.Gen_Stats is
                                         Key   : in String;
                                         Value : in Data_Type));
 
-end DB.Gen_BTrees.Gen_Stats;
+end DB.DSA.Gen_BTrees.Gen_Stats;
 

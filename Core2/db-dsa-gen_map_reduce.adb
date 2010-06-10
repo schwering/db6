@@ -5,13 +5,12 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Unchecked_Deallocation;
-with System.Storage_Pools;
 
-with DB.Gen_BTrees;
+with DB.DSA.Gen_BTrees;
 with DB.Utils.Gen_Comparisons;
 with DB.Utils.Gen_Queues;
 
-procedure DB.Gen_Map_Reduce
+procedure DB.DSA.Gen_Map_Reduce
   (Intermediates_File_Name : in String)
 is
 
@@ -256,5 +255,5 @@ exception
    when others =>
       Intermediate_BTrees.Finalize(Context.Intermediates);
       raise;
-end DB.Gen_Map_Reduce;
+end DB.DSA.Gen_Map_Reduce;
 

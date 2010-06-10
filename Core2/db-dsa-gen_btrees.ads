@@ -66,7 +66,7 @@ generic
    with package Values is new Blocks.Gen_Values_Signature (<>);
    with package Block_IO is new Blocks.Gen_IO_Signature (<>);
    Default_Allow_Duplicates : in Boolean := False;
-package DB.Gen_BTrees is
+package DB.DSA.Gen_BTrees is
    pragma Preelaborate;
 
    ----------
@@ -632,5 +632,5 @@ private
          Mutex              : Locks.Mutexes.Mutex_Type;
       end record;
 
-end DB.Gen_BTrees;
+end DB.DSA.Gen_BTrees;
 

@@ -7,7 +7,7 @@
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
 
-package body DB.Gen_BTrees is
+package body DB.DSA.Gen_BTrees is
 
    package Stacks is
       type Stack_Type is limited private;
@@ -454,5 +454,5 @@ package body DB.Gen_BTrees is
    package body Cursors is separate;
    package body Misc is separate;
 
-end DB.Gen_BTrees;
+end DB.DSA.Gen_BTrees;
 

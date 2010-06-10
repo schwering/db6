@@ -4,13 +4,13 @@
 --
 -- References:
 --
--- The problem in the Find_Best*-searches is that we need additional comparisons
--- to assure that if the I-th element is supposed to be the smallest element
--- such that K <= K_I by checking K_{I-1} < K.
+-- The problem in the Find_Less_Or_Equal*-searches is that we need additional
+-- comparisons to assure that if the I-th element is supposed to be the smallest
+-- element such that K <= K_I by checking K_{I-1} < K.
 --
--- While Uniform_Find_Best_In_Container2 moves these assertions into the
--- branching body, the Uniform_Find_Best_In_Container modifies the Compare
--- function so that K = K_I iff K <= K_I and K_{I-1} < K.
+-- While Uniform_Find_Less_Or_Equal_In_Container2 moves these assertions into
+-- the branching body, the Uniform_Find_Less_Or_Equal_In_Container modifies the
+-- Compare function so that K = K_I iff K <= K_I and K_{I-1} < K.
 --
 -- Design Notes:
 --
@@ -18,6 +18,8 @@
 -- (for uniform binary search: pp. 414-415)
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
+
+with DB.Utils;
 
 package DB.Utils.Binary_Search is
    pragma Pure;
@@ -28,18 +30,7 @@ package DB.Utils.Binary_Search is
       type Array_Type is array (Index_Type range <>) of Item_Type;
       with function "<=" (A, B : Item_Type) return Boolean is <>;
       with function "=" (A, B : Item_Type) return Boolean is <>;
-   procedure Find_Exact
-     (Arr   : in  Array_Type;
-      Item  : in  Item_Type;
-      Found : out Boolean;
-      Index : out Index_Type);
-
-   generic
-      type Index_Type is range <>;
-      type Item_Type is limited private;
-      type Array_Type is array (Index_Type range <>) of Item_Type;
-      with function "<=" (A, B : Item_Type) return Boolean is <>;
-   procedure Find_Best
+   procedure Find_Equal
      (Arr   : in  Array_Type;
       Item  : in  Item_Type;
       Found : out Boolean;
@@ -51,7 +42,7 @@ package DB.Utils.Binary_Search is
       type Item_Type is limited private;
       with function Get (C : Container_Type; I : Index_Type) return Item_Type;
       with function "<=" (A, B : Item_Type) return Boolean is <>;
-   procedure Find_Best_In_Container
+   procedure Find_Less_Or_Equal
      (Container   : in  Container_Type;
       First_Index : in  Index_Type;
       Last_Index  : in  Index_Type;
@@ -71,7 +62,7 @@ package DB.Utils.Binary_Search is
       with function Compare
              (A, B : Item_Type)
               return Comparison_Result_Type;
-   procedure Uniform_Find_Best_In_Container
+   procedure Uniform_Find_Less_Or_Equal
      (Container   : in  Container_Type;
       First_Index : in  Extended_Index_Type;
       Last_Index  : in  Extended_Index_Type;
@@ -90,7 +81,7 @@ package DB.Utils.Binary_Search is
       with function Compare
              (A, B : Item_Type)
               return Comparison_Result_Type;
-   procedure Uniform_Find_Best_In_Container2
+   procedure Uniform_Find_Less_Or_Equal2
      (Container   : in  Container_Type;
       First_Index : in  Extended_Index_Type;
       Last_Index  : in  Extended_Index_Type;
@@ -98,9 +89,9 @@ package DB.Utils.Binary_Search is
       Index       : out Extended_Index_Type);
 
 private
-   pragma Inline (Find_Exact);
-   pragma Inline (Find_Best);
-   pragma Inline (Find_Best_In_Container);
+   pragma Inline (Find_Equal);
+   pragma Inline (Find_Less_Or_Equal);
+   pragma Inline (Find_Less_Or_Equal);
 
 end DB.Utils.Binary_Search;
 

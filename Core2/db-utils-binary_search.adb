@@ -6,7 +6,7 @@
 
 package body DB.Utils.Binary_Search is
 
-   procedure Find_Exact
+   procedure Find_Equal
      (Arr   : in  Array_Type;
       Item  : in  Item_Type;
       Found : out Boolean;
@@ -33,46 +33,10 @@ package body DB.Utils.Binary_Search is
          end;
       end loop;
       Found := False;
-   end Find_Exact;
+   end Find_Equal;
 
 
-   procedure Find_Best
-     (Arr   : in  Array_Type;
-      Item  : in  Item_Type;
-      Found : out Boolean;
-      Index : out Index_Type)
-   is
-      From : Index_Type;
-      To   : Index_Type;
-   begin
-      if Arr'Length = 0 then
-         Found := False;
-         return;
-      end if;
-      From := Arr'First;
-      To   := Arr'Last;
-      while From <= To loop
-         declare
-            I : constant Index_Type := (From + To) / 2;
-         begin
-            if Item <= Arr(I) then -- Left half or found.
-               if (I = Arr'First) or else not (Item <= Arr(I-1)) then -- Found.
-                  Index := I;
-                  Found := True;
-                  return;
-               else -- Left half.
-                  To := I - 1;
-               end if;
-            else -- Right half.
-               From := I + 1;
-            end if;
-         end;
-      end loop;
-      Found := False;
-   end Find_Best;
-
-
-   procedure Find_Best_In_Container
+   procedure Find_Less_Or_Equal
      (Container   : in  Container_Type;
       First_Index : in  Index_Type;
       Last_Index  : in  Index_Type;
@@ -104,10 +68,10 @@ package body DB.Utils.Binary_Search is
          end;
       end loop;
       Found := False;
-   end Find_Best_In_Container;
+   end Find_Less_Or_Equal;
 
 
-   procedure Uniform_Find_Best_In_Container
+   procedure Uniform_Find_Less_Or_Equal
      (Container   : in  Container_Type;
       First_Index : in  Extended_Index_Type;
       Last_Index  : in  Extended_Index_Type;
@@ -118,11 +82,11 @@ package body DB.Utils.Binary_Search is
 --pragma Postcondition
 --   ((Index = Invalid_Index and then
 --     (First_Index > Last_Index or else
---      Compare(Item, Get(Container, Last_Index)) = Utils.Greater))
+--      Compare(Item, Get(Container, Last_Index)) = Greater))
 --    or else
---    (Compare(Item, Get(Container, Index)) in Utils.Less .. Utils.Equal and then
+--    (Compare(Item, Get(Container, Index)) in Less .. Equal and then
 --     (Index = First_Index or else
---      Compare(Item, Get(Container, Index - 1)) = Utils.Greater)));
+--      Compare(Item, Get(Container, Index - 1)) = Greater)));
 
       One : constant Integer := 1;
       N   : constant Natural := Natural(Last_Index - First_Index + 1);
@@ -216,10 +180,10 @@ package body DB.Utils.Binary_Search is
                end;
          end case;
       end loop;
-   end Uniform_Find_Best_In_Container;
+   end Uniform_Find_Less_Or_Equal;
 
 
-   procedure Uniform_Find_Best_In_Container2
+   procedure Uniform_Find_Less_Or_Equal2
      (Container   : in  Container_Type;
       First_Index : in  Extended_Index_Type;
       Last_Index  : in  Extended_Index_Type;
@@ -331,7 +295,7 @@ package body DB.Utils.Binary_Search is
                end;
          end case;
       end loop;
-   end Uniform_Find_Best_In_Container2;
+   end Uniform_Find_Less_Or_Equal2;
 
 end DB.Utils.Binary_Search;
 

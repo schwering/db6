@@ -8,7 +8,7 @@ with Ada.Containers.Ordered_Maps;
 
 with DB.Blocks;
 
-package body DB.Gen_BTrees.Gen_Stats is
+package body DB.DSA.Gen_BTrees.Gen_Stats is
 
    procedure Make_Stats
      (Tree : in out Tree_Type;
@@ -139,5 +139,5 @@ package body DB.Gen_BTrees.Gen_Stats is
       end;
    end Make_Stats;
 
-end DB.Gen_BTrees.Gen_Stats;
+end DB.DSA.Gen_BTrees.Gen_Stats;
 

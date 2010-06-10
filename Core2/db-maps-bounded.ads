@@ -5,7 +5,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Gen_BTrees;
+with DB.DSA.Gen_BTrees;
 with DB.Blocks.Gen_Values_Signature;
 with DB.Blocks;
 with DB.Blocks.Local_IO;
@@ -185,7 +185,7 @@ private
    end Values;
    use Values;
 
-   package BTrees is new Gen_BTrees
+   package BTrees is new DSA.Gen_BTrees
      (Keys                     => Types.Keys.Keys_Signature,
       Values                   => Bounded_Values_Signature,
       Default_Allow_Duplicates => Default_Allow_Duplicates,

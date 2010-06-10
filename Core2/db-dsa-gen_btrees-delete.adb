@@ -44,7 +44,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-separate (DB.Gen_BTrees)
+separate (DB.DSA.Gen_BTrees)
 procedure Delete
   (Tree     : in out Tree_Type;
    Key      : in     Keys.Key_Type;

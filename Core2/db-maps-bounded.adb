@@ -4,8 +4,8 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Gen_BTrees.Gen_Check;
-with DB.Gen_BTrees.Gen_Stats;
+with DB.DSA.Gen_BTrees.Gen_Check;
+with DB.DSA.Gen_BTrees.Gen_Stats;
 with DB.Types.Values.Bounded.Streams;
 
 package body DB.Maps.Bounded is

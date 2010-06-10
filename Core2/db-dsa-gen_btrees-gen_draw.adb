@@ -10,7 +10,7 @@ with Ada.Containers.Ordered_Sets;
 with DB.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
 
-procedure DB.Gen_BTrees.Gen_Draw
+procedure DB.DSA.Gen_BTrees.Gen_Draw
   (Tree : in out Tree_Type)
 is
    use Ada.Text_IO;
@@ -123,5 +123,5 @@ begin
       end loop;
    end loop;
    Put_Line("}");
-end DB.Gen_BTrees.Gen_Draw;
+end DB.DSA.Gen_BTrees.Gen_Draw;
 
