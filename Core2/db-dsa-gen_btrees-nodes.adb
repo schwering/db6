@@ -1044,7 +1044,7 @@ package body Nodes is
 
 
    function Has_High_Key
-     (Node : Nodes.Node_Type)
+     (Node : Node_Type)
       return Boolean is
    begin
       if Degree(Node) = 0 then
@@ -1064,13 +1064,13 @@ package body Nodes is
 
 
    function High_Key
-     (Node : Nodes.Node_Type)
+     (Node : Node_Type)
       return Keys.Key_Type
    is
       High_Key     : Keys.Key_Type;
       Has_High_Key : Boolean;
    begin
-      Nodes.Get_High_Key(Node, High_Key, Has_High_Key);
+      Get_High_Key(Node, High_Key, Has_High_Key);
       if not Has_High_Key then
          raise Tree_Error;
       end if;
@@ -1223,7 +1223,7 @@ package body Nodes is
                Index : Index_Type;
             begin
                Find(Node, 1, Degree(Node), Key, Index);
-               if Nodes.Is_Valid(Index) then
+               if Is_Valid(Index) then
                   return Index;
                else
                   return Invalid_Index;
@@ -1659,7 +1659,7 @@ package body Nodes is
       To   : Index_Type)
       return RW_Node_Type is
    begin
-      if not Nodes.Is_Ok(Node) then
+      if not Is_Ok(Node) then
          return Invalid_Node;
       end if;
 
@@ -1806,7 +1806,7 @@ package body Nodes is
      (Node : Node_Type)
       return Blocks.Size_Type
    is
-      pragma Precondition (Nodes.Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
       Last_Used : constant Blocks.Base_Position_Type :=
          Phys.Total_Size(Blocks.Base_Block_Type(Node));
    begin
@@ -1830,7 +1830,7 @@ package body Nodes is
    is
       use type Blocks.Size_Type;
    begin
-      if not Nodes.Is_Ok(Node) then
+      if not Is_Ok(Node) then
          return Too_Large;
       end if;
 
@@ -1879,7 +1879,7 @@ package body Nodes is
      (Node : Node_Type)
       return Blocks.Block_Type
    is
-      pragma Precondition (Nodes.Is_Ok(Node));
+      pragma Precondition (Is_Ok(Node));
       pragma Precondition (Validation(Node) = Valid);
       use type Blocks.Base_Position_Type;
       pragma Assert (Phys.Total_Size(Blocks.Base_Block_Type(Node)) <=

@@ -52,7 +52,7 @@ statsbt:
 statsbl:
 	@grep -c ";" *.adb | sort -t \: -k 2 -n
 	@echo -n "Sum: "
-	@cat *.adb | grep -c ";"
+	@cat *.ad? | grep -c ";"
 
 upload:
 	tar czvf btree.tar.gz db.ads db-blocks.ad? db-blocks-gen_* db-blocks-lo* db-dsa.ads db-dsa-gen_btrees* db-dsa-utils.ads db-dsa-utils-binary_search.ad? db-dsa-utils-gen_comparisons.ad? db-dsa-utils-gen_stacks.ad? db-locks* db-utils.ads db-utils-global_pool.ads

@@ -583,9 +583,9 @@ private
       end record;
 
    procedure Read_Node
-     (Tree        : in out Tree_Type;
-      N_A         : in     Nodes.Valid_Address_Type;
-      N           :    out Nodes.Node_Type);
+     (Tree : in out Tree_Type;
+      N_A  : in     Nodes.Valid_Address_Type;
+      N    :    out Nodes.Node_Type);
 
    procedure Write_Node
      (Tree : in out Tree_Type;
