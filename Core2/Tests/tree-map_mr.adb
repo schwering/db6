@@ -7,7 +7,7 @@ with Tree.Args;
 with Tree.Jobs;
 with Tree.To_Strings;
 
-with DB.DSA.Gen_Map_Reduce;
+with DB.DSA.Map_Reduce;
 with DB.Blocks;
 with DB.Blocks.Gen_Keys_Signature;
 with DB.Blocks.Gen_Values_Signature;
@@ -165,7 +165,7 @@ procedure Tree.Map_MR is
             raise;
       end Output;
 
-      procedure Map_Reduce is new DB.DSA.Gen_Map_Reduce
+      procedure Map_Reduce is new DB.DSA.Map_Reduce.Gen_Local_Map_Reduce
         (In_Key_Type        => In_Key_Type,
          In_Value_Type      => In_Value_Type,
          Input              => Input,

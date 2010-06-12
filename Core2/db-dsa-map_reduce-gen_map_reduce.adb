@@ -4,40 +4,9 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Unchecked_Deallocation;
-
-with DB.DSA.Gen_BTrees;
-with DB.DSA.Utils.Gen_Comparisons;
-with DB.DSA.Utils.Gen_Queues;
-
-procedure DB.DSA.Gen_Map_Reduce
-  (Intermediates_File_Name : in String)
+separate (DB.DSA.Map_Reduce)
+procedure Gen_Map_Reduce
 is
-
-   ----------
-   -- Helpers for intermediate keys/values.
-
-   -- for some reasons, accessing Intermediate_*.*_Type directly raises compiler
-   -- errors
-   subtype Intermediate_Keys_Type is Intermediate_Keys.Key_Type;
-   subtype Intermediate_Values_Type is Intermediate_Values.Value_Type;
-
-   package Key_Comparisons is new Utils.Gen_Comparisons
-     (Item_Type => Intermediate_Keys_Type,
-      Compare   => Intermediate_Keys.Compare);
-   use Key_Comparisons;
-
-   package Intermediate_BTrees is new Gen_BTrees
-     (Keys                     => Intermediate_Keys,
-      Values                   => Intermediate_Values,
-      Block_IO                 => Intermediate_Block_IO,
-      Default_Allow_Duplicates => Allow_Intermediate_Duplicates);
-
-   type Context_Type is
-      record
-         Intermediates : Intermediate_BTrees.Tree_Type;
-      end record;
-
 
    ----------
    -- The map phase. It just calls the user-supplied subprogram Input until
@@ -46,7 +15,6 @@ is
    -- procedure.
 
    procedure Map_Phase
-     (Context : in out Context_Type)
    is
       task type Map_Task_Type is
          entry Start;
@@ -55,17 +23,10 @@ is
       task body Map_Task_Type
       is
          procedure Emit
-           (Key   : in Intermediate_Keys_Type;
-            Value : in Intermediate_Values_Type)
-         is
-            use type Intermediate_BTrees.State_Type;
-            State : Intermediate_BTrees.State_Type;
+           (Key   : in Intermediate_Key_Type;
+            Value : in Intermediate_Value_Type) is
          begin
-            Intermediate_BTrees.Insert(Context.Intermediates, Key, Value,
-                                       State);
-            if State /= Intermediate_BTrees.Success then
-               raise Tree_Error;
-            end if;
+            Intermediate_Output(Key, Value);
          end Emit;
 
          In_Key   : In_Key_Type;
@@ -90,43 +51,44 @@ is
 
    ----------
    -- The sorting phase. This is obsolete at the moment because sorting is
-   -- currently done at the time of inserting since we use a BTree as temporary
-   -- storage.
+   -- currently done at the time of inserting since we use a BTree as
+   -- temporary storage.
 
-   procedure Sort_Phase
-     (Context : in out Context_Type)
-   is null;
+   procedure Sort_Phase is
+   begin
+      Sort_Intermediate_Storage;
+   end;
 
 
    ----------
    -- The reduce phase. There are two types tasks:
-   -- 1. The first one traverses the intermediate key/value pairs and produces
-   --    Key_Values_Type objects which consists of 1 key and some positive
-   --    number of values that are associated with the key.
+   -- 1. The first one traverses the intermediate key/value pairs and
+   --    produces Key_Values_Type objects which consists of 1 key and
+   --    some positive number of values that are associated with the key.
    --    Only one of these tasks exists.
    -- 2. The second one is the consumer task type. There might be multiple
    --    consumers (Reduce_Task_Count many). Each task chooses one
-   --    Key_Values_Type; if there is none at the moment, it waits until it gets
-   --    one. Then it consumes all the values in this Key + Value-sequence
-   --    object and reduces them (by calling the user's Reduce subprogram).
-   -- Just a note about the queues we use here: there is one queue that stores
-   -- Key + Value-sequence objects. It is populated by the cursor task. The
-   -- Value-sequences again are queues, but they live on the heap. While the
-   -- cursor task creates these objects and populates them and also marks them
-   -- as final (this is the case when there are no more values for the specific
-   -- key), their memory is freed by that reduce task that consumed the Key +
-   -- Value-sequence object.
+   --    Key_Values_Type; if there is none at the moment, it waits until it
+   --    gets one. Then it consumes all the values in this Key + Value-
+   --    sequence object and reduces them (by calling the user's Reduce
+   --    subprogram).
+   -- Just a note about the queues we use here: there is one queue that
+   -- stores Key + Value-sequence objects. It is populated by the cursor
+   -- task. The Value-sequences again are queues, but they live on the heap.
+   -- While the cursor task creates these objects and populates them and also
+   -- marks them as final (this is the case when there are no more values for
+   -- the specific key), their memory is freed by that reduce task that
+   -- consumed the Key + Value-sequence object.
 
    procedure Reduce_Phase
-     (Context : in out Context_Type)
    is
       package Value_Queues is new Utils.Gen_Queues
          (Queue_Size => Value_Queue_Size,
-          Item_Type  => Intermediate_Values_Type);
+          Item_Type  => Intermediate_Value_Type);
 
       type Key_Values_Type is
          record
-            Key         : Intermediate_Keys_Type;
+            Key         : Intermediate_Key_Type;
             Value_Queue : Value_Queues.Queue_Type;
          end record;
 
@@ -143,18 +105,7 @@ is
          entry Start;
       end Cursor_Task_Type;
 
-      task body Cursor_Task_Type
-      is
-         Neg_Inf : constant Intermediate_BTrees.Bound_Type :=
-            Intermediate_BTrees.Negative_Infinity_Bound;
-         Pos_Inf : constant Intermediate_BTrees.Bound_Type :=
-            Intermediate_BTrees.Positive_Infinity_Bound;
-         Cursor  : Intermediate_BTrees.Cursor_Type :=
-            Intermediate_BTrees.New_Cursor
-               (Tree        => Context.Intermediates,
-                Thread_Safe => False,
-                Lower_Bound => Neg_Inf,
-                Upper_Bound => Pos_Inf);
+      task body Cursor_Task_Type is
       begin
          accept Start;
          declare
@@ -162,21 +113,18 @@ is
          begin
             loop
                declare
-                  use type Intermediate_BTrees.State_Type;
-                  Key     : Intermediate_Keys_Type;
-                  Value   : Intermediate_Values_Type;
-                  State   : Intermediate_BTrees.State_Type;
+                  Key        : Intermediate_Key_Type;
+                  Value      : Intermediate_Value_Type;
+                  Successful : Boolean;
                begin
-                  Intermediate_BTrees.Next(Context.Intermediates, Cursor,
-                                           Key, Value, State);
+                  Intermediate_Input(Key, Value, Successful);
                   -- Mark as final.
                   if Key_Values /= null and then
-                     (State /= Intermediate_BTrees.Success or else
-                     Key_Values.Key /= Key) then
+                    (not Successful or else Key_Values.Key /= Key) then
                      Value_Queues.Mark_Final(Key_Values.Value_Queue);
                   end if;
                   -- Leave loop.
-                  exit when State /= Intermediate_BTrees.Success;
+                  exit when not Successful;
                   -- Possibly create a new Key + Value-sequence queue
                   if Key_Values = null or else Key_Values.Key /= Key then
                      Key_Values := new Key_Values_Type'(Key    => Key,
@@ -216,7 +164,7 @@ is
                exit when not Success;
                declare
                   procedure Next_Value
-                    (Value   : out Intermediate_Values_Type;
+                    (Value   : out Intermediate_Value_Type;
                      Success : out Boolean) is
                   begin
                      Value_Queues.Dequeue(Key_Values.Value_Queue, Success,
@@ -226,7 +174,8 @@ is
                   Out_Key   : Out_Key_Type;
                   Out_Value : Out_Value_Type;
                begin
-                  Reduce(Key_Values.Key, Next_Value'Access, Out_Key, Out_Value);
+                  Reduce(Key_Values.Key, Next_Value'Access, Out_Key,
+                         Out_Value);
                   Output(Out_Key, Out_Value);
                end;
                Free(Key_Values);
@@ -243,17 +192,9 @@ is
       end loop;
    end Reduce_Phase;
 
-   Context : Context_Type;
 begin
-   Intermediate_BTrees.Create_Temporary(Context.Intermediates,
-                                        Intermediates_File_Name);
-   Map_Phase(Context);
-   Sort_Phase(Context);
-   Reduce_Phase(Context);
-   Intermediate_BTrees.Finalize(Context.Intermediates);
-exception
-   when others =>
-      Intermediate_BTrees.Finalize(Context.Intermediates);
-      raise;
-end DB.DSA.Gen_Map_Reduce;
+   Map_Phase;
+   Sort_Phase;
+   Reduce_Phase;
+end Gen_Map_Reduce;
 
