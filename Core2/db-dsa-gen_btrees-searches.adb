@@ -107,6 +107,7 @@ package body Searches is
             if Nodes.Degree(N) > 0 then
                Index := 1;
                State := Success;
+               return;
             elsif Nodes.Is_Valid(Nodes.Link(N)) then
                N_A := Nodes.Valid_Link(N);
             else
