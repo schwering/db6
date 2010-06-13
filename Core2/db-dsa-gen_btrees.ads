@@ -97,7 +97,7 @@ package DB.DSA.Gen_BTrees is
 
    function Max_Key_Size
      (Max_Value_Size : Blocks.Size_Type :=
-        Blocks.Bits_To_Units(Values.Value_Type'Size))
+        Blocks.Bits_To_Units (Values.Value_Type'Size))
       return Blocks.Size_Type;
    -- Returns the maximum allowed size of keys if the maximum size of
    -- values is Max_Value_Size.
@@ -133,7 +133,7 @@ package DB.DSA.Gen_BTrees is
       Key   : in     Keys.Key_Type;
       Value : in     Values.Value_Type;
       State :    out State_Type);
-   -- Synonym for Insert(Tree, Key, Value, Default_Allow_Duplicates, State).
+   -- Synonym for Insert (Tree, Key, Value, Default_Allow_Duplicates, State).
    -- (A default argument for Allow_Duplicates doesn't work well.)
 
    procedure Insert
@@ -194,7 +194,7 @@ package DB.DSA.Gen_BTrees is
      (Comparison : Comparison_Type;
       Key        : Keys.Key_Type)
       return Bound_Type;
-   -- Creates a concrete bound. The bound New_Bound(Greater, Min) is a
+   -- Creates a concrete bound. The bound New_Bound (Greater, Min) is a
    -- lower bound, because this means that all keys Key hit by the cursor
    -- must satisfy: Key > Min.
 
@@ -265,15 +265,15 @@ private
       use type Valid_Address_Type;
 
       type Node_Type is new Blocks.Base_Block_Type;
-      subtype RO_Node_Type is Node_Type(1 .. RO_Node_Size);
-      subtype RW_Node_Type is Node_Type(1 .. RW_Node_Size);
+      subtype RO_Node_Type is Node_Type (1 .. RO_Node_Size);
+      subtype RW_Node_Type is Node_Type (1 .. RW_Node_Size);
 
       type State_Type is (Valid, Too_Small, Too_Large);
       subtype Validation_State_Type is State_Type;
 
       Invalid_Index   : constant Index_Type := Index_Type'First;
       Invalid_Address : constant Address_Type :=
-         Address_Type(Block_IO.Invalid_Address);
+         Address_Type (Block_IO.Invalid_Address);
       Leaf_Level      : constant Level_Type := Level_Type'First;
 
       ----------
@@ -565,10 +565,10 @@ private
    -- Tree type.
 
    Invalid_Address : constant Nodes.Address_Type :=
-      Nodes.Address_Type(Block_IO.Invalid_Address);
+      Nodes.Address_Type (Block_IO.Invalid_Address);
 
    Root_Address : constant Nodes.Valid_Address_Type :=
-      Nodes.Valid_Address_Type(Block_IO.First_Address);
+      Nodes.Valid_Address_Type (Block_IO.First_Address);
 
    type Tree_Ref_Type is not null access all Tree_Type;
    pragma Controlled (Tree_Ref_Type);

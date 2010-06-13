@@ -22,14 +22,14 @@ package body Searches is
 
       procedure Find_Leaf
       is
-         pragma Postcondition (Nodes.Is_Leaf(N));
+         pragma Postcondition (Nodes.Is_Leaf (N));
          pragma Inline (Find_Leaf);
          N_A : Nodes.Valid_Address_Type := Root_Address;
       begin
          loop
-            Read_Node(Tree, N_A, N);
-            exit when Nodes.Is_Leaf(N);
-            N_A := Scan_Node(N, Key);
+            Read_Node (Tree, N_A, N);
+            exit when Nodes.Is_Leaf (N);
+            N_A := Scan_Node (N, Key);
          end loop;
       end Find_Leaf;
 
@@ -38,10 +38,10 @@ package body Searches is
       loop
          declare
             use type Utils.Comparison_Result_Type;
-            I : constant Nodes.Index_Type := Nodes.Key_Position(N, Key);
+            I : constant Nodes.Index_Type := Nodes.Key_Position (N, Key);
          begin
-            if Nodes.Is_Valid(I) then
-               case Keys.Compare(Key, Nodes.Key(N, I)) is
+            if Nodes.Is_Valid (I) then
+               case Keys.Compare (Key, Nodes.Key (N, I)) is
                   when Utils.Equal =>
                      Index := I;
                      State := Success;
@@ -54,7 +54,7 @@ package body Searches is
                end case;
             end if;
          end;
-         if not Nodes.Is_Valid(Nodes.Link(N)) then
+         if not Nodes.Is_Valid (Nodes.Link (N)) then
             State := Failure;
             return;
          end if;
@@ -62,13 +62,13 @@ package body Searches is
             High_Key     : Keys.Key_Type;
             Has_High_Key : Boolean;
          begin
-            Nodes.Get_High_Key(N, High_Key, Has_High_Key);
+            Nodes.Get_High_Key (N, High_Key, Has_High_Key);
             if Has_High_Key and then Key < High_Key then
                State := Failure;
                return;
             end if;
          end;
-         Read_Node(Tree, Nodes.Valid_Link(N), N);
+         Read_Node (Tree, Nodes.Valid_Link (N), N);
       end loop;
    end Search_Node;
 
@@ -82,9 +82,9 @@ package body Searches is
       N : Nodes.RO_Node_Type;
       I : Nodes.Valid_Index_Type;
    begin
-      Search_Node(Tree, Key, N, I, State);
+      Search_Node (Tree, Key, N, I, State);
       if State = Success then
-         Value := Nodes.Value(N, I);
+         Value := Nodes.Value (N, I);
       end if;
    end Search;
 
@@ -100,16 +100,16 @@ package body Searches is
       N_A : Nodes.Valid_Address_Type := Root_Address;
    begin
       loop
-         Read_Node(Tree, N_A, N);
-         if Nodes.Is_Inner(N) then
-            N_A := Nodes.Child(N, 1);
+         Read_Node (Tree, N_A, N);
+         if Nodes.Is_Inner (N) then
+            N_A := Nodes.Child (N, 1);
          else
-            if Nodes.Degree(N) > 0 then
+            if Nodes.Degree (N) > 0 then
                Index := 1;
                State := Success;
                return;
-            elsif Nodes.Is_Valid(Nodes.Link(N)) then
-               N_A := Nodes.Valid_Link(N);
+            elsif Nodes.Is_Valid (Nodes.Link (N)) then
+               N_A := Nodes.Valid_Link (N);
             else
                State := Failure;
                return;
@@ -128,10 +128,10 @@ package body Searches is
       N : Nodes.RO_Node_Type;
       I : Nodes.Valid_Index_Type;
    begin
-      Search_Minimum_Node(Tree, N, I, State);
+      Search_Minimum_Node (Tree, N, I, State);
       if State = Success then
-         Key   := Nodes.Key(N, I);
-         Value := Nodes.Value(N, I);
+         Key   := Nodes.Key (N, I);
+         Value := Nodes.Value (N, I);
       end if;
    end Search_Minimum;
 

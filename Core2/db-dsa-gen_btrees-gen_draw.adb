@@ -26,8 +26,8 @@ is
 
    function Image (N_A : Address_Type) return String is
    begin
-      if Is_Valid(N_A) then
-         return Image(To_Valid_Address(N_A));
+      if Is_Valid (N_A) then
+         return Image (To_Valid_Address (N_A));
       else
          return "invalid";
       end if;
@@ -47,10 +47,10 @@ is
       N   : RO_Node_Type;
    begin
       loop
-         Stacks.Push(Stack, N_A);
-         Read_Node(Tree, N_A, N);
-         exit when Is_Leaf(N);
-         N_A := Child(N, 1);
+         Stacks.Push (Stack, N_A);
+         Read_Node (Tree, N_A, N);
+         exit when Is_Leaf (N);
+         N_A := Child (N, 1);
       end loop;
    end Init_Stack;
 
@@ -58,50 +58,50 @@ is
    is
       function Style return String is
       begin
-         if Is_Leaf(N) then
+         if Is_Leaf (N) then
             return "doublecircle";
          else
             return "circle";
          end if;
       end Style;
-      Deg  : constant String := Degree_Type'Image(Degree(N));
-      Addr : constant String := Image(To_Address(N_A));
-      Lev  : constant String := Level_Type'Image(Nodes.Level(N));
+      Deg  : constant String := Degree_Type'Image (Degree (N));
+      Addr : constant String := Image (To_Address (N_A));
+      Lev  : constant String := Level_Type'Image (Nodes.Level (N));
    begin
-      Put(""""& Addr &"""");
-      Put(" [label="""& Addr &": "& Deg &", "& Lev &""",shape="""& Style &"""]");
+      Put (""""& Addr &"""");
+      Put (" [label="""& Addr &": "& Deg &", "& Lev &""",shape="""& Style &"""]");
       New_Line;
    end Draw_Node;
 
    procedure Draw_Arrow (From, To : Valid_Address_Type; Is_Link : Boolean) is
    begin
-      Put(""""& Image(To_Address(From)) &"""");
-      Put(" -> ");
-      Put(""""& Image(To_Address(To)) &"""");
+      Put (""""& Image (To_Address (From)) &"""");
+      Put (" -> ");
+      Put (""""& Image (To_Address (To)) &"""");
       if Is_Link then
-         Put(" [arrowhead=diamond]");
+         Put (" [arrowhead=diamond]");
       end if;
       New_Line;
    end Draw_Arrow;
 
    procedure Handle_Node (N_A : Nodes.Valid_Address_Type; N : out Node_Type) is
    begin
-      if Sets.Contains(Set, N_A) then
+      if Sets.Contains (Set, N_A) then
          return;
       end if;
-      Sets.Insert(Set, N_A);
-      Read_Node(Tree, N_A, N);
-      Draw_Node(N_A, N);
-      if Is_Valid(Link(N)) then
-         Draw_Arrow(N_A, Valid_Link(N), Is_Link => True);
+      Sets.Insert (Set, N_A);
+      Read_Node (Tree, N_A, N);
+      Draw_Node (N_A, N);
+      if Is_Valid (Link (N)) then
+         Draw_Arrow (N_A, Valid_Link (N), Is_Link => True);
       end if;
-      if Is_Inner(N) then
-         for I in 1 .. Degree(N) loop
-            Draw_Arrow(N_A, Child(N, I), Is_Link => False);
+      if Is_Inner (N) then
+         for I in 1 .. Degree (N) loop
+            Draw_Arrow (N_A, Child (N, I), Is_Link => False);
             declare
                C : RO_Node_Type;
             begin
-               Handle_Node(Child(N, I), C);
+               Handle_Node (Child (N, I), C);
             end;
          end loop;
       end if;
@@ -111,17 +111,17 @@ is
    N   : RO_Node_Type;
 begin
    Init_Stack;
-   Put_Line("digraph {");
-   --Put_Line("   node [shape=circle]");
+   Put_Line ("digraph {");
+   --Put_Line ("   node [shape=circle]");
    loop
-      exit when Stacks.Is_Empty(Stack);
-      Stacks.Pop(Stack, N_A);
+      exit when Stacks.Is_Empty (Stack);
+      Stacks.Pop (Stack, N_A);
       loop
-         Handle_Node(N_A, N);
-         exit when not Is_Valid(Link(N));
-         N_A := Valid_Link(N);
+         Handle_Node (N_A, N);
+         exit when not Is_Valid (Link (N));
+         N_A := Valid_Link (N);
       end loop;
    end loop;
-   Put_Line("}");
+   Put_Line ("}");
 end DB.DSA.Gen_BTrees.Gen_Draw;
 

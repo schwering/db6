@@ -25,54 +25,45 @@ package body DB.Maps.Bounded is
    end To_State;
 
 
-   function New_Map
-     (Allow_Duplicates : in Boolean)
-      return Map_Type is
+   function New_Map (Allow_Duplicates : in Boolean) return Map_Type is
    begin
-      return Map_Type'(AF.Limited_Controlled with
-                       Allow_Duplicates => Allow_Duplicates,
-                       others => <>);
+      return Map_Type' (AF.Limited_Controlled with
+                        Allow_Duplicates => Allow_Duplicates,
+                        others => <>);
    end New_Map;
 
 
-   procedure Create
-     (Map : in out Map_Type;
-      ID  : in     String)
+   procedure Create (Map : in out Map_Type; ID : in String)
    is
       pragma Precondition (not Map.Initialized);
    begin
-      BTrees.Create(Map.Tree, ID);
+      BTrees.Create (Map.Tree, ID);
       Map.Initialized := True;
    end Create;
 
 
-   procedure Create_Temporary
-     (Map : in out Map_Type;
-      ID  : in     String)
+   procedure Create_Temporary (Map : in out Map_Type; ID : in String)
    is
       pragma Precondition (not Map.Initialized);
    begin
-      BTrees.Create_Temporary(Map.Tree, ID);
+      BTrees.Create_Temporary (Map.Tree, ID);
       Map.Initialized := True;
    end Create_Temporary;
 
 
-   procedure Open
-     (Map : in out Map_Type;
-      ID  : in     String)
+   procedure Open (Map : in out Map_Type; ID : in String)
    is
       pragma Precondition (not Map.Initialized);
    begin
-      BTrees.Open(Map.Tree, ID);
+      BTrees.Open (Map.Tree, ID);
       Map.Initialized := True;
    end Open;
 
 
-   procedure Finalize
-     (Map : in out Map_Type) is
+   procedure Finalize (Map : in out Map_Type) is
    begin
       if Map.Initialized then
-         BTrees.Finalize(Map.Tree);
+         BTrees.Finalize (Map.Tree);
          Map.Initialized := False;
       end if;
    end Finalize;
@@ -82,7 +73,7 @@ package body DB.Maps.Bounded is
      (Max_Value_Size : Blocks.Size_Type)
       return Blocks.Size_Type is
    begin
-      return BTrees.Max_Key_Size(Max_Value_Size);
+      return BTrees.Max_Key_Size (Max_Value_Size);
    end Max_Key_Size;
 
 
@@ -93,20 +84,17 @@ package body DB.Maps.Bounded is
    is
       pragma Unreferenced (Map);
    begin
-      return Max_Key_Size(Max_Value_Size);
+      return Max_Key_Size (Max_Value_Size);
    end Max_Key_Size;
 
 
-   function Contains
-     (Map : Map_Type;
-      Key : Key_Type)
-      return Boolean
+   function Contains (Map : Map_Type; Key : Key_Type) return Boolean
    is
       use type BTrees.State_Type;
       State  : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
    begin
-      BTrees.Search(Map.Self.Tree, Key, String, State);
+      BTrees.Search (Map.Self.Tree, Key, String, State);
       return State = BTrees.Success;
    end Contains;
 
@@ -120,12 +108,12 @@ package body DB.Maps.Bounded is
       S      : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
+         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
    begin
-      BTrees.Search(Map.Tree, Key, String, S);
-      State := To_State(S);
+      BTrees.Search (Map.Tree, Key, String, S);
+      State := To_State (S);
       if State = Success then
-         Read(Stream, Value);
+         Read (Stream, Value);
       end if;
    end Search;
 
@@ -139,12 +127,12 @@ package body DB.Maps.Bounded is
       S      : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
+         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
    begin
-      BTrees.Search_Minimum(Map.Tree, Key, String, S);
-      State := To_State(S);
+      BTrees.Search_Minimum (Map.Tree, Key, String, S);
+      State := To_State (S);
       if State = Success then
-         Read(Stream, Value);
+         Read (Stream, Value);
       end if;
    end Search_Minimum;
 
@@ -155,7 +143,7 @@ package body DB.Maps.Bounded is
       Value : in     Value_Type'Class;
       State :    out State_Type) is
    begin
-      Insert(Map, Key, Value, Map.Allow_Duplicates, State);
+      Insert (Map, Key, Value, Map.Allow_Duplicates, State);
    end Insert;
 
 
@@ -170,11 +158,11 @@ package body DB.Maps.Bounded is
       String : aliased Types.Values.Bounded.String_Type := 
          Types.Values.Bounded.Empty_String;
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
+         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
    begin
-      Write(Stream, Value);
-      BTrees.Insert(Map.Tree, Key, String, Allow_Duplicates, S);
-      State := To_State(S);
+      Write (Stream, Value);
+      BTrees.Insert (Map.Tree, Key, String, Allow_Duplicates, S);
+      State := To_State (S);
    end Insert;
 
 
@@ -187,12 +175,12 @@ package body DB.Maps.Bounded is
       S      : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
+         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
    begin
-      BTrees.Delete(Map.Tree, Key, String, S);
-      State := To_State(S);
+      BTrees.Delete (Map.Tree, Key, String, S);
+      State := To_State (S);
       if State = Success then
-         Read(Stream, Value);
+         Read (Stream, Value);
       end if;
    end Delete;
 
@@ -220,7 +208,7 @@ package body DB.Maps.Bounded is
             when Greater_Or_Equal => C := BTrees.Greater_Or_Equal;
             when Greater          => C := BTrees.Greater;
          end case;
-         return BTrees.New_Bound(C, Key);
+         return BTrees.New_Bound (C, Key);
       end New_Bound;
 
       function To_Bound
@@ -229,7 +217,7 @@ package body DB.Maps.Bounded is
       begin
          case Bound.Concrete is
             when True =>
-               return New_Bound(Bound.Comparison, Bound.Key);
+               return New_Bound (Bound.Comparison, Bound.Key);
             when False =>
                case Bound.Infinity is
                   when Negative_Infinity =>
@@ -240,16 +228,16 @@ package body DB.Maps.Bounded is
          end case;
       end To_Bound;
 
-      B_Lower_Bound : constant BTrees.Bound_Type := To_Bound(Lower_Bound);
-      B_Upper_Bound : constant BTrees.Bound_Type := To_Bound(Upper_Bound);
+      B_Lower_Bound : constant BTrees.Bound_Type := To_Bound (Lower_Bound);
+      B_Upper_Bound : constant BTrees.Bound_Type := To_Bound (Upper_Bound);
    begin
-      return Cursor_Type'(Initialized => True,
-                          Map         => Map.Self,
-                          Cursor      => BTrees.New_Cursor
-                                          (Tree        => Map.Tree,
-                                           Thread_Safe => Thread_Safe,
-                                           Lower_Bound => B_Lower_Bound,
-                                           Upper_Bound => B_Upper_Bound));
+      return Cursor_Type' (Initialized => True,
+                           Map         => Map.Self,
+                           Cursor      => BTrees.New_Cursor
+                              (Tree        => Map.Tree,
+                               Thread_Safe => Thread_Safe,
+                               Lower_Bound => B_Lower_Bound,
+                               Upper_Bound => B_Upper_Bound));
    end New_Cursor;
 
 
@@ -257,14 +245,14 @@ package body DB.Maps.Bounded is
      (Cursor  : in out Cursor_Type;
       Enabled : in     Boolean) is
    begin
-      BTrees.Set_Thread_Safety(Cursor.Cursor, Enabled);
+      BTrees.Set_Thread_Safety (Cursor.Cursor, Enabled);
    end Set_Thread_Safety;
 
 
    procedure Pause
      (Cursor : in out Cursor_Type) is
    begin
-      BTrees.Pause(Cursor.Map.Tree, Cursor.Cursor);
+      BTrees.Pause (Cursor.Map.Tree, Cursor.Cursor);
    end Pause;
 
 
@@ -277,12 +265,12 @@ package body DB.Maps.Bounded is
       S      : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
+         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
    begin
-      BTrees.Next(Cursor.Map.Tree, Cursor.Cursor, Key, String, S);
-      State := To_State(S);
+      BTrees.Next (Cursor.Map.Tree, Cursor.Cursor, Key, String, S);
+      State := To_State (S);
       if State = Success then
-         Read(Stream, Value);
+         Read (Stream, Value);
       end if;
    end Next;
 
@@ -296,12 +284,12 @@ package body DB.Maps.Bounded is
       S      : BTrees.State_Type;
       String : aliased Types.Values.Bounded.String_Type;
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream(String'Unchecked_Access);
+         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
    begin
-      BTrees.Delete(Cursor.Map.Tree, Cursor.Cursor, Key, String, S);
-      State := To_State(S);
+      BTrees.Delete (Cursor.Map.Tree, Cursor.Cursor, Key, String, S);
+      State := To_State (S);
       if State = Success then
-         Read(Stream, Value);
+         Read (Stream, Value);
       end if;
    end Delete;
 
@@ -310,7 +298,7 @@ package body DB.Maps.Bounded is
      (Map   : in out Map_Type;
       Count :    out Count_Type) is
    begin
-      BTrees.Count(Map.Tree, Count);
+      BTrees.Count (Map.Tree, Count);
    end Count;
 
 
@@ -320,8 +308,8 @@ package body DB.Maps.Bounded is
    is
       S      : BTrees.State_Type;
    begin
-      BTrees.Reorganize(Map.Tree, S);
-      State := To_State(S);
+      BTrees.Reorganize (Map.Tree, S);
+      State := To_State (S);
    end Reorganize;
 
 
@@ -333,15 +321,17 @@ package body DB.Maps.Bounded is
       is
          function Row_Image (S : Types.Keys.Rows.String_Type) return String is
          begin
-            return String(Types.Keys.Rows.To_Buffer(S));
+            return String (Types.Keys.Rows.To_Buffer (S));
          end Row_Image;
 
-         function Column_Image (S : Types.Keys.Columns.String_Type) return String is
+         function Column_Image
+           (S : Types.Keys.Columns.String_Type)
+            return String is
          begin
-            return String(Types.Keys.Columns.To_Buffer(S));
+            return String (Types.Keys.Columns.To_Buffer (S));
          end Column_Image;
       begin
-         return "("& Row_Image(Key.Row) &", "& Column_Image(Key.Column) &", "&
+         return "("& Row_Image (Key.Row) &", "& Column_Image (Key.Column) &", "&
                 Key.Time'Img &")";
       end Key_To_String;
 
@@ -358,7 +348,7 @@ package body DB.Maps.Bounded is
         (Key_To_String   => Key_To_String,
          Value_To_String => Value_To_String);
    begin
-      Check(Map.Tree);
+      Check (Map.Tree);
    end Check;
 
 
@@ -377,22 +367,22 @@ package body DB.Maps.Bounded is
       begin
          case Value.Compound is
             when True =>
-               Emit(Level_Type(Level),
-                    Key,
-                    Data_Type'(Compound => True,
-                               Avg => Average_Type(Value.Avg),
-                               Var => Average_Type(Value.Var),
-                               Min => Absolute_Type(Value.Min),
-                               Max => Absolute_Type(Value.Max)));
+               Emit (Level_Type (Level),
+                     Key,
+                     Data_Type' (Compound => True,
+                                 Avg => Average_Type (Value.Avg),
+                                 Var => Average_Type (Value.Var),
+                                 Min => Absolute_Type (Value.Min),
+                                 Max => Absolute_Type (Value.Max)));
             when False =>
-               Emit(Level_Type(Level),
-                    Key,
-                    Data_Type'(Compound => False,
-                               Val => Absolute_Type(Value.Val)));
+               Emit (Level_Type (Level),
+                     Key,
+                     Data_Type' (Compound => False,
+                                 Val => Absolute_Type (Value.Val)));
          end case;
       end;
    begin
-      Stats.Make_Stats(Map.Tree, My_Emit'Access);
+      Stats.Make_Stats (Map.Tree, My_Emit'Access);
    end Stats;
 
 

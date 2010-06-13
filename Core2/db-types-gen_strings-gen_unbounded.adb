@@ -34,7 +34,7 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
             procedure Free_Bounded_String is new Ada.Unchecked_Deallocation
               (Bounded_String_Type, Bounded_String_Ref_Type);
          begin
-            Free_Bounded_String(String.S);
+            Free_Bounded_String (String.S);
          end;
       end if;
    end;
@@ -89,7 +89,7 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
       elsif Right.S = null then
          return Left;
       else
-         return New_String(Left.S.Buffer & Right.S.Buffer);
+         return New_String (Left.S.Buffer & Right.S.Buffer);
       end if;
    end "&";
 
@@ -100,9 +100,9 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
       return String_Type is
    begin
       if Left.S = null then
-         return New_String(Right);
+         return New_String (Right);
       else
-         return New_String(Left.S.Buffer & Right);
+         return New_String (Left.S.Buffer & Right);
       end if;
    end "&";
 
@@ -113,47 +113,41 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
       return String_Type is
    begin
       if Right.S = null then
-         return New_String(Left);
+         return New_String (Left);
       else
-         return New_String(Left & Right.S.Buffer);
+         return New_String (Left & Right.S.Buffer);
       end if;
    end "&";
 
 
-   function To_Index
-     (L : Length_Type)
-      return Index_Type is
+   function To_Index (L : Length_Type) return Index_Type is
    begin
-      return Index_Type(L);
+      return Index_Type (L);
    end To_Index;
 
 
-   function New_String
-     (Arr : Indefinite_Buffer_Type)
-      return String_Type is
+   function New_String (Arr : Indefinite_Buffer_Type) return String_Type is
    begin
       if Arr'Length = 0 then
          return Empty_String;
       else
-         return String_Type'(Ada.Finalization.Controlled with
-                             new Bounded_String_Type'(Length   => Arr'Length,
-                                                      Refcount => 1,
-                                                      Buffer   => Arr));
+         return String_Type' (Ada.Finalization.Controlled with
+                              new Bounded_String_Type' (Length   => Arr'Length,
+                                                        Refcount => 1,
+                                                        Buffer   => Arr));
       end if;
    end New_String;
 
 
-   function New_String
-     (Length : Length_Type)
-      return String_Type is
+   function New_String (Length : Length_Type) return String_Type is
    begin
       if Length = 0 then
          return Empty_String;
       else
-         return String_Type'(Ada.Finalization.Controlled with
-                             new Bounded_String_Type'(Length   => Length,
-                                                      Refcount => 1,
-                                                      others   => <>));
+         return String_Type' (Ada.Finalization.Controlled with
+                              new Bounded_String_Type' (Length   => Length,
+                                                        Refcount => 1,
+                                                        others   => <>));
       end if;
    end New_String;
 
@@ -168,17 +162,15 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
       SF : Index_Type renames S_From;
       SL : Length_Type renames S_Length;
       TL : Length_Type renames T.Length;
-      R  : String_Type := New_String(SL + TL);
+      R  : String_Type := New_String (SL + TL);
    begin
-      R.S.Buffer(1 .. SL)         := S.S.Buffer(SF .. SF+SL-1);
-      R.S.Buffer(SL+1 .. SL+TL-1) := T.S.Buffer(1 .. TL);
+      R.S.Buffer (1 .. SL)         := S.S.Buffer (SF .. SF+SL-1);
+      R.S.Buffer (SL+1 .. SL+TL-1) := T.S.Buffer (1 .. TL);
       return R;
    end New_String;
 
 
-   function Length
-     (S : String_Type)
-      return Length_Type is
+   function Length (S : String_Type) return Length_Type is
    begin
       if S.S = null then
          return 0;
@@ -188,12 +180,9 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
    end Length;
 
 
-   function Element
-     (S : String_Type;
-      I : Index_Type)
-      return Item_Type is
+   function Element (S : String_Type; I : Index_Type) return Item_Type is
    begin
-      return S.S.Buffer(I);
+      return S.S.Buffer (I);
    end Element;
 
 
@@ -203,23 +192,21 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
       Length : Length_Type)
       return String_Type is
    begin
-      return New_String(S.S.Buffer(From .. From + Length - 1));
+      return New_String (S.S.Buffer (From .. From + Length - 1));
    end Substring;
 
 
-   function To_Buffer
-     (S : String_Type)
-      return Indefinite_Buffer_Type is
+   function To_Buffer (S : String_Type) return Indefinite_Buffer_Type is
    begin
       if S.S = null then
          declare
-            Empty_Buffer : constant Indefinite_Buffer_Type(1 .. 0)
+            Empty_Buffer : constant Indefinite_Buffer_Type (1 .. 0)
                          := (others => Item_Type'First);
          begin
             return Empty_Buffer;
          end;
       else
-         return S.S.Buffer(1 .. S.Length);
+         return S.S.Buffer (1 .. S.Length);
       end if;
    end To_Buffer;
 

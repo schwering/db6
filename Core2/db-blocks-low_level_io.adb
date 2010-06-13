@@ -41,15 +41,25 @@ package body DB.Blocks.Low_Level_IO is
       function close (FD : int) return int;
       pragma Import (C, close, "db_blocks_low_level_io_close");
 
-      function read (FD : int; Buf : void_ptr; NBytes : size_t;
-                     Offset : off_t) return ssize_t;
-      pragma Import(C, read, "db_blocks_low_level_io_read");
+      function read
+        (FD     : int;
+         Buf    : void_ptr;
+         NBytes : size_t;
+         Offset : off_t)
+         return ssize_t;
+      pragma Import (C, read, "db_blocks_low_level_io_read");
 
-      function write (FD : int; Buf : void_ptr; NBytes : size_t;
-                      Offset : off_t) return ssize_t;
+      function write
+        (FD     : int;
+         Buf    : void_ptr; NBytes : size_t;
+         Offset : off_t)
+         return ssize_t;
       pragma Import (C, write, "db_blocks_low_level_io_write");
 
-      function write_new (FD : int; Buf : void_ptr; NBytes : size_t)
+      function write_new
+        (FD     : int;
+         Buf    : void_ptr;
+         NBytes : size_t)
          return off_t;
       pragma Import (C, write_new, "db_blocks_low_level_io_write_new");
 
@@ -71,10 +81,10 @@ package body DB.Blocks.Low_Level_IO is
       pragma Warnings (On);
 
       function To_Ada (S : char_ptr; Trim_Nul : Boolean := True) return String
-         renames Interfaces.C.To_Ada;
+      renames Interfaces.C.To_Ada;
 
       function To_C (S : String; Append_Nul : Boolean := True) return char_ptr
-         renames Interfaces.C.To_C;
+      renames Interfaces.C.To_C;
    end C;
 
 
@@ -84,7 +94,7 @@ package body DB.Blocks.Low_Level_IO is
       File      : out File_Descriptor_Type)
    is
       use type C.int;
-      Str   : constant C.char_ptr := C.To_C(Path);
+      Str   : constant C.char_ptr := C.To_C (Path);
       Flags : C.int;
       FD    : C.int;
    begin
@@ -93,11 +103,11 @@ package body DB.Blocks.Low_Level_IO is
          when Read_Only =>  Flags := C.FLAGS_OPEN_RO;
          when Read_Write => Flags := C.FLAGS_OPEN_RW;
       end case;
-      FD := C.open(Str, Flags, C.MODE);
+      FD := C.open (Str, Flags, C.MODE);
       if FD = -1 then
          raise IO_Error;
       end if;
-      File := File_Descriptor_Type(FD);
+      File := File_Descriptor_Type (FD);
    end Open;
 
 
@@ -106,7 +116,7 @@ package body DB.Blocks.Low_Level_IO is
    is
       use type C.int;
    begin
-      if C.unlink(C.To_C(Path)) /= 0 then
+      if C.unlink (C.To_C (Path)) /= 0 then
          raise IO_Error;
       end if;
    end Unlink;
@@ -117,7 +127,7 @@ package body DB.Blocks.Low_Level_IO is
    is
       use type C.int;
    begin
-      if C.close(C.int(File)) /= 0 then
+      if C.close (C.int (File)) /= 0 then
          raise IO_Error;
       end if;
    end Close;
@@ -130,12 +140,12 @@ package body DB.Blocks.Low_Level_IO is
    is
       Size  : constant Size_Type := Item'Size / System.Storage_Unit;
       Count : constant Signed_Size_Type :=
-         Signed_Size_Type(C.read(C.int(File),
-                                 Item'Address,
-                                 C.size_t(Size),
-                                 C.off_t(Pos)));
+         Signed_Size_Type (C.read (C.int (File),
+                                   Item'Address,
+                                   C.size_t (Size),
+                                   C.off_t (Pos)));
    begin
-      if Count < 0 or else Size_Type(Count) /= Size then
+      if Count < 0 or else Size_Type (Count) /= Size then
          raise IO_Error;
       end if;
    end Read;
@@ -148,12 +158,12 @@ package body DB.Blocks.Low_Level_IO is
    is
       Size  : constant Size_Type := Item'Size / System.Storage_Unit;
       Count : constant Signed_Size_Type :=
-         Signed_Size_Type(C.write(C.int(File),
-                                  Item'Address,
-                                  C.size_t(Size),
-                                  C.off_t(Pos)));
+         Signed_Size_Type (C.write (C.int (File),
+                                    Item'Address,
+                                    C.size_t (Size),
+                                    C.off_t (Pos)));
    begin
-      if Count < 0 or else Size_Type(Count) /= Size then
+      if Count < 0 or else Size_Type (Count) /= Size then
          raise IO_Error;
       end if;
    end Write;
@@ -166,9 +176,9 @@ package body DB.Blocks.Low_Level_IO is
    is
       Size  : constant Size_Type := Item'Size / System.Storage_Unit;
    begin
-      Pos := File_Position_Type(C.write_new(C.int(File),
-                                            Item'Address,
-                                            C.size_t(Size)));
+      Pos := File_Position_Type (C.write_new (C.int (File),
+                                              Item'Address,
+                                              C.size_t (Size)));
       if Pos = File_Position_Type'Last then
          raise IO_Error;
       end if;
@@ -179,7 +189,7 @@ package body DB.Blocks.Low_Level_IO is
      (File : in  File_Descriptor_Type;
       Pos  : out File_Position_Type) is
    begin
-      Pos := File_Position_Type(C.seek_end(C.int(File)));
+      Pos := File_Position_Type (C.seek_end (C.int (File)));
       if Pos = File_Position_Type'Last then
          raise IO_Error;
       end if;
@@ -193,7 +203,7 @@ package body DB.Blocks.Low_Level_IO is
    is
       use type C.int;
    begin
-      if C.lock(C.int(File), C.off_t(Pos), C.size_t(Length)) = -1 then
+      if C.lock (C.int (File), C.off_t (Pos), C.size_t (Length)) = -1 then
          raise IO_Error;
       end if;
    end Lock;
@@ -206,7 +216,7 @@ package body DB.Blocks.Low_Level_IO is
    is
       use type C.int;
    begin
-      if C.unlock(C.int(File), C.off_t(Pos), C.size_t(Length)) = -1 then
+      if C.unlock (C.int (File), C.off_t (Pos), C.size_t (Length)) = -1 then
          raise IO_Error;
       end if;
    end Unlock;
@@ -218,7 +228,7 @@ package body DB.Blocks.Low_Level_IO is
       use type C.int;
    begin
       if C.errno /= 0 then
-         return C.To_Ada(C.strerror(C.errno));
+         return C.To_Ada (C.strerror (C.errno));
       else
          return "(No error)";
       end if;

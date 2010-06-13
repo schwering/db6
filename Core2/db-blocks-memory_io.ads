@@ -19,41 +19,23 @@ package DB.Blocks.Memory_IO is
    Invalid_Address : constant Address_Type := 0;
    First_Address   : constant Address_Type := 1;
 
-   procedure Create
-     (ID   : in  String;
-      File : out File_Type);
+   procedure Create (ID : in String; File : out File_Type);
 
-   procedure Create_And_Open_Temporary
-     (ID   : in  String;
-      File : out File_Type);
+   procedure Create_And_Open_Temporary (ID : in String; File : out File_Type);
 
-   procedure Open
-     (ID   : in  String;
-      File : out File_Type);
+   procedure Open (ID : in String; File : out File_Type);
 
-   procedure Close
-     (File : in out File_Type)
-   is null;
+   procedure Close (File : in out File_Type) is null;
 
-   function Succ
-     (Address : Valid_Address_Type)
-      return Valid_Address_Type;
+   function Succ (Address : Valid_Address_Type) return Valid_Address_Type;
 
-   function Image
-     (A : in Valid_Address_Type)
-      return String;
+   function Image (A : Valid_Address_Type) return String;
 
-   function To_Address
-     (Address : Valid_Address_Type)
-      return Address_Type;
+   function To_Address (Address : Valid_Address_Type) return Address_Type;
 
-   function To_Valid_Address
-     (Address : Address_Type)
-      return Valid_Address_Type;
+   function To_Valid_Address (Address : Address_Type) return Valid_Address_Type;
 
-   function Is_Valid_Address
-     (Address : Address_Type)
-      return Boolean;
+   function Is_Valid_Address (Address : Address_Type) return Boolean;
 
    procedure Read
      (File    : in out File_Type;
@@ -72,13 +54,9 @@ package DB.Blocks.Memory_IO is
       Block          : in     Block_Type;
       Cache_Priority : in     Natural := Natural'First);
 
-   procedure Lock
-     (File    : in out File_Type;
-      Address : in     Valid_Address_Type);
+   procedure Lock (File : in out File_Type; Address : in Valid_Address_Type);
 
-   procedure Unlock
-     (File    : in out File_Type;
-      Address : in     Valid_Address_Type);
+   procedure Unlock (File : in out File_Type; Address : in Valid_Address_Type);
 
 
    package IO_Signature is new Gen_IO_Signature

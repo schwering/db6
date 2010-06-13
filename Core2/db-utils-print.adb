@@ -11,7 +11,7 @@ is
    use Interfaces;
    function Internal (S : C.char_array) return C.int;
    pragma Import (C, Internal, "puts");
-   I : constant C.int := Internal(C.To_C(S & ASCII.LF));
+   I : constant C.int := Internal (C.To_C (S & ASCII.LF));
    pragma Unreferenced (I);
 begin
    null;

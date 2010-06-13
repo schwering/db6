@@ -11,68 +11,55 @@ package body DB.Blocks.Local_IO is
       return Valid_Address_Type;
 
 
-   procedure Create
-     (ID   : in  String;
-      File : out File_Type) is
+   procedure Create (ID : in String; File : out File_Type) is
    begin
-      Low_Level_IO.Open(Path      => ID,
-                        Open_Kind => Low_Level_IO.Create,
-                        File      => File.FD);
+      Low_Level_IO.Open (Path      => ID,
+                         Open_Kind => Low_Level_IO.Create,
+                         File      => File.FD);
    end Create;
 
 
-   procedure Create_And_Open_Temporary
-     (ID   : in  String;
-      File : out File_Type) is
+   procedure Create_And_Open_Temporary (ID : in String; File : out File_Type) is
    begin
       declare
       begin
-         Create(ID, File);
+         Create (ID, File);
       exception
          when others =>
-            Low_Level_IO.Unlink(ID);
+            Low_Level_IO.Unlink (ID);
             raise;
       end;
-      Low_Level_IO.Unlink(ID);
+      Low_Level_IO.Unlink (ID);
    end Create_And_Open_Temporary;
 
 
-   procedure Open
-     (ID   : in  String;
-      File : out File_Type) is
+   procedure Open (ID : in String; File : out File_Type) is
    begin
-      Low_Level_IO.Open(Path      => ID,
+      Low_Level_IO.Open (Path      => ID,
                         Open_Kind => Low_Level_IO.Read_Write,
                         File      => File.FD);
    end Open;
 
 
-   procedure Close
-     (File : in out File_Type) is
+   procedure Close (File : in out File_Type) is
    begin
-      Low_Level_IO.Close(File.FD);
+      Low_Level_IO.Close (File.FD);
    end Close;
 
 
-   function Succ
-     (Address : Valid_Address_Type)
-      return Valid_Address_Type is
+   function Succ (Address : Valid_Address_Type) return Valid_Address_Type is
    begin
       return Address + 1;
    end Succ;
 
 
-   function Image
-     (A : in Valid_Address_Type)
-      return String is
+   function Image (A : Valid_Address_Type) return String is
    begin
-      return Valid_Address_Type'Image(A);
+      return Valid_Address_Type'Image (A);
    end Image;
 
 
-   function To_Address
-     (Address : Valid_Address_Type)
-      return Address_Type is
+   function To_Address (Address : Valid_Address_Type) return Address_Type is
    begin
       return Address;
    end To_Address;
@@ -89,9 +76,7 @@ package body DB.Blocks.Local_IO is
    end To_Valid_Address;
 
 
-   function Is_Valid_Address
-     (Address : Address_Type)
-      return Boolean is
+   function Is_Valid_Address (Address : Address_Type) return Boolean is
    begin
       return Address in Valid_Address_Type;
    end Is_Valid_Address;
@@ -107,7 +92,7 @@ package body DB.Blocks.Local_IO is
       if Position mod Block_Size /= 0 then
          raise IO_Error;
       end if;
-      return Valid_Address_Type(Position / Block_Size + 1);
+      return Valid_Address_Type (Position / Block_Size + 1);
    end To_Valid_Address;
 
 
@@ -121,7 +106,7 @@ package body DB.Blocks.Local_IO is
       if not Address'Valid then
          raise IO_Error;
       end if;
-      return Low_Level_IO.File_Position_Type(Address - 1) * Block_Size;
+      return Low_Level_IO.File_Position_Type (Address - 1) * Block_Size;
    end To_File_Position;
 
 
@@ -130,9 +115,9 @@ package body DB.Blocks.Local_IO is
       Address : in     Valid_Address_Type;
       Block   :    out Block_Type)
    is
-      procedure LL_Read is new Low_Level_IO.Read(Block_Type);
+      procedure LL_Read is new Low_Level_IO.Read (Block_Type);
    begin
-      LL_Read(File.FD, To_File_Position(Address), Block);
+      LL_Read (File.FD, To_File_Position (Address), Block);
    end Read;
 
 
@@ -143,9 +128,9 @@ package body DB.Blocks.Local_IO is
       Cache_Priority : in     Natural := Natural'First)
    is
       pragma Unreferenced (Cache_Priority);
-      procedure LL_Write is new Low_Level_IO.Write(Block_Type);
+      procedure LL_Write is new Low_Level_IO.Write (Block_Type);
    begin
-      LL_Write(File.FD, To_File_Position(Address), Block);
+      LL_Write (File.FD, To_File_Position (Address), Block);
    end Write;
 
 
@@ -156,11 +141,11 @@ package body DB.Blocks.Local_IO is
       Cache_Priority : in     Natural := Natural'First)
    is
       pragma Unreferenced (Cache_Priority);
-      procedure LL_Write_New is new Low_Level_IO.Write_New(Block_Type);
+      procedure LL_Write_New is new Low_Level_IO.Write_New (Block_Type);
       Pos : Low_Level_IO.File_Position_Type;
    begin
-      LL_Write_New(File.FD, Pos, Block);
-      Address := To_Valid_Address(Pos);
+      LL_Write_New (File.FD, Pos, Block);
+      Address := To_Valid_Address (Pos);
    end Write_New_Block;
 
 
@@ -169,7 +154,7 @@ package body DB.Blocks.Local_IO is
       Address : in     Valid_Address_Type;
       Success :    out Boolean) is
    begin
-      Mutex_Sets.Try_Lock(File.Mutex_Set, Address, Success);
+      Mutex_Sets.Try_Lock (File.Mutex_Set, Address, Success);
    end Try_Lock;
 
 
@@ -177,7 +162,7 @@ package body DB.Blocks.Local_IO is
      (File    : in out File_Type;
       Address : in     Valid_Address_Type) is
    begin
-      Mutex_Sets.Lock(File.Mutex_Set, Address);
+      Mutex_Sets.Lock (File.Mutex_Set, Address);
    end Lock;
 
 
@@ -185,13 +170,11 @@ package body DB.Blocks.Local_IO is
      (File    : in out File_Type;
       Address : in     Valid_Address_Type) is
    begin
-      Mutex_Sets.Unlock(File.Mutex_Set, Address);
+      Mutex_Sets.Unlock (File.Mutex_Set, Address);
    end Unlock;
 
 
-   function FD
-     (File : File_Type)
-      return Low_Level_IO.File_Descriptor_Type is
+   function FD (File : File_Type) return Low_Level_IO.File_Descriptor_Type is
    begin
       return File.FD;
    end FD;

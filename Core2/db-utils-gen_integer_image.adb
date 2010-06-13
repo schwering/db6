@@ -7,17 +7,17 @@ is
    use type Blocks.Size_Type;
    pragma Warnings (Off); -- Object_Type'Size warnings
    function Convert_To_Integer is
-      new Ada.Unchecked_Conversion(Object_Type, Integer);
+      new Ada.Unchecked_Conversion (Object_Type, Integer);
    function Convert_To_Long_Integer is
-      new Ada.Unchecked_Conversion(Object_Type, Long_Integer);
+      new Ada.Unchecked_Conversion (Object_Type, Long_Integer);
    pragma Warnings (On);
    Size : constant Blocks.Size_Type
-        := Blocks.Bits_To_Units(Object_Type'Size);
+        := Blocks.Bits_To_Units (Object_Type'Size);
 begin
-   if Size = Blocks.Bits_To_Units(Integer'Size) then
-      return Integer'Image(Convert_To_Integer(O));
-   elsif Size = Blocks.Bits_To_Units(Long_Integer'Size) then
-      return Long_Integer'Image(Convert_To_Long_Integer(O));
+   if Size = Blocks.Bits_To_Units (Integer'Size) then
+      return Integer'Image (Convert_To_Integer (O));
+   elsif Size = Blocks.Bits_To_Units (Long_Integer'Size) then
+      return Long_Integer'Image (Convert_To_Long_Integer (O));
    else
       raise Program_Error;
    end if;

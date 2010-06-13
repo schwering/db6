@@ -6,6 +6,6 @@
 
 with DB.Types.Gen_Strings.Gen_Bounded;
 
-package DB.Types.Values.Bounded is new Values.Gen_Bounded(Max_Length => 1024);
+package DB.Types.Values.Bounded is new Values.Gen_Bounded (Max_Length => 1024);
 pragma Pure (DB.Types.Values.Bounded);
 

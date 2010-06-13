@@ -36,7 +36,7 @@ package DB.Blocks is
 
    type Base_Block_Type is
       array (Base_Index_Type range <>) of aliased Storage_Element_Type;
-   subtype Block_Type is Base_Block_Type(Index_Type);
+   subtype Block_Type is Base_Block_Type (Index_Type);
 
    type Cursor_Type (<>) is limited private;
 
@@ -64,21 +64,13 @@ package DB.Blocks is
    -- to the To_Block functions, this is done to prepare the block for being
    -- written to disk.
 
-   function New_Cursor
-     (Start : Base_Position_Type)
-      return Cursor_Type;
+   function New_Cursor (Start : Base_Position_Type) return Cursor_Type;
 
-   function Is_Valid
-     (Cursor : Cursor_Type)
-      return Boolean;
+   function Is_Valid (Cursor : Cursor_Type) return Boolean;
 
-   function Is_Valid
-     (Position : Base_Position_Type)
-      return Boolean;
+   function Is_Valid (Position : Base_Position_Type) return Boolean;
 
-   function Position
-     (Cursor : Cursor_Type)
-      return Base_Position_Type;
+   function Position (Cursor : Cursor_Type) return Base_Position_Type;
 
    function Remaining_Space
      (Block  : Base_Block_Type;
@@ -90,19 +82,14 @@ package DB.Blocks is
       Since  : Base_Position_Type)
       return Size_Type;
 
-   function Bits_To_Units
-     (Bits : Size_Type)
-      return Size_Type;
+   function Bits_To_Units (Bits : Size_Type) return Size_Type;
    pragma Pure_Function (Bits_To_Units);
 
-   procedure Reset
-     (Block : in out Base_Block_Type);
+   procedure Reset (Block : in out Base_Block_Type);
 
    generic
       type Item_Type is private;
-   function Size_Of
-     (Item : Item_Type)
-      return Size_Type;
+   function Size_Of (Item : Item_Type) return Size_Type;
 
    generic
       type Item_Type is private;

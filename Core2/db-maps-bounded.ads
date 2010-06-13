@@ -21,33 +21,24 @@ package DB.Maps.Bounded is
 
    type Map_Type is limited new Maps.Map_Type with private;
 
-   function New_Map
-     (Allow_Duplicates : in Boolean)
-      return Map_Type;
+   function New_Map (Allow_Duplicates : in Boolean) return Map_Type;
 
    overriding
-   procedure Create
-     (Map : in out Map_Type;
-      ID  : in     String);
+   procedure Create (Map : in out Map_Type; ID : in String);
    -- Creates a new map named ID or raises a DB.IO_Error when creation
    -- fails.
 
    overriding
-   procedure Create_Temporary
-     (Map : in out Map_Type;
-      ID  : in     String);
+   procedure Create_Temporary (Map : in out Map_Type; ID : in String);
    -- Creates a new temporary map named ID or raises a DB.IO_Error when creation
    -- fails.
 
    overriding
-   procedure Open
-     (Map  : in out Map_Type;
-      ID   : in     String);
+   procedure Open (Map : in out Map_Type; ID : in String);
    -- Opens Map with the map named ID.
 
    overriding
-   procedure Finalize
-     (Map  : in out Map_Type);
+   procedure Finalize (Map : in out Map_Type);
    -- Finalizes Map, i.e. closes opened files.
 
    function Max_Key_Size
@@ -67,10 +58,7 @@ package DB.Maps.Bounded is
    -- Core operations: Search, Insertion, Deletion.
 
    overriding
-   function Contains
-     (Map : Map_Type;
-      Key : Key_Type)
-      return Boolean;
+   function Contains (Map : Map_Type; Key : Key_Type) return Boolean;
 
    overriding
    procedure Search

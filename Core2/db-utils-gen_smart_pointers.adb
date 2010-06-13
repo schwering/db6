@@ -10,8 +10,8 @@ package body DB.Utils.Gen_Smart_Pointers is
 
    function New_Smart_Pointer (Ref : Item_Ref_Type) return Smart_Pointer_Type is
    begin
-      return Smart_Pointer_Type'(Ada.Finalization.Controlled with
-                                 Ref => Ref, others => <>);
+      return Smart_Pointer_Type' (Ada.Finalization.Controlled with
+                                  Ref => Ref, others => <>);
    end New_Smart_Pointer;
 
 
@@ -25,7 +25,7 @@ package body DB.Utils.Gen_Smart_Pointers is
    procedure Initialize
      (Ref : in out Smart_Pointer_Type) is
    begin
-      Ref.Ref_Count := new Natural'(1);
+      Ref.Ref_Count := new Natural' (1);
    end Initialize;
 
 
@@ -48,9 +48,9 @@ package body DB.Utils.Gen_Smart_Pointers is
    begin
       Ref.Ref_Count.all := Ref.Ref_Count.all - 1;
       if Ref.Ref_Count.all = 0 then
-         Free(Ref.Ref_Count);
+         Free (Ref.Ref_Count);
          if Ref.Ref /= null then
-            Free(Ref.Ref);
+            Free (Ref.Ref);
          end if;
       end if;
    end Finalize;

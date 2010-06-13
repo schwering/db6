@@ -17,9 +17,7 @@ package DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams is
 
    type Stream_Type is new Ada.Streams.Root_Stream_Type with private;
 
-   function New_Stream
-     (String_Ref : String_Ref_Type)
-      return Stream_Type;
+   function New_Stream (String_Ref : String_Ref_Type) return Stream_Type;
 
    overriding
    procedure Write
@@ -36,9 +34,7 @@ package DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams is
      (Stream : in out Stream_Type;
       Pos    : in     Ada.Streams.Stream_Element_Offset);
 
-   function Remaining
-      (Stream : Stream_Type)
-       return Length_Type;
+   function Remaining (Stream : Stream_Type) return Length_Type;
 
 
 private

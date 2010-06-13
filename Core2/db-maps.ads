@@ -32,14 +32,10 @@ package DB.Maps is
 
    type Comparable_Type is interface;
 
-   function Equals
-     (A, B : Comparable_Type)
-      return Boolean
+   function Equals (A, B : Comparable_Type) return Boolean
    is abstract;
 
-   function Equals
-     (Left, Right : Comparable_Type'Class)
-      return Boolean;
+   function Equals (Left, Right : Comparable_Type'Class) return Boolean;
 
 
    subtype Key_Type is DB.Types.Keys.Key_Type;
@@ -47,9 +43,7 @@ package DB.Maps is
 
    type Value_Type is interface and Serializable_Type and Comparable_Type;
 
-   function Image
-     (Value : Value_Type)
-      return String
+   function Image (Value : Value_Type) return String
    is abstract;
 
    ----------
@@ -72,29 +66,22 @@ package DB.Maps is
       return Map_Type'Class;
    -- Initializes a map object.
 
-   procedure Create
-     (Map : in out Map_Type;
-      ID  : in     String)
+   procedure Create (Map : in out Map_Type; ID : in String)
    is abstract;
    -- Creates a new map named ID or raises a DB.IO_Error when creation
    -- fails.
 
-   procedure Create_Temporary
-     (Map : in out Map_Type;
-      ID  : in     String)
+   procedure Create_Temporary (Map : in out Map_Type; ID : in String)
    is abstract;
    -- Creates a new temporary map named ID or raises a DB.IO_Error when creation
    -- fails.
 
-   procedure Open
-     (Map  : in out Map_Type;
-      ID   : in     String)
+   procedure Open (Map : in out Map_Type; ID : in String)
    is abstract;
    -- Initializes Map with the map named ID.
 
    overriding
-   procedure Finalize
-     (Map  : in out Map_Type)
+   procedure Finalize (Map : in out Map_Type)
    is abstract;
    -- Finalizes Map, i.e. closes opened files.
 
@@ -111,10 +98,7 @@ package DB.Maps is
 
    type State_Type is (Success, Failure);
 
-   function Contains
-     (Map : Map_Type;
-      Key : Key_Type)
-      return Boolean
+   function Contains (Map : Map_Type; Key : Key_Type) return Boolean
    is abstract;
 
    procedure Search
@@ -216,7 +200,7 @@ package DB.Maps is
      (Comparison : Comparison_Type;
       Key        : Key_Type)
       return Bound_Type;
-   -- Creates a concrete bound. The bound New_Bound(Greater, Min) is a
+   -- Creates a concrete bound. The bound New_Bound (Greater, Min) is a
    -- lower bound, because this means that all keys Key hit by the cursor
    -- must satisfy: Key > Min.
 

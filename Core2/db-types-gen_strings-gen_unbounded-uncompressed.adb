@@ -9,35 +9,30 @@ with DB.Blocks;
 separate (DB.Types.Gen_Strings.Gen_Unbounded)
 package body Uncompressed is
 
-   function New_Context
-      return Context_Type is
+   function New_Context return Context_Type is
    begin
-      return Context_Type'(others => <>);
+      return Context_Type' (others => <>);
    end New_Context;
 
 
-   function New_Read_Context
-      return Read_Context_Type
+   function New_Read_Context return Read_Context_Type
    renames New_Context;
 
 
-   function New_Write_Context
-      return Write_Context_Type
+   function New_Write_Context return Write_Context_Type
    renames New_Context;
 
 
-   function Size_Bound
-     (S : String_Type)
-      return Blocks.Size_Type
+   function Size_Bound (S : String_Type) return Blocks.Size_Type
    is
       type Definite_Buffer_Type is
          array (Index_Type range S.S.Buffer'Range) of Item_Type;
-      function Size_Of_Length is new Blocks.Size_Of(Length_Type);
-      function Size_Of_Buffer is new Blocks.Size_Of(Definite_Buffer_Type);
+      function Size_Of_Length is new Blocks.Size_Of (Length_Type);
+      function Size_Of_Buffer is new Blocks.Size_Of (Definite_Buffer_Type);
       use type Blocks.Size_Type;
    begin
-      return Size_Of_Length(S.S.Buffer'Length)
-           + Size_Of_Buffer(Definite_Buffer_Type(S.S.Buffer));
+      return Size_Of_Length (S.S.Buffer'Length)
+           + Size_Of_Buffer (Definite_Buffer_Type (S.S.Buffer));
    end Size_Bound;
 
 
@@ -48,11 +43,11 @@ package body Uncompressed is
    is
       type Definite_Buffer_Type is
          array (Index_Type range S.S.Buffer'Range) of Item_Type;
-      procedure Write_Length is new Blocks.Write(Length_Type);
-      procedure Write_Buffer is new Blocks.Write(Definite_Buffer_Type);
+      procedure Write_Length is new Blocks.Write (Length_Type);
+      procedure Write_Buffer is new Blocks.Write (Definite_Buffer_Type);
    begin
-      Write_Length(Block, Cursor, S.S.Buffer'Length);
-      Write_Buffer(Block, Cursor, Definite_Buffer_Type(S.S.Buffer));
+      Write_Length (Block, Cursor, S.S.Buffer'Length);
+      Write_Buffer (Block, Cursor, Definite_Buffer_Type (S.S.Buffer));
    end Write;
 
 
@@ -64,7 +59,7 @@ package body Uncompressed is
    is
       pragma Unreferenced (Context);
    begin
-      Write(Block, Cursor, S);
+      Write (Block, Cursor, S);
    end Write;
 
 
@@ -73,19 +68,19 @@ package body Uncompressed is
       Cursor  : in out Blocks.Cursor_Type;
       S       :    out String_Type)
    is
-      procedure Read_Length is new Blocks.Read(Length_Type);
+      procedure Read_Length is new Blocks.Read (Length_Type);
       Length : Length_Type;
    begin
-      Read_Length(Block, Cursor, Length);
+      Read_Length (Block, Cursor, Length);
       declare
          type Definite_Buffer_Type is
             array (Index_Type range 1 .. Length) of Item_Type;
          procedure Read_Buffer is
-            new Blocks.Read(Definite_Buffer_Type);
+            new Blocks.Read (Definite_Buffer_Type);
          Definite_Buffer : Definite_Buffer_Type;
       begin
-         Read_Buffer(Block, Cursor, Definite_Buffer);
-         S := New_String(Indefinite_Buffer_Type(Definite_Buffer));
+         Read_Buffer (Block, Cursor, Definite_Buffer);
+         S := New_String (Indefinite_Buffer_Type (Definite_Buffer));
       end;
    end Read;
 
@@ -98,7 +93,7 @@ package body Uncompressed is
    is
       pragma Unreferenced (Context);
    begin
-      Read(Block, Cursor, S);
+      Read (Block, Cursor, S);
    end Read;
 
 
@@ -109,7 +104,7 @@ package body Uncompressed is
    is
       S : String_Type;
    begin
-      Read(Context, Block, Cursor, S);
+      Read (Context, Block, Cursor, S);
    end Skip;
 
 end Uncompressed;

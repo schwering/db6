@@ -190,8 +190,8 @@ package body DB.DSA.Gen_BTrees is
    begin
       Block_IO.Read
          (File    => Tree.File,
-          Address => Block_IO.Valid_Address_Type(N_A),
-          Block   => Blocks.Base_Block_Type(N(Nodes.RO_Node_Type'Range)));
+          Address => Block_IO.Valid_Address_Type (N_A),
+          Block   => Blocks.Base_Block_Type (N (Nodes.RO_Node_Type'Range)));
    end Read_Node;
 
 
@@ -202,13 +202,13 @@ package body DB.DSA.Gen_BTrees is
    is
       pragma Inline (Write_Node);
       use type Nodes.Valid_Address_Type;
-      pragma Assert (Nodes.Is_Safe(N, Is_Root => N_A = Root_Address));
+      pragma Assert (Nodes.Is_Safe (N, Is_Root => N_A = Root_Address));
    begin
       Block_IO.Write
          (File           => Tree.File,
-          Address        => Block_IO.Valid_Address_Type(N_A),
-          Block          => Nodes.To_Block(N),
-          Cache_Priority => Natural(Nodes.Level(N)));
+          Address        => Block_IO.Valid_Address_Type (N_A),
+          Block          => Nodes.To_Block (N),
+          Cache_Priority => Natural (Nodes.Level (N)));
    end Write_Node;
 
 
@@ -218,13 +218,13 @@ package body DB.DSA.Gen_BTrees is
       N    : in     Nodes.RW_Node_Type)
    is
       pragma Inline (Write_New_Node);
-      pragma Assert (Nodes.Is_Safe(N, Is_Root => False));
+      pragma Assert (Nodes.Is_Safe (N, Is_Root => False));
    begin
       Block_IO.Write_New_Block
          (File           => Tree.File,
-          Address        => Block_IO.Valid_Address_Type(N_A),
-          Block          => Nodes.To_Block(N),
-          Cache_Priority => Natural(Nodes.Level(N)));
+          Address        => Block_IO.Valid_Address_Type (N_A),
+          Block          => Nodes.To_Block (N),
+          Cache_Priority => Natural (Nodes.Level (N)));
    end Write_New_Node;
 
 
@@ -232,7 +232,7 @@ package body DB.DSA.Gen_BTrees is
      (Tree : in out Tree_Type;
       N_A  : in     Nodes.Valid_Address_Type) is
    begin
-      Block_IO.Lock(Tree.File, Block_IO.Valid_Address_Type(N_A));
+      Block_IO.Lock (Tree.File, Block_IO.Valid_Address_Type (N_A));
    end Lock;
 
 
@@ -240,7 +240,7 @@ package body DB.DSA.Gen_BTrees is
      (Tree : in out Tree_Type;
       N_A  : in     Nodes.Valid_Address_Type) is
    begin
-      Block_IO.Unlock(Tree.File, Block_IO.Valid_Address_Type(N_A));
+      Block_IO.Unlock (Tree.File, Block_IO.Valid_Address_Type (N_A));
    end Unlock;
 
 
@@ -256,15 +256,15 @@ package body DB.DSA.Gen_BTrees is
       Key : Keys.Key_Type)
       return Nodes.Valid_Address_Type
    is
-      pragma Assert (Nodes.Is_Inner(N));
-      I : constant Nodes.Index_Type := Nodes.Key_Position(N, Key);
+      pragma Assert (Nodes.Is_Inner (N));
+      I : constant Nodes.Index_Type := Nodes.Key_Position (N, Key);
    begin
-      if Nodes.Is_Valid(I) then
-         return Nodes.Child(N, I);
-      elsif Nodes.Is_Valid(Nodes.Link(N)) then
-         return Nodes.Valid_Link(N);
+      if Nodes.Is_Valid (I) then
+         return Nodes.Child (N, I);
+      elsif Nodes.Is_Valid (Nodes.Link (N)) then
+         return Nodes.Valid_Link (N);
       else
-         return Nodes.Child(N, Nodes.Degree(N));
+         return Nodes.Child (N, Nodes.Degree (N));
       end if;
    end Scan_Node;
 
@@ -281,26 +281,26 @@ package body DB.DSA.Gen_BTrees is
       N_A       : in out          Nodes.Valid_Address_Type;
       N         :    out          Nodes.Node_Type) is
    begin
-      Lock(Tree, N_A);
+      Lock (Tree, N_A);
       loop
          declare
             use type Nodes.Valid_Address_Type;
          begin
-            Read_Node(Tree, N_A, N);
-            exit when Exit_Cond(N);
-            if not Nodes.Is_Valid(Nodes.Link(N)) then
+            Read_Node (Tree, N_A, N);
+            exit when Exit_Cond (N);
+            if not Nodes.Is_Valid (Nodes.Link (N)) then
                raise Tree_Error;
             end if;
          exception
             when others =>
-               Unlock(Tree, N_A);
+               Unlock (Tree, N_A);
                raise;
          end;
          declare
-            R_A : constant Nodes.Valid_Address_Type := Nodes.Valid_Link(N);
+            R_A : constant Nodes.Valid_Address_Type := Nodes.Valid_Link (N);
          begin
-            Lock(Tree, R_A);
-            Unlock(Tree, N_A);
+            Lock (Tree, R_A);
+            Unlock (Tree, N_A);
             N_A := R_A;
          end;
       end loop;
@@ -332,7 +332,7 @@ package body DB.DSA.Gen_BTrees is
 
    function Max_Key_Size
      (Max_Value_Size : Blocks.Size_Type :=
-        Blocks.Bits_To_Units(Values.Value_Type'Size))
+        Blocks.Bits_To_Units (Values.Value_Type'Size))
       return Blocks.Size_Type
    renames Nodes.Max_Key_Size;
 
@@ -359,7 +359,7 @@ package body DB.DSA.Gen_BTrees is
       Value : in     Values.Value_Type;
       State :    out State_Type) is
    begin
-      Insert(Tree, Key, Value, Default_Allow_Duplicates, State);
+      Insert (Tree, Key, Value, Default_Allow_Duplicates, State);
    end Insert;
 
 

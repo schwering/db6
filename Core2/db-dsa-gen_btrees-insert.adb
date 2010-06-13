@@ -33,12 +33,12 @@ is
    N_A   : Nodes.Valid_Address_Type;
    N_Old : Nodes.RW_Node_Type;
 begin
-   if Keys.Size_Bound(Key) > Max_Key_Size(Values.Size_Bound(Value)) then
+   if Keys.Size_Bound (Key) > Max_Key_Size (Values.Size_Bound (Value)) then
       State := Failure;
       return;
    end if;
 
-   Stacks.Initialize(Stack, Key);
+   Stacks.Initialize (Stack, Key);
 
    declare
       use type Nodes.Level_Type;
@@ -53,55 +53,55 @@ begin
             use type Nodes.Validation_State_Type;
             I : Nodes.Index_Type;
          begin
-           I := Nodes.Key_Position(N, K);
-           if not Nodes.Is_Valid(I) then
-              I := Nodes.Degree(N) + 1;
+           I := Nodes.Key_Position (N, K);
+           if not Nodes.Is_Valid (I) then
+              I := Nodes.Degree (N) + 1;
            end if;
-           return Nodes.Validation(Nodes.Insertion(N, I, K, V)) /=
+           return Nodes.Validation (Nodes.Insertion (N, I, K, V)) /=
                   Nodes.Too_Large;
          end Fits_Into_Node;
       begin
-         if not Nodes.Is_Leaf(N) then
+         if not Nodes.Is_Leaf (N) then
             return True;
          end if;
-         if not Nodes.Is_Valid(Nodes.Link(N)) then
+         if not Nodes.Is_Valid (Nodes.Link (N)) then
             return True;
          end if;
-         case Keys.Compare(Key, Nodes.High_Key(N)) is
+         case Keys.Compare (Key, Nodes.High_Key (N)) is
             when Utils.Less    => return True;
-            when Utils.Equal   => return Fits_Into_Node(Key, Value);
+            when Utils.Equal   => return Fits_Into_Node (Key, Value);
             when Utils.Greater => return False;
          end case;
       end Exit_Cond;
    begin
-      Stacks.Build_Stack(Tree, Stack, Nodes.Leaf_Level);
-      Stacks.Pop(Stack, N_A);
-      Stacks.Move_Right(Tree, Stack, Nodes.Leaf_Level, Exit_Cond'Access,
-                        N_A, N_Old);
+      Stacks.Build_Stack (Tree, Stack, Nodes.Leaf_Level);
+      Stacks.Pop (Stack, N_A);
+      Stacks.Move_Right (Tree, Stack, Nodes.Leaf_Level, Exit_Cond'Access,
+                         N_A, N_Old);
    end;
 
    declare
       N : Nodes.RW_Node_Type;
       I : Nodes.Index_Type;
    begin
-      I := Nodes.Key_Position(N_Old, Key);
-      if not Nodes.Is_Valid(I) then
-         I := Nodes.Degree(N_Old) + 1;
-      elsif not Allow_Duplicates and then Nodes.Key(N_Old, I) = Key then
-         Stacks.Finalize(Stack);
+      I := Nodes.Key_Position (N_Old, Key);
+      if not Nodes.Is_Valid (I) then
+         I := Nodes.Degree (N_Old) + 1;
+      elsif not Allow_Duplicates and then Nodes.Key (N_Old, I) = Key then
+         Stacks.Finalize (Stack);
          State := Failure;
          return;
       end if;
-      N := Nodes.Insertion(N_Old, I, Key, Value);
-      Stacks.Write_And_Ascend(Tree, Stack, N_A, N_Old, N);
+      N := Nodes.Insertion (N_Old, I, Key, Value);
+      Stacks.Write_And_Ascend (Tree, Stack, N_A, N_Old, N);
       State := Success;
    end;
 
-   Stacks.Finalize(Stack);
+   Stacks.Finalize (Stack);
 
 exception
    when others =>
-      Stacks.Finalize(Stack);
+      Stacks.Finalize (Stack);
       raise;
 end Insert;
 

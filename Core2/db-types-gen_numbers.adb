@@ -20,30 +20,26 @@ package body DB.Types.Gen_Numbers is
    end Compare;
 
 
-   function New_Context
-      return Context_Type is
+   function New_Context return Context_Type is
    begin
       return (null record);
    end New_Context;
 
 
-   function New_Read_Context
-      return Read_Context_Type
+   function New_Read_Context return Read_Context_Type
    renames New_Context;
 
 
-   function New_Write_Context
-      return Write_Context_Type
+   function New_Write_Context return Write_Context_Type
    renames New_Context;
 
 
-   function Size_Bound
-     (Number : Number_Type)
+   function Size_Bound (Number : Number_Type)
       return Blocks.Size_Type
    is
-      function Size_Of is new Blocks.Size_Of(Number_Type);
+      function Size_Of is new Blocks.Size_Of (Number_Type);
    begin
-      return Size_Of(Number);
+      return Size_Of (Number);
    end Size_Bound;
 
 
@@ -54,9 +50,9 @@ package body DB.Types.Gen_Numbers is
       Number  : in     Number_Type)
    is
       pragma Unreferenced (Context);
-      procedure Write is new Blocks.Write(Number_Type);
+      procedure Write is new Blocks.Write (Number_Type);
    begin
-      Write(Block, Cursor, Number);
+      Write (Block, Cursor, Number);
    end Write;
 
 
@@ -67,9 +63,9 @@ package body DB.Types.Gen_Numbers is
       Number  :    out Number_Type)
    is
       pragma Unreferenced (Context);
-      procedure Read is new Blocks.Read(Number_Type);
+      procedure Read is new Blocks.Read (Number_Type);
    begin
-      Read(Block, Cursor, Number);
+      Read (Block, Cursor, Number);
    end Read;
 
 
@@ -80,22 +76,17 @@ package body DB.Types.Gen_Numbers is
    is
       Number : Number_Type;
    begin
-      Read(Context, Block, Cursor, Number);
+      Read (Context, Block, Cursor, Number);
    end Skip;
 
 
-   function Short_Bound
-     (Left  : Number_Type)
-      return Number_Type is
+   function Short_Bound (Left  : Number_Type) return Number_Type is
    begin
       return Left;
    end Short_Bound;
 
 
-   function Short_Delimiter
-     (Left  : Number_Type;
-      Right : Number_Type)
-      return Number_Type
+   function Short_Delimiter (Left, Right : Number_Type) return Number_Type
    is
       pragma Unreferenced (Right);
    begin

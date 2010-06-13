@@ -49,15 +49,11 @@ package DB.Types.Keys is
      (Left, Right : Key_Type)
       return Utils.Comparison_Result_Type;
 
-   function New_Read_Context
-      return Read_Context_Type;
+   function New_Read_Context return Read_Context_Type;
 
-   function New_Write_Context
-      return Write_Context_Type;
+   function New_Write_Context return Write_Context_Type;
 
-   function Size_Bound
-     (Key : Key_Type)
-      return Blocks.Size_Type;
+   function Size_Bound (Key : Key_Type) return Blocks.Size_Type;
 
    procedure Write
      (Context : in out Write_Context_Type;
@@ -76,14 +72,9 @@ package DB.Types.Keys is
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type);
 
-   function Short_Bound
-     (Left  : Key_Type)
-      return Key_Type;
+   function Short_Bound (Left : Key_Type) return Key_Type;
 
-   function Short_Delimiter
-     (Left  : Key_Type;
-      Right : Key_Type)
-      return Key_Type;
+   function Short_Delimiter (Left, Right : Key_Type) return Key_Type;
 
    package Keys_Signature is new Blocks.Gen_Keys_Signature
      (Key_Type           => Key_Type,
@@ -91,10 +82,10 @@ package DB.Types.Keys is
       Write_Context_Type => Write_Context_Type);
 
 private
-   Is_Context_Free_Serialization : constant Boolean
-      := Row_Serialization.Is_Context_Free_Serialization and
-         Column_Serialization.Is_Context_Free_Serialization and
-         Times.Is_Context_Free_Serialization;
+   Is_Context_Free_Serialization : constant Boolean :=
+      Row_Serialization.Is_Context_Free_Serialization and
+      Column_Serialization.Is_Context_Free_Serialization and
+      Times.Is_Context_Free_Serialization;
 
    pragma Inline (New_Read_Context);
    pragma Inline (New_Write_Context);

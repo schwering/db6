@@ -26,7 +26,7 @@ is
            (Key   : in Intermediate_Key_Type;
             Value : in Intermediate_Value_Type) is
          begin
-            Intermediate_Output(Key, Value);
+            Intermediate_Output (Key, Value);
          end Emit;
 
          In_Key   : In_Key_Type;
@@ -35,16 +35,16 @@ is
       begin
          accept Start;
          loop
-            Input(In_Key, In_Value, Success);
+            Input (In_Key, In_Value, Success);
             exit when not Success;
-            Map(In_Key, In_Value, Emit'Access);
+            Map (In_Key, In_Value, Emit'Access);
          end loop;
       end Map_Task_Type;
 
       Map_Tasks : array (1 .. Map_Task_Count) of Map_Task_Type;
    begin
       for I in Map_Tasks'Range loop
-         Map_Tasks(I).Start;
+         Map_Tasks (I).Start;
       end loop;
    end Map_Phase;
 
@@ -117,30 +117,30 @@ is
                   Value      : Intermediate_Value_Type;
                   Successful : Boolean;
                begin
-                  Intermediate_Input(Key, Value, Successful);
+                  Intermediate_Input (Key, Value, Successful);
                   -- Mark as final.
                   if Key_Values /= null and then
                     (not Successful or else Key_Values.Key /= Key) then
-                     Value_Queues.Mark_Final(Key_Values.Value_Queue);
+                     Value_Queues.Mark_Final (Key_Values.Value_Queue);
                   end if;
                   -- Leave loop.
                   exit when not Successful;
                   -- Possibly create a new Key + Value-sequence queue
                   if Key_Values = null or else Key_Values.Key /= Key then
-                     Key_Values := new Key_Values_Type'(Key    => Key,
-                                                        others => <>);
-                     Queues.Enqueue(Queue, Key_Values);
+                     Key_Values := new Key_Values_Type' (Key    => Key,
+                                                         others => <>);
+                     Queues.Enqueue (Queue, Key_Values);
                   end if;
                   -- What we really wanted: enqueue the value in the
                   -- Key + Value-sequence!
-                  Value_Queues.Enqueue(Key_Values.Value_Queue, Value);
+                  Value_Queues.Enqueue (Key_Values.Value_Queue, Value);
                end;
             end loop;
          end;
-         Queues.Mark_Final(Queue);
+         Queues.Mark_Final (Queue);
       exception
          when others =>
-            Queues.Mark_Final(Queue);
+            Queues.Mark_Final (Queue);
             raise;
       end Cursor_Task_Type;
 
@@ -160,25 +160,25 @@ is
                Key_Values : Key_Values_Ref_Type;
                Success    : Boolean;
             begin
-               Queues.Dequeue(Queue, Success, Key_Values);
+               Queues.Dequeue (Queue, Success, Key_Values);
                exit when not Success;
                declare
                   procedure Next_Value
                     (Value   : out Intermediate_Value_Type;
                      Success : out Boolean) is
                   begin
-                     Value_Queues.Dequeue(Key_Values.Value_Queue, Success,
-                                          Value);
+                     Value_Queues.Dequeue (Key_Values.Value_Queue, Success,
+                                           Value);
                   end Next_Value;
 
                   Out_Key   : Out_Key_Type;
                   Out_Value : Out_Value_Type;
                begin
-                  Reduce(Key_Values.Key, Next_Value'Access, Out_Key,
-                         Out_Value);
-                  Output(Out_Key, Out_Value);
+                  Reduce (Key_Values.Key, Next_Value'Access, Out_Key,
+                          Out_Value);
+                  Output (Out_Key, Out_Value);
                end;
-               Free(Key_Values);
+               Free (Key_Values);
             end;
          end loop;
       end Reduce_Task_Type;
@@ -188,7 +188,7 @@ is
    begin
       Cursor_Task.Start;
       for I in Reduce_Tasks'Range loop
-         Reduce_Tasks(I).Start;
+         Reduce_Tasks (I).Start;
       end loop;
    end Reduce_Phase;
 

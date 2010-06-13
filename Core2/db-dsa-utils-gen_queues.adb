@@ -18,7 +18,7 @@ package body DB.DSA.Utils.Gen_Queues is
 
    procedure Enqueue (Q : in out Queue_Type; Item : in Item_Type) is
    begin
-      Q.Enqueue(Item);
+      Q.Enqueue (Item);
    end Enqueue;
 
 
@@ -27,7 +27,7 @@ package body DB.DSA.Utils.Gen_Queues is
       Success :    out Boolean;
       Item    :    out Item_Type) is
    begin
-      Q.Dequeue(Success, Item);
+      Q.Dequeue (Success, Item);
    end Dequeue;
 
 
@@ -58,16 +58,16 @@ package body DB.DSA.Utils.Gen_Queues is
    protected body Queue_Type is
       entry Enqueue (Item : in Item_Type) when not Is_Full is
       begin
-         Arr(Tail) := Item;
-         Tail      := Succ(Tail);
+         Arr (Tail) := Item;
+         Tail      := Succ (Tail);
       end Enqueue;
 
       entry Dequeue (Success : out Boolean; Item : out Item_Type)
          when Final or not Is_Empty is
       begin
          if not Is_Empty then
-            Item    := Arr(Head);
-            Head    := Succ(Head);
+            Item    := Arr (Head);
+            Head    := Succ (Head);
             Success := True;
          else
             Success := False;
@@ -81,7 +81,7 @@ package body DB.DSA.Utils.Gen_Queues is
 
       function Is_Full return Boolean is
       begin
-         return Head = Succ(Tail);
+         return Head = Succ (Tail);
       end Is_Full;
 
       function Is_Empty return Boolean is
@@ -92,9 +92,9 @@ package body DB.DSA.Utils.Gen_Queues is
       function Size return Natural is
       begin
          if Head <= Tail then
-            return Natural(Tail) - Natural(Head);
+            return Natural (Tail) - Natural (Head);
          else
-            return Natural(Arr'Last) - Natural(Head) + Natural(Tail);
+            return Natural (Arr'Last) - Natural (Head) + Natural (Tail);
          end if;
       end Size;
    end Queue_Type;

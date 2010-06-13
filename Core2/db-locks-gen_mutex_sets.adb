@@ -10,7 +10,7 @@ package body DB.Locks.Gen_Mutex_Sets is
      (MS   : in out Mutex_Set_Type;
       Item : in     Item_Type) is
    begin
-      MS.Lock(Item);
+      MS.Lock (Item);
    end Lock;
 
 
@@ -19,7 +19,7 @@ package body DB.Locks.Gen_Mutex_Sets is
       Item    : in     Item_Type;
       Success :    out Boolean) is
    begin
-      MS.Try_Lock(Item, Success);
+      MS.Try_Lock (Item, Success);
    end Try_Lock;
 
 
@@ -27,7 +27,7 @@ package body DB.Locks.Gen_Mutex_Sets is
      (MS   : in out Mutex_Set_Type;
       Item : in     Item_Type) is
    begin
-      MS.Unlock(Item);
+      MS.Unlock (Item);
    end Unlock;
 
 
@@ -36,7 +36,7 @@ package body DB.Locks.Gen_Mutex_Sets is
       is
          Cursor : Sets.Cursor;
       begin
-         Sets.Insert(Set, Item, Cursor, Success);
+         Sets.Insert (Set, Item, Cursor, Success);
       end Try_Lock;
 
       entry Lock (Item : in Item_Type) when Reset'Count = 0
@@ -44,7 +44,7 @@ package body DB.Locks.Gen_Mutex_Sets is
          Cursor   : Sets.Cursor;
          Inserted : Boolean;
       begin
-         Sets.Insert(Set, Item, Cursor, Inserted);
+         Sets.Insert (Set, Item, Cursor, Inserted);
          if not Inserted then
             requeue Wait_Lock;
          end if;
@@ -55,7 +55,7 @@ package body DB.Locks.Gen_Mutex_Sets is
          Cursor   : Sets.Cursor;
          Inserted : Boolean;
       begin
-         Sets.Insert(Set, Item, Cursor, Inserted);
+         Sets.Insert (Set, Item, Cursor, Inserted);
          if not Inserted then
             requeue Lock;
          end if;
@@ -63,8 +63,8 @@ package body DB.Locks.Gen_Mutex_Sets is
 
       entry Unlock (Item : in Item_Type) when True is
       begin
-         pragma Assert (Sets.Contains(Set, Item));
-         Sets.Exclude(Set, Item);
+         pragma Assert (Sets.Contains (Set, Item));
+         Sets.Exclude (Set, Item);
          if Wait_Lock'Count > 0 then
             Removed := True;
             requeue Reset;

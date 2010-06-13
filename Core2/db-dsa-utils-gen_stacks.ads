@@ -73,7 +73,7 @@ private
 
    type Stack_Type is
       record
-         Stack_Items : Item_Array_Type(1 .. Initial_Size);
+         Stack_Items : Item_Array_Type (1 .. Initial_Size);
          Heap_Items  : Item_Array_Ref_Type := null;
          Top         : Natural := 0;
       end record;

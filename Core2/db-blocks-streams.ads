@@ -16,9 +16,7 @@ package DB.Blocks.Streams is
 
    type Stream_Type is new Ada.Streams.Root_Stream_Type with private;
 
-   function New_Stream
-     (Block_Ref : Base_Block_Ref_Type)
-      return Stream_Type;
+   function New_Stream (Block_Ref : Base_Block_Ref_Type) return Stream_Type;
 
    overriding
    procedure Write

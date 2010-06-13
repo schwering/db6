@@ -53,12 +53,12 @@ package body DB.DSA.Map_Reduce is
             Intermediate_BTrees.Positive_Infinity_Bound;
       begin
          pragma Assert (Cursor = null);
-         Cursor := new Intermediate_BTrees.Cursor_Type'(
-            Intermediate_BTrees.New_Cursor
-               (Tree        => Tree,
-                Thread_Safe => False,
-                Lower_Bound => Neg_Inf,
-                Upper_Bound => Pos_Inf));
+         Cursor := new Intermediate_BTrees.Cursor_Type'
+           (Intermediate_BTrees.New_Cursor
+              (Tree        => Tree,
+               Thread_Safe => False,
+               Lower_Bound => Neg_Inf,
+               Upper_Bound => Pos_Inf));
          pragma Assert (Cursor /= null);
       end Sort_Intermediate_Storage;
 
@@ -69,7 +69,7 @@ package body DB.DSA.Map_Reduce is
          use type Intermediate_BTrees.State_Type;
          State : Intermediate_BTrees.State_Type;
       begin
-         Intermediate_BTrees.Insert(Tree, Key, Value, State);
+         Intermediate_BTrees.Insert (Tree, Key, Value, State);
          if State /= Intermediate_BTrees.Success then
             raise Tree_Error;
          end if;
@@ -83,7 +83,7 @@ package body DB.DSA.Map_Reduce is
          use type Intermediate_BTrees.State_Type;
          State : Intermediate_BTrees.State_Type;
       begin
-         Intermediate_BTrees.Next(Tree, Cursor.all, Key, Value, State);
+         Intermediate_BTrees.Next (Tree, Cursor.all, Key, Value, State);
          Success := State = Intermediate_BTrees.Success;
       end Intermediate_Input;
 
@@ -108,18 +108,18 @@ package body DB.DSA.Map_Reduce is
          Storage_Pool              => Storage_Pool);
 
    begin
-      Intermediate_BTrees.Create_Temporary(Tree, Intermediates_File_Name);
+      Intermediate_BTrees.Create_Temporary (Tree, Intermediates_File_Name);
       Map_Reduce;
       if Cursor /= null then
-         Free(Cursor);
+         Free (Cursor);
       end if;
-      Intermediate_BTrees.Finalize(Tree);
+      Intermediate_BTrees.Finalize (Tree);
    exception
       when others =>
          if Cursor /= null then
-            Free(Cursor);
+            Free (Cursor);
          end if;
-         Intermediate_BTrees.Finalize(Tree);
+         Intermediate_BTrees.Finalize (Tree);
          raise;
    end Gen_Local_Map_Reduce;
 

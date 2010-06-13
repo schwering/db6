@@ -23,30 +23,20 @@ generic
    First_Address : in Valid_Address_Type;
    -- The first valid address of all files.
 
-   with function Succ
-     (Address : Valid_Address_Type)
-      return Valid_Address_Type;
+   with function Succ (Address : Valid_Address_Type) return Valid_Address_Type;
    -- Returns the successor of Address. In a simple case, this might be
    -- Address + 1.
 
-   with function "<"
-     (A, B : Valid_Address_Type)
-      return Boolean;
-   -- Strict less operation for valid addresses. X < Succ(X) must always hold.
+   with function "<" (A, B : Valid_Address_Type) return Boolean;
+   -- Strict less operation for valid addresses. X < Succ (X) must always hold.
 
-   with function "="
-     (A, B : Valid_Address_Type)
-      return Boolean;
+   with function "=" (A, B : Valid_Address_Type) return Boolean;
    -- Equality relation for valid addresses.
 
-   with function Image
-     (A : in Valid_Address_Type)
-      return String;
+   with function Image (A : in Valid_Address_Type) return String;
    -- Converts a valid address into a string. Just for debugging purposes.
 
-   with function To_Address
-     (Address : Valid_Address_Type)
-      return Address_Type;
+   with function To_Address (Address : Valid_Address_Type) return Address_Type;
    -- Casts or converts Address to an address. Is allowed for all valid
    -- addresses.
 
@@ -57,14 +47,10 @@ generic
    -- the behaviour is undefined, should be checked with Is_Valid_Address
    -- in advance.
 
-   with function Is_Valid_Address
-     (Address : Address_Type)
-      return Boolean;
+   with function Is_Valid_Address (Address : Address_Type) return Boolean;
    -- Checks whether Address is valid or not.
 
-   with procedure Create
-     (ID   : in  String;
-      File : out File_Type);
+   with procedure Create (ID : in  String; File : out File_Type);
    -- Creates a File. If this fails, an IO_Error is raised. The File is opened
    -- in read/write-mode.
 
@@ -79,9 +65,7 @@ generic
    -- read/write-mode.
    -- This operation might be unsupported in which case IO_Error must be raised.
 
-   with procedure Open
-     (ID   : in  String;
-      File : out File_Type);
+   with procedure Open (ID : in  String; File : out File_Type);
    -- Opens a File. If this fails, an IO_Error is raised. The File is opened
    -- in read/write-mode in general (this might not be needed if the implementor
    -- is sure that nobody ever calls Write of his Gen_IO implementation).

@@ -25,15 +25,11 @@ generic
      (A, B : Key_Type)
       return Utils.Comparison_Result_Type is <>;
 
-   with function New_Read_Context
-      return Read_Context_Type is <>;
+   with function New_Read_Context return Read_Context_Type is <>;
 
-   with function New_Write_Context
-      return Write_Context_Type is <>;
+   with function New_Write_Context return Write_Context_Type is <>;
 
-   with function Size_Bound
-     (Key : Key_Type)
-      return Blocks.Size_Type is <>;
+   with function Size_Bound (Key : Key_Type) return Blocks.Size_Type is <>;
 
    with procedure Read
      (Context : in out Read_Context_Type;

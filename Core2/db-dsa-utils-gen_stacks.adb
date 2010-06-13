@@ -31,18 +31,18 @@ package body DB.DSA.Utils.Gen_Stacks is
    is
       pragma Inline (Resize);
    begin
-      if Stack.Top = Capacity(Stack) then
+      if Stack.Top = Capacity (Stack) then
          declare
-            New_Capacity   : constant Natural := Capacity(Stack) * 3 / 2 + 1;
+            New_Capacity   : constant Natural := Capacity (Stack) * 3 / 2 + 1;
             New_Heap_Items : Item_Array_Ref_Type :=
-               new Item_Array_Type(Stack.Stack_Items'Last + 1 .. New_Capacity);
+               new Item_Array_Type (Stack.Stack_Items'Last + 1 .. New_Capacity);
          begin
             if Stack.Heap_Items /= null then
-               New_Heap_Items(Stack.Heap_Items'Range) := Stack.Heap_Items.all;
-               Free(Stack.Heap_Items);
+               New_Heap_Items (Stack.Heap_Items'Range) := Stack.Heap_Items.all;
+               Free (Stack.Heap_Items);
             end if;
             Stack.Heap_Items := New_Heap_Items;
-            pragma Assert (Capacity(Stack) = New_Capacity);
+            pragma Assert (Capacity (Stack) = New_Capacity);
          end;
       end if;
    end Resize;
@@ -51,7 +51,7 @@ package body DB.DSA.Utils.Gen_Stacks is
    function New_Stack
       return Stack_Type is
    begin
-      return Stack_Type'(others => <>);
+      return Stack_Type' (others => <>);
    end New_Stack;
 
 
@@ -59,7 +59,7 @@ package body DB.DSA.Utils.Gen_Stacks is
      (Stack : in out Stack_Type) is
    begin
       if Stack.Heap_Items /= null then
-         Free(Stack.Heap_Items);
+         Free (Stack.Heap_Items);
       end if;
    end Finalize;
 
@@ -68,12 +68,12 @@ package body DB.DSA.Utils.Gen_Stacks is
      (Stack : in out Stack_Type;
       Item  : in     Item_Type) is
    begin
-      Resize(Stack);
+      Resize (Stack);
       Stack.Top := Stack.Top + 1;
       if Stack.Top <= Stack.Stack_Items'Last then
-         Stack.Stack_Items(Stack.Top) := Item;
+         Stack.Stack_Items (Stack.Top) := Item;
       else
-         Stack.Heap_Items(Stack.Top) := Item;
+         Stack.Heap_Items (Stack.Top) := Item;
       end if;
    end Push;
 
@@ -83,9 +83,9 @@ package body DB.DSA.Utils.Gen_Stacks is
       Item  :    out Item_Type) is
    begin
       if Stack.Top <= Stack.Stack_Items'Last then
-         Item := Stack.Stack_Items(Stack.Top);
+         Item := Stack.Stack_Items (Stack.Top);
       else
-         Item := Stack.Heap_Items(Stack.Top);
+         Item := Stack.Heap_Items (Stack.Top);
       end if;
       Stack.Top := Stack.Top - 1;
    end Pop;
@@ -96,9 +96,9 @@ package body DB.DSA.Utils.Gen_Stacks is
       return Item_Type is
    begin
       if Stack.Top <= Stack.Stack_Items'Last then
-         return Stack.Stack_Items(Stack.Top);
+         return Stack.Stack_Items (Stack.Top);
       else
-         return Stack.Heap_Items(Stack.Top);
+         return Stack.Heap_Items (Stack.Top);
       end if;
    end Top;
 
@@ -132,9 +132,9 @@ package body DB.DSA.Utils.Gen_Stacks is
       return Item_Type is
    begin
       if I <= Stack.Stack_Items'Last then
-         return Stack.Stack_Items(I);
+         return Stack.Stack_Items (I);
       else
-         return Stack.Heap_Items(I);
+         return Stack.Heap_Items (I);
       end if;
    end Get;
 
@@ -145,9 +145,9 @@ package body DB.DSA.Utils.Gen_Stacks is
       Item  : in     Item_Type) is
    begin
       if I <= Stack.Stack_Items'Last then
-         Stack.Stack_Items(I) := Item;
+         Stack.Stack_Items (I) := Item;
       else
-         Stack.Heap_Items(I) := Item;
+         Stack.Heap_Items (I) := Item;
       end if;
    end Set;
 
@@ -157,14 +157,14 @@ package body DB.DSA.Utils.Gen_Stacks is
    is
       procedure Swap (I, J : Positive)
       is
-         Tmp : constant Item_Type := Get(Stack, I);
+         Tmp : constant Item_Type := Get (Stack, I);
       begin
-         Set(Stack, I, Get(Stack, J));
-         Set(Stack, J, Tmp);
+         Set (Stack, I, Get (Stack, J));
+         Set (Stack, J, Tmp);
       end Swap;
    begin
-      for I in 1 .. Size(Stack) / 2 loop
-         Swap(I, Size(Stack) - I + 1);
+      for I in 1 .. Size (Stack) / 2 loop
+         Swap (I, Size (Stack) - I + 1);
       end loop;
    end Flip;
 

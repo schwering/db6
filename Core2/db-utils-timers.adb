@@ -21,8 +21,8 @@ package body DB.Utils.Timers is
    C_TIMES_PER_SEC : constant Interfaces.C.unsigned_long;
    pragma Import (C, C_TIMES_PER_SEC, "db_utils_timer_TIMES_PER_SEC");
 
-   CLOCKS_PER_SEC : constant Ticks_Type := Ticks_Type(C_CLOCKS_PER_SEC);
-   TIMES_PER_SEC : constant Time_Type := Time_Type(C_TIMES_PER_SEC);
+   CLOCKS_PER_SEC : constant Ticks_Type := Ticks_Type (C_CLOCKS_PER_SEC);
+   TIMES_PER_SEC : constant Time_Type := Time_Type (C_TIMES_PER_SEC);
 
 
    procedure Start (Timer : in out Timer_Type) is
@@ -32,8 +32,8 @@ package body DB.Utils.Timers is
       end if;
 
       Timer.Running := True;
-      Timer.CPU_Start_Time := Ticks_Type(C_clock);
-      Timer.Real_Start_Time := Time_Type(C_time);
+      Timer.CPU_Start_Time := Ticks_Type (C_clock);
+      Timer.Real_Start_Time := Time_Type (C_time);
    end Start;
 
 
@@ -46,14 +46,14 @@ package body DB.Utils.Timers is
       Timer.Running := False;
 
       declare
-         Now : constant Ticks_Type := Ticks_Type(C_clock);
+         Now : constant Ticks_Type := Ticks_Type (C_clock);
       begin
          Timer.CPU_Duration := (Now - Timer.CPU_Start_Time)
                               + Timer.CPU_Duration;
       end;
 
       declare
-         Now : constant Time_Type := Time_Type(C_time);
+         Now : constant Time_Type := Time_Type (C_time);
       begin
          if Now >= Timer.Real_Start_Time then
             Timer.Real_Duration := (Now - Timer.Real_Start_Time)
@@ -106,11 +106,11 @@ package body DB.Utils.Timers is
    function CPU_String (Timer : Timer_Type) return String is
    begin
       declare
-         T : constant Ticks_Type := CPU_Ticks(Timer);
-         M : constant Natural := Natural(T / CLOCKS_PER_SEC / 60);
-         S : constant Natural := Natural((T / CLOCKS_PER_SEC) mod 60);
+         T : constant Ticks_Type := CPU_Ticks (Timer);
+         M : constant Natural := Natural (T / CLOCKS_PER_SEC / 60);
+         S : constant Natural := Natural ((T / CLOCKS_PER_SEC) mod 60);
       begin
-         return Natural'Image(M) &"m"& Natural'Image(S) &"s";
+         return Natural'Image (M) &"m"& Natural'Image (S) &"s";
       end;
    exception
       when Constraint_Error =>
@@ -121,11 +121,11 @@ package body DB.Utils.Timers is
    function Real_String (Timer : Timer_Type) return String is
    begin
       declare
-         T : constant Time_Type := Real_Time(Timer);
-         M : constant Natural := Natural(T / TIMES_PER_SEC / 60);
-         S : constant Natural := Natural((T / TIMES_PER_SEC) mod 60);
+         T : constant Time_Type := Real_Time (Timer);
+         M : constant Natural := Natural (T / TIMES_PER_SEC / 60);
+         S : constant Natural := Natural ((T / TIMES_PER_SEC) mod 60);
       begin
-         return Natural'Image(M) &"m"& Natural'Image(S) &"s";
+         return Natural'Image (M) &"m"& Natural'Image (S) &"s";
       end;
    exception
       when Constraint_Error =>
@@ -137,24 +137,24 @@ package body DB.Utils.Timers is
    is
       function Trim (S : String) return String is
       begin
-         if S(S'First) = ' ' then
-            return S(S'First+1 .. S'Last);
+         if S (S'First) = ' ' then
+            return S (S'First+1 .. S'Last);
          else
             return S;
          end if;
       end Trim;
 
-      CPU_Duration  : constant Ticks_Type := CPU_Ticks(Timer);
-      Real_Duration : constant Time_Type := Real_Time(Timer);
+      CPU_Duration  : constant Ticks_Type := CPU_Ticks (Timer);
+      Real_Duration : constant Time_Type := Real_Time (Timer);
    begin
-      Ada.Text_IO.Put(S &": ");
-      Ada.Text_IO.Put(CPU_String(Timer) &" (");
-      Ada.Text_IO.Put(Trim(Ticks_Type'Image(CPU_Duration)));
-      Ada.Text_IO.Put(")   ");
-      Ada.Text_IO.Put(" ");
-      Ada.Text_IO.Put(Real_String(Timer) &" (");
-      Ada.Text_IO.Put(Trim(Time_Type'Image(Real_Duration)));
-      Ada.Text_IO.Put(")");
+      Ada.Text_IO.Put (S &": ");
+      Ada.Text_IO.Put (CPU_String (Timer) &" (");
+      Ada.Text_IO.Put (Trim (Ticks_Type'Image (CPU_Duration)));
+      Ada.Text_IO.Put (")   ");
+      Ada.Text_IO.Put (" ");
+      Ada.Text_IO.Put (Real_String (Timer) &" (");
+      Ada.Text_IO.Put (Trim (Time_Type'Image (Real_Duration)));
+      Ada.Text_IO.Put (")");
       Ada.Text_IO.New_Line;
    end Print;
 

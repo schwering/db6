@@ -11,13 +11,13 @@ package body Initialization is
      (File : in out Block_IO.File_Type)
    is
       Root : constant Nodes.RW_Node_Type :=
-         Nodes.Root_Node(Nodes.Leaf_Level);
+         Nodes.Root_Node (Nodes.Leaf_Level);
    begin
-      Block_IO.Write(File, Block_IO.Valid_Address_Type(Root_Address),
-                     Nodes.To_Block(Root));
+      Block_IO.Write (File, Block_IO.Valid_Address_Type (Root_Address),
+                      Nodes.To_Block (Root));
    exception
       when others =>
-         Block_IO.Close(File);
+         Block_IO.Close (File);
          raise;
    end Prepare_File;
 
@@ -30,8 +30,8 @@ package body Initialization is
       pragma Precondition (not Tree.Finalized);
    begin
       Tree.Initialized := False;
-      Block_IO.Create(ID, Tree.File);
-      Prepare_File(Tree.File);
+      Block_IO.Create (ID, Tree.File);
+      Prepare_File (Tree.File);
       Tree.Initialized := True;
    end Create;
 
@@ -44,8 +44,8 @@ package body Initialization is
       pragma Precondition (not Tree.Finalized);
    begin
       Tree.Initialized := False;
-      Block_IO.Create_And_Open_Temporary(ID, Tree.File);
-      Prepare_File(Tree.File);
+      Block_IO.Create_And_Open_Temporary (ID, Tree.File);
+      Prepare_File (Tree.File);
       Tree.Initialized := True;
    end Create_Temporary;
 
@@ -58,7 +58,7 @@ package body Initialization is
       pragma Precondition (not Tree.Finalized);
    begin
       Tree.Initialized := False;
-      Block_IO.Open(ID, Tree.File);
+      Block_IO.Open (ID, Tree.File);
       Tree.Initialized := True;
    end Open;
 
@@ -67,7 +67,7 @@ package body Initialization is
      (Tree : in out Tree_Type) is
    begin
       if Tree.Initialized then
-         Block_IO.Close(Tree.File);
+         Block_IO.Close (Tree.File);
          Tree.Initialized := False;
       end if;
       Tree.Finalized := True;

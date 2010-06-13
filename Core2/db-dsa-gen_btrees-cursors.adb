@@ -11,7 +11,7 @@ package body Cursors is
      (Cursor : in out Cursor_Type) is
    begin
       if Cursor.Thread_Safe then
-         Locks.Mutexes.Lock(Cursor.Mutex);
+         Locks.Mutexes.Lock (Cursor.Mutex);
       end if;
    end Lock_Mutex;
 
@@ -20,7 +20,7 @@ package body Cursors is
      (Cursor : in out Cursor_Type) is
    begin
       if Cursor.Thread_Safe then
-         Locks.Mutexes.Unlock(Cursor.Mutex);
+         Locks.Mutexes.Unlock (Cursor.Mutex);
       end if;
    end Unlock_Mutex;
 
@@ -28,14 +28,16 @@ package body Cursors is
    function Positive_Infinity_Bound
       return Bound_Type is
    begin
-      return Bound_Type'(Kind => Abstract_Bound, Location => Positive_Infinity);
+      return Bound_Type' (Kind => Abstract_Bound,
+                          Location => Positive_Infinity);
    end Positive_Infinity_Bound;
 
 
    function Negative_Infinity_Bound
       return Bound_Type is
    begin
-      return Bound_Type'(Kind => Abstract_Bound, Location => Negative_Infinity);
+      return Bound_Type' (Kind => Abstract_Bound,
+                          Location => Negative_Infinity);
    end Negative_Infinity_Bound;
 
 
@@ -44,9 +46,9 @@ package body Cursors is
       Key        : Keys.Key_Type)
       return Bound_Type is
    begin
-      return Bound_Type'(Kind       => Concrete_Bound,
-                         Comparison => Comparison,
-                         Key        => Key);
+      return Bound_Type' (Kind       => Concrete_Bound,
+                          Comparison => Comparison,
+                          Key        => Key);
    end New_Bound;
 
 
@@ -87,12 +89,12 @@ package body Cursors is
       end Check_Bounds;
    begin
       Check_Bounds;
-      return Cursor_Type'(Lower_Bound => Lower_Bound,
-                          Upper_Bound => Upper_Bound,
-                          Owning_Tree => Tree.Self,
-                          Initialized => True,
-                          Thread_Safe => Thread_Safe,
-                          others      => <>);
+      return Cursor_Type' (Lower_Bound => Lower_Bound,
+                           Upper_Bound => Upper_Bound,
+                           Owning_Tree => Tree.Self,
+                           Initialized => True,
+                           Thread_Safe => Thread_Safe,
+                           others      => <>);
    end New_Cursor;
 
 
@@ -102,9 +104,9 @@ package body Cursors is
    is
       pragma Precondition (Cursor.Initialized);
    begin
-      Lock_Mutex(Cursor);
+      Lock_Mutex (Cursor);
       Cursor.Thread_Safe := Enabled;
-      Unlock_Mutex(Cursor);
+      Unlock_Mutex (Cursor);
    end Set_Thread_Safety;
 
 
@@ -116,13 +118,13 @@ package body Cursors is
       pragma Precondition (Cursor.Initialized);
       pragma Precondition (Cursor.Owning_Tree = Tree.Self);
    begin
-      Lock_Mutex(Cursor);
+      Lock_Mutex (Cursor);
       Cursor.Force_Recalibrate := True;
-      Unlock_Mutex(Cursor);
+      Unlock_Mutex (Cursor);
 
    exception
       when others =>
-         Unlock_Mutex(Cursor);
+         Unlock_Mutex (Cursor);
          raise;
    end Pause;
 
@@ -155,7 +157,7 @@ package body Cursors is
    begin
       case Bound.Kind is
          when Concrete_Bound =>
-            return Key_Matches(Cursor.Key, Bound.Comparison, Bound.Key);
+            return Key_Matches (Cursor.Key, Bound.Comparison, Bound.Key);
          when Abstract_Bound =>
             return True;
       end case;
@@ -168,8 +170,8 @@ package body Cursors is
    is
       pragma Inline (Has_Satisfied_Bounds);
    begin
-      return Is_Satisfied(Cursor, Cursor.Lower_Bound) and
-             Is_Satisfied(Cursor, Cursor.Upper_Bound);
+      return Is_Satisfied (Cursor, Cursor.Lower_Bound) and
+             Is_Satisfied (Cursor, Cursor.Upper_Bound);
    end Has_Satisfied_Bounds;
 
 
@@ -188,8 +190,8 @@ package body Cursors is
       begin
          Cursor.Key_Context   := Keys.New_Read_Context;
          Cursor.Value_Context := Values.New_Read_Context;
-         Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
-                       Cursor.Key_Context);
+         Nodes.Get_Key (Cursor.Node, Cursor.Index, Cursor.Key,
+                        Cursor.Key_Context);
       end Init_Contexts_And_Key;
 
 
@@ -197,11 +199,11 @@ package body Cursors is
       is
          use type Nodes.Degree_Type;
       begin
-         if Cursor.Index = Nodes.Degree(Cursor.Node) then
+         if Cursor.Index = Nodes.Degree (Cursor.Node) then
             loop
-               if Nodes.Is_Valid(Nodes.Link(Cursor.Node)) then
-                  Read_Node(Tree, Nodes.Valid_Link(Cursor.Node), Cursor.Node);
-                  if Nodes.Degree(Cursor.Node) > 0 then
+               if Nodes.Is_Valid (Nodes.Link (Cursor.Node)) then
+                  Read_Node (Tree, Nodes.Valid_Link (Cursor.Node), Cursor.Node);
+                  if Nodes.Degree (Cursor.Node) > 0 then
                      Cursor.Index := 1;
                      Init_Contexts_And_Key;
                      State := Success;
@@ -215,8 +217,8 @@ package body Cursors is
             end loop;
          else
             Cursor.Index := Cursor.Index + 1;
-            Nodes.Get_Key(Cursor.Node, Cursor.Index, Cursor.Key,
-                          Cursor.Key_Context);
+            Nodes.Get_Key (Cursor.Node, Cursor.Index, Cursor.Key,
+                           Cursor.Key_Context);
             State := Success;
          end if;
       exception
@@ -236,8 +238,8 @@ package body Cursors is
          declare
             Old_Key : constant Keys.Key_Type := Cursor.Key;
          begin
-            Searches.Search_Node(Tree, Old_Key, Cursor.Node, Cursor.Index,
-                                 State);
+            Searches.Search_Node (Tree, Old_Key, Cursor.Node, Cursor.Index,
+                                  State);
             if State /= Success then
                Cursor.Final := True;
                return;
@@ -254,14 +256,14 @@ package body Cursors is
 
             -- Move on until Lower_Bound is satisfied.
             loop
-               if Is_Satisfied(Cursor, Cursor.Lower_Bound) then
+               if Is_Satisfied (Cursor, Cursor.Lower_Bound) then
                   return;
                end if;
                Move_To_Next;
                if Cursor.Final then
                   return;
                end if;
-               if not Is_Satisfied(Cursor, Cursor.Upper_Bound) then
+               if not Is_Satisfied (Cursor, Cursor.Upper_Bound) then
                   Cursor.Final := True;
                   return;
                end if;
@@ -276,8 +278,8 @@ package body Cursors is
       begin
          case Cursor.Lower_Bound.Location is
             when Negative_Infinity =>
-               Searches.Search_Minimum_Node(Tree, Cursor.Node, Cursor.Index,
-                                            State);
+               Searches.Search_Minimum_Node (Tree, Cursor.Node, Cursor.Index,
+                                             State);
                if State /= Success then
                   Cursor.Final := True;
                   return;
@@ -294,7 +296,7 @@ package body Cursors is
          pragma Precondition (not Cursor.Has_Node);
          FB : constant Bound_Type := Cursor.Lower_Bound;
       begin
-         Searches.Search_Node(Tree, FB.Key, Cursor.Node, Cursor.Index, State);
+         Searches.Search_Node (Tree, FB.Key, Cursor.Node, Cursor.Index, State);
          if State /= Success then
             Cursor.Final := True;
             return;
@@ -306,7 +308,7 @@ package body Cursors is
                pragma Assert (False);
                null;
             when Equal | Greater =>
-               if not Key_Matches(Cursor.Key, FB.Comparison, FB.Key) then
+               if not Key_Matches (Cursor.Key, FB.Comparison, FB.Key) then
                   Move_To_Next;
                else
                   State := Success;
@@ -318,10 +320,10 @@ package body Cursors is
 
       use type Nodes.Degree_Type;
    begin
-      Lock_Mutex(Cursor);
+      Lock_Mutex (Cursor);
       if Cursor.Final then
          State := Failure;
-         Unlock_Mutex(Cursor);
+         Unlock_Mutex (Cursor);
          return;
       end if;
 
@@ -341,19 +343,19 @@ package body Cursors is
       end if;
 
       if (not Cursor.Final and State = Success) and then
-         Has_Satisfied_Bounds(Cursor) then
+         Has_Satisfied_Bounds (Cursor) then
          State := Success;
          Key   := Cursor.Key;
-         Nodes.Get_Value(Cursor.Node, Cursor.Index, Value,
-                         Cursor.Key_Context, Cursor.Value_Context);
+         Nodes.Get_Value (Cursor.Node, Cursor.Index, Value,
+                          Cursor.Key_Context, Cursor.Value_Context);
       elsif State = Success then
          State := Failure;
       end if;
-      Unlock_Mutex(Cursor);
+      Unlock_Mutex (Cursor);
 
    exception
       when others =>
-         Unlock_Mutex(Cursor);
+         Unlock_Mutex (Cursor);
          raise;
    end Next;
 
@@ -369,22 +371,22 @@ package body Cursors is
       pragma Precondition (Cursor.Initialized);
       pragma Precondition (Cursor.Owning_Tree = Tree.Self);
    begin
-      Lock_Mutex(Cursor);
+      Lock_Mutex (Cursor);
       if not Cursor.Has_Node then
          State := Failure;
-         Unlock_Mutex(Cursor);
+         Unlock_Mutex (Cursor);
          return;
       end if;
       Key := Cursor.Key;
-      Nodes.Get_Value(Cursor.Node, Cursor.Index, Value, Cursor.Key_Context,
-                      Cursor.Value_Context);
-      Delete(Tree, Key, Value, State);
+      Nodes.Get_Value (Cursor.Node, Cursor.Index, Value, Cursor.Key_Context,
+                       Cursor.Value_Context);
+      Delete (Tree, Key, Value, State);
       Cursor.Force_Recalibrate := True;
-      Unlock_Mutex(Cursor);
+      Unlock_Mutex (Cursor);
 
    exception
       when others =>
-         Unlock_Mutex(Cursor);
+         Unlock_Mutex (Cursor);
          raise;
    end Delete;
 

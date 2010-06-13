@@ -17,7 +17,7 @@ package body DB.Locks.Mutexes is
      (M       : in out Mutex_Type;
       Success :    out Boolean) is
    begin
-      M.Try_Lock(Success);
+      M.Try_Lock (Success);
    end Try_Lock;
 
 

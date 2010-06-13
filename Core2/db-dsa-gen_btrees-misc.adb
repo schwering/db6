@@ -14,7 +14,7 @@ package body Misc is
       pragma Precondition (Tree.Initialized);
 
       N_A : Nodes.Valid_Address_Type :=
-         Nodes.Valid_Address_Type(Block_IO.First_Address);
+         Nodes.Valid_Address_Type (Block_IO.First_Address);
    begin
       Count := 0;
       loop
@@ -22,12 +22,12 @@ package body Misc is
             use type Nodes.Degree_Type;
             N : Nodes.RO_Node_Type;
          begin
-            Read_Node(Tree, N_A, N);
-            if Nodes.Is_Leaf(N) then
-               Count := Count + Count_Type(Nodes.Degree(N));
+            Read_Node (Tree, N_A, N);
+            if Nodes.Is_Leaf (N) then
+               Count := Count + Count_Type (Nodes.Degree (N));
             end if;
-            N_A := Nodes.Valid_Address_Type(Block_IO.Succ
-                        (Block_IO.Valid_Address_Type(N_A)));
+            N_A := Nodes.Valid_Address_Type (Block_IO.Succ
+                        (Block_IO.Valid_Address_Type (N_A)));
          exception
             when IO_Error =>
                exit;
@@ -48,9 +48,9 @@ package body Misc is
 --         declare
 --            N : Nodes.RO_Node_Type;
 --         begin
---            Read_Node(Tree, N_A, N);
---            exit when Nodes.Is_Leaf(N);
---            N_A := Nodes.Child(N, 1);
+--            Read_Node (Tree, N_A, N);
+--            exit when Nodes.Is_Leaf (N);
+--            N_A := Nodes.Child (N, 1);
 --         end;
 --      end loop;
 --      Count := 0;
@@ -58,10 +58,10 @@ package body Misc is
 --         declare
 --            N : Nodes.RO_Node_Type;
 --         begin
---            Read_Node(Tree, N_A, N);
---            Count := Count + Count_Type(Nodes.Degree(N));
---            exit when not Nodes.Is_Valid(Nodes.Link(N));
---            N_A := Nodes.Valid_Link(N);
+--            Read_Node (Tree, N_A, N);
+--            Count := Count + Count_Type (Nodes.Degree (N));
+--            exit when not Nodes.Is_Valid (Nodes.Link (N));
+--            N_A := Nodes.Valid_Link (N);
 --         end;
 --      end loop;
 --   end Count;

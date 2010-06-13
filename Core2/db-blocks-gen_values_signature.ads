@@ -19,15 +19,11 @@ generic
    type Read_Context_Type is private;
    type Write_Context_Type is private;
 
-   with function New_Read_Context
-      return Read_Context_Type is <>;
+   with function New_Read_Context return Read_Context_Type is <>;
 
-   with function New_Write_Context
-      return Write_Context_Type is <>;
+   with function New_Write_Context return Write_Context_Type is <>;
 
-   with function Size_Bound
-     (Value : Value_Type)
-      return Blocks.Size_Type is <>;
+   with function Size_Bound (Value : Value_Type) return Blocks.Size_Type is <>;
 
    with procedure Read
      (Context : in out Read_Context_Type;

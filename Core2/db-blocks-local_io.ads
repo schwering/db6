@@ -28,28 +28,19 @@ package DB.Blocks.Local_IO is
          Mutex_Set : Mutex_Sets.Mutex_Set_Type;
       end record;
 
-   procedure Create
-     (ID   : in  String;
-      File : out File_Type);
+   procedure Create (ID : in String; File : out File_Type);
 
-   procedure Create_And_Open_Temporary
-     (ID   : in  String;
-      File : out File_Type);
+   procedure Create_And_Open_Temporary (ID : in String; File : out File_Type);
 
-   procedure Open
-     (ID   : in  String;
-      File : out File_Type);
+   procedure Open (ID : in String; File : out File_Type);
 
-   procedure Close
-     (File : in out File_Type);
+   procedure Close (File : in out File_Type);
 
    function Succ
      (Address : Valid_Address_Type)
       return Valid_Address_Type;
 
-   function Image
-     (A : in Valid_Address_Type)
-      return String;
+   function Image (A : Valid_Address_Type) return String;
 
    function To_Address
      (Address : Valid_Address_Type)

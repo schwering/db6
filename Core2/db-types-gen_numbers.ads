@@ -24,15 +24,11 @@ package DB.Types.Gen_Numbers is
      (Left, Right : Number_Type)
       return Utils.Comparison_Result_Type;
 
-   function New_Read_Context
-      return Read_Context_Type;
+   function New_Read_Context return Read_Context_Type;
 
-   function New_Write_Context
-      return Write_Context_Type;
+   function New_Write_Context return Write_Context_Type;
 
-   function Size_Bound
-     (Number : Number_Type)
-      return Blocks.Size_Type;
+   function Size_Bound (Number : Number_Type) return Blocks.Size_Type;
 
    procedure Write
      (Context : in out Write_Context_Type;
@@ -51,14 +47,9 @@ package DB.Types.Gen_Numbers is
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type);
 
-   function Short_Bound
-     (Left  : Number_Type)
-      return Number_Type;
+   function Short_Bound (Left  : Number_Type) return Number_Type;
 
-   function Short_Delimiter
-     (Left  : Number_Type;
-      Right : Number_Type)
-      return Number_Type;
+   function Short_Delimiter (Left, Right : Number_Type) return Number_Type;
 
 private
    type Context_Type is null record;

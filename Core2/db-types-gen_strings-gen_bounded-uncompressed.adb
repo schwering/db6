@@ -9,21 +9,18 @@ with DB.Blocks;
 separate (DB.Types.Gen_Strings.Gen_Bounded)
 package body Uncompressed is
 
-   function New_Context
-      return Context_Type is
+   function New_Context return Context_Type is
    begin
       return (null record);
    end New_Context;
 
 
-   function Size_Bound
-     (S : String_Type)
-      return Blocks.Size_Type
+   function Size_Bound (S : String_Type) return Blocks.Size_Type
    is
       function Size_Of_String is
-         new Blocks.Size_Of_Array(Index_Type, Item_Type, Buffer_Type);
+         new Blocks.Size_Of_Array (Index_Type, Item_Type, Buffer_Type);
    begin
-      return Size_Of_String(S.Buffer, 1, S.Length);
+      return Size_Of_String (S.Buffer, 1, S.Length);
    end Size_Bound;
 
 
@@ -33,9 +30,9 @@ package body Uncompressed is
       S       : in     String_Type)
    is
       procedure Write_String is
-         new Blocks.Write_Array(Index_Type, Item_Type, Buffer_Type);
+         new Blocks.Write_Array (Index_Type, Item_Type, Buffer_Type);
    begin
-      Write_String(Block, Cursor, S.Buffer, 1, S.Length);
+      Write_String (Block, Cursor, S.Buffer, 1, S.Length);
    end Write;
 
 
@@ -47,7 +44,7 @@ package body Uncompressed is
    is
       pragma Unreferenced (Context);
    begin
-      Write(Block, Cursor, S);
+      Write (Block, Cursor, S);
    end Write;
 
 
@@ -57,9 +54,9 @@ package body Uncompressed is
       S       :    out String_Type)
    is
       procedure Read_String is
-         new Blocks.Read_Array(Index_Type, Item_Type, Buffer_Type);
+         new Blocks.Read_Array (Index_Type, Item_Type, Buffer_Type);
    begin
-      Read_String(Block, Cursor, S.Buffer, 1, S.Length);
+      Read_String (Block, Cursor, S.Buffer, 1, S.Length);
    end Read;
 
 
@@ -71,7 +68,7 @@ package body Uncompressed is
    is
       pragma Unreferenced (Context);
    begin
-      Read(Block, Cursor, S);
+      Read (Block, Cursor, S);
    end Read;
 
 
@@ -82,7 +79,7 @@ package body Uncompressed is
    is
       S : String_Type;
    begin
-      Read(Context, Block, Cursor, S);
+      Read (Context, Block, Cursor, S);
    end Skip;
 
 end Uncompressed;

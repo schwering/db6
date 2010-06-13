@@ -10,7 +10,7 @@ package body DB.Blocks.Memory_IO is
 
    type Entry_Type (Name_Length : Positive) is
       record
-         Name : String(1 .. Name_Length);
+         Name : String (1 .. Name_Length);
          File : File_Type;
       end record;
    type Entry_Ref_Type is access Entry_Type;
@@ -48,18 +48,16 @@ package body DB.Blocks.Memory_IO is
    end Item_Type;
 
 
-   procedure Create
-     (ID   : in  String;
-      File : out File_Type) is
+   procedure Create (ID : in String; File : out File_Type) is
    begin
       for I in Files'Range loop
-         if Files(I) /= null and then Files(I).Name = ID then
+         if Files (I) /= null and then Files (I).Name = ID then
             raise IO_Error;
-         elsif Files(I) = null then
+         elsif Files (I) = null then
             File := new File_Object_Type;
-            Files(I) := new Entry_Type'(Name_Length => ID'Length,
-                                        Name        => ID,
-                                        File        => File);
+            Files (I) := new Entry_Type' (Name_Length => ID'Length,
+                                          Name        => ID,
+                                          File        => File);
             return;
          end if;
       end loop;
@@ -67,21 +65,17 @@ package body DB.Blocks.Memory_IO is
    end Create;
 
 
-   procedure Create_And_Open_Temporary
-     (ID   : in  String;
-      File : out File_Type) is
+   procedure Create_And_Open_Temporary (ID : in String; File : out File_Type) is
    begin
       raise IO_Error;
    end Create_And_Open_Temporary;
 
 
-   procedure Open
-     (ID   : in  String;
-      File : out File_Type) is
+   procedure Open (ID : in String; File : out File_Type) is
    begin
       for I in Files'Range loop
-         if Files(I) /= null and then Files(I).Name = ID then
-            File := Files(I).File;
+         if Files (I) /= null and then Files (I).Name = ID then
+            File := Files (I).File;
             return;
          end if;
       end loop;
@@ -89,25 +83,19 @@ package body DB.Blocks.Memory_IO is
    end Open;
 
 
-   function Succ
-     (Address : Valid_Address_Type)
-      return Valid_Address_Type is
+   function Succ (Address : Valid_Address_Type) return Valid_Address_Type is
    begin
       return Address + 1;
    end Succ;
 
 
-   function Image
-     (A : in Valid_Address_Type)
-      return String is
+   function Image (A : Valid_Address_Type) return String is
    begin
-      return Valid_Address_Type'Image(A);
+      return Valid_Address_Type'Image (A);
    end Image;
 
 
-   function To_Address
-     (Address : Valid_Address_Type)
-      return Address_Type is
+   function To_Address (Address : Valid_Address_Type) return Address_Type is
    begin
       return Address;
    end To_Address;
@@ -137,13 +125,13 @@ package body DB.Blocks.Memory_IO is
             Capacity : constant Address_Type :=
                File.Maximum * 4 / 3 + 1;
             Buffer   : constant Item_Ref_Array_Ref_Type :=
-               new Item_Ref_Array_Type(1 .. Capacity);
+               new Item_Ref_Array_Type (1 .. Capacity);
          begin
             if File.Buffer /= null then
-               Buffer(File.Buffer'Range) := File.Buffer(File.Buffer'Range);
+               Buffer (File.Buffer'Range) := File.Buffer (File.Buffer'Range);
             end if;
             for I in File.Capacity + 1 .. Capacity loop
-               Buffer(I) := new Item_Type;
+               Buffer (I) := new Item_Type;
             end loop;
             File.Capacity := Capacity;
             File.Buffer   := Buffer;
@@ -160,7 +148,7 @@ package body DB.Blocks.Memory_IO is
       use type Blocks.Block_Type;
    begin
       pragma Assert (Address in File.Buffer'Range);
-      Block := File.Buffer(Address).Read;
+      Block := File.Buffer (Address).Read;
    end Read;
 
 
@@ -176,23 +164,23 @@ package body DB.Blocks.Memory_IO is
       if Address > File.Maximum then -- not thread-safe (that's intended)
          declare
          begin
-            Locks.Mutexes.Lock(File.Mutex);
+            Locks.Mutexes.Lock (File.Mutex);
             File.Maximum := Address;
-            Resize_Buffer(File);
-            Locks.Mutexes.Unlock(File.Mutex);
+            Resize_Buffer (File);
+            Locks.Mutexes.Unlock (File.Mutex);
          exception
             when others =>
-               Locks.Mutexes.Unlock(File.Mutex);
+               Locks.Mutexes.Unlock (File.Mutex);
                raise;
          end;
       else
-         if not File.Buffer(Address).Is_Locked then
+         if not File.Buffer (Address).Is_Locked then
             raise IO_Error;
          end if;
       end if;
       pragma Assert (Address in File.Buffer'Range);
-      File.Buffer(Address).Write(Block);
-      pragma Assert (File.Buffer(Address).Read = Block);
+      File.Buffer (Address).Write (Block);
+      pragma Assert (File.Buffer  (Address).Read = Block);
    end Write;
 
 
@@ -205,34 +193,32 @@ package body DB.Blocks.Memory_IO is
       pragma Unreferenced (Cache_Priority);
       use type Blocks.Block_Type;
    begin
-      Locks.Mutexes.Lock(File.Mutex);
+      Locks.Mutexes.Lock (File.Mutex);
       File.Maximum := File.Maximum + 1;
       Address := File.Maximum;
-      Resize_Buffer(File);
+      Resize_Buffer (File);
       pragma Assert (Address in File.Buffer'Range);
-      File.Buffer(Address).Write(Block);
-      pragma Assert (File.Buffer(Address).Read = Block);
-      Locks.Mutexes.Unlock(File.Mutex);
+      File.Buffer (Address).Write (Block);
+      pragma Assert (File.Buffer (Address).Read = Block);
+      Locks.Mutexes.Unlock (File.Mutex);
    exception
       when others =>
-         Locks.Mutexes.Unlock(File.Mutex);
+         Locks.Mutexes.Unlock (File.Mutex);
          raise;
    end Write_New_Block;
 
 
-   procedure Lock
-     (File    : in out File_Type;
-      Address : in     Valid_Address_Type) is
+   procedure Lock (File : in out File_Type; Address : in Valid_Address_Type) is
    begin
-      File.Buffer(Address).Lock;
+      File.Buffer (Address).Lock;
    end Lock;
 
 
    procedure Unlock
-     (File    : in out File_Type;
-      Address : in     Valid_Address_Type) is
+     (File : in out File_Type;
+      Address : in Valid_Address_Type) is
    begin
-      File.Buffer(Address).Unlock;
+      File.Buffer (Address).Unlock;
    end Unlock;
 
 end DB.Blocks.Memory_IO;

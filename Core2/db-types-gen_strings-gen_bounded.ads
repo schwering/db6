@@ -37,13 +37,9 @@ package DB.Types.Gen_Strings.Gen_Bounded is
       Right : String_Type)
       return String_Type;
 
-   function To_Index
-     (L : Length_Type)
-      return Index_Type;
+   function To_Index (L : Length_Type) return Index_Type;
 
-   function New_String
-     (Arr : Indefinite_Buffer_Type)
-      return String_Type;
+   function New_String (Arr : Indefinite_Buffer_Type) return String_Type;
 
    function New_String
      (S        : String_Type;
@@ -52,19 +48,11 @@ package DB.Types.Gen_Strings.Gen_Bounded is
       T        : String_Type)
       return String_Type;
 
-   function Length
-     (S : String_Type)
-      return Length_Type;
+   function Length (S : String_Type) return Length_Type;
 
-   function Element
-     (S : String_Type;
-      I : Index_Type)
-      return Item_Type;
+   function Element (S : String_Type; I : Index_Type) return Item_Type;
 
-   function Substring
-     (S    : String_Type;
-      From : Index_Type)
-      return String_Type;
+   function Substring (S : String_Type; From : Index_Type) return String_Type;
 
    function Substring
      (S      : String_Type;
@@ -72,18 +60,11 @@ package DB.Types.Gen_Strings.Gen_Bounded is
       Length : Length_Type)
       return String_Type;
 
-   function To_Buffer
-     (S : String_Type)
-      return Indefinite_Buffer_Type;
+   function To_Buffer (S : String_Type) return Indefinite_Buffer_Type;
 
-   function Short_Bound
-     (Left  : String_Type)
-      return String_Type;
+   function Short_Bound (Left : String_Type) return String_Type;
 
-   function Short_Delimiter
-     (Left  : String_Type;
-      Right : String_Type)
-      return String_Type;
+   function Short_Delimiter (Left, Right : String_Type) return String_Type;
 
 
    package Uncompressed is
@@ -93,15 +74,12 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
       Is_Context_Free_Serialization : constant Boolean := True;
 
-      function New_Context
-         return Context_Type;
+      function New_Context return Context_Type;
 
       function New_Read_Context return Read_Context_Type renames New_Context;
       function New_Write_Context return Write_Context_Type renames New_Context;
 
-      function Size_Bound
-        (S : String_Type)
-         return Blocks.Size_Type;
+      function Size_Bound (S : String_Type) return Blocks.Size_Type;
 
       procedure Write
         (Block   : in out Blocks.Base_Block_Type;
@@ -145,15 +123,11 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
       Is_Context_Free_Serialization : constant Boolean := False;
 
-      function New_Read_Context
-         return Read_Context_Type;
+      function New_Read_Context return Read_Context_Type;
 
-      function New_Write_Context
-         return Write_Context_Type;
+      function New_Write_Context return Write_Context_Type;
 
-      function Size_Bound
-        (S : String_Type)
-         return Blocks.Size_Type;
+      function Size_Bound (S : String_Type) return Blocks.Size_Type;
 
       procedure Write
         (Context : in out Write_Context_Type;
@@ -174,15 +148,15 @@ package DB.Types.Gen_Strings.Gen_Bounded is
    end Prefix;
 
 private
-   subtype Buffer_Type is Indefinite_Buffer_Type(Index_Type);
+   subtype Buffer_Type is Indefinite_Buffer_Type (Index_Type);
    type String_Type is
       record
          Buffer : Buffer_Type;
          Length : Length_Type;
       end record;
 
-   Empty_String : constant String_Type
-                := String_Type'(Length => 0, others => <>);
+   Empty_String : constant String_Type :=
+      String_Type' (Length => 0, others => <>);
 
    pragma Inline (New_String);
    pragma Inline (To_Index);

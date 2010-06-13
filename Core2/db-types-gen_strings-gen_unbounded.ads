@@ -37,17 +37,11 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
       Right : String_Type)
       return String_Type;
 
-   function To_Index
-     (L : Length_Type)
-      return Index_Type;
+   function To_Index (L : Length_Type) return Index_Type;
 
-   function New_String
-     (Arr : Indefinite_Buffer_Type)
-      return String_Type;
+   function New_String (Arr : Indefinite_Buffer_Type) return String_Type;
 
-   function New_String
-     (Length : Length_Type)
-      return String_Type;
+   function New_String (Length : Length_Type) return String_Type;
 
    function New_String
      (S        : String_Type;
@@ -56,14 +50,9 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
       T        : String_Type)
       return String_Type;
 
-   function Length
-     (S : String_Type)
-      return Length_Type;
+   function Length (S : String_Type) return Length_Type;
 
-   function Element
-     (S : String_Type;
-      I : Index_Type)
-      return Item_Type;
+   function Element (S : String_Type; I : Index_Type) return Item_Type;
 
    function Substring
      (S      : String_Type;
@@ -71,9 +60,7 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
       Length : Length_Type)
       return String_Type;
 
-   function To_Buffer
-     (S : String_Type)
-      return Indefinite_Buffer_Type;
+   function To_Buffer (S : String_Type) return Indefinite_Buffer_Type;
 
 
    package Uncompressed is
@@ -83,15 +70,11 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
 
       Is_Context_Free_Serialization : constant Boolean := True;
 
-      function New_Read_Context
-         return Read_Context_Type;
+      function New_Read_Context return Read_Context_Type;
 
-      function New_Write_Context
-         return Write_Context_Type;
+      function New_Write_Context return Write_Context_Type;
 
-      function Size_Bound
-        (S : String_Type)
-         return Blocks.Size_Type;
+      function Size_Bound (S : String_Type) return Blocks.Size_Type;
 
       procedure Write
         (Block   : in out Blocks.Base_Block_Type;
@@ -136,7 +119,7 @@ private
    type Bounded_String_Type (Length : Natural) is
       record
          Refcount : Refcount_Type;
-         Buffer   : Indefinite_Buffer_Type(1 .. Length);
+         Buffer   : Indefinite_Buffer_Type (1 .. Length);
       end record;
 
    type Bounded_String_Ref_Type is access Bounded_String_Type;
@@ -147,9 +130,8 @@ private
          S : Bounded_String_Ref_Type;
       end record;
 
-   Empty_String : constant String_Type
-                := String_Type'(Ada.Finalization.Controlled with
-                                S => null);
+   Empty_String : constant String_Type :=
+      String_Type' (Ada.Finalization.Controlled with S => null);
 
    pragma Inline (Initialize);
    pragma Inline (Adjust);

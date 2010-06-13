@@ -104,14 +104,14 @@ package body Stacks is
    procedure Finalize
      (Stack : in out Stack_Type) is
    begin
-      Stacks.Finalize(Stack.S);
+      Stacks.Finalize (Stack.S);
    end Finalize;
 
 
    procedure Clear
      (Stack : in out Stack_Type) is
    begin
-      Stacks.Clear(Stack.S);
+      Stacks.Clear (Stack.S);
    end Clear;
 
 
@@ -119,7 +119,7 @@ package body Stacks is
      (Stack : Stack_Type)
       return Boolean is
    begin
-      return Stacks.Is_Empty(Stack.S);
+      return Stacks.Is_Empty (Stack.S);
    end Is_Empty;
 
 
@@ -128,7 +128,7 @@ package body Stacks is
       N_A   : in Nodes.Valid_Address_Type;
       Level : in Nodes.Level_Type) is
    begin
-      Stacks.Push(Stack.S, Item_Type'(N_A, Level));
+      Stacks.Push (Stack.S, Item_Type' (N_A, Level));
    end Push;
 
 
@@ -138,7 +138,7 @@ package body Stacks is
    is
       Level : Nodes.Level_Type;
    begin
-      Pop(Stack, N_A, Level);
+      Pop (Stack, N_A, Level);
    end Pop;
 
 
@@ -149,7 +149,7 @@ package body Stacks is
    is
       Item : Item_Type;
    begin
-      Stacks.Pop(Stack.S, Item);
+      Stacks.Pop (Stack.S, Item);
       N_A := Item.Address;
       Level := Item.Level;
    end Pop;
@@ -164,41 +164,42 @@ package body Stacks is
       N_A : Nodes.Valid_Address_Type;
       N   : Nodes.RO_Node_Type;
    begin
-      Clear(Stack);
+      Clear (Stack);
 
       N_A := Root_Address;
-      Read_Node(Tree, N_A, N);
-      if Nodes.Is_Valid(Nodes.Link(N)) then
+      Read_Node (Tree, N_A, N);
+      if Nodes.Is_Valid (Nodes.Link (N)) then
          -- Lock root to enforce that it is the first node in the stack.
-         Lock(Tree, N_A);
+         Lock (Tree, N_A);
          declare
          begin
-            Read_Node(Tree, N_A, N);
-            pragma Assert (not Nodes.Is_Valid(Nodes.Link(N)));
+            Read_Node (Tree, N_A, N);
+            pragma Assert (not Nodes.Is_Valid (Nodes.Link (N)));
          exception
             when others =>
-               Unlock(Tree, N_A);
+               Unlock (Tree, N_A);
                raise;
          end;
-         Unlock(Tree, N_A);
+         Unlock (Tree, N_A);
       end if;
 
       loop
-         if Nodes.Level(N) = Level then
-            Push(Stack, N_A, Nodes.Level(N));
+         if Nodes.Level (N) = Level then
+            Push (Stack, N_A, Nodes.Level (N));
             exit;
          end if;
-         pragma Assert (Nodes.Level(N) > Level);
+         pragma Assert (Nodes.Level (N) > Level);
          declare
             use type Nodes.Address_Type;
-            NN_A : constant Nodes.Valid_Address_Type := Scan_Node(N, Stack.Key);
+            NN_A : constant Nodes.Valid_Address_Type :=
+              Scan_Node (N, Stack.Key);
          begin
-            if Nodes.To_Address(NN_A) /= Nodes.Link(N) then
-               Push(Stack, N_A, Nodes.Level(N));
+            if Nodes.To_Address (NN_A) /= Nodes.Link (N) then
+               Push (Stack, N_A, Nodes.Level (N));
             end if;
             N_A := NN_A;
          end;
-         Read_Node(Tree, N_A, N);
+         Read_Node (Tree, N_A, N);
       end loop;
    end Build_Stack;
 
@@ -216,22 +217,22 @@ package body Stacks is
 
       function Precise_Exit_Cond (N : Nodes.Node_Type) return Boolean is
       begin
-         if Nodes.Level(N) /= Level then
-            pragma Assert (Is_Empty(Stack));
+         if Nodes.Level (N) /= Level then
+            pragma Assert (Is_Empty (Stack));
             return True;
          end if;
-         return Exit_Cond(N);
+         return Exit_Cond (N);
       end Precise_Exit_Cond;
    begin
-      Move_Right(Tree, Precise_Exit_Cond'Access, N_A, N);
-      if Nodes.Level(N) /= Level then
+      Move_Right (Tree, Precise_Exit_Cond'Access, N_A, N);
+      if Nodes.Level (N) /= Level then
          pragma Assert (N_A = Root_Address);
-         Unlock(Tree, N_A);
-         Build_Stack(Tree, Stack, Level);
-         Pop(Stack, N_A);
+         Unlock (Tree, N_A);
+         Build_Stack (Tree, Stack, Level);
+         Pop (Stack, N_A);
          pragma Assert (N_A /= Root_Address);
-         Move_Right(Tree, Precise_Exit_Cond'Access, N_A, N);
-         pragma Assert (Nodes.Level(N) = Level);
+         Move_Right (Tree, Precise_Exit_Cond'Access, N_A, N);
+         pragma Assert (Nodes.Level (N) = Level);
       end if;
    end Move_Right;
 
@@ -251,21 +252,21 @@ package body Stacks is
       is
          function Exit_Cond (N : Nodes.Node_Type) return Boolean is
          begin
-            return Nodes.Is_Valid(Nodes.Child_Position(N, C_A));
+            return Nodes.Is_Valid (Nodes.Child_Position (N, C_A));
          end Exit_Cond;
 
          Level : Nodes.Level_Type;
       begin
          declare
          begin
-            Pop(Stack, N_A, Level);
-            Move_Right(Tree, Stack, Level, Exit_Cond'Access, N_A, N);
+            Pop (Stack, N_A, Level);
+            Move_Right (Tree, Stack, Level, Exit_Cond'Access, N_A, N);
          exception
             when others =>
-               Unlock(Tree, C_A);
+               Unlock (Tree, C_A);
                raise;
          end;
-         Unlock(Tree, C_A);
+         Unlock (Tree, C_A);
       end Pop_Inner;
 
 
@@ -281,8 +282,8 @@ package body Stacks is
         (C_Key : in Keys.Key_Type;
          C_A   : in Nodes.Valid_Address_Type) is
       begin
-         if Is_Empty(Stack) then
-            Unlock(Tree, C_A);
+         if Is_Empty (Stack) then
+            Unlock (Tree, C_A);
          else
             declare
                N_A   : Nodes.Valid_Address_Type;
@@ -290,10 +291,10 @@ package body Stacks is
                I     : Nodes.Valid_Index_Type;
                N     : Nodes.RW_Node_Type;
             begin
-               Pop_Inner(C_A, N_A, N_Old);
-               I := Nodes.Child_Position(N_Old, C_A);
-               N := Nodes.Substitution(N_Old, I, C_Key, C_A);
-               Write_And_Ascend(N_A, N_Old, N);
+               Pop_Inner (C_A, N_A, N_Old);
+               I := Nodes.Child_Position (N_Old, C_A);
+               N := Nodes.Substitution (N_Old, I, C_Key, C_A);
+               Write_And_Ascend (N_A, N_Old, N);
             end;
          end if;
       end Update_High_Key;
@@ -316,7 +317,7 @@ package body Stacks is
       is
          use type Nodes.Valid_Address_Type;
       begin
-         if Is_Empty(Stack) then
+         if Is_Empty (Stack) then
             -- Create a new root that points to L and R.
             pragma Assert (L_A = Root_Address);
             declare
@@ -326,22 +327,22 @@ package body Stacks is
                L       : Nodes.RW_Node_Type;
                L_A_New : Nodes.Valid_Address_Type;
             begin
-               Read_Node(Tree, L_A, L);
-               pragma Assert (Nodes.Valid_Link(L) = R_A);
-               Write_New_Node(Tree, L_A_New, L);
-               N := Nodes.Root_Node(Nodes.Level(L) + 1);
-               N := Nodes.Insertion(N, 1, L_Key, L_A_New);
-               N := Nodes.Insertion(N, 2, R_Key, R_A);
-               Nodes.Set_Link(N, Invalid_Address);
-               Write_Node(Tree, N_A, N);
+               Read_Node (Tree, L_A, L);
+               pragma Assert (Nodes.Valid_Link (L) = R_A);
+               Write_New_Node (Tree, L_A_New, L);
+               N := Nodes.Root_Node (Nodes.Level (L) + 1);
+               N := Nodes.Insertion (N, 1, L_Key, L_A_New);
+               N := Nodes.Insertion (N, 2, R_Key, R_A);
+               Nodes.Set_Link (N, Invalid_Address);
+               Write_Node (Tree, N_A, N);
             exception
                when others =>
-                  Unlock(Tree, L_A);
-                  Unlock(Tree, R_A);
+                  Unlock (Tree, L_A);
+                  Unlock (Tree, R_A);
                   raise;
             end;
-            Unlock(Tree, L_A);
-            Unlock(Tree, R_A);
+            Unlock (Tree, L_A);
+            Unlock (Tree, R_A);
          else
             -- Update high key of L and insert high key of R.
             declare
@@ -353,18 +354,18 @@ package body Stacks is
             begin
                declare
                begin
-                  Pop_Inner(L_A, N_A, N_Old);
+                  Pop_Inner (L_A, N_A, N_Old);
                exception
                   when others =>
-                     Unlock(Tree, R_A);
+                     Unlock (Tree, R_A);
                      raise;
                end;
-               Unlock(Tree, R_A);
-               I := Nodes.Child_Position(N_Old, L_A);
-               N := Nodes.Substitution(N_Old, I, L_Key, L_A);
+               Unlock (Tree, R_A);
+               I := Nodes.Child_Position (N_Old, L_A);
+               N := Nodes.Substitution (N_Old, I, L_Key, L_A);
                I := I + 1;
-               N := Nodes.Insertion(N, I, R_Key, R_A);
-               Write_And_Ascend(N_A, N_Old, N);
+               N := Nodes.Insertion (N, I, R_Key, R_A);
+               Write_And_Ascend (N_A, N_Old, N);
             end;
          end if;
       end Insert_Key_And_Update_High_Key;
@@ -377,49 +378,50 @@ package body Stacks is
       is
          use type Nodes.Degree_Type;
       begin
-         if Nodes.Is_Safe(N, Is_Root => Is_Empty(Stack)) then
+         if Nodes.Is_Safe (N, Is_Root => Is_Empty (Stack)) then
             declare
             begin
-               Write_Node(Tree, N_A, N);
+               Write_Node (Tree, N_A, N);
             exception
                when others =>
-                  Unlock(Tree, N_A);
+                  Unlock (Tree, N_A);
                   raise;
             end;
-            if not Nodes.Has_High_Key(N_Old) or else
-               Nodes.High_Key(N_Old) /= Nodes.High_Key(N) then
-               Update_High_Key(Nodes.High_Key(N), N_A);
+            if not Nodes.Has_High_Key (N_Old) or else
+               Nodes.High_Key (N_Old) /= Nodes.High_Key (N) then
+               Update_High_Key (Nodes.High_Key (N), N_A);
             else
-               Unlock(Tree, N_A);
+               Unlock (Tree, N_A);
             end if;
          else
             declare
-               I   : constant Nodes.Valid_Index_Type := Nodes.Split_Position(N);
-               L   : Nodes.RW_Node_Type := Nodes.Copy(N, 1, I - 1);
-               R   : Nodes.RW_Node_Type := Nodes.Copy(N, I, Nodes.Degree(N));
+               I   : constant Nodes.Valid_Index_Type :=
+                 Nodes.Split_Position (N);
+               L   : Nodes.RW_Node_Type := Nodes.Copy (N, 1, I - 1);
+               R   : Nodes.RW_Node_Type := Nodes.Copy (N, I, Nodes.Degree (N));
                L_A : Nodes.Valid_Address_Type renames N_A;
                R_A : Nodes.Valid_Address_Type;
             begin
-               Nodes.Set_Link(R, Nodes.Link(N));
-               Write_New_Node(Tree, R_A, R);
-               Lock(Tree, R_A);
+               Nodes.Set_Link (R, Nodes.Link (N));
+               Write_New_Node (Tree, R_A, R);
+               Lock (Tree, R_A);
                declare
                begin
-                  Nodes.Set_Link(L, R_A);
-                  Write_Node(Tree, L_A, L);
+                  Nodes.Set_Link (L, R_A);
+                  Write_Node (Tree, L_A, L);
                exception
                   when others =>
-                     Unlock(Tree, R_A);
+                     Unlock (Tree, R_A);
                      raise;
                end;
-               Insert_Key_And_Update_High_Key(Nodes.High_Key(L), L_A,
-                                              Nodes.High_Key(R), R_A);
+               Insert_Key_And_Update_High_Key (Nodes.High_Key (L), L_A,
+                                               Nodes.High_Key (R), R_A);
             end;
          end if;
       end Write_And_Ascend;
 
    begin
-      Write_And_Ascend(N_A, N_Old, N);
+      Write_And_Ascend (N_A, N_Old, N);
    end Write_And_Ascend;
 
 end Stacks;
