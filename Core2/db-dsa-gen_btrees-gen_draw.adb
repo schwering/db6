@@ -69,7 +69,8 @@ is
       Lev  : constant String := Level_Type'Image (Nodes.Level (N));
    begin
       Put (""""& Addr &"""");
-      Put (" [label="""& Addr &": "& Deg &", "& Lev &""",shape="""& Style &"""]");
+      Put (" [label="""& Addr &": "& Deg &", "& Lev &""",shape="""&
+           Style &"""]");
       New_Line;
    end Draw_Node;
 

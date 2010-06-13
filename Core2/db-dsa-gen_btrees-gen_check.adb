@@ -50,11 +50,14 @@ is
       Stacks.Flip (Stack);
    end Init_Stack;
 
-   procedure Check_Local_Order (N : in Node_Type; N_A : in Valid_Address_Type) is
+   procedure Check_Local_Order
+     (N   : in Node_Type;
+      N_A : in Valid_Address_Type) is
    begin
       for I in 2 .. Degree (N) loop
          if not (Key (N, I-1) <= Key (N, I)) then
-            Put_Line ("Wrong order in"& Image (N_A) &" "& Boolean'Image (Is_Leaf (N)));
+            Put_Line ("Wrong order in"& Image (N_A) &" "&
+                      Boolean'Image (Is_Leaf (N)));
             raise Tree_Error with "wrong node-internal order";
          end if;
       end loop;
@@ -98,13 +101,15 @@ is
          return;
       end if;
       if not (Key (N, Degree (N)) <= Key (L, 1)) then
-         Put_Line ("Wrong link order in"& Image (N_A) &" "& Image (Link (N)) &" "&
-                   Boolean'Image (Is_Leaf (N)));
+         Put_Line ("Wrong link order in"& Image (N_A) &" "& Image (Link (N)) &
+                   " "& Boolean'Image (Is_Leaf (N)));
          raise Tree_Error with "link's keys are less than node's";
       end if;
    end Check_Link_Order;
 
-   procedure Check_High_Key_Order (N : in Node_Type; N_A : in Valid_Address_Type)
+   procedure Check_High_Key_Order
+     (N   : in Node_Type;
+      N_A : in Valid_Address_Type)
    is
       L : RO_Node_Type;
       NHK : Keys.Key_Type;
@@ -117,7 +122,7 @@ is
       Get_High_Key (L, LHK, Has_LHK);
       if Has_NHK /= Has_LHK then
          Put_Line ("Difference about existence of high keys: "&
-                  Has_NHK'Img &" "& Has_LHK'Img);
+                   Has_NHK'Img &" "& Has_LHK'Img);
          raise Tree_Error with "node and link differ in having a high key";
       end if;
       if not Has_NHK then
@@ -125,8 +130,8 @@ is
       end if;
       if not (NHK <= LHK) then
          Put_Line ("Wrong high key order in"& Image (N_A) &" "&
-                  Image (Link (N)) &" "&
-                  Boolean'Image (Is_Leaf (N)));
+                   Image (Link (N)) &" "&
+                   Boolean'Image (Is_Leaf (N)));
          raise Tree_Error with "link's high key is less than node's";
       end if;
    end Check_High_Key_Order;
@@ -157,7 +162,8 @@ is
             raise Tree_Error with "child has no high key";
          end if;
          if not (CHK <= NHK) then
-            Put_Line ("N_A ="& Image (N_A) &" C_A ="& Image (Child (N, Degree (N))));
+            Put_Line ("N_A ="& Image (N_A) &" C_A ="&
+                      Image (Child (N, Degree (N))));
             raise Tree_Error with "child's high key is greater than node's";
          end if;
       end;

@@ -115,8 +115,9 @@ package DB.DSA.Map_Reduce is
       type Out_Value_Type is private;
       with procedure Reduce
         (Key        : in     Intermediate_Keys.Key_Type;
-         Next_Value : access procedure (Value : out Intermediate_Values.Value_Type;
-                                        Success : out Boolean);
+         Next_Value : access procedure
+           (Value   : out Intermediate_Values.Value_Type;
+            Success : out Boolean);
          Out_Key    :    out Out_Key_Type;
          Out_Value  :    out Out_Value_Type);
       with procedure Output
