@@ -104,7 +104,7 @@ package DB.DSA.Gen_BTrees is
 
 
    ----------
-   -- Core operations: Retrieve, Insertion, Deletion.
+   -- Core operations: Search, Insert, Delete.
 
    type State_Type is (Success, Failure);
 

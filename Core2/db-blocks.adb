@@ -103,7 +103,7 @@ package body DB.Blocks is
    end Reset;
 
 
-   function Size_Of (Item  : Item_Type) return Size_Type is
+   function Size_Of (Item : Item_Type) return Size_Type is
    begin
       return Bits_To_Units (Item'Size);
    end Size_Of;
