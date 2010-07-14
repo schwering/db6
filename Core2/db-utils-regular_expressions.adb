@@ -1385,10 +1385,28 @@ package body DB.Utils.Regular_Expressions is
       end;
    end Create_Secondary_Table;
 
+   -----------
+   -- Union --
+   -----------
 
    function Union (L, R : Regexp) return Regexp
    is
       type Reverse_Mapping is array (Column_Index range <>) of Character;
+
+      function Create_Reverse_Mapping (R : Regexp) return Reverse_Mapping;
+      --  Creates a reverse mapping of a DFA, i.e. Column -> Character.
+
+      procedure Create_Mapping;
+      --  Creates the mapping of the union automaton.
+
+      procedure Add_DFA
+        (R       : Regexp;
+         Rev_Map : Reverse_Mapping;
+         Offset  : State_Index);
+      --  Adds the DFA R to the union NFA. The states of the DFA R are
+      --  transformed by adding Offset to avoid clashes with the states already
+      --  in the union NFA.
+
 
       function Create_Reverse_Mapping (R : Regexp) return Reverse_Mapping
       is
@@ -1408,6 +1426,9 @@ package body DB.Utils.Regular_Expressions is
       Map           : Mapping := (others => 0);
 
       procedure Create_Mapping is
+         procedure Add_In_Map (C : Character);
+         --  Add a character in the mapping, if it is not already defined
+
          procedure Add_In_Map (C : Character) is
          begin
             if Map (C) = 0 then
@@ -1424,16 +1445,24 @@ package body DB.Utils.Regular_Expressions is
          end loop;
       end Create_Mapping;
 
-      NFA             : Regexp_Array_Access;
+      NFA             : Regexp_Array_Access := null;
       NFA_Start_State : State_Index;
       NFA_End_State   : State_Index;
       Epsilon_Column  : Column_Index;
 
       procedure Add_DFA
-        (R              : Regexp;
-         Rev_Map        : Reverse_Mapping;
-         Offset         : State_Index)
+        (R       : Regexp;
+         Rev_Map : Reverse_Mapping;
+         Offset  : State_Index)
       is
+         function T (State : State_Index) return State_Index;
+         --  Transforms a state from the input DFA to the union NFA.
+
+         function T (Column : Column_Index) return Column_Index;
+         --  Transforms a column from the input DFA to the union NFA.
+
+         pragma Inline (T);
+
          function T (State : State_Index) return State_Index is
          begin
             return Offset + State;
@@ -1480,8 +1509,10 @@ package body DB.Utils.Regular_Expressions is
                                0 .. Alphabet_Size + 2);
       --  To comply with Create_Secondary_Table, the first column of NFA
       --  denotes the transitions for all characters ('.') (not used here)
-      --  and the last columns denote epsilon transitions (at most one epsilon
-      --  transition per state and column).
+      --  and the last columns denote epsilon transitions. Since each state of
+      --  the DFAs needs one epsilon transition (iff it's final) and the start
+      --  state of the NFA needs two epsilon transitions (to the start states of
+      --  the DFAs), we need two extra columns, hence the Alphabet_Size + 2.
       NFA.all := (others => (others => 0));
       NFA_Start_State := NFA'Last (1) - 1;
       NFA_End_State   := NFA'Last (1);
@@ -1496,6 +1527,12 @@ package body DB.Utils.Regular_Expressions is
          Free (NFA);
          return R;
       end;
+   exception
+      when others =>
+         if NFA /= null then
+            Free (NFA);
+         end if;
+         raise;
    end Union;
 
    ---------------------------------
