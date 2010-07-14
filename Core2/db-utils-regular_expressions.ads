@@ -60,6 +60,7 @@
 with Ada.Finalization;
 
 package DB.Utils.Regular_Expressions is
+   pragma Preelaborate;
 
    --  The regular expression must first be compiled, using the Compile
    --  function, which creates a finite state matching table, allowing
@@ -131,6 +132,10 @@ package DB.Utils.Regular_Expressions is
    function Match (S : String; R : Regexp) return Boolean;
    --  True if S matches R, otherwise False. Raises Constraint_Error if
    --  R is an uninitialized regular expression value.
+
+   function Union (L, R : Regexp) return Regexp;
+   --  Creates a new regular expression that accepts the union of the languages
+   --  of L and R.
 
    function Is_Subset (L, R : Regexp) return Boolean;
    --  Determines whether the language accepted by L is a subset of

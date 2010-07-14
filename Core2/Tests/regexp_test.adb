@@ -31,5 +31,41 @@ begin
    Put_Line(E2&" cap "&E1&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE2, RE1)));
    Put_Line(E1&" cap "&E3&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE1, RE3)));
    Put_Line(E2&" cap "&E3&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE2, RE3)));
+   New_Line;
+   declare
+      S12  : constant String := S1 &" | "& S2;
+      RE12 : constant Regexp := Union (RE1, RE2);
+   begin
+      Put_Line(S12&" accepts "&S1&" = "& Boolean'Image(Match(S1, RE12)));
+      Put_Line(S12&" accepts "&S2&" = "& Boolean'Image(Match(S2, RE12)));
+      Put_Line(S12&" accepts "&S3&" = "& Boolean'Image(Match(S3, RE12)));
+   end;
+   New_Line;
+   declare
+      S13  : constant String := S1 &" | "& S3;
+      RE13 : constant Regexp := Union (RE1, RE3);
+   begin
+      Put_Line(S13&" accepts "&S1&" = "& Boolean'Image(Match(S1, RE13)));
+      Put_Line(S13&" accepts "&S2&" = "& Boolean'Image(Match(S2, RE13)));
+      Put_Line(S13&" accepts "&S3&" = "& Boolean'Image(Match(S3, RE13)));
+   end;
+   New_Line;
+   declare
+      E23  : constant String := "("& E2 &")|("& E3 &")";
+      RE23 : constant Regexp :=  Union (RE2, RE3); -- Compile (E23); -- Union (RE2, RE3);
+   begin
+      Put_Line(E23&" accepts "&S1&" = "& Boolean'Image(Match(S1, RE23)));
+      Put_Line(E23&" accepts "&S2&" = "& Boolean'Image(Match(S2, RE23)));
+      Put_Line(E23&" accepts "&S3&" = "& Boolean'Image(Match(S3, RE23)));
+   end;
+   New_Line;
+   declare
+      RE : constant Regexp :=  Union (Compile ("bla"), Compile ("blupp"));
+   begin
+      Put_Line("RE accepts bla = "& Boolean'Image(Match("bla", RE)));
+      Put_Line("RE accepts blupp = "& Boolean'Image(Match("blupp", RE)));
+      Put_Line("RE accepts blablupp = "& Boolean'Image(Match("blablupp", RE)));
+      Put_Line("RE accepts bl = "& Boolean'Image(Match("bl", RE)));
+   end;
 end Regexp_Test;
 

@@ -32,6 +32,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with DB.Utils.Print;
+use DB.Utils;
 with Ada.Unchecked_Deallocation;
 
 package body DB.Utils.Regular_Expressions is
@@ -94,6 +96,25 @@ package body DB.Utils.Regular_Expressions is
 
    procedure Free is new Ada.Unchecked_Deallocation
      (Regexp_Array, Regexp_Array_Access);
+
+   function Create_Secondary_Table
+     (Map           : Mapping;
+      Alphabet_Size : Column_Index;
+      First_Table   : Regexp_Array_Access;
+      Num_States    : State_Index;
+      Start_State   : State_Index;
+      End_State     : State_Index)
+      return        Regexp;
+   --  Creates the definitive table representing the regular expression
+   --  This is actually a transformation of the primary table First_Table,
+   --  where every state is grouped with the states in its 'no-character'
+   --  columns. The transitions between the new states are then recalculated
+   --  and if necessary some new states are created.
+   --
+   --  Note that the resulting finite-state machine is not optimized in
+   --  terms of the number of states : it would be more time-consuming to
+   --  add a third pass to reduce the number of states in the machine, with
+   --  no speed improvement...
 
    function Is_Final (R : Regexp; S : State_Index) return Boolean;
    pragma Inline (Is_Final);
@@ -169,23 +190,6 @@ package body DB.Utils.Regular_Expressions is
       --  Same function as above, but it deals with the second possible
       --  grammar for 'globbing pattern', which is a kind of subset of the
       --  whole regular expression grammar.
-
-      function Create_Secondary_Table
-        (First_Table : Regexp_Array_Access;
-         Num_States  : State_Index;
-         Start_State : State_Index;
-         End_State   : State_Index)
-         return        Regexp;
-      --  Creates the definitive table representing the regular expression
-      --  This is actually a transformation of the primary table First_Table,
-      --  where every state is grouped with the states in its 'no-character'
-      --  columns. The transitions between the new states are then recalculated
-      --  and if necessary some new states are created.
-      --
-      --  Note that the resulting finite-state machine is not optimized in
-      --  terms of the number of states : it would be more time-consuming to
-      --  add a third pass to reduce the number of states in the machine, with
-      --  no speed improvement...
 
       procedure Raise_Exception (M : String; Index : Integer);
       pragma No_Return (Raise_Exception);
@@ -1091,143 +1095,6 @@ package body DB.Utils.Regular_Expressions is
          Num_States := Current_State;
       end Create_Primary_Table_Glob;
 
-      ----------------------------
-      -- Create_Secondary_Table --
-      ----------------------------
-
-      function Create_Secondary_Table
-        (First_Table : Regexp_Array_Access;
-         Num_States  : State_Index;
-         Start_State : State_Index;
-         End_State   : State_Index) return Regexp
-      is
-         pragma Warnings (Off, Num_States);
-
-         Last_Index : constant State_Index := First_Table'Last (1);
-         type Meta_State is array (1 .. Last_Index) of Boolean;
-
-         Table : Regexp_Array (1 .. Last_Index, 0 .. Alphabet_Size) :=
-                   (others => (others => 0));
-
-         Meta_States : array (1 .. Last_Index + 1) of Meta_State :=
-                         (others => (others => False));
-
-         Temp_State_Not_Null : Boolean;
-
-         Is_Final : Boolean_Array (1 .. Last_Index) := (others => False);
-
-         Current_State       : State_Index := 1;
-         Nb_State            : State_Index := 1;
-
-         procedure Closure
-           (State : in out Meta_State;
-            Item  :        State_Index);
-         --  Compute the closure of the state (that is every other state which
-         --  has a empty-character transition) and add it to the state
-
-         -------------
-         -- Closure --
-         -------------
-
-         procedure Closure
-           (State : in out Meta_State;
-            Item  : State_Index)
-         is
-         begin
-            if State (Item) then
-               return;
-            end if;
-
-            State (Item) := True;
-
-            for Column in Alphabet_Size + 1 .. First_Table'Last (2) loop
-               if First_Table (Item, Column) = 0 then
-                  return;
-               end if;
-
-               Closure (State, First_Table (Item, Column));
-            end loop;
-         end Closure;
-
-      --  Start of processing for Create_Secondary_Table
-
-      begin
-         --  Create a new state
-
-         Closure (Meta_States (Current_State), Start_State);
-
-         while Current_State <= Nb_State loop
-
-            --  If this new meta-state includes the primary table end state,
-            --  then this meta-state will be a final state in the regexp
-
-            if Meta_States (Current_State)(End_State) then
-               Is_Final (Current_State) := True;
-            end if;
-
-            --  For every character in the regexp, calculate the possible
-            --  transitions from Current_State
-
-            for Column in 0 .. Alphabet_Size loop
-               Meta_States (Nb_State + 1) := (others => False);
-               Temp_State_Not_Null := False;
-
-               for K in Meta_States (Current_State)'Range loop
-                  if Meta_States (Current_State)(K)
-                    and then First_Table (K, Column) /= 0
-                  then
-                     Closure
-                       (Meta_States (Nb_State + 1), First_Table (K, Column));
-                     Temp_State_Not_Null := True;
-                  end if;
-               end loop;
-
-               --  If at least one transition existed
-
-               if Temp_State_Not_Null then
-
-                  --  Check if this new state corresponds to an old one
-
-                  for K in 1 .. Nb_State loop
-                     if Meta_States (K) = Meta_States (Nb_State + 1) then
-                        Table (Current_State, Column) := K;
-                        exit;
-                     end if;
-                  end loop;
-
-                  --  If not, create a new state
-
-                  if Table (Current_State, Column) = 0 then
-                     Nb_State := Nb_State + 1;
-                     Table (Current_State, Column) := Nb_State;
-                  end if;
-               end if;
-            end loop;
-
-            Current_State := Current_State + 1;
-         end loop;
-
-         --  Returns the regexp
-
-         declare
-            R : Regexp_Access;
-
-         begin
-            R := new Regexp_Value (Alphabet_Size => Alphabet_Size,
-                                   Num_States    => Nb_State);
-            R.Map      := Map;
-            R.Is_Final := Is_Final (1 .. Nb_State);
-
-            for State in 1 .. Nb_State loop
-               for K in 0 .. Alphabet_Size loop
-                  R.States (State, K) := Table (State, K);
-               end loop;
-            end loop;
-
-            return (Ada.Finalization.Controlled with R => R);
-         end;
-      end Create_Secondary_Table;
-
       ---------------------
       -- Raise_Exception --
       ---------------------
@@ -1276,7 +1143,7 @@ package body DB.Utils.Regular_Expressions is
          --  Creates the secondary table
 
          R := Create_Secondary_Table
-           (Table, Num_States, Start_State, End_State);
+           (Map, Alphabet_Size, Table, Num_States, Start_State, End_State);
          Free (Table);
          return R;
       end;
@@ -1378,6 +1245,258 @@ package body DB.Utils.Regular_Expressions is
          Table (State, Column) := Value;
       end if;
    end Set;
+
+   ----------------------------
+   -- Create_Secondary_Table --
+   ----------------------------
+
+   function Create_Secondary_Table
+     (Map           : Mapping;
+      Alphabet_Size : Column_Index;
+      First_Table   : Regexp_Array_Access;
+      Num_States    : State_Index;
+      Start_State   : State_Index;
+      End_State     : State_Index) return Regexp
+   is
+      pragma Warnings (Off, Num_States);
+
+      Last_Index : constant State_Index := First_Table'Last (1);
+      type Meta_State is array (1 .. Last_Index) of Boolean;
+
+      Table : Regexp_Array (1 .. Last_Index, 0 .. Alphabet_Size) :=
+                (others => (others => 0));
+
+      Meta_States : array (1 .. Last_Index + 1) of Meta_State :=
+                      (others => (others => False));
+
+      Temp_State_Not_Null : Boolean;
+
+      Is_Final : Boolean_Array (1 .. Last_Index) := (others => False);
+
+      Current_State       : State_Index := 1;
+      Nb_State            : State_Index := 1;
+
+      procedure Closure
+        (State : in out Meta_State;
+         Item  :        State_Index);
+      --  Compute the closure of the state (that is every other state which
+      --  has a empty-character transition) and add it to the state
+
+      -------------
+      -- Closure --
+      -------------
+
+      procedure Closure
+        (State : in out Meta_State;
+         Item  : State_Index)
+      is
+      begin
+         if State (Item) then
+            return;
+         end if;
+
+         State (Item) := True;
+
+         for Column in Alphabet_Size + 1 .. First_Table'Last (2) loop
+            if First_Table (Item, Column) = 0 then
+               return;
+            end if;
+
+            Closure (State, First_Table (Item, Column));
+         end loop;
+      end Closure;
+
+   --  Start of processing for Create_Secondary_Table
+
+   begin
+      --  Create a new state
+
+      Closure (Meta_States (Current_State), Start_State);
+
+      while Current_State <= Nb_State loop
+
+         --  If this new meta-state includes the primary table end state,
+         --  then this meta-state will be a final state in the regexp
+
+         if Meta_States (Current_State)(End_State) then
+            Is_Final (Current_State) := True;
+         end if;
+
+         --  For every character in the regexp, calculate the possible
+         --  transitions from Current_State
+
+         for Column in 0 .. Alphabet_Size loop
+            Meta_States (Nb_State + 1) := (others => False);
+            Temp_State_Not_Null := False;
+
+            for K in Meta_States (Current_State)'Range loop
+               if Meta_States (Current_State)(K)
+                 and then First_Table (K, Column) /= 0
+               then
+                  Closure
+                    (Meta_States (Nb_State + 1), First_Table (K, Column));
+                  Temp_State_Not_Null := True;
+               end if;
+            end loop;
+
+            --  If at least one transition existed
+
+            if Temp_State_Not_Null then
+
+               --  Check if this new state corresponds to an old one
+
+               for K in 1 .. Nb_State loop
+                  if Meta_States (K) = Meta_States (Nb_State + 1) then
+                     Table (Current_State, Column) := K;
+                     exit;
+                  end if;
+               end loop;
+
+               --  If not, create a new state
+
+               if Table (Current_State, Column) = 0 then
+                  Nb_State := Nb_State + 1;
+                  Table (Current_State, Column) := Nb_State;
+               end if;
+            end if;
+         end loop;
+
+         Current_State := Current_State + 1;
+      end loop;
+
+      --  Returns the regexp
+
+      declare
+         R : Regexp_Access;
+
+      begin
+         R := new Regexp_Value (Alphabet_Size => Alphabet_Size,
+                                Num_States    => Nb_State);
+         R.Map      := Map;
+         R.Is_Final := Is_Final (1 .. Nb_State);
+
+         for State in 1 .. Nb_State loop
+            for K in 0 .. Alphabet_Size loop
+               R.States (State, K) := Table (State, K);
+            end loop;
+         end loop;
+
+         return (Ada.Finalization.Controlled with R => R);
+      end;
+   end Create_Secondary_Table;
+
+
+   function Union (L, R : Regexp) return Regexp
+   is
+      type Reverse_Mapping is array (Column_Index range <>) of Character;
+
+      function Create_Reverse_Mapping (R : Regexp) return Reverse_Mapping
+      is
+         Rev_Map : Reverse_Mapping (1 .. R.R.Alphabet_Size);
+      begin
+         for C in R.R.Map'Range loop
+            if R.R.Map (C) /= 0 then
+               Rev_Map (R.R.Map (C)) := C;
+            end if;
+         end loop;
+         return Rev_Map;
+      end Create_Reverse_Mapping;
+
+      L_Rev_Map     : constant Reverse_Mapping := Create_Reverse_Mapping (L);
+      R_Rev_Map     : constant Reverse_Mapping := Create_Reverse_Mapping (R);
+      Alphabet_Size : Column_Index := 0;
+      Map           : Mapping := (others => 0);
+
+      procedure Create_Mapping is
+         procedure Add_In_Map (C : Character) is
+         begin
+            if Map (C) = 0 then
+               Alphabet_Size := Alphabet_Size + 1;
+               Map (C) := Alphabet_Size;
+            end if;
+         end Add_In_Map;
+      begin
+         for J in L_Rev_Map'Range loop
+            Add_In_Map (L_Rev_Map (J));
+         end loop;
+         for J in R_Rev_Map'Range loop
+            Add_In_Map (R_Rev_Map (J));
+         end loop;
+      end Create_Mapping;
+
+      NFA             : Regexp_Array_Access;
+      NFA_Start_State : State_Index;
+      NFA_End_State   : State_Index;
+      Epsilon_Column  : Column_Index;
+
+      procedure Add_DFA
+        (R              : Regexp;
+         Rev_Map        : Reverse_Mapping;
+         Offset         : State_Index)
+      is
+         function T (State : State_Index) return State_Index is
+         begin
+            return Offset + State;
+         end T;
+
+         function T (Column : Column_Index) return Column_Index is
+         begin
+            return Map (Rev_Map (Column));
+         end T;
+
+         DFA          : Regexp_Array renames R.R.States;
+         DFA_Is_Final : Boolean_Array renames R.R.Is_Final;
+      begin
+         pragma Assert (NFA_Start_State not in
+                        T (DFA'First (1)) .. T (DFA'Last (1)));
+         pragma Assert (NFA_End_State not in
+                        T (DFA'First (1)) .. T (DFA'Last (1)));
+
+         for Next_Epsilon_Column in Epsilon_Column .. Column_Index'Last loop
+            if NFA (NFA_Start_State, Next_Epsilon_Column) = 0 then
+               NFA (NFA_Start_State, Next_Epsilon_Column) := T (Start_State);
+               exit;
+            end if;
+         end loop;
+
+         for State in DFA'Range (1) loop
+            for Column in DFA'Range (2) loop
+               if DFA (State, Column) /= Sink_State then
+                  pragma Assert (T (State) in NFA'Range (1));
+                  pragma Assert (T (Column) in NFA'Range (2));
+                  NFA (T (State), T (Column)) := T (DFA (State, Column));
+               end if;
+            end loop;
+
+            if DFA_Is_Final (State) then
+               NFA (T (State), Epsilon_Column) := NFA_End_State;
+            end if;
+         end loop;
+      end Add_DFA;
+
+   begin
+      Create_Mapping;
+      NFA := new Regexp_Array (1 .. L.R.Num_States + R.R.Num_States + 2,
+                               0 .. Alphabet_Size + 2);
+      --  To comply with Create_Secondary_Table, the first column of NFA
+      --  denotes the transitions for all characters ('.') (not used here)
+      --  and the last columns denote epsilon transitions (at most one epsilon
+      --  transition per state and column).
+      NFA.all := (others => (others => 0));
+      NFA_Start_State := NFA'Last (1) - 1;
+      NFA_End_State   := NFA'Last (1);
+      Epsilon_Column  := Alphabet_Size + 1;
+      Add_DFA (L, L_Rev_Map, Offset => 0);
+      Add_DFA (R, R_Rev_Map, Offset => L.R.Num_States);
+      declare
+         R : Regexp;
+      begin
+         R := Create_Secondary_Table (Map, Alphabet_Size, NFA, NFA'Length (1),
+                                      NFA_Start_State, NFA_End_State);
+         Free (NFA);
+         return R;
+      end;
+   end Union;
 
    ---------------------------------
    -- Product_DFA_Accepts_Nothing --
