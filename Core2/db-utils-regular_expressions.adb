@@ -44,10 +44,12 @@ package body DB.Utils.Regular_Expressions is
    Close_Bracket : constant Character := ']';
 
    type State_Index is new Natural;
-   type Column_Index is new Natural;
+   --  Convention: 0 is kind of a default sink (just initialize the table with
+   --  0 and then add the transitions).
 
-   Sink_State  : constant State_Index := 0;
-   Start_State : constant State_Index := 1;
+   type Column_Index is new Natural;
+   --  Convention: 0 represents `all the other' characters (in the mapping, for
+   --  example).
 
    type Regexp_Array is array
      (State_Index range <>, Column_Index range <>) of State_Index;
@@ -62,6 +64,9 @@ package body DB.Utils.Regular_Expressions is
    type Mapping is array (Character'Range) of Column_Index;
    --  Mapping between characters and column in the Regexp_Array
 
+   type Reverse_Mapping is array (Column_Index range <>) of Character;
+   --  Reverse mapping between columns and characters.
+
    type Boolean_Array is array (State_Index range <>) of Boolean;
 
    type Regexp_Value
@@ -70,7 +75,8 @@ package body DB.Utils.Regular_Expressions is
    record
       Map            : Mapping;
       States         : Regexp_Array (1 .. Num_States, 0 .. Alphabet_Size);
-      Is_Final       : Boolean_Array (1 .. Num_States);
+      Is_Final       : Boolean_Array (0 .. Num_States);
+      Start_State    : State_Index;
    end record;
    --  Deterministic finite-state machine
 
@@ -116,30 +122,53 @@ package body DB.Utils.Regular_Expressions is
    --  add a third pass to reduce the number of states in the machine, with
    --  no speed improvement...
 
-   function Is_Final (R : Regexp; S : State_Index) return Boolean;
-   pragma Inline (Is_Final);
-   --  Checks whether S is not the sink and final in R.
+   function Create_Reverse_Mapping (R : Regexp) return Reverse_Mapping;
+   --  Creates a reverse mapping of a DFA, i.e. Column -> Character.
+
+   procedure Create_Mapping
+     (L_Rev_Map     : Reverse_Mapping;
+      R_Rev_Map     : Reverse_Mapping;
+      Alphabet_Size : out Column_Index;
+      Map           : out Mapping);
+   --  Creates the united mapping of L_Rev and R_Rev.
 
    generic
       with function Left_Is_Final (L : Regexp; S : State_Index) return Boolean;
       with function Right_Is_Final (R : Regexp; S : State_Index) return Boolean;
-   function Product_DFA_Accepts_Nothing (L, R : Regexp) return Boolean;
-   --  Checks whether the product DFA of L and R with the given Left_Is_Final
-   --  and Right_Is_Final relations relation accepts nothing at all.
+   function Gen_Product_DFA (L, R : Regexp) return Regexp;
+   --  Calculates the product DFA.
 
    ------------
    -- Adjust --
    ------------
 
    procedure Adjust (R : in out Regexp) is
-      Tmp : Regexp_Access;
-
    begin
-      Tmp := new Regexp_Value (Alphabet_Size => R.R.Alphabet_Size,
-                               Num_States    => R.R.Num_States);
-      Tmp.all := R.R.all;
-      R.R := Tmp;
+      if R.Refcount /= null then
+         R.Refcount.all := R.Refcount.all + 1;
+      end if;
    end Adjust;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   procedure Finalize (R : in out Regexp) is
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Regexp_Value, Regexp_Access);
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Natural, Natural_Access);
+   begin
+      if R.Refcount /= null then
+         R.Refcount.all := R.Refcount.all - 1;
+         if R.Refcount.all = 0 then
+            Free (R.Refcount);
+            if R.R /= null then
+               Free (R.R);
+            end if;
+         end if;
+      end if;
+   end Finalize;
 
    -------------
    -- Compile --
@@ -1116,7 +1145,9 @@ package body DB.Utils.Regular_Expressions is
                        Num_States    => 1,
                        Map           => (others => 0),
                        States        => (others => (others => 1)),
-                       Is_Final      => (others => True)));
+                       Is_Final      => (0 => False, 1 => True),
+                       Start_State   => 1),
+                 Refcount => new Natural' (1));
       end if;
 
       Create_Mapping;
@@ -1149,18 +1180,6 @@ package body DB.Utils.Regular_Expressions is
       end;
    end Compile;
 
-   --------------
-   -- Finalize --
-   --------------
-
-   procedure Finalize (R : in out Regexp) is
-      procedure Free is new
-        Ada.Unchecked_Deallocation (Regexp_Value, Regexp_Access);
-
-   begin
-      Free (R.R);
-   end Finalize;
-
    ---------
    -- Get --
    ---------
@@ -1185,7 +1204,7 @@ package body DB.Utils.Regular_Expressions is
    -----------
 
    function Match (S : String; R : Regexp) return Boolean is
-      Current_State : State_Index := 1;
+      Current_State : State_Index := R.R.Start_State;
 
    begin
       if R.R = null then
@@ -1271,7 +1290,7 @@ package body DB.Utils.Regular_Expressions is
 
       Temp_State_Not_Null : Boolean;
 
-      Is_Final : Boolean_Array (1 .. Last_Index) := (others => False);
+      Is_Final : Boolean_Array (0 .. Last_Index) := (others => False);
 
       Current_State       : State_Index := 1;
       Nb_State            : State_Index := 1;
@@ -1372,8 +1391,9 @@ package body DB.Utils.Regular_Expressions is
       begin
          R := new Regexp_Value (Alphabet_Size => Alphabet_Size,
                                 Num_States    => Nb_State);
-         R.Map      := Map;
-         R.Is_Final := Is_Final (1 .. Nb_State);
+         R.Map         := Map;
+         R.Is_Final    := Is_Final (Is_Final'First .. Nb_State);
+         R.Start_State := 1;
 
          for State in 1 .. Nb_State loop
             for K in 0 .. Alphabet_Size loop
@@ -1381,9 +1401,152 @@ package body DB.Utils.Regular_Expressions is
             end loop;
          end loop;
 
-         return (Ada.Finalization.Controlled with R => R);
+         return (Ada.Finalization.Controlled with
+                 R        => R,
+                 Refcount => new Natural' (1));
       end;
    end Create_Secondary_Table;
+
+   ------------------
+   -- Empty_Regexp --
+   ------------------
+
+   function Empty_Regexp return Regexp is
+   begin
+      return (Ada.Finalization.Controlled with
+              R => new Regexp_Value'
+                   (Alphabet_Size => 0,
+                    Num_States    => 1,
+                    Map           => (others => 0),
+                    States        => (others => (others => 1)),
+                    Is_Final      => (0 => False, 1 => False),
+                    Start_State   => 1),
+              Refcount => new Natural' (1));
+   end Empty_Regexp;
+
+   ----------------------------
+   -- Create_Reverse_Mapping --
+   ----------------------------
+
+   function Create_Reverse_Mapping (R : Regexp) return Reverse_Mapping
+   is
+      Rev_Map : Reverse_Mapping (1 .. R.R.Alphabet_Size);
+   begin
+      for C in R.R.Map'Range loop
+         if R.R.Map (C) /= 0 then
+            Rev_Map (R.R.Map (C)) := C;
+         end if;
+      end loop;
+      return Rev_Map;
+   end Create_Reverse_Mapping;
+
+   --------------------
+   -- Create_Mapping --
+   --------------------
+
+   procedure Create_Mapping
+     (L_Rev_Map     : Reverse_Mapping;
+      R_Rev_Map     : Reverse_Mapping;
+      Alphabet_Size : out Column_Index;
+      Map           : out Mapping)
+   is
+      procedure Add_In_Map (C : Character);
+      --  Add a character in the mapping, if it is not already defined
+
+      procedure Add_In_Map (C : Character) is
+      begin
+         if Map (C) = 0 then
+            Alphabet_Size := Alphabet_Size + 1;
+            Map (C) := Alphabet_Size;
+         end if;
+      end Add_In_Map;
+   begin
+      Alphabet_Size := 0;
+      Map           := (others => 0);
+      for J in L_Rev_Map'Range loop
+         Add_In_Map (L_Rev_Map (J));
+      end loop;
+      for J in R_Rev_Map'Range loop
+         Add_In_Map (R_Rev_Map (J));
+      end loop;
+   end Create_Mapping;
+
+   ---------------------
+   -- Gen_Product_DFA --
+   ---------------------
+
+   function Gen_Product_DFA (L, R : Regexp) return Regexp
+   is
+      function Trans (S, T : State_Index) return State_Index;
+      --  Transforms the states S, T of L, R to a state (S, T) of the product
+      --  DFA.
+      --  Generally, the idea is to map (S,T) to the flat space by
+      --  (S,T) -> S * (R.Num_States+1) + T.
+      --  The problem is that (1,1), e.g. the product start state, is not mapped
+      --  to 1, which is what other subprograms expect.
+      --  Solution: Hence we exchange (1,1) and the (x,y) that is mapped to 1.
+      --  Nicer solutions would be to introduce a DFA/NFA-dependend start state
+      --  or a formal generic state, but both solutions would require much more
+      --  refactoring.
+
+      pragma Inline (Trans);
+
+      function Trans (S, T : State_Index) return State_Index is
+      begin
+         return S * (R.R.Num_States + 1) + (T + 1);
+      end Trans;
+
+      P : Regexp_Access := null;
+   begin
+      declare
+         L_Rev_Map     : constant Reverse_Mapping := Create_Reverse_Mapping (L);
+         R_Rev_Map     : constant Reverse_Mapping := Create_Reverse_Mapping (R);
+         Num_States    : constant State_Index :=
+            (L.R.Num_States + 1) * (R.R.Num_States + 1);
+         Map           : Mapping;
+         Alphabet_Size : Column_Index;
+      begin
+         Create_Mapping (L_Rev_Map, R_Rev_Map, Alphabet_Size, Map);
+         P := new Regexp_Value (Alphabet_Size => Alphabet_Size,
+                                Num_States    => Num_States);
+         P.Map := Map;
+      end;
+
+      declare
+         L_Map    : Mapping       renames L.R.Map;
+         R_Map    : Mapping       renames R.R.Map;
+         Map      : Mapping       renames P.Map;
+         L_States : Regexp_Array  renames L.R.States;
+         R_States : Regexp_Array  renames R.R.States;
+         States   : Regexp_Array  renames P.States;
+         Is_Final : Boolean_Array renames P.Is_Final;
+      begin
+         States := (others => (others => 0));
+         for C in Character'Range loop
+            for S in L_States'Range (1) loop
+               for T in R_States'Range (1) loop
+                  pragma Assert (Trans (S, T) in States'Range (1));
+                  States (Trans (S, T), Map (C)) :=
+                     Trans (L_States (S, L_Map (C)),
+                            R_States (T, R_Map (C)));
+               end loop;
+            end loop;
+         end loop;
+
+         for S in 0 .. L_States'Last (1) loop
+            for T in 0 .. R_States'Last (1) loop
+               Is_Final (Trans (S, T)) := Left_Is_Final (L, S) and
+                                          Right_Is_Final (R, T);
+            end loop;
+         end loop;
+
+         P.Start_State := Trans (L.R.Start_State, R.R.Start_State);
+      end;
+
+      return (Ada.Finalization.Controlled with
+              R        => P,
+              Refcount => new Natural' (1));
+   end Gen_Product_DFA;
 
    -----------
    -- Union --
@@ -1391,14 +1554,6 @@ package body DB.Utils.Regular_Expressions is
 
    function Union (L, R : Regexp) return Regexp
    is
-      type Reverse_Mapping is array (Column_Index range <>) of Character;
-
-      function Create_Reverse_Mapping (R : Regexp) return Reverse_Mapping;
-      --  Creates a reverse mapping of a DFA, i.e. Column -> Character.
-
-      procedure Create_Mapping;
-      --  Creates the mapping of the union automaton.
-
       procedure Add_DFA
         (R       : Regexp;
          Rev_Map : Reverse_Mapping;
@@ -1407,44 +1562,10 @@ package body DB.Utils.Regular_Expressions is
       --  transformed by adding Offset to avoid clashes with the states already
       --  in the union NFA.
 
-
-      function Create_Reverse_Mapping (R : Regexp) return Reverse_Mapping
-      is
-         Rev_Map : Reverse_Mapping (1 .. R.R.Alphabet_Size);
-      begin
-         for C in R.R.Map'Range loop
-            if R.R.Map (C) /= 0 then
-               Rev_Map (R.R.Map (C)) := C;
-            end if;
-         end loop;
-         return Rev_Map;
-      end Create_Reverse_Mapping;
-
-      L_Rev_Map     : constant Reverse_Mapping := Create_Reverse_Mapping (L);
-      R_Rev_Map     : constant Reverse_Mapping := Create_Reverse_Mapping (R);
-      Alphabet_Size : Column_Index := 0;
-      Map           : Mapping := (others => 0);
-
-      procedure Create_Mapping is
-         procedure Add_In_Map (C : Character);
-         --  Add a character in the mapping, if it is not already defined
-
-         procedure Add_In_Map (C : Character) is
-         begin
-            if Map (C) = 0 then
-               Alphabet_Size := Alphabet_Size + 1;
-               Map (C) := Alphabet_Size;
-            end if;
-         end Add_In_Map;
-      begin
-         for J in L_Rev_Map'Range loop
-            Add_In_Map (L_Rev_Map (J));
-         end loop;
-         for J in R_Rev_Map'Range loop
-            Add_In_Map (R_Rev_Map (J));
-         end loop;
-      end Create_Mapping;
-
+      L_Rev_Map       : constant Reverse_Mapping := Create_Reverse_Mapping (L);
+      R_Rev_Map       : constant Reverse_Mapping := Create_Reverse_Mapping (R);
+      Alphabet_Size   : Column_Index;
+      Map             : Mapping;
       NFA             : Regexp_Array_Access := null;
       NFA_Start_State : State_Index;
       NFA_End_State   : State_Index;
@@ -1470,7 +1591,12 @@ package body DB.Utils.Regular_Expressions is
 
          function T (Column : Column_Index) return Column_Index is
          begin
-            return Map (Rev_Map (Column));
+            if Column = 0 then
+               return 0;
+            else
+               pragma Assert (Column in Rev_Map'Range);
+               return Map (Rev_Map (Column));
+            end if;
          end T;
 
          DFA          : Regexp_Array renames R.R.States;
@@ -1483,14 +1609,15 @@ package body DB.Utils.Regular_Expressions is
 
          for Next_Epsilon_Column in Epsilon_Column .. Column_Index'Last loop
             if NFA (NFA_Start_State, Next_Epsilon_Column) = 0 then
-               NFA (NFA_Start_State, Next_Epsilon_Column) := T (Start_State);
+               NFA (NFA_Start_State, Next_Epsilon_Column) :=
+                  T (R.R.Start_State);
                exit;
             end if;
          end loop;
 
          for State in DFA'Range (1) loop
             for Column in DFA'Range (2) loop
-               if DFA (State, Column) /= Sink_State then
+               if DFA (State, Column) /= 0 then
                   pragma Assert (T (State) in NFA'Range (1));
                   pragma Assert (T (Column) in NFA'Range (2));
                   NFA (T (State), T (Column)) := T (DFA (State, Column));
@@ -1504,7 +1631,7 @@ package body DB.Utils.Regular_Expressions is
       end Add_DFA;
 
    begin
-      Create_Mapping;
+      Create_Mapping (L_Rev_Map, R_Rev_Map, Alphabet_Size, Map);
       NFA := new Regexp_Array (1 .. L.R.Num_States + R.R.Num_States + 2,
                                0 .. Alphabet_Size + 2);
       --  To comply with Create_Secondary_Table, the first column of NFA
@@ -1535,182 +1662,137 @@ package body DB.Utils.Regular_Expressions is
          raise;
    end Union;
 
-   ---------------------------------
-   -- Product_DFA_Accepts_Nothing --
-   ---------------------------------
+   ------------------
+   -- Intersection --
+   ------------------
 
-   function Product_DFA_Accepts_Nothing (L, R : Regexp) return Boolean
-   --  We don't build the product DFA explicitly but do it implicitly while we
-   --  look for a final state in (L x R).
-   --  The marking works as follows: start from (q_0^L, q_0^R) and mark it.
-   --  Repeat until no additional state is marked: check whether from any marked
-   --  state an unmarked state could be reached.
-   --  If no final state is marked, the automaton accepts nothing but the empty
-   --  language.
+   function Intersection (L, R : Regexp) return Regexp
+   is
+      function Is_Final (R : Regexp; S : State_Index) return Boolean;
+      pragma Inline (Is_Final);
+
+      function Is_Final (R : Regexp; S : State_Index) return Boolean is
+      begin
+         return R.R.Is_Final (S);
+      end Is_Final;
+
+      function Intersection_DFA is new Gen_Product_DFA
+        (Left_Is_Final  => Is_Final,
+         Right_Is_Final => Is_Final);
+   begin
+      return Intersection_DFA (L, R);
+   end Intersection;
+
+   ----------------
+   -- Difference --
+   ----------------
+
+   function Difference (L, R : Regexp) return Regexp
+   is
+      function Is_Final (R : Regexp; S : State_Index) return Boolean;
+      pragma Inline (Is_Final);
+
+      function Is_Not_Final (R : Regexp; S : State_Index) return Boolean;
+      pragma Inline (Is_Not_Final);
+
+      function Is_Final (R : Regexp; S : State_Index) return Boolean is
+      begin
+         return R.R.Is_Final (S);
+      end Is_Final;
+
+      function Is_Not_Final (R : Regexp; S : State_Index) return Boolean is
+      begin
+         return not R.R.Is_Final (S);
+      end Is_Not_Final;
+
+      function Difference_DFA is new Gen_Product_DFA
+        (Left_Is_Final  => Is_Final,
+         Right_Is_Final => Is_Not_Final);
+   begin
+      return Difference_DFA (L, R);
+   end Difference;
+
+   --------------
+   -- Is_Empty --
+   --------------
+
+   function Is_Empty (R : Regexp) return Boolean
    is
       type Mark is (Unmarked, Marked, Visited);
       --  States are either Unmarked or Marked or, for performance reasons,
       --  Visited.
 
-      function Make_Alphabet return String;
-      --  Computes the common alphabet of L and R. This is done for performance
-      --  reasons to avoid scanning all available characters in the inner-most
-      --  loop.
-
       procedure Mark_Next_State
-        (L_State     : State_Index;
-         R_State     : State_Index;
-         Char        : Character;
+        (S           : State_Index;
+         C           : Column_Index;
          Have_Marked : out Boolean;
          Final       : out Boolean);
-      --  For brevity, let's call L_State p, R_State q and Char a. Then this
-      --  procedure marks marks the successor of (p, q) in the product DFA,
-      --  i.e. (delta_L(p,a), delta_R(q,a)), if it is Unmarked at the moment.
-      --  Have_Marked is set to True iff the state was Unmarked previously.
-      --  Final is set to True iff delta_L(p,a) is final in L (Left_Is_Final)
-      --  and delta_R(q,a) is final in R (Right_Is_Final).
+      --  Marks T := delta(S, C), if T is currently unmarked. Have_Marked is set
+      --  to True iff the state was Unmarked previously. Final is set to True
+      --  iff T is final.
 
-
-      function Make_Alphabet return String
-      is
-         S : String (1 .. Mapping'Length);
-         J : Positive := 1;
-      begin
-         for Char in Mapping'Range loop
-            if L.R.Map (Char) > 0 or R.R.Map (Char) > 0 then
-               S (J) := Char;
-               J := J + 1;
-            end if;
-         end loop;
-         return S (1 .. J - 1);
-      end Make_Alphabet;
-
-
-      Marks : array (Sink_State .. L.R.Num_States,
-                     Sink_State .. R.R.Num_States) of Mark :=
-                        (others => (others => Unmarked));
-
+      Marks : array (0 .. R.R.Num_States) of Mark;
 
       procedure Mark_Next_State
-        (L_State     : State_Index;
-         R_State     : State_Index;
-         Char        : Character;
+        (S           : State_Index;
+         C           : Column_Index;
          Have_Marked : out Boolean;
          Final       : out Boolean)
       is
-         N_L_State : constant State_Index :=
-            L.R.States (L_State, L.R.Map (Char));
-         N_R_State : constant State_Index :=
-            R.R.States (R_State, R.R.Map (Char));
+         T : constant State_Index := R.R.States (S, C);
       begin
-         if Marks (N_L_State, N_R_State) = Unmarked then
-            Marks (N_L_State, N_R_State) := Marked;
+         if Marks (T) = Unmarked then
+            Marks (T)   := Marked;
             Have_Marked := True;
-            Final := Left_Is_Final (L, N_L_State) and
-                     Right_Is_Final (R, N_R_State);
+            Final       := R.R.Is_Final (T);
          else
             Have_Marked := False;
-            Final := False;
+            Final       := False;
          end if;
       end Mark_Next_State;
 
-      Alphabet : constant String := Make_Alphabet;
    begin
-      Marks (Start_State, Start_State) := Marked;
+      Marks := (others => Unmarked);
+      Marks (R.R.Start_State) := Marked;
       loop
          declare
             Something_Marked : Boolean := False;
          begin
-            for L_State in Start_State .. Marks'Last (1) loop
-               for R_State in Start_State .. Marks'Last (2) loop
-                  if Marks (L_State, R_State) = Marked then
-                     Marks (L_State, R_State) := Visited;
-                     for J in Alphabet'Range loop
-                        declare
-                           Have_Marked : Boolean;
-                           Final       : Boolean;
-                        begin
-                           Mark_Next_State
-                              (L_State     => L_State,
-                               R_State     => R_State,
-                               Char        => Alphabet (J),
-                               Have_Marked => Have_Marked,
-                               Final       => Final);
-                           Something_Marked := Something_Marked or Have_Marked;
-                           if Have_Marked and Final then
-                              --  We have found a state that's final, hence the
-                              --  product DFA accepts a word and is not empty.
-                              return False;
-                           end if;
-                        end;
-                     end loop;
-                  end if;
-               end loop;
+            for S in R.R.States'Range (1) loop
+               if Marks (S) = Marked then
+                  Marks (S) := Visited;
+                  for C in R.R.States'Range (2) loop
+                     declare
+                        Have_Marked : Boolean;
+                        Final       : Boolean;
+                     begin
+                        Mark_Next_State (S, C, Have_Marked, Final);
+                        Something_Marked := Something_Marked or Have_Marked;
+                        if Have_Marked and Final then
+                           return False;
+                        end if;
+                     end;
+                  end loop;
+               end if;
             end loop;
 
-            --  No further states can be reached, in particular no final,
-            --  therefore the product DFA accepts nothing at all.
             if not Something_Marked then
+               --  No further states can be reached, in particular no final,
+               --  therefore the product DFA accepts nothing at all.
                return True;
             end if;
          end;
       end loop;
-   end Product_DFA_Accepts_Nothing;
-
-   --------------
-   -- Is_Final --
-   --------------
-
-   function Is_Final (R : Regexp; S : State_Index) return Boolean is
-   begin
-      return S /= Sink_State and then R.R.Is_Final (S);
-   end Is_Final;
+   end Is_Empty;
 
    ---------------
    -- Is_Subset --
    ---------------
 
-   function Is_Subset (L, R : Regexp) return Boolean
-   --  We want to check whether Lang(L) is a subset (or equal to) Lang(R).
-   --       A is a subset of B 
-   --  iff  for all a: a in A => a in B
-   --  iff  (A \ B) is empty
-   --  Hence we need to check whether the difference-automaton of L and R
-   --  has no final state (exactly then L accepts exaclty a subset of R).
-   --
-   --  The difference-automaton is the same like the product-automaton but with
-   --  different set of final states: a state is final iff it is final in A but
-   --  not in B.
-   is
-      function Is_Not_Final (R : Regexp; S : State_Index) return Boolean;
-      pragma Inline (Is_Not_Final);
-
-      function Is_Not_Final (R : Regexp; S : State_Index) return Boolean is
-      begin
-         return not Is_Final (R, S);
-      end Is_Not_Final;
-
-      function Difference_DFA_Accepts_Nothing is new Product_DFA_Accepts_Nothing
-        (Left_Is_Final  => Is_Final,
-         Right_Is_Final => Is_Not_Final);
+   function Is_Subset (L, R : Regexp) return Boolean is
    begin
-      return Difference_DFA_Accepts_Nothing (L, R);
+      return Is_Empty (Difference (L, R));
    end Is_Subset;
 
-   ---------------------------
-   -- Intersection_Is_Empty --
-   ---------------------------
-
-   function Intersection_Is_Empty (L, R : Regexp) return Boolean
-   --  We want to check whether the intersection of Lang(L) and Lang(R) is
-   --  empty. This is exactly the case if the product DFA accepts nothing.
-   is
-      function Intersection_DFA_Accepts_Nothing is new
-      Product_DFA_Accepts_Nothing
-        (Left_Is_Final  => Is_Final,
-         Right_Is_Final => Is_Final);
-   begin
-      return Intersection_DFA_Accepts_Nothing (L, R);
-   end Intersection_Is_Empty;
-
 end DB.Utils.Regular_Expressions;
+

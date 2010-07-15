@@ -1,10 +1,21 @@
 -- Abstract:
 --
 -- A copy of GNAT.Regexp from AdaCore.
--- The only modification of mine is the addition of the Is_Subset and
--- Intersection_Is_Empty functions. These functions can be used to investigate
--- the relation of the languages accepted by two regular expressions.
 --
+-- Major Modifications:
+--  * Union                  (Lang(L) \cup Lang(R))
+--  * Intersection           (Lang(L) \cap Lang(R))
+--  * Difference             (Lang(L) \setminus Lang(R))
+--  * Is_Empty               (Lang(R) = \emptyset?)
+--  * Intersection_Is_Empty  (Lang(L) \cap Lang(R) = \emptyset)
+--  * Is_Subset              (Lang(L) \subseteq Lang(R))
+--
+-- Minor Modifications:
+--  * Regexp_Type subtype of Regexp (just for convention reasons)
+--  * Empty_Regexp (the regular expression that accepts nothing)
+--  * The zero state has a final-flag.
+--  * Each DFA has a specific start state (formerly, start state was 1).
+--  
 -- I had to copy the whole package because one cannot (and shouldn't) make child
 -- packages of system packages (System.Regexp) nor renamed packages
 -- (GNAT.Regexp).
@@ -118,6 +129,9 @@ package DB.Utils.Regular_Expressions is
    type Regexp is private;
    --  Private type used to represent a regular expression
 
+   subtype Regexp_Type is Regexp;
+   --  In the DB-package, there's we want to have the _Type suffix.
+
    Error_In_Regexp : exception;
    --  Exception raised when an error is found in the regular expression
 
@@ -133,28 +147,49 @@ package DB.Utils.Regular_Expressions is
    --  True if S matches R, otherwise False. Raises Constraint_Error if
    --  R is an uninitialized regular expression value.
 
+   function Empty_Regexp return Regexp;
+   --  Regular regular expression that accepts nothing.
+
    function Union (L, R : Regexp) return Regexp;
    --  Creates a new regular expression that accepts the union of the languages
-   --  of L and R.
+   --  of L and R. This function is faster than re-compiling (S1)|(S2) where S1,
+   --  S2 are the string representations of L and R, because it directly works
+   --  on the state machines.
+
+   function Intersection (L, R : Regexp) return Regexp;
+   --  Creates a new regular expression that accepts the intersection of the
+   --  languages of L and R. The intersection is accepted by the product DFA.
+
+   function Difference (L, R : Regexp) return Regexp;
+   --  Creates a new regular expression that accepts the intersection of the
+   --  languages of L and R. The intersection is accepted by the product DFA.
+   --  The difference-automaton is the same like the product-automaton but with
+   --  different set of final states: a state is final iff it is final in A but
+   --  not in B.
+
+   function Is_Empty (R : Regexp) return Boolean;
+   --  Returns True iff the regular expression accepts nothing at all.
+   --  This is done by a (not very efficient) marking algorithm.
 
    function Is_Subset (L, R : Regexp) return Boolean;
    --  Determines whether the language accepted by L is a subset of
    --  (or equal to) the language accepted by R.
-   --  For details, check the documentation in the subprogram body.
-
-   function Intersection_Is_Empty (L, R : Regexp) return Boolean;
-   --  Determines whether there is no word that is accepted by both, L and R.
+   --  Note that A is a subset of B
+   --       iff  for all x: x in A => x in B
+   --       iff  (A \ B) is empty
+   --  Hence it suffices to check whether (Lang(L) \ Lang(R)) is empty.
+   --  The function is the same as Is_Empty (Difference (L, R)).
 
 private
    type Regexp_Value;
 
+   type Natural_Access is access Natural;
    type Regexp_Access is access Regexp_Value;
 
    type Regexp is new Ada.Finalization.Controlled with record
-      R : Regexp_Access := null;
+      R        : Regexp_Access  := null;
+      Refcount : Natural_Access := null;
    end record;
-
-   pragma Finalize_Storage_Only (Regexp);
 
    procedure Finalize (R : in out Regexp);
    --  Free the memory occupied by R

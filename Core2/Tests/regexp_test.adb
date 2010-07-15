@@ -25,12 +25,12 @@ begin
    Put_Line(E2&" subset "&E2&" = "& Boolean'Image(Is_Subset(RE2, RE2)));
    Put_Line(E2&" subset "&E1&" = "& Boolean'Image(Is_Subset(RE2, RE1)));
    New_Line;
-   Put_Line(E1&" cap "&E1&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE1, RE1)));
-   Put_Line(E1&" cap "&E2&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE1, RE2)));
-   Put_Line(E2&" cap "&E2&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE2, RE2)));
-   Put_Line(E2&" cap "&E1&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE2, RE1)));
-   Put_Line(E1&" cap "&E3&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE1, RE3)));
-   Put_Line(E2&" cap "&E3&" = empty? "& Boolean'Image(Intersection_Is_Empty(RE2, RE3)));
+   Put_Line(E1&" cap "&E1&" = empty? "& Boolean'Image(Is_Empty(Intersection(RE1, RE1))));
+   Put_Line(E1&" cap "&E2&" = empty? "& Boolean'Image(Is_Empty(Intersection(RE1, RE2))));
+   Put_Line(E2&" cap "&E2&" = empty? "& Boolean'Image(Is_Empty(Intersection(RE2, RE2))));
+   Put_Line(E2&" cap "&E1&" = empty? "& Boolean'Image(Is_Empty(Intersection(RE2, RE1))));
+   Put_Line(E1&" cap "&E3&" = empty? "& Boolean'Image(Is_Empty(Intersection(RE1, RE3))));
+   Put_Line(E2&" cap "&E3&" = empty? "& Boolean'Image(Is_Empty(Intersection(RE2, RE3))));
    New_Line;
    declare
       S12  : constant String := S1 &" | "& S2;
@@ -52,7 +52,7 @@ begin
    New_Line;
    declare
       E23  : constant String := "("& E2 &")|("& E3 &")";
-      RE23 : constant Regexp :=  Union (RE2, RE3); -- Compile (E23); -- Union (RE2, RE3);
+      RE23 : constant Regexp := Union (Empty_Regexp, Union (RE2, RE3));
    begin
       Put_Line(E23&" accepts "&S1&" = "& Boolean'Image(Match(S1, RE23)));
       Put_Line(E23&" accepts "&S2&" = "& Boolean'Image(Match(S2, RE23)));
@@ -66,6 +66,49 @@ begin
       Put_Line("RE accepts blupp = "& Boolean'Image(Match("blupp", RE)));
       Put_Line("RE accepts blablupp = "& Boolean'Image(Match("blablupp", RE)));
       Put_Line("RE accepts bl = "& Boolean'Image(Match("bl", RE)));
+   end;
+   New_Line;
+   declare
+      RE : constant Regexp := Union (Compile (".*"), Empty_Regexp);
+   begin
+      Put_Line("RE accepts bla = "& Boolean'Image(Match("bla", RE)));
+      Put_Line("RE accepts blupp = "& Boolean'Image(Match("blupp", RE)));
+      Put_Line("RE accepts blablupp = "& Boolean'Image(Match("blablupp", RE)));
+      Put_Line("RE accepts bl = "& Boolean'Image(Match("bl", RE)));
+   end;
+   New_Line;
+   declare
+      RE : constant Regexp := Empty_Regexp;
+   begin
+      Put_Line("RE accepts bla = "& Boolean'Image(Match("bla", RE)));
+      Put_Line("RE accepts blupp = "& Boolean'Image(Match("blupp", RE)));
+      Put_Line("RE accepts blablupp = "& Boolean'Image(Match("blablupp", RE)));
+      Put_Line("RE accepts bl = "& Boolean'Image(Match("bl", RE)));
+   end;
+   New_Line;
+   declare
+      R1 : constant Regexp := Compile ("a(b*)a");
+      R2 : constant Regexp := Compile (".*");
+      R3 : constant Regexp := Intersection (R1, R2);
+      R4 : constant Regexp := Intersection (R2, R1);
+      R5 : constant Regexp := Difference (R1, R3);
+      R6 : constant Regexp := Difference (R1, R4);
+   begin
+      pragma Assert (Is_Subset (R1, R1));
+      pragma Assert (Is_Subset (R2, R2));
+      pragma Assert (Is_Subset (R1, R2));
+      pragma Assert (Is_Subset (R3, R1));
+      pragma Assert (Is_Subset (R3, R2));
+      pragma Assert (Is_Subset (R4, R1));
+      pragma Assert (Is_Subset (R4, R2));
+      pragma Assert (Is_Empty (R5));
+      pragma Assert (Is_Empty (R6));
+      pragma Assert (Is_Subset (Empty_Regexp, R1));
+      pragma Assert (Is_Subset (Empty_Regexp, R2));
+      pragma Assert (Is_Subset (R6, R2));
+      pragma Assert (Is_Subset (R6, R2));
+      pragma Assert (Is_Subset (R5, R1));
+      Put_Line("All assertions ok");
    end;
 end Regexp_Test;
 
