@@ -1,8 +1,8 @@
 -- Abstract:
 --
--- A general, object-oriented map API.
--- The keys of the maps are Types.Keys whereas the values must implement the
--- Value_Type interface.
+-- A general, object-oriented map API whose keys are composite types consisting
+-- of a row ID, a column ID and a timestamp whereas the values must implement
+-- the Value_Type interface.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -10,6 +10,7 @@ with Ada.Finalization;
 
 with DB.Blocks;
 with DB.Types.Keys;
+with DB.Types.Times;
 with DB.Types.Values.Bounded.Streams;
 
 package DB.Maps is
@@ -38,13 +39,38 @@ package DB.Maps is
    function Equals (Left, Right : Comparable_Type'Class) return Boolean;
 
 
-   subtype Key_Type is DB.Types.Keys.Key_Type;
-   use type Key_Type;
+   type Printable_Type is interface;
 
-   type Value_Type is interface and Serializable_Type and Comparable_Type;
-
-   function Image (Value : Value_Type) return String
+   function Image (Printable : Printable_Type) return String
    is abstract;
+
+
+   type String_Type is interface and Printable_Type;
+
+   procedure Set (S : in out String_Type; Value : in String)
+   is abstract;
+
+   package Keys renames Types.Keys;
+   subtype Key_Type is Keys.Key_Type;
+   subtype Row_Type is String_Type;
+   subtype Column_Type is String_Type;
+   subtype Time_Type is Types.Times.Number_Type;
+
+   type Value_Type is interface and Serializable_Type and Comparable_Type and
+      Printable_Type;
+
+   function To_Key
+     (Row  : Row_Type'Class;
+      Col  : Column_Type'Class;
+      Time : Time_Type)
+      return Key_Type;
+
+   procedure From_Key
+     (Row  : out Row_Type'Class;
+      Col  : out Column_Type'Class;
+      Time : out Time_Type;
+      Key  : in  Key_Type);
+
 
    ----------
    -- Map initialization operations.
@@ -98,7 +124,10 @@ package DB.Maps is
 
    type State_Type is (Success, Failure);
 
-   function Contains (Map : Map_Type; Key : Key_Type) return Boolean
+   function Contains 
+     (Map : Map_Type;
+      Key : Key_Type)
+      return Boolean
    is abstract;
 
    procedure Search
@@ -202,7 +231,7 @@ package DB.Maps is
       return Bound_Type;
    -- Creates a concrete bound. The bound New_Bound (Greater, Min) is a
    -- lower bound, because this means that all keys Key hit by the cursor
-   -- must satisfy: Key > Min.
+   -- must satisfy: Key > Min, where Key is the tuple (Row, Col, Time).
 
    function New_Cursor
      (Map         : Map_Type;
@@ -264,6 +293,8 @@ private
    pragma Inline (Positive_Infinity_Bound);
    pragma Inline (Negative_Infinity_Bound);
    pragma Inline (New_Bound);
+   pragma Inline (To_Key);
+   pragma Inline (From_Key);
 
 end DB.Maps;
 

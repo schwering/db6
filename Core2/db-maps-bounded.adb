@@ -88,7 +88,11 @@ package body DB.Maps.Bounded is
    end Max_Key_Size;
 
 
-   function Contains (Map : Map_Type; Key : Key_Type) return Boolean
+   overriding
+   function Contains 
+     (Map : Map_Type;
+      Key : Key_Type)
+      return Boolean
    is
       use type BTrees.State_Type;
       State  : BTrees.State_Type;
@@ -319,16 +323,16 @@ package body DB.Maps.Bounded is
    is
       function Key_To_String (Key : Key_Type) return String
       is
-         function Row_Image (S : Types.Keys.Rows.String_Type) return String is
+         function Row_Image (S : Keys.Rows.String_Type) return String is
          begin
-            return String (Types.Keys.Rows.To_Buffer (S));
+            return String (Keys.Rows.To_Buffer (S));
          end Row_Image;
 
          function Column_Image
            (S : Types.Keys.Columns.String_Type)
             return String is
          begin
-            return String (Types.Keys.Columns.To_Buffer (S));
+            return String (Keys.Columns.To_Buffer (S));
          end Column_Image;
       begin
          return "("& Row_Image (Key.Row) &", "& Column_Image (Key.Column) &", "&

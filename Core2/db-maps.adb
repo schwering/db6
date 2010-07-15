@@ -7,6 +7,7 @@
 with Ada.Tags;
 
 with DB.Maps.Bounded;
+with DB.Maps.Covering;
 
 package body DB.Maps is
 
@@ -26,6 +27,8 @@ package body DB.Maps is
    begin
       if Implementation = "btree" then
          return Bounded.New_Map (Allow_Duplicates);
+      elsif Implementation = "covering" then
+         return Covering.New_Map (Allow_Duplicates);
       else
          raise Program_Error;
       end if;
@@ -69,6 +72,34 @@ package body DB.Maps is
                           Comparison => Comparison,
                           Key        => Key);
    end New_Bound;
+
+
+   function To_Key
+     (Row  : Row_Type'Class;
+      Col  : Column_Type'Class;
+      Time : Time_Type)
+      return Key_Type
+   is
+      use Keys;
+   begin
+      return Key_Type' (Row    => Rows.New_String
+                                   (Rows.Indefinite_Buffer_Type (Row.Image)),
+                        Column => Columns.New_String
+                                   (Rows.Indefinite_Buffer_Type (Col.Image)),
+                        Time   => Time);
+   end To_Key;
+
+
+   procedure From_Key
+     (Row  : out Row_Type'Class;
+      Col  : out Column_Type'Class;
+      Time : out Time_Type;
+      Key  : in  Key_Type) is
+   begin
+      Row.Set (String (Keys.Rows.To_Buffer (Key.Row)));
+      Col.Set (String (Keys.Columns.To_Buffer (Key.Column)));
+      Time := Key.Time;
+   end From_Key;
 
 end DB.Maps;
 

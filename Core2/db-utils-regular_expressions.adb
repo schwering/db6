@@ -32,8 +32,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with DB.Utils.Print;
-use DB.Utils;
 with Ada.Unchecked_Deallocation;
 
 package body DB.Utils.Regular_Expressions is
