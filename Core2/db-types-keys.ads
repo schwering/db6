@@ -43,6 +43,7 @@ package DB.Types.Keys is
 
    Is_Context_Free_Serialization : constant Boolean;
 
+   function "<"  (Left, Right : Key_Type) return Boolean;
    function "<=" (Left, Right : Key_Type) return Boolean;
    function "="  (Left, Right : Key_Type) return Boolean;
    function Compare

@@ -7,6 +7,7 @@
 
 with Ada.Finalization;
 
+with DB.Utils.Gen_Binary_Heaps;
 with DB.Utils.Regular_Expressions;
 
 private
@@ -216,17 +217,33 @@ private
          Self             : Map_Ref_Type         := Map_Type'Unchecked_Access;
       end record;
 
+
    subtype Base_Cursor_Type is Maps.Cursor_Type'Class;
    type Base_Cursor_Ref_Type is access Base_Cursor_Type;
    type Base_Cursor_Ref_Array_Type is array (Positive range <>) of
       Base_Cursor_Ref_Type;
    type Base_Cursor_Ref_Array_Ref_Type is access Base_Cursor_Ref_Array_Type;
 
+   type Value_Ref_Type is access Value_Type'Class;
+
+   type Heap_Item_Type is
+      record
+         Key    : Key_Type;
+         Value  : Value_Ref_Type;
+         Cursor : Base_Cursor_Ref_Type;
+      end record;
+
+   function "<" (Left, Right : Heap_Item_Type) return Boolean;
+   package Heaps is new Utils.Gen_Binary_Heaps (Heap_Item_Type, "<");
+   type Heap_Ref_Type is access Heaps.Heap_Type;
+
    type Cursor_Type is new AF.Limited_Controlled and Maps.Cursor_Type with
       record
          Initialized : Boolean;
          Map         : Map_Ref_Type;
          Cursors     : Base_Cursor_Ref_Array_Ref_Type := null;
+         Heap        : Heap_Ref_Type                  := null;
+         Heap_Filled : Boolean;
       end record;
 
 end DB.Maps.Covering;

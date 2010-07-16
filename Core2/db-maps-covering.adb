@@ -253,17 +253,6 @@ package body DB.Maps.Covering is
    end Col_Image;
 
 
-   function Matches
-     (Key   : Key_Type;
-      Guard : RE.Regexp_Type)
-      return Boolean
-   is
-      pragma Inline (Matches);
-   begin
-      return Matches (Col_Image (Key), Guard);
-   end Matches;
-
-
    overriding
    function Contains 
      (Map : Map_Type;
@@ -380,6 +369,29 @@ package body DB.Maps.Covering is
    end Delete;
 
 
+   procedure Free_Heap_Item (Item : in out Heap_Item_Type)
+   is
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Value_Type'Class, Value_Ref_Type);
+   begin
+      if Item.Value /= null then
+         Free (Item.Value);
+      end if;
+   end Free_Heap_Item;
+
+
+   procedure Free_Heap (Heap : in out Heap_Ref_Type)
+   is
+      pragma Precondition (Heap /= null);
+      pragma Precondition (Heap = null);
+
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Heaps.Heap_Type, Heap_Ref_Type);
+   begin
+      Heaps.Clear (Heap.all, Free_Heap_Item'Access);
+      Free (Heap);
+   end Free_Heap;
+
    function New_Cursor
      (Map         : Map_Type;
       Thread_Safe : Boolean;
@@ -388,11 +400,15 @@ package body DB.Maps.Covering is
       return Maps.Cursor_Type'Class
    is
       pragma Precondition (Map.Initialized);
+
       procedure Free is new Ada.Unchecked_Deallocation
         (Base_Cursor_Ref_Array_Type, Base_Cursor_Ref_Array_Ref_Type);
-      Cursors : Base_Cursor_Ref_Array_Ref_Type :=
-         new Base_Cursor_Ref_Array_Type (1 .. Map.Cover'Length);
+
+      Cursors : Base_Cursor_Ref_Array_Ref_Type := null;
+      Heap    : Heap_Ref_Type                  := null;
    begin
+      Cursors := new Base_Cursor_Ref_Array_Type (1 .. Map.Cover'Length);
+      Heap    := new Heaps.Heap_Type' (Heaps.New_Heap (Map.Cover'Length));
       for I in Map.Cover'Range loop
          Cursors (Map.Cover (I)) := new Base_Cursor_Type'
            (Map.Slices (Map.Cover (I)).Map.New_Cursor (Thread_Safe,
@@ -402,10 +418,17 @@ package body DB.Maps.Covering is
       return Cursor_Type' (AF.Limited_Controlled with
                            Initialized => True,
                            Map         => Map.Self,
-                           Cursors     => Cursors);
+                           Cursors     => Cursors,
+                           Heap        => Heap,
+                           Heap_Filled => False);
    exception
       when others =>
-         Free (Cursors);
+         if Cursors /= null then
+            Free (Cursors);
+         end if;
+         if Heap /= null then
+            Free_Heap (Heap);
+         end if;
          raise;
    end New_Cursor;
 
@@ -415,12 +438,21 @@ package body DB.Maps.Covering is
      (Cursor : in out Cursor_Type)
    is
       pragma Precondition (Cursor.Initialized = (Cursor.Cursors /= null));
+      pragma Precondition (Cursor.Initialized = (Cursor.Heap /= null));
+
       procedure Free is new Ada.Unchecked_Deallocation
         (Base_Cursor_Ref_Array_Type, Base_Cursor_Ref_Array_Ref_Type);
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Heaps.Heap_Type, Heap_Ref_Type);
    begin
       if Cursor.Initialized then
          Cursor.Initialized := False;
-         Free (Cursor.Cursors);
+         if Cursor.Cursors /= null then
+            Free (Cursor.Cursors);
+         end if;
+         if Cursor.Heap /= null then
+            Free (Cursor.Heap);
+         end if;
       end if;
    end Finalize;
 
@@ -444,15 +476,69 @@ package body DB.Maps.Covering is
    end Pause;
 
 
+   function "<" (Left, Right : Heap_Item_Type) return Boolean
+   is
+      use type Key_Type;
+   begin
+      return Left.Key < Right.Key;
+   end "<";
+
+
    procedure Next
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
       State  :    out State_Type)
    is
+      pragma Precondition (Cursor.Initialized);
+      pragma Precondition (Cursor.Cursors /= null);
+      pragma Precondition (Cursor.Heap /= null);
+
+      -- The idea is to populate the heap with at most one item per subcursor.
+      -- When one item is taken from the heap, a new one is inserted from the
+      -- owning subcursor, if the subcursor has a next value.
+      -- This guarantees that if a subcursor has no next value, Next isn't
+      -- invoked anymore on this subcursor.
+
+      procedure Insert_From_Sub_Cursor (Sub_Cursor : in Base_Cursor_Ref_Type)
+      is
+         K : Key_Type;
+         V : Value_Type'Class := Value;
+         S : State_Type;
+      begin
+         Sub_Cursor.Next (K, V, S);
+         if S = Success then
+            declare
+               V_Ref : Value_Ref_Type := new Value_Type'Class' (V);
+               Item  : Heap_Item_Type := Heap_Item_Type' (K, V_Ref, Sub_Cursor);
+            begin
+               Heaps.Insert (Cursor.Heap.all, Item);
+            end;
+         end if;
+      end Insert_From_Sub_Cursor;
+
    begin
-      -- TODO implement, probably using a bin-heap or so
-      null;
+      if not Cursor.Heap_Filled then
+         for I in Cursor.Cursors'Range loop
+            Insert_From_Sub_Cursor (Cursor.Cursors (I));
+         end loop;
+         Cursor.Heap_Filled := True;
+      end if;
+
+      if Heaps.Is_Empty (Cursor.Heap.all) then
+         State := Failure;
+         return;
+      end if;
+
+      declare
+         Item : Heap_Item_Type;
+      begin
+         Heaps.Extract_Min (Cursor.Heap.all, Item);
+         Key   := Item.Key;
+         Value := Item.Value.all;
+         State := Success;
+         Insert_From_Sub_Cursor (Item.Cursor);
+      end;
    end Next;
 
 

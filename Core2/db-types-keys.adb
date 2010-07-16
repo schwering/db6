@@ -11,6 +11,23 @@ package body DB.Types.Keys is
    function "=" (Left, Right : Rows.String_Type) return Boolean
    renames Rows."=";
 
+
+   function "<" (Left, Right : Key_Type) return Boolean is
+   begin
+      if Left.Row < Right.Row then
+         return True;
+      elsif Left.Row = Right.Row then
+         --if Left.Column < Right.Column then
+            --return True;
+         --elsif Left.Column = Right.Column then
+            return Right.Time < Left.Time;
+            -- intentionally L > R (most recent time is smallest)
+         --end if;
+      end if;
+      return False;
+   end "<";
+
+
    function "<=" (Left, Right : Key_Type) return Boolean is
    begin
       if Left.Row < Right.Row then
@@ -20,6 +37,7 @@ package body DB.Types.Keys is
             --return True;
          --elsif Left.Column = Right.Column then
             return not (Left.Time < Right.Time);
+            -- intentionally !(L < R) <=> L >= R (most recent time is smallest)
          --end if;
       end if;
       return False;
