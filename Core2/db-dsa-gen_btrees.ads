@@ -48,9 +48,8 @@
 -- Design Notes:
 --
 -- Exceptions should only be raised under really serious circumstances or in
--- debugging mode.
--- In productive use, the State_Type should be used.
--- XXX Really?
+-- debugging mode: Tree_Error for tree inconsitencies etc., and other exceptions
+-- depending on the generic actual parameters, usually IO_Error.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -228,7 +227,7 @@ package DB.DSA.Gen_BTrees is
       State  :    out State_Type);
    -- Steps forward to the next Key/Value-pair and sets State to Success.
    -- If no such pair exists (with regard to the set bounds), State is set to
-   -- Failure or Error.
+   -- Failure.
    -- If Delete was called before, Next must recalibrate, i.e. find the
    -- key/value-pair that should be visited next.
 
