@@ -5,16 +5,20 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Finalization;
+
 with DB.Utils.Regular_Expressions;
 
 private
 package DB.Maps.Covering is
    pragma Preelaborate;
 
+   package AF renames Ada.Finalization;
+
    ----------
    -- Map initialization operations.
 
-   type Map_Type is limited new Maps.Map_Type with private;
+   type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with private;
 
    not overriding
    function New_Map (Allow_Duplicates : in Boolean) return Map_Type;
@@ -126,7 +130,8 @@ package DB.Maps.Covering is
    ----------
    -- Cursor operations.
 
-   type Cursor_Type is limited new Maps.Cursor_Type with private;
+   type Cursor_Type is new AF.Limited_Controlled and Maps.Cursor_Type with
+      private;
 
    overriding
    function New_Cursor
@@ -135,6 +140,10 @@ package DB.Maps.Covering is
       Lower_Bound : Bound_Type;
       Upper_Bound : Bound_Type)
       return Maps.Cursor_Type'Class;
+
+   overriding
+   procedure Finalize
+     (Cursor : in out Cursor_Type);
 
    overriding
    procedure Set_Thread_Safety
@@ -188,23 +197,36 @@ private
    type Slice_Array_Type is array (Positive range <>) of Slice_Type;
    type Slice_Array_Ref_Type is access Slice_Array_Type;
 
-   type Map_Type is limited new Maps.Map_Type with
+   type Cover_Index_Type is new Natural;
+   type Cover_Type is array (Cover_Index_Type range <>) of Positive;
+   -- Cover_Index_Type is only used as Cover_Type's index to avoid stupid errors
+   -- like:
+   --    for I in Cover'Range loop ... Slices (       I ) ... end loop;
+   -- instead of
+   --    for I in Cover'Range loop ... Slices (Cover (I)) ... end loop;
+   type Cover_Ref_Type is access Cover_Type;
+
+   type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with
       record
-         Config           : Node_Ref_Type := null;
+         Initialized      : Boolean;
          Allow_Duplicates : Boolean;
+         Config           : Node_Ref_Type        := null;
          Slices           : Slice_Array_Ref_Type := null;
-         Self             : Map_Ref_Type := Map_Type'Unchecked_Access;
+         Cover            : Cover_Ref_Type       := null;
+         Self             : Map_Ref_Type         := Map_Type'Unchecked_Access;
       end record;
 
-   type Base_Cursor_Ref_Type is access Maps.Cursor_Type;
+   subtype Base_Cursor_Type is Maps.Cursor_Type'Class;
+   type Base_Cursor_Ref_Type is access Base_Cursor_Type;
    type Base_Cursor_Ref_Array_Type is array (Positive range <>) of
       Base_Cursor_Ref_Type;
    type Base_Cursor_Ref_Array_Ref_Type is access Base_Cursor_Ref_Array_Type;
 
-   type Cursor_Type is limited new Maps.Cursor_Type with
+   type Cursor_Type is new AF.Limited_Controlled and Maps.Cursor_Type with
       record
-         Map     : Map_Ref_Type;
-         Cursors : Base_Cursor_Ref_Array_Ref_Type := null;
+         Initialized : Boolean;
+         Map         : Map_Ref_Type;
+         Cursors     : Base_Cursor_Ref_Array_Ref_Type := null;
       end record;
 
 end DB.Maps.Covering;

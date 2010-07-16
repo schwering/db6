@@ -8,17 +8,37 @@ with Ada.Unchecked_Deallocation;
 
 package body DB.Maps.Covering is
 
-   type Cover_Type is array (Positive range <>) of Boolean;
-
    function Cover
      (R   : RE.Regexp_Type; 
       Map : Map_Type'Class)
       return Cover_Type
    is
       pragma Precondition (Map.Slices /= null);
+
+      type Booleans_Type is array (Positive range <>) of Boolean;
+
+      function Booleans_To_Cover
+         (Take : Booleans_Type;
+          Size : Natural)
+          return Cover_Type
+      is
+         Cover : Cover_Type (1 .. Cover_Index_Type (Size));
+         J     : Cover_Index_Type := 0;
+      begin
+         for I in Take'Range loop
+            if Take (I) then
+               J         := J + 1;
+               Cover (J) := I;
+            end if;
+         end loop;
+         pragma Assert (Natural (J) = Size);
+         return Cover;
+      end Booleans_To_Cover;
+
       Slices          : Slice_Array_Type renames Map.Slices.all;
-      Cover           : Cover_Type (Slices'Range) := (others => False);
-      Already_Covered : RE.Regexp_Type := RE.Empty_Regexp;
+      Take            : Booleans_Type (Slices'Range) := (others => False);
+      Size            : Natural                      := 0;
+      Already_Covered : RE.Regexp_Type               := RE.Empty_Regexp;
    begin
       for I in Slices'Range loop
          declare
@@ -31,18 +51,20 @@ package body DB.Maps.Covering is
             -- there is in fact no benefit.
          begin
             if Has_Benefit then
-               Cover (I)       := True;
+               Take (I)        := True;
+               Size            := Size + 1;
                Already_Covered := RE.Union (Already_Covered, Guard);
             end if;
          end;
       end loop;
-      return Cover;
+      pragma Assert (RE.Is_Subset (Already_Covered, R));
+      return Booleans_To_Cover (Take, Size);
    end Cover;
 
 
    function Cover (Regexp : String; Map : Map_Type'Class) return Cover_Type
    is
-      R : RE.Regexp_Type := RE.Compile (Regexp);
+      R : constant RE.Regexp_Type := RE.Compile (Regexp);
    begin
       return Cover (R, Map);
    end Cover;
@@ -62,8 +84,9 @@ package body DB.Maps.Covering is
    function New_Map (Allow_Duplicates : in Boolean) return Map_Type is
    begin
       return Map_Type' (AF.Limited_Controlled with
+                        Initialized      => False,
                         Allow_Duplicates => Allow_Duplicates,
-                        others => <>);
+                        others           => <>);
    end New_Map;
 
 
@@ -94,7 +117,7 @@ package body DB.Maps.Covering is
    end Add_Slice;
 
 
-   procedure Init_Slices (Map : in out Map_Type)
+   procedure Allocate_Slices (Map : in out Map_Type)
    is
       --pragma Precondition (Map.Config /= null);
       --pragma Postcondition (Map.Slices /= null);
@@ -109,7 +132,7 @@ package body DB.Maps.Covering is
          end loop;
       end;
       Map.Slices := new Slice_Array_Type (1 .. Count);
-   end Init_Slices;
+   end Allocate_Slices;
 
 
    procedure Create (Map : in out Map_Type; ID : in String)
@@ -117,21 +140,21 @@ package body DB.Maps.Covering is
       pragma Unreferenced (ID);
       pragma Precondition (not Map.Initialized);
    begin
-      Init_Slices (Map);
+      Allocate_Slices (Map);
       declare
          Node : Node_Ref_Type := Map.Config;
          I    : Natural := 1;
       begin
          while Node /= null loop
             Map.Slices (I).Guard := RE.Compile (Node.Guard);
-            Map.Slices (I).Map :=
-               new Base_Map_Type' (Maps.New_Map (Node.Impl,
-                                                 Map.Allow_Duplicates));
+            Map.Slices (I).Map   := new Base_Map_Type'
+              (Maps.New_Map (Node.Impl, Map.Allow_Duplicates));
             Maps.Create (Map.Slices (I).Map.all, Node.ID);
             Node := Node.Next;
             I := I + 1;
          end loop;
       end;
+      Map.Cover := new Cover_Type' (Total_Cover (Map));
       Map.Initialized := True;
    end Create;
 
@@ -156,30 +179,40 @@ package body DB.Maps.Covering is
 
    procedure Finalize (Map : in out Map_Type)
    is
-      procedure Free_Base_Map_Array is new Ada.Unchecked_Deallocation
+      pragma Precondition (Map.Initialized = (Map.Slices /= null));
+      pragma Precondition (Map.Initialized = (Map.Cover /= null));
+      procedure Free is new Ada.Unchecked_Deallocation
         (Slice_Array_Type, Slice_Array_Ref_Type);
-      procedure Free_Base_Map is new Ada.Unchecked_Deallocation
+      procedure Free is new Ada.Unchecked_Deallocation
         (Base_Map_Type, Base_Map_Ref_Type);
-      procedure Free_Node is new Ada.Unchecked_Deallocation
+      procedure Free is new Ada.Unchecked_Deallocation
         (Node_Type, Node_Ref_Type);
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Cover_Type, Cover_Ref_Type);
    begin
       if Map.Initialized then
+         -- Free Config
+         while Map.Config /= null loop
+            declare
+               Next : Node_Ref_Type;
+            begin
+               Next := Map.Config.Next;
+               Free (Map.Config);
+               Map.Config := Next;
+            end;
+         end loop;
+         Map.Config := null;
+
+         -- Free Slices and Maps
          for I in Map.Slices'Range loop
             Map.Slices (I).Map.Finalize;
-            Free_Base_Map (Map.Slices (I).Map);
+            Free (Map.Slices (I).Map);
          end loop;
-         Free_Base_Map_Array (Map.Slices);
-         declare
-            Current : Node_Ref_Type := Map.Config;
-            Next    : Node_Ref_Type;
-         begin
-            while Current /= null loop
-               Next := Current.Next;
-               Free_Node (Current);
-               Current := Next;
-            end loop;
-            Map.Config := null;
-         end;
+         Free (Map.Slices);
+
+         -- Free Cover
+         Free (Map.Cover);
+
          Map.Initialized := False;
       end if;
    end Finalize;
@@ -271,19 +304,20 @@ package body DB.Maps.Covering is
       Value :    out Value_Type'Class;
       State :    out State_Type) is
    begin
-      if Map.Slices'Length = 0 then
+      if Map.Cover'Length = 0 then
          State := Failure;
          return;
       end if;
-      Map.Slices (Map.Slices'First).Map.Search_Minimum (Key, Value, State);
-      for I in Map.Slices'First + 1 .. Map.Slices'Last loop
+      Map.Slices (Map.Cover (Map.Cover'First)).Map.Search_Minimum
+        (Key, Value, State);
+      for I in Map.Cover'First + 1 .. Map.Cover'Last loop
          declare
             use type Utils.Comparison_Result_Type;
             This_Key   : Key_Type;
             This_Value : Value_Type'Class := Value; -- Value is the prototype
             This_State : State_Type;
          begin
-            Map.Slices (I).Map.Search_Minimum
+            Map.Slices (Map.Cover (I)).Map.Search_Minimum
               (This_Key, This_Value, This_State);
             if This_State = Success and then
                Keys.Compare (This_Key, Key) = Utils.Less then
@@ -354,23 +388,59 @@ package body DB.Maps.Covering is
       return Maps.Cursor_Type'Class
    is
       pragma Precondition (Map.Initialized);
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Base_Cursor_Ref_Array_Type, Base_Cursor_Ref_Array_Ref_Type);
+      Cursors : Base_Cursor_Ref_Array_Ref_Type :=
+         new Base_Cursor_Ref_Array_Type (1 .. Map.Cover'Length);
    begin
-      return Cursor_Type' (Maps.Cursor_Type with others => <>);
+      for I in Map.Cover'Range loop
+         Cursors (Map.Cover (I)) := new Base_Cursor_Type'
+           (Map.Slices (Map.Cover (I)).Map.New_Cursor (Thread_Safe,
+                                                       Lower_Bound,
+                                                       Upper_Bound));
+      end loop;
+      return Cursor_Type' (AF.Limited_Controlled with
+                           Initialized => True,
+                           Map         => Map.Self,
+                           Cursors     => Cursors);
+   exception
+      when others =>
+         Free (Cursors);
+         raise;
    end New_Cursor;
+
+
+   overriding
+   procedure Finalize
+     (Cursor : in out Cursor_Type)
+   is
+      pragma Precondition (Cursor.Initialized = (Cursor.Cursors /= null));
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Base_Cursor_Ref_Array_Type, Base_Cursor_Ref_Array_Ref_Type);
+   begin
+      if Cursor.Initialized then
+         Cursor.Initialized := False;
+         Free (Cursor.Cursors);
+      end if;
+   end Finalize;
 
 
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
       Enabled : in     Boolean) is
    begin
-      null;
+      for I in Cursor.Cursors'Range loop
+         Cursor.Cursors (I).Set_Thread_Safety (Enabled);
+      end loop;
    end Set_Thread_Safety;
 
 
    procedure Pause
      (Cursor : in out Cursor_Type) is
    begin
-      null;
+      for I in Cursor.Cursors'Range loop
+         Cursor.Cursors (I).Pause;
+      end loop;
    end Pause;
 
 
@@ -381,6 +451,7 @@ package body DB.Maps.Covering is
       State  :    out State_Type)
    is
    begin
+      -- TODO implement, probably using a bin-heap or so
       null;
    end Next;
 
@@ -392,6 +463,8 @@ package body DB.Maps.Covering is
       State  :    out State_Type)
    is
    begin
+      -- TODO implement
+      -- XXX How should it behave?!
       null;
    end Delete;
 

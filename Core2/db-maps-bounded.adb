@@ -28,8 +28,9 @@ package body DB.Maps.Bounded is
    function New_Map (Allow_Duplicates : in Boolean) return Map_Type is
    begin
       return Map_Type' (AF.Limited_Controlled with
+                        Initialized      => False,
                         Allow_Duplicates => Allow_Duplicates,
-                        others => <>);
+                        others           => <>);
    end New_Map;
 
 

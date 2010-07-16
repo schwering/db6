@@ -5,6 +5,8 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Finalization;
+
 with DB.DSA.Gen_BTrees;
 with DB.Blocks.Gen_Values_Signature;
 with DB.Blocks;
@@ -16,10 +18,12 @@ private
 package DB.Maps.Bounded is
    pragma Preelaborate;
 
+   package AF renames Ada.Finalization;
+
    ----------
    -- Map initialization operations.
 
-   type Map_Type is limited new Maps.Map_Type with private;
+   type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with private;
 
    function New_Map (Allow_Duplicates : in Boolean) return Map_Type;
 
@@ -186,8 +190,9 @@ private
    pragma Controlled (Map_Ref_Type);
    for Map_Ref_Type'Storage_Size use 0;
 
-   type Map_Type is limited new Maps.Map_Type with
+   type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with
       record
+         Initialized      : Boolean;
          Allow_Duplicates : Boolean;
          Self             : Map_Ref_Type := Map_Type'Unchecked_Access;
          Tree             : BTrees.Tree_Type;
@@ -196,8 +201,9 @@ private
 
    type Cursor_Type is limited new Maps.Cursor_Type with
       record
-         Map    : Map_Ref_Type;
-         Cursor : BTrees.Cursor_Type;
+         Initialized : Boolean;
+         Map         : Map_Ref_Type;
+         Cursor      : BTrees.Cursor_Type;
       end record;
 
 end DB.Maps.Bounded;

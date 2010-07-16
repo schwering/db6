@@ -6,8 +6,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Finalization;
-
 with DB.Blocks;
 with DB.Types.Keys;
 with DB.Types.Times;
@@ -15,8 +13,6 @@ with DB.Types.Values.Bounded.Streams;
 
 package DB.Maps is
    pragma Preelaborate;
-
-   package AF renames Ada.Finalization;
 
    type Serializable_Type is interface;
 
@@ -75,7 +71,7 @@ package DB.Maps is
    ----------
    -- Map initialization operations.
 
-   type Map_Type is abstract new AF.Limited_Controlled with private;
+   type Map_Type is limited interface;
 
    Default_Allow_Duplicates : constant Boolean := True;
 
@@ -106,7 +102,6 @@ package DB.Maps is
    is abstract;
    -- Initializes Map with the map named ID.
 
-   overriding
    procedure Finalize (Map : in out Map_Type)
    is abstract;
    -- Finalizes Map, i.e. closes opened files.
@@ -215,7 +210,7 @@ package DB.Maps is
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
    type Bound_Type is private;
-   type Cursor_Type is abstract tagged limited private;
+   type Cursor_Type is limited interface;
 
    function Positive_Infinity_Bound
       return Bound_Type;
@@ -277,17 +272,6 @@ private
                Infinity   : Infinity_Type;
          end case;
       end record;
-
-   type Map_Type is abstract new AF.Limited_Controlled with
-      record
-         Initialized : Boolean := False;
-      end record;
-
-   type Cursor_Type is abstract tagged limited
-      record
-         Initialized : Boolean := False;
-      end record;
-
 
    pragma Inline (New_Map);
    pragma Inline (Positive_Infinity_Bound);
