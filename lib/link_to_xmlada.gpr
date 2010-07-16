@@ -1,0 +1,6 @@
+with "/usr/gnat/lib/gnat/xmlada.gpr";
+
+--library
+project Link_To_XMLAda is
+end Link_To_XMLAda;
+
