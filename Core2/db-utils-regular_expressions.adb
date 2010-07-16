@@ -1,3 +1,10 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 1998-2008, AdaCore
+-- Copyright 2010 Christoph Schwering
+
 ------------------------------------------------------------------------------
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
@@ -46,7 +53,7 @@ package body DB.Utils.Regular_Expressions is
    --  0 and then add the transitions).
 
    type Column_Index is new Natural;
-   --  Convention: 0 represents `all the other' characters (in the mapping, for
+   --  Convention: 0 represents `all the other characters' (in the mapping, for
    --  example).
 
    type Regexp_Array is array
@@ -60,10 +67,14 @@ package body DB.Utils.Regular_Expressions is
    --  can grow dynamically depending on the needs.
 
    type Mapping is array (Character'Range) of Column_Index;
-   --  Mapping between characters and column in the Regexp_Array
+   --  Mapping between characters and column in the Regexp_Array. Those
+   --  characters that are not explicitly mapped are assigned to column 0, i.e.
+   --  the `all the other characters' transition.
 
    type Reverse_Mapping is array (Column_Index range <>) of Character;
-   --  Reverse mapping between columns and characters.
+   --  Reverse mapping between columns and characters. Those characters that are
+   --  mapped to the `all the other characters' column in the original mapping
+   --  are not contained in the reverse mapping, of course.
 
    type Boolean_Array is array (State_Index range <>) of Boolean;
 
@@ -71,10 +82,10 @@ package body DB.Utils.Regular_Expressions is
      (Alphabet_Size : Column_Index;
       Num_States    : State_Index) is
    record
-      Map            : Mapping;
-      States         : Regexp_Array (1 .. Num_States, 0 .. Alphabet_Size);
-      Is_Final       : Boolean_Array (0 .. Num_States);
-      Start_State    : State_Index;
+      Map         : Mapping;
+      States      : Regexp_Array (1 .. Num_States, 0 .. Alphabet_Size);
+      Is_Final    : Boolean_Array (0 .. Num_States);
+      Start_State : State_Index;
    end record;
    --  Deterministic finite-state machine
 

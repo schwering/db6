@@ -2,20 +2,20 @@
 --
 -- A copy of GNAT.Regexp from AdaCore.
 --
--- Major Modifications:
+-- Additions:
 --  * Union                  (Lang(L) \cup Lang(R))
 --  * Intersection           (Lang(L) \cap Lang(R))
 --  * Difference             (Lang(L) \setminus Lang(R))
 --  * Is_Empty               (Lang(R) = \emptyset?)
---  * Intersection_Is_Empty  (Lang(L) \cap Lang(R) = \emptyset)
---  * Is_Subset              (Lang(L) \subseteq Lang(R))
+--  * Is_Subset              (Lang(L) \subseteq Lang(R)?)
 --
--- Minor Modifications:
---  * Regexp_Type subtype of Regexp (just for convention reasons)
+-- Internal Modifications:
 --  * Empty_Regexp (the regular expression that accepts nothing)
 --  * The zero state has a final-flag.
 --  * Each DFA has a specific start state (formerly, start state was 1).
---  
+--  * Gen_Product_DFA, which builds a product DFA.
+--  * The DFAs use reference-counting.
+--
 -- I had to copy the whole package because one cannot (and shouldn't) make child
 -- packages of system packages (System.Regexp) nor renamed packages
 -- (GNAT.Regexp).
@@ -190,6 +190,8 @@ private
       R        : Regexp_Access  := null;
       Refcount : Natural_Access := null;
    end record;
+
+   pragma Finalize_Storage_Only (Regexp);
 
    procedure Finalize (R : in out Regexp);
    --  Free the memory occupied by R
