@@ -112,6 +112,9 @@ package body DB.Utils.Regular_Expressions is
    procedure Free is new Ada.Unchecked_Deallocation
      (Regexp_Array, Regexp_Array_Access);
 
+   procedure Free is new Ada.Unchecked_Deallocation
+     (Regexp_Value, Regexp_Access);
+
    function Create_Secondary_Table
      (Map           : Mapping;
       Alphabet_Size : Column_Index;
@@ -163,8 +166,6 @@ package body DB.Utils.Regular_Expressions is
    --------------
 
    procedure Finalize (R : in out Regexp) is
-      procedure Free is new Ada.Unchecked_Deallocation
-        (Regexp_Value, Regexp_Access);
       procedure Free is new Ada.Unchecked_Deallocation
         (Natural, Natural_Access);
    begin
@@ -1489,14 +1490,6 @@ package body DB.Utils.Regular_Expressions is
       function Trans (S, T : State_Index) return State_Index;
       --  Transforms the states S, T of L, R to a state (S, T) of the product
       --  DFA.
-      --  Generally, the idea is to map (S,T) to the flat space by
-      --  (S,T) -> S * (R.Num_States+1) + T.
-      --  The problem is that (1,1), e.g. the product start state, is not mapped
-      --  to 1, which is what other subprograms expect.
-      --  Solution: Hence we exchange (1,1) and the (x,y) that is mapped to 1.
-      --  Nicer solutions would be to introduce a DFA/NFA-dependend start state
-      --  or a formal generic state, but both solutions would require much more
-      --  refactoring.
 
       pragma Inline (Trans);
 
@@ -1542,6 +1535,7 @@ package body DB.Utils.Regular_Expressions is
             end loop;
          end loop;
 
+         Is_Final := (others => False);
          for S in 0 .. L_States'Last (1) loop
             for T in 0 .. R_States'Last (1) loop
                Is_Final (Trans (S, T)) := Left_Is_Final (L, S) and
@@ -1555,6 +1549,12 @@ package body DB.Utils.Regular_Expressions is
       return (Ada.Finalization.Controlled with
               R        => P,
               Refcount => new Natural' (1));
+   exception
+      when others =>
+         if P /= null then
+            Free (P);
+         end if;
+         raise;
    end Gen_Product_DFA;
 
    -----------

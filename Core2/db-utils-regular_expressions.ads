@@ -3,6 +3,7 @@
 -- A copy of GNAT.Regexp from AdaCore.
 --
 -- Additions:
+--  * Empty_Regexp           (\emptyset)
 --  * Union                  (Lang(L) \cup Lang(R))
 --  * Intersection           (Lang(L) \cap Lang(R))
 --  * Difference             (Lang(L) \setminus Lang(R))
@@ -10,7 +11,6 @@
 --  * Is_Subset              (Lang(L) \subseteq Lang(R)?)
 --
 -- Internal Modifications:
---  * Empty_Regexp (the regular expression that accepts nothing)
 --  * The zero state has a final-flag.
 --  * Each DFA has a specific start state (formerly, start state was 1).
 --  * Gen_Product_DFA, which builds a product DFA.
