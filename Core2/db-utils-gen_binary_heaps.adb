@@ -35,6 +35,7 @@ package body DB.Utils.Gen_Binary_Heaps is
       return 2 * Index + 1;
    end Right_Child;
 
+
    function Min_Child (Heap : Heap_Type; Index : Positive) return Positive
    is
       pragma Inline (Min_Child);
@@ -118,6 +119,29 @@ package body DB.Utils.Gen_Binary_Heaps is
       Heap.Buffer (Heap.Last) := Item;
       Heapify (Heap, Heap.Last);
    end Insert;
+
+
+   procedure Clear
+     (Heap : in out Heap_Type;
+      Free : access procedure (Item : in out Item_Type)) is
+   begin
+      for I in 1 .. Heap.Last loop
+         Free (Heap.Buffer (I));
+      end loop;
+      Heap.Last := 0;
+   end Clear;
+
+
+   function Is_Empty (Heap : Heap_Type) return Boolean is
+   begin
+      return Heap.Last = 0;
+   end Is_Empty;
+
+
+   function Size (Heap : Heap_Type) return Natural is
+   begin
+      return Heap.Last;
+   end Size;
 
 end DB.Utils.Gen_Binary_Heaps;
 

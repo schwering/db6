@@ -17,8 +17,16 @@ package DB.Utils.Gen_Binary_Heaps is
    type Heap_Type (<>) is limited private;
 
    function New_Heap (Size : Natural) return Heap_Type;
+
    procedure Extract_Min (Heap : in out Heap_Type; Item : out Item_Type);
    procedure Insert (Heap : in out Heap_Type; Item : in Item_Type);
+
+   procedure Clear
+     (Heap : in out Heap_Type;
+      Free : access procedure (Item : in out Item_Type));
+
+   function Is_Empty (Heap : Heap_Type) return Boolean;
+   function Size (Heap : Heap_Type) return Natural;
 
 private
    type Item_Array_Type is array (Positive range <>) of Item_Type;
@@ -30,6 +38,8 @@ private
       end record;
 
    pragma Inline (New_Heap);
+   pragma Inline (Is_Empty);
+   pragma Inline (Size);
 
 end DB.Utils.Gen_Binary_Heaps;
 
