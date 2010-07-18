@@ -16,7 +16,6 @@ with DB.Types.Values.Bounded;
 
 private
 package DB.Maps.Bounded is
-   pragma Preelaborate;
 
    package AF renames Ada.Finalization;
 

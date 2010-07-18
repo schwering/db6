@@ -12,7 +12,6 @@ with DB.Types.Times;
 with DB.Types.Values.Bounded.Streams;
 
 package DB.Maps is
-   pragma Preelaborate;
 
    type Serializable_Type is interface;
 

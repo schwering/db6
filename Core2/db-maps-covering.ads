@@ -12,7 +12,6 @@ with DB.Utils.Regular_Expressions;
 
 private
 package DB.Maps.Covering is
-   pragma Preelaborate;
 
    package AF renames Ada.Finalization;
 

@@ -6,6 +6,15 @@
 
 with Ada.Unchecked_Deallocation;
 
+with Input_Sources;
+with Sax.Attributes;
+with Sax.Readers;
+with Unicode;
+with Unicode.CES;
+
+with DB.Blocks.Gen_ASCII_Layer;
+with DB.Blocks.Local_IO;
+
 package body DB.Maps.Covering is
 
    function Cover
@@ -79,6 +88,236 @@ package body DB.Maps.Covering is
       end loop;
       return Cover (Union, Map);
    end Total_Cover;
+
+
+   package XML is
+      type File_Type is limited private;
+
+      procedure Create
+        (ID   : in     String;
+         File : in out File_Type);
+
+      procedure Open
+        (ID   : in     String;
+         File : in out File_Type);
+
+      procedure Close
+        (File : in out File_Type);
+
+      procedure Write
+        (File        : in out File_Type;
+         Config_Head : in     Node_Ref_Type);
+
+      procedure Read
+        (File        : in out File_Type;
+         Config_Head :    out Node_Ref_Type);
+
+   private
+      package ASCII_IO is new Blocks.Gen_ASCII_Layer
+        (Blocks.Local_IO.IO_Signature);
+
+      type File_Type is limited new Input_Sources.Input_Source with
+         record
+            File : ASCII_IO.File_Type;
+            Char : Unicode.Unicode_Char;
+            EOF  : Boolean;
+         end record;
+
+      overriding
+      procedure Next_Char
+        (From : in out File_Type;
+         C    :    out Unicode.Unicode_Char);
+
+      overriding
+      function EOF
+        (From : File_Type)
+         return Boolean;
+
+   end XML;
+
+
+   package body XML is
+
+      procedure Lookahead (File : in out File_Type)
+      is
+         C : Character;
+      begin
+         ASCII_IO.Read (File.File, C, File.EOF);
+         File.Char := Unicode.To_Unicode (C);
+      end Lookahead;
+
+
+      procedure Create
+        (ID   : in     String;
+         File : in out File_Type) is
+      begin
+         ASCII_IO.Create (ID, File.File);
+      end;
+
+
+      procedure Open
+        (ID   : in     String;
+         File : in out File_Type) is
+      begin
+         ASCII_IO.Open (ID, File.File);
+         Lookahead (File);
+      end;
+
+
+      overriding
+      procedure Close
+        (File : in out File_Type) is
+      begin
+         ASCII_IO.Close (File.File);
+      end Close;
+
+
+      procedure Write
+        (File : in out File_Type;
+         S    : in     String) is
+      begin
+         for I in S'Range loop
+            ASCII_IO.Write (File.File, S (I));
+         end loop;
+      end Write;
+
+
+      procedure Write
+        (File : in out File_Type;
+         N    : in     Natural)
+      is
+         S : constant String := Natural'Image (N);
+      begin
+         Write (File, S (S'First + 1 .. S'Last));
+      end Write;
+
+
+      procedure Write
+        (File        : in out File_Type;
+         Config_Head : in     Node_Ref_Type)
+      is
+         function Length (N : Node_Ref_Type) return Natural
+         is
+            Len : Natural := 0;
+         begin
+            while N /= null loop
+               Len := Len + 1;
+            end loop;
+            return Len;
+         end Length;
+
+         N : Node_Ref_Type := Config_Head;
+      begin
+         Write (File, "<table cnt=""");
+         Write (File, Length (Config_Head));
+         Write (File, """>");
+         while N /= null loop
+            Write (File, "<slice ");
+            Write (File, "guard="""& N.Guard &""" ");
+            Write (File, "impl="""& N.Impl &""" ");
+            Write (File, "id="""& N.ID &""" ");
+            Write (File, "/>");
+            N := N.Next;
+         end loop;
+         Write (File, "</table>");
+      end Write;
+
+
+      procedure Read
+        (File        : in out File_Type;
+         Config_Head :    out Node_Ref_Type)
+      is
+         type String_Ref_Type is access String;
+
+         procedure Free is new Ada.Unchecked_Deallocation
+           (String, String_Ref_Type);
+
+         type Reader_Type is new Sax.Readers.Reader with
+            record
+               Current : Node_Ref_Type   := null;
+               Guard   : String_Ref_Type := null;
+               Impl    : String_Ref_Type := null;
+               ID      : String_Ref_Type := null;
+            end record;
+
+         procedure Start_Element
+           (Handler       : in out Reader_Type;
+            Namespace_URI : in     Unicode.CES.Byte_Sequence := "";
+            Local_Name    : in     Unicode.CES.Byte_Sequence := "";
+            QName         : in     Unicode.CES.Byte_Sequence := "";
+            Atts          : in     Sax.Attributes.Attributes'Class)
+         is
+            pragma Unreferenced (Namespace_URI);
+            pragma Unreferenced (Local_Name);
+         begin
+            if QName = "slice" then
+               for I in 1 .. Sax.Attributes.Get_Length (Atts) loop
+                  declare
+                     P : constant Node_Ref_Type := Handler.Current;
+                     K : constant String := Sax.Attributes.Get_QName (Atts, I);
+                     V : constant String := Sax.Attributes.Get_Value (Atts, I);
+                  begin
+                     if K = "guard" then
+                        pragma Assert (Handler.Guard = null);
+                        Handler.Guard := new String'(V);
+                     elsif K = "impl" then
+                        pragma Assert (Handler.Impl = null);
+                        Handler.Impl := new String'(V);
+                     elsif K = "id" then
+                        pragma Assert (Handler.ID = null);
+                        Handler.ID := new String'(V);
+                     else
+                        raise IO_Error;
+                     end if;
+                     if Handler.Guard /= null and
+                        Handler.Impl /= null and
+                        Handler.ID /= null then
+                        Handler.Current := new Node_Type'
+                          (Guard_Length => Handler.Guard'Length,
+                           Impl_Length  => Handler.Impl'Length,
+                           ID_Length    => Handler.ID'Length,
+                           Guard        => Handler.Guard.all,
+                           Impl         => Handler.Impl.all,
+                           ID           => Handler.ID.all,
+                           Next         => null);
+                        Free (Handler.Guard);
+                        Free (Handler.Impl);
+                        Free (Handler.ID);
+
+                        P.Next := Handler.Current;
+                        if P = null then -- It's the first element.
+                           Config_Head := Handler.Current;
+                        end if;
+                     end if;
+                  end;
+               end loop;
+            end if;
+         end Start_Element;
+
+         Reader : Reader_Type;
+      begin
+         Reader.Parse (File);
+      end Read;
+
+      overriding
+      procedure Next_Char
+        (From : in out File_Type;
+         C    :    out Unicode.Unicode_Char) is
+      begin
+         C := From.Char;
+         Lookahead (From);
+      end;
+
+
+      overriding
+      function EOF
+        (From : File_Type)
+         return Boolean is
+      begin
+         return From.EOF;
+      end;
+
+   end XML;
 
 
    function New_Map (Allow_Duplicates : in Boolean) return Map_Type is
@@ -510,7 +749,8 @@ package body DB.Maps.Covering is
          if S = Success then
             declare
                V_Ref : Value_Ref_Type := new Value_Type'Class' (V);
-               Item  : Heap_Item_Type := Heap_Item_Type' (K, V_Ref, Sub_Cursor);
+               Item  : constant Heap_Item_Type :=
+                 Heap_Item_Type' (K, V_Ref, Sub_Cursor);
             begin
                Heaps.Insert (Cursor.Heap.all, Item);
             end;
