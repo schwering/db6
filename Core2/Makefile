@@ -7,7 +7,7 @@ else # older Gnat
 	GPRCLEAN=
 endif
 
-all: tests_debug tests_release
+all: tests_debug tests_release unit_tests_debug unit_tests_release
 
 libdb_debug:
 	$(GPRBUILD) -p -Plibdb -XBUILD=debug -XKIND=static
@@ -22,6 +22,12 @@ tests_debug:
 
 tests_release:
 	$(GPRBUILD) -p -Ptests -XBUILD=release -XKIND=static
+
+unit_tests_debug:
+	$(GPRBUILD) -p -Punit_tests -XBUILD=debug -XKIND=static
+
+unit_tests_release:
+	$(GPRBUILD) -p -Punit_tests -XBUILD=release -XKIND=static
 
 gcov_release:
 	gcov -o libdb/release/static/objects libdb/release/static/objects/*.gcno

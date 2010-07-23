@@ -1,0 +1,20 @@
+-- Abstract:
+--
+-- The composition of all test suites.
+--
+-- Copyright 2008, 2009, 2010 Christoph Schwering
+
+with DB.Utils.Binary_Heaps.Test.Suite;
+
+package body Composite_Suite is
+
+   function Suite return Access_Test_Suite
+   is
+      Res : Access_Test_Suite := New_Suite;
+   begin
+      Res.Add_Test (DB.Utils.Binary_Heaps.Test.Suite.Suite);
+      return Res;
+   end Suite;
+
+end Composite_Suite;
+

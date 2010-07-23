@@ -26,6 +26,10 @@ package DB is
    ----------
    -- Exceptions.
 
+   Underflow_Error, Overflow_Error : exception;
+   -- Indicate container (e.g. array) under- and overflows.
+   -- Mainly used in the DB.Utils package.
+
    IO_Error : exception;
    -- Indicates a serios IO error.
    -- Raised in DB.IO and its child packages.

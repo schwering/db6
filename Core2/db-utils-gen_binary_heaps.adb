@@ -6,9 +6,9 @@
 
 package body DB.Utils.Gen_Binary_Heaps is
 
-   function New_Heap (Size : Natural) return Heap_Type is
+   function New_Heap (Capacity : Natural) return Heap_Type is
    begin
-      return Heap_Type'(Size => Size, Last => 0, others => <>);
+      return Heap_Type'(Capacity => Capacity, Last => 0, others => <>);
    end New_Heap;
 
 
@@ -97,11 +97,12 @@ package body DB.Utils.Gen_Binary_Heaps is
    end Heapify;
 
 
-   procedure Extract_Min (Heap : in out Heap_Type; Item : out Item_Type)
-   is
-      pragma Precondition (Heap.Last >= 1);
-      pragma Postcondition (Heap.Last >= 0);
+   procedure Extract_Min (Heap : in out Heap_Type; Item : out Item_Type) is
    begin
+      if Heap.Last < 1 then
+         raise Underflow_Error;
+      end if;
+
       Item := Heap.Buffer (1);
       if Heap.Last > 1 then
          Heap.Buffer (1) := Heap.Buffer (Heap.Last);
@@ -112,9 +113,11 @@ package body DB.Utils.Gen_Binary_Heaps is
 
 
    procedure Insert (Heap : in out Heap_Type; Item : in Item_Type) is
-      pragma Precondition (Heap.Last < Heap.Size);
-      pragma Postcondition (Heap.Last <= Heap.Size);
    begin
+      if Heap.Last >= Heap.Capacity then
+         raise Overflow_Error;
+      end if;
+
       Heap.Last := Heap.Last + 1;
       Heap.Buffer (Heap.Last) := Item;
       Heapify (Heap, Heap.Last);
@@ -125,9 +128,11 @@ package body DB.Utils.Gen_Binary_Heaps is
      (Heap : in out Heap_Type;
       Free : access procedure (Item : in out Item_Type)) is
    begin
-      for I in 1 .. Heap.Last loop
-         Free (Heap.Buffer (I));
-      end loop;
+      if Free /= null then
+         for I in 1 .. Heap.Last loop
+            Free (Heap.Buffer (I));
+         end loop;
+      end if;
       Heap.Last := 0;
    end Clear;
 
@@ -142,6 +147,12 @@ package body DB.Utils.Gen_Binary_Heaps is
    begin
       return Heap.Last;
    end Size;
+
+
+   function Capacity (Heap : Heap_Type) return Natural is
+   begin
+      return Heap.Capacity;
+   end Capacity;
 
 end DB.Utils.Gen_Binary_Heaps;
 
