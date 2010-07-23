@@ -13,7 +13,7 @@ package DB.DSA.Utils.Gen_Queues is
    type Queue_Type is limited private;
 
    procedure Enqueue (Q : in out Queue_Type; Item : in Item_Type);
-   procedure Dequeue 
+   procedure Dequeue
      (Q       : in out Queue_Type;
       Success :    out Boolean;
       Item    :    out Item_Type);
@@ -29,7 +29,7 @@ private
    function Succ (I : Index_Type) return Index_Type;
    pragma Inline (Succ);
 
-   protected type Queue_Type is 
+   protected type Queue_Type is
       entry Enqueue (Item : in Item_Type);
 
       entry Dequeue (Success : out Boolean; Item : out Item_Type);

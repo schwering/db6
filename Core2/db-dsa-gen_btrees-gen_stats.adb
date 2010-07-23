@@ -117,25 +117,25 @@ package body DB.DSA.Gen_BTrees.Gen_Stats is
                       Avg (Sum) * Avg (Sum);
             end Var;
          begin
-            Emit (L, "Count", Data_Type' (Compound => False, Val => I.Count));
+            Emit (L, "Count", Data_Type'(Compound => False, Val => I.Count));
             Emit (L, "Degree",
-                  Data_Type' (Compound => True,
-                              Avg => Avg (I.Degree_Sum),
-                              Var => Var (I.Degree_Sqs, I.Degree_Sum),
-                              Min => I.Degree_Min,
-                              Max => I.Degree_Max));
+                  Data_Type'(Compound => True,
+                             Avg => Avg (I.Degree_Sum),
+                             Var => Var (I.Degree_Sqs, I.Degree_Sum),
+                             Min => I.Degree_Min,
+                             Max => I.Degree_Max));
             Emit (L, "Size",
-                  Data_Type' (Compound => True,
-                              Avg => Avg (I.Size_Sum),
-                              Var => Var (I.Size_Sqs, I.Size_Sum),
-                              Min => I.Size_Min,
-                              Max => I.Size_Max));
+                  Data_Type'(Compound => True,
+                             Avg => Avg (I.Size_Sum),
+                             Var => Var (I.Size_Sqs, I.Size_Sum),
+                             Min => I.Size_Min,
+                             Max => I.Size_Max));
             Emit (L, "Waste",
-                  Data_Type' (Compound => True,
-                              Avg => Avg (I.Waste_Sum),
-                              Var => Var (I.Waste_Sqs, I.Waste_Sum),
-                              Min => I.Waste_Min,
-                              Max => I.Waste_Max));
+                  Data_Type'(Compound => True,
+                             Avg => Avg (I.Waste_Sum),
+                             Var => Var (I.Waste_Sqs, I.Waste_Sum),
+                             Min => I.Waste_Min,
+                             Max => I.Waste_Max));
          end;
       begin
          Maps.Iterate (Map, Call_Emit'Access);

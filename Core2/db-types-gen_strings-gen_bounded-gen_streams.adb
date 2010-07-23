@@ -10,9 +10,9 @@ package body DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams is
 
    function New_Stream (String_Ref : String_Ref_Type) return Stream_Type is
    begin
-      return Stream_Type' (Ada.Streams.Root_Stream_Type with
-                           String => String_Ref,
-                           Pos    => String_Ref.Buffer'First);
+      return Stream_Type'(Ada.Streams.Root_Stream_Type with
+                          String => String_Ref,
+                          Pos    => String_Ref.Buffer'First);
    end New_Stream;
 
 

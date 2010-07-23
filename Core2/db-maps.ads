@@ -118,7 +118,7 @@ package DB.Maps is
 
    type State_Type is (Success, Failure);
 
-   function Contains 
+   function Contains
      (Map : Map_Type;
       Key : Key_Type)
       return Boolean

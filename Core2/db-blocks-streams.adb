@@ -10,9 +10,9 @@ package body DB.Blocks.Streams is
 
    function New_Stream (Block_Ref : Base_Block_Ref_Type) return Stream_Type is
    begin
-      return Stream_Type' (Ada.Streams.Root_Stream_Type with
-                           Block => Block_Ref,
-                           Pos   => Block_Ref.all'First);
+      return Stream_Type'(Ada.Streams.Root_Stream_Type with
+                          Block => Block_Ref,
+                          Pos   => Block_Ref.all'First);
    end New_Stream;
 
 

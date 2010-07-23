@@ -55,9 +55,9 @@ package body DB.Blocks.Memory_IO is
             raise IO_Error;
          elsif Files (I) = null then
             File := new File_Object_Type;
-            Files (I) := new Entry_Type' (Name_Length => ID'Length,
-                                          Name        => ID,
-                                          File        => File);
+            Files (I) := new Entry_Type'(Name_Length => ID'Length,
+                                         Name        => ID,
+                                         File        => File);
             return;
          end if;
       end loop;

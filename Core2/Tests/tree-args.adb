@@ -41,9 +41,15 @@ package body Tree.Args is
    end File_Name;
 
 
+   function Implementation return String is
+   begin
+      return Ada.Command_Line.Argument(Offset + 2);
+   end Implementation;
+
+
    function Generator return Types.Generator_Type
    is
-      S : constant String := Ada.Command_Line.Argument(Offset + 2);
+      S : constant String := Ada.Command_Line.Argument(Offset + 3);
    begin
       if S = "pseudorandom" then
          return Types.Pseudo_Random_Gen;
@@ -63,7 +69,7 @@ package body Tree.Args is
 
    function Init_Offset return Types.Count_Type is
    begin
-      return Types.Count_Type(To_Number(Ada.Command_Line.Argument(Offset + 3)));
+      return Types.Count_Type(To_Number(Ada.Command_Line.Argument(Offset + 4)));
    end Init_Offset;
 
 
@@ -150,7 +156,7 @@ package body Tree.Args is
                              Concurrency_Degree, Reset);
       end New_Job;
 
-      Long_Job : Jobs.Long_Job_Type(Offset+4..Ada.Command_Line.Argument_Count);
+      Long_Job : Jobs.Long_Job_Type(Offset+5..Ada.Command_Line.Argument_Count);
    begin
       for I in Long_Job'Range loop
          Long_Job(I) := New_Job(Ada.Command_Line.Argument(I));

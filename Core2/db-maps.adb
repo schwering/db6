@@ -53,13 +53,13 @@ package body DB.Maps is
 
    function Positive_Infinity_Bound return Bound_Type is
    begin
-      return Bound_Type' (Concrete => False, Infinity => Positive_Infinity);
+      return Bound_Type'(Concrete => False, Infinity => Positive_Infinity);
    end Positive_Infinity_Bound;
 
 
    function Negative_Infinity_Bound return Bound_Type is
    begin
-      return Bound_Type' (Concrete => False, Infinity => Negative_Infinity);
+      return Bound_Type'(Concrete => False, Infinity => Negative_Infinity);
    end Negative_Infinity_Bound;
 
 
@@ -68,9 +68,9 @@ package body DB.Maps is
       Key        : Key_Type)
       return Bound_Type is
    begin
-      return Bound_Type' (Concrete   => True,
-                          Comparison => Comparison,
-                          Key        => Key);
+      return Bound_Type'(Concrete   => True,
+                         Comparison => Comparison,
+                         Key        => Key);
    end New_Bound;
 
 
@@ -82,11 +82,11 @@ package body DB.Maps is
    is
       use Keys;
    begin
-      return Key_Type' (Row    => Rows.New_String
-                                   (Rows.Indefinite_Buffer_Type (Row.Image)),
-                        Column => Columns.New_String
+      return Key_Type'(Row    => Rows.New_String
+                                  (Rows.Indefinite_Buffer_Type (Row.Image)),
+                       Column => Columns.New_String
                                    (Rows.Indefinite_Buffer_Type (Col.Image)),
-                        Time   => Time);
+                       Time   => Time);
    end To_Key;
 
 

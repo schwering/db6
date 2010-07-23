@@ -18,7 +18,7 @@ with DB.Blocks.Local_IO;
 package body DB.Maps.Covering is
 
    function Cover
-     (R   : RE.Regexp_Type; 
+     (R   : RE.Regexp_Type;
       Map : Map_Type'Class)
       return Cover_Type
    is
@@ -322,10 +322,10 @@ package body DB.Maps.Covering is
 
    function New_Map (Allow_Duplicates : in Boolean) return Map_Type is
    begin
-      return Map_Type' (AF.Limited_Controlled with
-                        Initialized      => False,
-                        Allow_Duplicates => Allow_Duplicates,
-                        others           => <>);
+      return Map_Type'(AF.Limited_Controlled with
+                       Initialized      => False,
+                       Allow_Duplicates => Allow_Duplicates,
+                       others           => <>);
    end New_Map;
 
 
@@ -337,13 +337,13 @@ package body DB.Maps.Covering is
    is
       Pred : Node_Ref_Type := Map.Config;
       Node : constant Node_Ref_Type :=
-        new Node_Type' (Guard_Length => Guard'Length,
-                        Impl_Length  => ID'Length,
-                        ID_Length    => ID'Length,
-                        Guard        => Guard,
-                        Impl         => Impl,
-                        ID           => ID,
-                        Next         => null);
+        new Node_Type'(Guard_Length => Guard'Length,
+                       Impl_Length  => ID'Length,
+                       ID_Length    => ID'Length,
+                       Guard        => Guard,
+                       Impl         => Impl,
+                       ID           => ID,
+                       Next         => null);
    begin
       if Pred = null then
          Map.Config := Node;
@@ -356,7 +356,10 @@ package body DB.Maps.Covering is
    end Add_Slice;
 
 
-   procedure Allocate_Slices (Map : in out Map_Type)
+   procedure Init_Map
+     (Map          : in out Map_Type;
+      Init_Sub_Map : access procedure (Map : in out Maps.Map_Type'Class;
+                                       ID  : in     String))
    is
       --pragma Precondition (Map.Config /= null);
       --pragma Postcondition (Map.Slices /= null);
@@ -371,15 +374,7 @@ package body DB.Maps.Covering is
          end loop;
       end;
       Map.Slices := new Slice_Array_Type (1 .. Count);
-   end Allocate_Slices;
 
-
-   procedure Create (Map : in out Map_Type; ID : in String)
-   is
-      pragma Unreferenced (ID);
-      pragma Precondition (not Map.Initialized);
-   begin
-      Allocate_Slices (Map);
       declare
          Node : Node_Ref_Type := Map.Config;
          I    : Natural := 1;
@@ -388,13 +383,28 @@ package body DB.Maps.Covering is
             Map.Slices (I).Guard := RE.Compile (Node.Guard);
             Map.Slices (I).Map   := new Base_Map_Type'
               (Maps.New_Map (Node.Impl, Map.Allow_Duplicates));
-            Maps.Create (Map.Slices (I).Map.all, Node.ID);
+            Init_Sub_Map (Map.Slices (I).Map.all, Node.ID);
             Node := Node.Next;
             I := I + 1;
          end loop;
       end;
-      Map.Cover := new Cover_Type' (Total_Cover (Map));
+
+      Map.Cover := new Cover_Type'(Total_Cover (Map));
       Map.Initialized := True;
+   end Init_Map;
+
+
+   procedure Create (Map : in out Map_Type; ID : in String)
+   is
+      pragma Unreferenced (ID);
+      pragma Precondition (not Map.Initialized);
+
+      procedure Create (Map : in out Maps.Map_Type'Class; ID : in String) is
+      begin
+         Map.Create (ID);
+      end Create;
+   begin
+      Init_Map (Map, Create'Access);
    end Create;
 
 
@@ -402,8 +412,13 @@ package body DB.Maps.Covering is
    is
       pragma Unreferenced (ID);
       pragma Precondition (not Map.Initialized);
+
+      procedure Create (Map : in out Maps.Map_Type'Class; ID : in String) is
+      begin
+         Map.Create_Temporary (ID);
+      end Create;
    begin
-      Map.Initialized := True;
+      Init_Map (Map, Create'Access);
    end Create_Temporary;
 
 
@@ -411,8 +426,13 @@ package body DB.Maps.Covering is
    is
       pragma Unreferenced (ID);
       pragma Precondition (not Map.Initialized);
+
+      procedure Open (Map : in out Maps.Map_Type'Class; ID : in String) is
+      begin
+         Map.Open (ID);
+      end Open;
    begin
-      Map.Initialized := True;
+      Init_Map (Map, Open'Access);
    end Open;
 
 
@@ -493,7 +513,7 @@ package body DB.Maps.Covering is
 
 
    overriding
-   function Contains 
+   function Contains
      (Map : Map_Type;
       Key : Key_Type)
       return Boolean
@@ -647,19 +667,19 @@ package body DB.Maps.Covering is
       Heap    : Heap_Ref_Type                  := null;
    begin
       Cursors := new Base_Cursor_Ref_Array_Type (1 .. Map.Cover'Length);
-      Heap    := new Heaps.Heap_Type' (Heaps.New_Heap (Map.Cover'Length));
+      Heap    := new Heaps.Heap_Type'(Heaps.New_Heap (Map.Cover'Length));
       for I in Map.Cover'Range loop
          Cursors (Map.Cover (I)) := new Base_Cursor_Type'
            (Map.Slices (Map.Cover (I)).Map.New_Cursor (Thread_Safe,
                                                        Lower_Bound,
                                                        Upper_Bound));
       end loop;
-      return Cursor_Type' (AF.Limited_Controlled with
-                           Initialized => True,
-                           Map         => Map.Self,
-                           Cursors     => Cursors,
-                           Heap        => Heap,
-                           Heap_Filled => False);
+      return Cursor_Type'(AF.Limited_Controlled with
+                          Initialized => True,
+                          Map         => Map.Self,
+                          Cursors     => Cursors,
+                          Heap        => Heap,
+                          Heap_Filled => False);
    exception
       when others =>
          if Cursors /= null then
@@ -748,9 +768,9 @@ package body DB.Maps.Covering is
          Sub_Cursor.Next (K, V, S);
          if S = Success then
             declare
-               V_Ref : Value_Ref_Type := new Value_Type'Class' (V);
+               V_Ref : Value_Ref_Type := new Value_Type'Class'(V);
                Item  : constant Heap_Item_Type :=
-                 Heap_Item_Type' (K, V_Ref, Sub_Cursor);
+                 Heap_Item_Type'(K, V_Ref, Sub_Cursor);
             begin
                Heaps.Insert (Cursor.Heap.all, Item);
             end;

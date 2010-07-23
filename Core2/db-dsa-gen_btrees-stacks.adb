@@ -128,7 +128,7 @@ package body Stacks is
       N_A   : in Nodes.Valid_Address_Type;
       Level : in Nodes.Level_Type) is
    begin
-      Stacks.Push (Stack.S, Item_Type' (N_A, Level));
+      Stacks.Push (Stack.S, Item_Type'(N_A, Level));
    end Push;
 
 

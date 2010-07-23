@@ -51,7 +51,7 @@ package body DB.DSA.Utils.Gen_Stacks is
    function New_Stack
       return Stack_Type is
    begin
-      return Stack_Type' (others => <>);
+      return Stack_Type'(others => <>);
    end New_Stack;
 
 

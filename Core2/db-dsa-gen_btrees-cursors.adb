@@ -28,16 +28,16 @@ package body Cursors is
    function Positive_Infinity_Bound
       return Bound_Type is
    begin
-      return Bound_Type' (Kind => Abstract_Bound,
-                          Location => Positive_Infinity);
+      return Bound_Type'(Kind => Abstract_Bound,
+                         Location => Positive_Infinity);
    end Positive_Infinity_Bound;
 
 
    function Negative_Infinity_Bound
       return Bound_Type is
    begin
-      return Bound_Type' (Kind => Abstract_Bound,
-                          Location => Negative_Infinity);
+      return Bound_Type'(Kind => Abstract_Bound,
+                         Location => Negative_Infinity);
    end Negative_Infinity_Bound;
 
 
@@ -46,9 +46,9 @@ package body Cursors is
       Key        : Keys.Key_Type)
       return Bound_Type is
    begin
-      return Bound_Type' (Kind       => Concrete_Bound,
-                          Comparison => Comparison,
-                          Key        => Key);
+      return Bound_Type'(Kind       => Concrete_Bound,
+                         Comparison => Comparison,
+                         Key        => Key);
    end New_Bound;
 
 
@@ -89,12 +89,12 @@ package body Cursors is
       end Check_Bounds;
    begin
       Check_Bounds;
-      return Cursor_Type' (Lower_Bound => Lower_Bound,
-                           Upper_Bound => Upper_Bound,
-                           Owning_Tree => Tree.Self,
-                           Initialized => True,
-                           Thread_Safe => Thread_Safe,
-                           others      => <>);
+      return Cursor_Type'(Lower_Bound => Lower_Bound,
+                          Upper_Bound => Upper_Bound,
+                          Owning_Tree => Tree.Self,
+                          Initialized => True,
+                          Thread_Safe => Thread_Safe,
+                          others      => <>);
    end New_Cursor;
 
 

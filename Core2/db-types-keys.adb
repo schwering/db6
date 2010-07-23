@@ -84,9 +84,9 @@ package body DB.Types.Keys is
      (Left : Key_Type)
       return Key_Type is
    begin
-      return Key_Type' (Row    => Rows.Short_Bound (Left.Row),
-                        Column => Columns.Short_Bound (Left.Column),
-                        Time   => Times.Short_Bound (Left.Time));
+      return Key_Type'(Row    => Rows.Short_Bound (Left.Row),
+                       Column => Columns.Short_Bound (Left.Column),
+                       Time   => Times.Short_Bound (Left.Time));
    end Short_Bound;
 
 
@@ -103,23 +103,23 @@ package body DB.Types.Keys is
          Rows.Short_Delimiter (Left.Row, Right.Row);
    begin
       if Left.Row < Row_Delim then
-         Key :=  Key_Type' (Row    => Row_Delim,
-                            Column => Columns.Empty_String,
-                            Time   => Times.Number_Type'Last);
+         Key :=  Key_Type'(Row    => Row_Delim,
+                           Column => Columns.Empty_String,
+                           Time   => Times.Number_Type'Last);
       else
          declare
             Column_Delim : constant Columns.String_Type :=
                Columns.Short_Delimiter (Left.Column, Right.Column);
          begin
             --if Left.Column < Column_Delim then
-            --   return Key_Type' (Row    => Row_Delim,
-            --                     Column => Column_Delim,
-            --                     Time   => Times.Number_Type'Last);
+            --   return Key_Type'(Row    => Row_Delim,
+            --                    Column => Column_Delim,
+            --                    Time   => Times.Number_Type'Last);
             --else
-               Key :=  Key_Type' (Row    => Row_Delim,
-                                  Column => Column_Delim,
-                                  Time   => Times.Short_Delimiter (Left.Time,
-                                                                   Right.Time));
+               Key :=  Key_Type'(Row    => Row_Delim,
+                                 Column => Column_Delim,
+                                 Time   => Times.Short_Delimiter (Left.Time,
+                                                                  Right.Time));
             --end if;
          end;
       end if;
@@ -131,17 +131,17 @@ package body DB.Types.Keys is
 
    function New_Read_Context return Read_Context_Type is
    begin
-      return Read_Context_Type' (Row_Serialization.New_Read_Context,
-                                 Column_Serialization.New_Read_Context,
-                                 Times.New_Read_Context);
+      return Read_Context_Type'(Row_Serialization.New_Read_Context,
+                                Column_Serialization.New_Read_Context,
+                                Times.New_Read_Context);
    end New_Read_Context;
 
 
    function New_Write_Context return Write_Context_Type is
    begin
-      return Write_Context_Type' (Row_Serialization.New_Write_Context,
-                                  Column_Serialization.New_Write_Context,
-                                  Times.New_Write_Context);
+      return Write_Context_Type'(Row_Serialization.New_Write_Context,
+                                 Column_Serialization.New_Write_Context,
+                                 Times.New_Write_Context);
    end New_Write_Context;
 
 
@@ -150,7 +150,7 @@ package body DB.Types.Keys is
       use type Blocks.Size_Type;
    begin
       return Row_Serialization.Size_Bound (Key.Row) +
-           --Column_Serialization.Size_Bound (Key.Column) + 
+           --Column_Serialization.Size_Bound (Key.Column) +
              Times.Size_Bound (Key.Time);
    end Size_Bound;
 

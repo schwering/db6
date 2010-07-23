@@ -127,8 +127,8 @@ is
                   exit when not Successful;
                   -- Possibly create a new Key + Value-sequence queue
                   if Key_Values = null or else Key_Values.Key /= Key then
-                     Key_Values := new Key_Values_Type' (Key    => Key,
-                                                         others => <>);
+                     Key_Values := new Key_Values_Type'(Key    => Key,
+                                                        others => <>);
                      Queues.Enqueue (Queue, Key_Values);
                   end if;
                   -- What we really wanted: enqueue the value in the

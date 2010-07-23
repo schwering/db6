@@ -89,7 +89,7 @@ package DB.DSA.Map_Reduce is
    procedure Gen_Map_Reduce;
    -- The raw map reduce procedure.
    -- The Sort_Intermediate_Storage parameter may be not thread-safe. No
-   -- Intermediate_Input calls are made before, and all Intermediate_Output 
+   -- Intermediate_Input calls are made before, and all Intermediate_Output
    -- are made before.
 
    generic

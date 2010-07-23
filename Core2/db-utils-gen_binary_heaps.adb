@@ -8,7 +8,7 @@ package body DB.Utils.Gen_Binary_Heaps is
 
    function New_Heap (Size : Natural) return Heap_Type is
    begin
-      return Heap_Type' (Size => Size, Last => 0, others => <>);
+      return Heap_Type'(Size => Size, Last => 0, others => <>);
    end New_Heap;
 
 

@@ -1,7 +1,7 @@
 -- Abstract:
 --
 -- Puts a sequential ASCII layer ontop of block file IO.
--- 
+--
 -- TODO XXX Note still implement this one?
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering

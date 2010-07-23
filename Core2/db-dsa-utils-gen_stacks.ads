@@ -4,7 +4,7 @@
 --
 -- Design Notes:
 --
--- The stack regrows by the factor of 1.5 each time it is overfull. 
+-- The stack regrows by the factor of 1.5 each time it is overfull.
 -- The Storage_Pool is used for the array memory. This means that the complete
 -- stack must be copied to the new array each time the stack is resized. On the
 -- other hand, this means the count of single allocations and deallocations is

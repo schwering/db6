@@ -79,7 +79,7 @@ package body Prefix is
             subtype Safed is Indefinite_Buffer_Type (1 .. Length);
             function Size_Of is new Blocks.Size_Of (Safed);
          begin
-            if Size_Of (Safed' (others => <>)) <= Size_Of (Info) then
+            if Size_Of (Safed'(others => <>)) <= Size_Of (Info) then
                Write_Boolean (Block, Cursor, False);
                Context := (Has_Pred => True,
                            Position => Blocks.Position (Cursor),

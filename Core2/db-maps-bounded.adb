@@ -27,10 +27,10 @@ package body DB.Maps.Bounded is
 
    function New_Map (Allow_Duplicates : in Boolean) return Map_Type is
    begin
-      return Map_Type' (AF.Limited_Controlled with
-                        Initialized      => False,
-                        Allow_Duplicates => Allow_Duplicates,
-                        others           => <>);
+      return Map_Type'(AF.Limited_Controlled with
+                       Initialized      => False,
+                       Allow_Duplicates => Allow_Duplicates,
+                       others           => <>);
    end New_Map;
 
 
@@ -90,7 +90,7 @@ package body DB.Maps.Bounded is
 
 
    overriding
-   function Contains 
+   function Contains
      (Map : Map_Type;
       Key : Key_Type)
       return Boolean
@@ -160,7 +160,7 @@ package body DB.Maps.Bounded is
       State            :    out State_Type)
    is
       S      : BTrees.State_Type;
-      String : aliased Types.Values.Bounded.String_Type := 
+      String : aliased Types.Values.Bounded.String_Type :=
          Types.Values.Bounded.Empty_String;
       Stream : Types.Values.Bounded.Streams.Stream_Type :=
          Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
@@ -236,13 +236,13 @@ package body DB.Maps.Bounded is
       B_Lower_Bound : constant BTrees.Bound_Type := To_Bound (Lower_Bound);
       B_Upper_Bound : constant BTrees.Bound_Type := To_Bound (Upper_Bound);
    begin
-      return Cursor_Type' (Initialized => True,
-                           Map         => Map.Self,
-                           Cursor      => BTrees.New_Cursor
-                              (Tree        => Map.Tree,
-                               Thread_Safe => Thread_Safe,
-                               Lower_Bound => B_Lower_Bound,
-                               Upper_Bound => B_Upper_Bound));
+      return Cursor_Type'(Initialized => True,
+                          Map         => Map.Self,
+                          Cursor      => BTrees.New_Cursor
+                            (Tree        => Map.Tree,
+                             Thread_Safe => Thread_Safe,
+                             Lower_Bound => B_Lower_Bound,
+                             Upper_Bound => B_Upper_Bound));
    end New_Cursor;
 
 
@@ -374,16 +374,16 @@ package body DB.Maps.Bounded is
             when True =>
                Emit (Level_Type (Level),
                      Key,
-                     Data_Type' (Compound => True,
-                                 Avg => Average_Type (Value.Avg),
-                                 Var => Average_Type (Value.Var),
-                                 Min => Absolute_Type (Value.Min),
-                                 Max => Absolute_Type (Value.Max)));
+                     Data_Type'(Compound => True,
+                                Avg => Average_Type (Value.Avg),
+                                Var => Average_Type (Value.Var),
+                                Min => Absolute_Type (Value.Min),
+                                Max => Absolute_Type (Value.Max)));
             when False =>
                Emit (Level_Type (Level),
                      Key,
-                     Data_Type' (Compound => False,
-                                 Val => Absolute_Type (Value.Val)));
+                     Data_Type'(Compound => False,
+                                Val => Absolute_Type (Value.Val)));
          end case;
       end;
    begin

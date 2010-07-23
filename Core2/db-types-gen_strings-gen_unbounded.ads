@@ -131,7 +131,7 @@ private
       end record;
 
    Empty_String : constant String_Type :=
-      String_Type' (Ada.Finalization.Controlled with S => null);
+      String_Type'(Ada.Finalization.Controlled with S => null);
 
    pragma Inline (Initialize);
    pragma Inline (Adjust);

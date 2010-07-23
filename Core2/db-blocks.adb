@@ -47,7 +47,7 @@ package body DB.Blocks is
    is
       pragma Precondition (Start /= Invalid_Position);
    begin
-      return Cursor_Type' (Pos => Start);
+      return Cursor_Type'(Pos => Start);
    end New_Cursor;
 
 

@@ -22,7 +22,7 @@ package body DB.DSA.Utils.Gen_Queues is
    end Enqueue;
 
 
-   procedure Dequeue 
+   procedure Dequeue
      (Q       : in out Queue_Type;
       Success :    out Boolean;
       Item    :    out Item_Type) is

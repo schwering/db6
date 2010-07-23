@@ -131,10 +131,10 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
       if Arr'Length = 0 then
          return Empty_String;
       else
-         return String_Type' (Ada.Finalization.Controlled with
-                              new Bounded_String_Type' (Length   => Arr'Length,
-                                                        Refcount => 1,
-                                                        Buffer   => Arr));
+         return String_Type'(Ada.Finalization.Controlled with
+                             new Bounded_String_Type'(Length   => Arr'Length,
+                                                      Refcount => 1,
+                                                      Buffer   => Arr));
       end if;
    end New_String;
 
@@ -144,10 +144,10 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
       if Length = 0 then
          return Empty_String;
       else
-         return String_Type' (Ada.Finalization.Controlled with
-                              new Bounded_String_Type' (Length   => Length,
-                                                        Refcount => 1,
-                                                        others   => <>));
+         return String_Type'(Ada.Finalization.Controlled with
+                             new Bounded_String_Type'(Length   => Length,
+                                                      Refcount => 1,
+                                                      others   => <>));
       end if;
    end New_String;
 

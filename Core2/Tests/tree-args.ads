@@ -9,6 +9,9 @@ package Tree.Args is
    function File_Name
       return String;
 
+   function Implementation
+      return String;
+
    function Generator
       return Types.Generator_Type;
 

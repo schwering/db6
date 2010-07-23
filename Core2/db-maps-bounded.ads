@@ -61,7 +61,7 @@ package DB.Maps.Bounded is
    -- Core operations: Search, Insertion, Deletion.
 
    overriding
-   function Contains 
+   function Contains
      (Map : Map_Type;
       Key : Key_Type)
       return Boolean;

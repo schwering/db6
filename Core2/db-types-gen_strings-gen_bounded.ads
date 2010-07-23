@@ -156,7 +156,7 @@ private
       end record;
 
    Empty_String : constant String_Type :=
-      String_Type' (Length => 0, others => <>);
+      String_Type'(Length => 0, others => <>);
 
    pragma Inline (New_String);
    pragma Inline (To_Index);

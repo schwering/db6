@@ -11,7 +11,7 @@ package body Uncompressed is
 
    function New_Context return Context_Type is
    begin
-      return Context_Type' (others => <>);
+      return Context_Type'(others => <>);
    end New_Context;
 
 

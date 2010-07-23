@@ -11,9 +11,10 @@ with DB.Maps; use DB.Maps;
 
 procedure Tree.Map is
 
-   Map : DB.Maps.Map_Type'Class
-       := DB.Maps.New_Map(Test_Data.Max_Key_Size,
-                          Test_Data.Max_Value_Size);
+   Map : DB.Maps.Map_Type'Class :=
+      DB.Maps.New_Map (Args.Implementation);
+    --DB.Maps.New_Map (Test_Data.Max_Key_Size,
+    --                 Test_Data.Max_Value_Size);
 
    Null_Value : Types.Value_Type := Types.Null_Value;
 

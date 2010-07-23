@@ -2,6 +2,7 @@
 IO=map
 BIN=bin/release/./tree_test
 FILE=`cat .temp_path`btree
+IMPL=btree
 GEN=urls
 C1=1m
 # 1. Simple insertions twice and check
@@ -14,7 +15,7 @@ C1=1m
 # 6. Check that there are no items left in the
 #    tree (just for fun, check for four instead of
 #    three blocks of insertions)
-C="$BIN $IO $FILE $GEN 0\
+C="$BIN $IO $FILE $IMPL $GEN 0\
         \
 	Insert,$C1,Cont\
 	Insert,$C1,Reset\

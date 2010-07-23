@@ -1157,7 +1157,7 @@ package body DB.Utils.Regular_Expressions is
                        States        => (others => (others => 1)),
                        Is_Final      => (0 => False, 1 => True),
                        Start_State   => 1),
-                 Refcount => new Natural' (1));
+                 Refcount => new Natural'(1));
       end if;
 
       Create_Mapping;
@@ -1413,7 +1413,7 @@ package body DB.Utils.Regular_Expressions is
 
          return (Ada.Finalization.Controlled with
                  R        => R,
-                 Refcount => new Natural' (1));
+                 Refcount => new Natural'(1));
       end;
    end Create_Secondary_Table;
 
@@ -1431,7 +1431,7 @@ package body DB.Utils.Regular_Expressions is
                     States        => (others => (others => 1)),
                     Is_Final      => (0 => False, 1 => False),
                     Start_State   => 1),
-              Refcount => new Natural' (1));
+              Refcount => new Natural'(1));
    end Empty_Regexp;
 
    ----------------------------
@@ -1548,7 +1548,7 @@ package body DB.Utils.Regular_Expressions is
 
       return (Ada.Finalization.Controlled with
               R        => P,
-              Refcount => new Natural' (1));
+              Refcount => new Natural'(1));
    exception
       when others =>
          if P /= null then
