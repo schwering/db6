@@ -21,7 +21,7 @@ private
 
    type Smart_Pointer_Type is new Ada.Finalization.Controlled with
       record
-         Ref       : Item_Ref_Type    := null;
+         Ref       : Item_Ref_Type := null;
          Ref_Count : Natural_Ref_Type;
       end record;
 

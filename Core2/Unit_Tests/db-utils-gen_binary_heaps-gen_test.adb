@@ -77,7 +77,8 @@ package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
             when Overflow_Error =>
                null;
             when E : others =>
-               Assert (False, "Wrong exception raised "& Exception_Name (E));
+               Assert (False,
+                       "Wrong exception raised "& Exception_Information (E));
          end;
       end if;
    end;

@@ -1,3 +1,5 @@
+with DB.Types.Values.Bounded.Streams;
+
 package body Tree.Types is
 
    function New_Value
@@ -8,26 +10,28 @@ package body Tree.Types is
    end New_Value;
 
 
-   overriding
    procedure Write
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
       Value  : in              Value_Type)
    is
       use Values_Impl;
    begin
-      Indefinite_Buffer_Type'Output (Stream, To_Buffer (Value.S));
+      Indefinite_Buffer_Type'Write (Stream, To_Buffer (Value.S));
    end Write;
 
 
-   overriding
    procedure Read
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
       Value  : out             Value_Type)
    is
       use Values_Impl;
-      Buffer : constant Indefinite_Buffer_Type :=
-         Indefinite_Buffer_Type'Input (Stream);
+      Length : constant Length_Type := Length_Type
+         (DB.Types.Values.Bounded.Streams.Remaining
+          (DB.Types.Values.Bounded.Streams.Stream_Type
+           (Stream.all)));
+      Buffer : Indefinite_Buffer_Type (1 .. Length);
    begin
+      Indefinite_Buffer_Type'Read (Stream, Buffer);
       Value.S := New_String (Buffer);
    end Read;
 
@@ -38,7 +42,7 @@ package body Tree.Types is
    is
       V : Value_Type;
    begin
-      V.S := Values_Impl.New_String (DB.Types.Values.Bounded.To_Buffer(S));
+      V.S := Values_Impl.New_String (DB.Types.Values.Bounded.To_Buffer (S));
       --V.S := S;
       return V;
    end From_Bounded;

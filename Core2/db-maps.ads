@@ -4,6 +4,34 @@
 -- of a row ID, a column ID and a timestamp whereas the values must implement
 -- the Value_Type interface.
 --
+-- The API of Value_Type has a disadvantage:
+-- The implented Read procedure usually wants to know how many bytes can be
+-- read, for example the length of the string. This information could be written
+-- in the corresponding Write procedure, but this would be redundant as the
+-- data is written as DB.Types.Values.Bounded.String_Type, i.e. with a length.
+-- The latter cannot be (easily) changed, because it is an integral part of the
+-- Gen_BTrees instance and Value_Type's Read function is invoked later, way out
+-- of control of Gen_BTrees. However, the length information must be present in
+-- Gen_BTrees control flow.
+-- So there are multiple ways to handle this problem:
+-- 1. Choose DB.Types.Values.Bounded.Streams'Class instead of
+--    Ada.Streams.Root_Stream_Type'Class as Read/Write and make use of the
+--    Remaining function.
+-- 2. Cast the Ada.Streams.Root_Stream_Type'Class and call the Remaining
+--    function when needed (i.e. for objects with non-static size).
+--    This yields the question whether it is a broken design aspect that the
+--    length of values is always written. But I think it isn't:
+--
+--    One might argue that we could leave the length -- or some other size
+--    indicator -- out and determine the size -- or the actual Read procedure --
+--    via the value object. A standard way how to do this would be object
+--    orientation. One could claim that the user searches for a certain key or
+--    so and knows the type of the corresponding value.
+--    But even then this idea doesn't work out: the cursor, or more precisely
+--    the caller of the cursor's Next operation, doesn't know the next item's
+--    type.
+-- 3. Forgot it. Is there even a third approach?
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Streams;

@@ -6,7 +6,6 @@ with DB.Maps;
 
 with DB.Types.Keys;
 with DB.Types.Values.Bounded;
-with DB.Types.Values.Bounded.Streams;
 with DB.Types.Values.Unbounded;
 
 private
