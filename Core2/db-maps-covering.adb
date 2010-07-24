@@ -768,7 +768,7 @@ package body DB.Maps.Covering is
          Sub_Cursor.Next (K, V, S);
          if S = Success then
             declare
-               V_Ref : Value_Ref_Type := new Value_Type'Class'(V);
+               V_Ref : constant Value_Ref_Type := new Value_Type'Class'(V);
                Item  : constant Heap_Item_Type :=
                  Heap_Item_Type'(K, V_Ref, Sub_Cursor);
             begin

@@ -106,6 +106,7 @@ package body Prefix is
       Cursor  : in out Blocks.Cursor_Type;
       S       :    out String_Type)
    is
+      pragma Unreferenced (Context);
       procedure Read_Boolean is new Blocks.Read (Boolean);
       procedure Read_Info is new Blocks.Read (Info_Type);
       procedure Read_String is
