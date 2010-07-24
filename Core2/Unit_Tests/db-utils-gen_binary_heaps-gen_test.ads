@@ -36,6 +36,10 @@ package DB.Utils.Gen_Binary_Heaps.Gen_Test is
    procedure Test_Inserts (T : in out Test_Type);
    procedure Test_Extract_Mins (T : in out Test_Type);
 
+
+   -- The following usually goes to the suite, but for AI reasons we can't do
+   -- that (the accesses are not allowed).
+
    package Caller is new AUnit.Test_Caller (Test_Type);
 
    Test_Extract_Mins_Access : Caller.Test_Method := Test_Extract_Mins'Access;

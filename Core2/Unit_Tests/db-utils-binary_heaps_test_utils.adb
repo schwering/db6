@@ -9,9 +9,9 @@ package body DB.Utils.Binary_Heaps_Test_Utils is
    function Succ (I : Integer) return Integer is
    begin
       if I < 0 then
-         return -1 * I + 1;
+         return (+1) * (I**2) + 1;
       else
-         return -1 * I - 1;
+         return (-1) * (I**2) - 1;
       end if;
    end Succ;
 

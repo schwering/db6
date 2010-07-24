@@ -65,11 +65,19 @@ upload:
 	scp btree.tar.gz schwering.ath.cx:public_html/db6
 	ssh schwering.ath.cx "cd public_html/db6/ && tar xvfz btree.tar.gz"
 
-clean:
-	$(GPRCLEAN) -f -q tests.gpr -XBUILD=debug || true
-	$(GPRCLEAN) -f -q tests.gpr -XBUILD=release || true
+clean_libdb:
 	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=debug -XKIND=static || true
 	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=debug -XKIND=relocatable || true
 	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=release -XKIND=static || true
 	$(GPRCLEAN) -f -q libdb.gpr -XBUILD=release -XKIND=relocatable || true
+
+clean_tests:
+	$(GPRCLEAN) -f -q tests.gpr -XBUILD=debug || true
+	$(GPRCLEAN) -f -q tests.gpr -XBUILD=release || true
+
+clean_unit_tests:
+	$(GPRCLEAN) -f -q unit_tests.gpr -XBUILD=debug || true
+	$(GPRCLEAN) -f -q unit_tests.gpr -XBUILD=release || true
+
+clean: clean_libdb clean_tests clean_unit_tests
 

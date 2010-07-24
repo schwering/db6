@@ -5,15 +5,15 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Unchecked_Deallocation;
-with Ada.Exceptions;
+with Ada.Exceptions; use Ada.Exceptions;
 
-with AUnit.Assertions;
+with AUnit.Assertions; use AUnit.Assertions;
+
 
 package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
-   use Ada.Exceptions;
-   use AUnit.Assertions;
 
    Heap_Size : constant := 100;
+
 
    procedure Set_Up (T : in out Test_Type) is
    begin

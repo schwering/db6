@@ -13,7 +13,12 @@ project UnitTests is
    for Object_Dir use Test_Dir &"/"& Attributes.Build;
    for Exec_Dir   use Test_Dir &"/"& Attributes.Build;
 
-   package Compiler renames Attributes.Compiler;
+   package Compiler is
+      for Default_Switches ("Ada") use
+         Attributes.Compiler.Ada_Sw & "-fno-strict-aliasing";
+      for Default_Switches ("C") use Attributes.Compiler.C_Sw;
+   end Compiler;
+
    package Binder renames Attributes.Binder;
    package Linker renames Attributes.Linker;
 
