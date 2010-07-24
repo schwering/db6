@@ -1,3 +1,5 @@
+with Ada.Streams;
+
 with Tree.To_Strings;
 
 with DB.Maps;
@@ -55,13 +57,13 @@ package Tree.Types is
 
    overriding
    procedure Write
-     (Stream : in out DB.Types.Values.Bounded.Streams.Stream_Type'Class;
-      Value  : in     Value_Type);
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Value  : in              Value_Type);
 
    overriding
    procedure Read
-     (Stream : in out DB.Types.Values.Bounded.Streams.Stream_Type'Class;
-      Value  :    out Value_Type);
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Value  : out             Value_Type);
 
    overriding function Equals
      (Left  : Value_Type;

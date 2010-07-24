@@ -6,23 +6,24 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Streams;
+
 with DB.Blocks;
 with DB.Types.Keys;
 with DB.Types.Times;
-with DB.Types.Values.Bounded.Streams;
 
 package DB.Maps is
 
    type Serializable_Type is interface;
 
    procedure Write
-     (Stream : in out Types.Values.Bounded.Streams.Stream_Type'Class;
-      Object : in     Serializable_Type)
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Object : in              Serializable_Type)
    is abstract;
 
    procedure Read
-     (Stream : in out Types.Values.Bounded.Streams.Stream_Type'Class;
-      Object :    out Serializable_Type)
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Object : out             Serializable_Type)
    is abstract;
 
 

@@ -14,7 +14,6 @@ with DB.Blocks.Local_IO;
 with DB.Types.Values;
 with DB.Types.Values.Bounded;
 
-private
 package DB.Maps.Bounded is
 
    package AF renames Ada.Finalization;

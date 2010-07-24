@@ -10,7 +10,6 @@ with Ada.Finalization;
 with DB.Utils.Gen_Binary_Heaps;
 with DB.Utils.Regular_Expressions;
 
-private
 package DB.Maps.Covering is
 
    package AF renames Ada.Finalization;

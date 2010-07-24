@@ -4,32 +4,31 @@ package body Tree.Types is
      (S : DB.Types.Values.Indefinite_Buffer_Type)
       return Value_Type is
    begin
-      return Value_Type'(S => Values_Impl.New_String(S));
+      return Value_Type'(S => Values_Impl.New_String (S));
    end New_Value;
 
 
+   overriding
    procedure Write
-     (Stream : in out DB.Types.Values.Bounded.Streams.Stream_Type'Class;
-      Value  : in     Value_Type)
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Value  : in              Value_Type)
    is
       use Values_Impl;
    begin
-      Indefinite_Buffer_Type'Write(Stream'Unrestricted_Access,
-                                   To_Buffer(Value.S));
+      Indefinite_Buffer_Type'Output (Stream, To_Buffer (Value.S));
    end Write;
 
 
+   overriding
    procedure Read
-     (Stream : in out DB.Types.Values.Bounded.Streams.Stream_Type'Class;
-      Value  :    out Value_Type)
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Value  : out             Value_Type)
    is
       use Values_Impl;
-      Length : constant Length_Type :=
-         Length_Type(DB.Types.Values.Bounded.Streams.Remaining(Stream));
-      Buffer : Indefinite_Buffer_Type(1 .. Length);
+      Buffer : constant Indefinite_Buffer_Type :=
+         Indefinite_Buffer_Type'Input (Stream);
    begin
-      Indefinite_Buffer_Type'Read(Stream'Unrestricted_Access, Buffer);
-      Value.S := New_String(Buffer);
+      Value.S := New_String (Buffer);
    end Read;
 
 
@@ -39,7 +38,7 @@ package body Tree.Types is
    is
       V : Value_Type;
    begin
-      V.S := Values_Impl.New_String(DB.Types.Values.Bounded.To_Buffer(S));
+      V.S := Values_Impl.New_String (DB.Types.Values.Bounded.To_Buffer(S));
       --V.S := S;
       return V;
    end From_Bounded;
@@ -52,7 +51,7 @@ package body Tree.Types is
       V : Value_Type;
    begin
       V.S := S;
-      --V.S := Values_Impl.New_String(DB.Types.Values.Bounded.To_Buffer(S));
+      --V.S := Values_Impl.New_String (DB.Types.Values.Bounded.To_Buffer (S));
       return V;
    end From_Unbounded;
 
@@ -61,7 +60,7 @@ package body Tree.Types is
      (V : Value_Type)
       return DB.Types.Values.Bounded.String_Type is
    begin
-      return DB.Types.Values.Bounded.New_String(Values_Impl.To_Buffer(V.S));
+      return DB.Types.Values.Bounded.New_String (Values_Impl.To_Buffer (V.S));
       --return V.S;
    end To_Bounded;
 
@@ -70,7 +69,7 @@ package body Tree.Types is
      (V : Value_Type)
       return DB.Types.Values.Unbounded.String_Type is
    begin
-      --return DB.Types.Values.Unbounded.New_String(Values_Impl.To_Buffer(V.S));
+      --return DB.Types.Values.Unbounded.New_String (Values_Impl.To_Buffer (V.S));
       return V.S;
    end To_Unbounded;
 
@@ -80,7 +79,7 @@ package body Tree.Types is
      (Left, Right : Value_Type)
       return Boolean is
    begin
-      return Values_Impl."="(Left.S, Right.S);
+      return Values_Impl."=" (Left.S, Right.S);
    end Equals;
 
 
@@ -89,9 +88,9 @@ package body Tree.Types is
    begin
       declare
          Len : constant DB.Types.Values.Length_Type
-             := Values_Impl.Length(V.S);
+             := Values_Impl.Length (V.S);
       begin
-         return "'"& To_Strings.To_String(V.S) &"' "&
+         return "'"& To_Strings.To_String (V.S) &"' "&
                 "["& Len'Img &"]";
       end;
    end Image;
@@ -99,7 +98,7 @@ package body Tree.Types is
 
    function Null_Value return Value_Type is
    begin
-      return From_Bounded(DB.Types.Values.Bounded.Empty_String);
+      return From_Bounded (DB.Types.Values.Bounded.Empty_String);
    end Null_Value;
 
 
