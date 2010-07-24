@@ -23,7 +23,6 @@ package body DB.Utils.Regular_Expressions.Test is
    end;
 
 
-   overriding
    procedure Tear_Down (T : in out Test_Type)
    is
       procedure Free is new Ada.Unchecked_Deallocation
