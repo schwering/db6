@@ -1,7 +1,8 @@
 -- Abstract:
 --
--- A simple stream implementation that wraps block.
--- Note that the stream must not live longer than the block that it wraps.
+-- A simple stream implementation that wraps a string.
+-- Note that the stream must not live longer than the string that it writes to
+-- and reads from.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
