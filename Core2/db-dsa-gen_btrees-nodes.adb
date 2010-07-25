@@ -24,9 +24,9 @@ package body Nodes is
    -- a) If Degree (N) > 0:
    --    2. If Is_Leaf (N): Degree (N) times Index_Type (end position of entry)
    --                       where an entry is either (Key, Child) or
-  --                       (Key, Value)
+  --                        (Key, Value)
    --    3. If Is_Leaf (N): Key1, Value1, ..., Key_|N|, Value_|N|
-   --       Else:          Key1, Child_Addr_1, ..., Key_|N|, Child_Addr_|N|
+   --       Else:           Key1, Child_Addr_1, ..., Key_|N|, Child_Addr_|N|
    -- b) If Degree (N) = 0:
    --    2. Index_Type (end position of high key)
    --    3. If Has_High_Key (N): High_Key
