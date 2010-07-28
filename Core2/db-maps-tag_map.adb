@@ -17,6 +17,7 @@ package body DB.Maps.Tag_Map is
          raise Overflow_Error;
       end if;
       I.Valid               := True;
+      I.Tag                 := Tag;
       I.Str (1 .. S'Length) := S;
       I.Len                 := S'Length;
       return I;
@@ -41,7 +42,7 @@ package body DB.Maps.Tag_Map is
    end "=";
 
 
-   procedure Register_Tag (Tag : in Ada.Tags.Tag)
+   procedure Register (Tag : in Ada.Tags.Tag)
    is
       pragma Precondition ((Head = null) = (Tail = null));
       Node : constant Node_Ref_Type := new Node_Type'(Item => New_Item (Tag),
@@ -58,7 +59,7 @@ package body DB.Maps.Tag_Map is
          Tail.Next := Node;
          Tail      := Node;
       end if;
-   end Register_Tag;
+   end Register;
 
 
    procedure Free_All
@@ -134,7 +135,7 @@ package body DB.Maps.Tag_Map is
 
       declare
          Cur : Node_Ref_Type := Head;
-         TID : TID_Type      := Map'First;
+         Tid : Tid_Type      := Map'First;
          Len : Natural       := 0;
       begin
          while Cur /= null loop
@@ -144,14 +145,14 @@ package body DB.Maps.Tag_Map is
             end if;
             if Cur.Prev = null or else Cur.Prev.Item /= Cur.Item then
                -- Don't store duplicates.
-               Map (TID) := Cur.Item;
-               TID := TID + 1;
+               Map (Tid) := Cur.Item;
+               Tid := Tid + 1;
                Len := Len + 1;
             end if;
             Cur := Cur.Next;
          end loop;
 
-         for T in TID .. Map'Last loop
+         for T in Tid .. Map'Last loop
             Map (T).Valid := False;
          end loop;
       end;
@@ -163,42 +164,37 @@ package body DB.Maps.Tag_Map is
       when Tag_Error | Overflow_Error =>
          Free_All;
          raise;
-      when others =>
-         raise;
    end Seal;
 
 
-   function To_TID (Tag : Ada.Tags.Tag) return TID_Type is
-      S : constant String := Ada.Tags.External_Tag (Tag);
+   function To_Tid (Tag : Ada.Tags.Tag) return Tid_Type
+   is
+      use type Ada.Tags.Tag;
    begin
       if not Sealed then
          raise Tag_Error;
       end if;
-      for TID in Map'Range loop
-         exit when not Map (TID).Valid;
-         if Map (TID) = S then
-            return TID;
+      for Tid in Map'Range loop
+         exit when not Map (Tid).Valid;
+         if Map (Tid).Tag = Tag then
+            return Tid;
          end if;
       end loop;
       raise Tag_Error;
-   end To_TID;
+   end To_Tid;
 
 
-   function To_Tag (TID : TID_Type) return Ada.Tags.Tag is
+   function To_Tag (Tid : Tid_Type) return Ada.Tags.Tag is
    begin
       if not Sealed then
          raise Tag_Error;
       end if;
-      pragma Warnings (Off); -- TID not in Map'Range could be optimized away
-      if TID not in Map'Range or else not Map (TID).Valid then
+      pragma Warnings (Off); -- Tid not in Map'Range could be optimized away
+      if Tid not in Map'Range or else not Map (Tid).Valid then
          raise Tag_Error;
       end if;
       pragma Warnings (Off);
-      declare
-         S : constant String := Map (TID).Str (1 .. Map (TID).Len);
-      begin
-         return Ada.Tags.Internal_Tag (S);
-      end;
+      return Map (Tid).Tag;
    end To_Tag;
 
 end DB.Maps.Tag_Map;

@@ -10,7 +10,7 @@ generic
    with function Next_Entry return Key_Value_Type;
 
    Map        : in out DB.Maps.Map_Type'Class;
-   Null_value : in out Value_Type;
+   Null_value : in out Types.Value_Type'Class;
 package Tree.Gen_Simple_Jobs is
 
    Stop_Now : exception;

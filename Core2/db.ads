@@ -46,5 +46,8 @@ package DB is
    Map_Reduce_Error : exception;
    -- An error occurred during map/reduce.
 
+   Tag_Error : exception;
+   -- Raised on tag (in OO-sense) error.
+
 end DB;
 

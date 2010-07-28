@@ -34,6 +34,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Finalization;
 with Ada.Streams;
 
 with DB.Blocks;
@@ -52,6 +53,11 @@ package DB.Maps is
    procedure Read
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
       Object : out             Serializable_Type)
+   is abstract;
+
+   function Size_Bound
+     (Object : Serializable_Type)
+      return Ada.Streams.Stream_Element_Offset
    is abstract;
 
 
@@ -80,8 +86,27 @@ package DB.Maps is
    subtype Column_Type is String_Type;
    subtype Time_Type is Types.Times.Number_Type;
 
-   type Value_Type is interface and Serializable_Type and Comparable_Type and
-      Printable_Type;
+
+   type Value_Type is abstract new Ada.Finalization.Controlled and
+                                   Serializable_Type and
+                                   Comparable_Type and
+                                   Printable_Type with private;
+
+   type Value_Parameters_Type is null record;
+
+   function New_Value
+     (Params : not null access Value_Parameters_Type)
+      return Value_Type
+   is abstract;
+   -- The purpose of this constructor is to initialize a default instance of a
+   -- Value_Type subclass.
+   -- It is required for the Ada.Tags.Generic_Dispatching_Constructor.
+
+   --procedure Finalize
+     --(Value : in out Value_Type)
+   --is abstract;
+   -- The Finalize is called whenever a value's life-cycle ends in the map.
+
 
    function To_Key
      (Row  : Row_Type'Class;
@@ -288,6 +313,11 @@ package DB.Maps is
    is abstract;
 
 private
+   type Value_Type is abstract new Ada.Finalization.Controlled and
+                                   Serializable_Type and
+                                   Comparable_Type and
+                                   Printable_Type with null record;
+
    type Infinity_Type is (Positive_Infinity, Negative_Infinity);
 
    type Bound_Type (Concrete : Boolean := True) is

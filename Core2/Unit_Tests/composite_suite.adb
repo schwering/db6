@@ -6,6 +6,7 @@
 
 with DB.Maps.Bounded.Test.Suite;
 with DB.Maps.Tag_Map.Test.Suite;
+with DB.Maps.Value_Utils.String_Values.Test.Suite;
 with DB.Utils.Binary_Heaps.Test.Suite;
 with DB.Utils.Regular_Expressions.Test.Suite;
 with DB.Utils.Smart_Pointers.Test.Suite;
@@ -18,6 +19,7 @@ package body Composite_Suite is
    begin
       Res.Add_Test (DB.Maps.Tag_Map.Test.Suite.Suite);
       Res.Add_Test (DB.Maps.Bounded.Test.Suite.Suite);
+      Res.Add_Test (DB.Maps.Value_Utils.String_Values.Test.Suite.Suite);
       Res.Add_Test (DB.Utils.Binary_Heaps.Test.Suite.Suite);
       Res.Add_Test (DB.Utils.Regular_Expressions.Test.Suite.Suite);
       Res.Add_Test (DB.Utils.Smart_Pointers.Test.Suite.Suite);

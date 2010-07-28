@@ -2,7 +2,7 @@
 --
 -- Tag maps can be used to have shorter (in count of bytes) representations of
 -- tags when the considered set of tags is limited.
--- The assigned TID (type identifier) to a tag depends on 
+-- The assigned Tid (type identifier) to a tag depends on 
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
@@ -10,24 +10,23 @@ with Ada.Tags;
 
 package DB.Maps.Tag_Map is
 
-   type TID_Type is private;
+   type Tid_Type is range 1 .. 8; -- mod 2**3;
+   for Tid_Type'Size use 8;
 
-   procedure Register_Tag (Tag : Ada.Tags.Tag);
+   procedure Register (Tag : Ada.Tags.Tag);
 
    procedure Seal;
 
-   function To_TID (Tag : Ada.Tags.Tag) return TID_Type;
-   function To_Tag (TID : TID_Type) return Ada.Tags.Tag;
+   function To_Tid (Tag : Ada.Tags.Tag) return Tid_Type;
+   function To_Tag (Tid : Tid_Type) return Ada.Tags.Tag;
 
 private
-   type TID_Type is mod 2**3;
-   for TID_Type'Size use 8;
-
    Max_Tag_Length : constant := 128;
 
    type Item_Type is
       record
          Valid : Boolean;
+         Tag   : Ada.Tags.Tag;
          Str   : String (1 .. Max_Tag_Length);
          Len   : Natural;
       end record;
@@ -49,7 +48,7 @@ private
    Head   : Node_Ref_Type := null;
    Tail   : Node_Ref_Type := null;
 
-   Map : array (TID_Type) of Item_Type;
+   Map : array (Tid_Type) of Item_Type;
 
 end DB.Maps.Tag_Map;
 

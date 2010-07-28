@@ -12,9 +12,10 @@ package body DB.Utils.Smart_Pointers.Test.Suite is
 
    function Suite return Access_Test_Suite
    is
-      Ret : constant Access_Test_Suite := new Test_Suite;
+      Name : constant String := "Smart_Pointers";
+      Ret  : constant Access_Test_Suite := new Test_Suite;
    begin
-      Ret.Add_Test (Caller.Create ("Memory management test",
+      Ret.Add_Test (Caller.Create (Name & ": Memory management",
                                    Test_Memory_Management'Access));
       return Ret;
    end Suite;

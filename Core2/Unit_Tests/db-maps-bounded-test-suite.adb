@@ -12,7 +12,8 @@ package body DB.Maps.Bounded.Test.Suite is
 
    function Suite return Access_Test_Suite
    is
-      Ret : constant Access_Test_Suite := new Test_Suite;
+      Name : constant String := "Maps.Bounded";
+      Ret  : constant Access_Test_Suite := new Test_Suite;
    begin
       return Ret;
    end Suite;

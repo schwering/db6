@@ -1,18 +1,16 @@
 -- Abstract:
 --
 -- Maps implementation using normal Gen_BTrees with Types.Keys and
--- Types.Values.Bounded.
+-- Maps.Values.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Finalization;
 
 with DB.DSA.Gen_BTrees;
-with DB.Blocks.Gen_Values_Signature;
 with DB.Blocks;
 with DB.Blocks.Local_IO;
-with DB.Types.Values;
-with DB.Types.Values.Bounded;
+with DB.Maps.Values;
 
 package DB.Maps.Bounded is
 
@@ -164,23 +162,12 @@ package DB.Maps.Bounded is
       State  :    out State_Type);
 
 private
-   package Bounded_Values_IO   renames Types.Values.Bounded.Uncompressed;
-   package Block_IO_Impl       renames Blocks.Local_IO;
-   package Block_IO            renames Block_IO_Impl.IO_Signature;
-
-   package Values is
-      use Bounded_Values_IO;   -- so that the serialization instances take
-
-      package Bounded_Values_Signature is new Blocks.Gen_Values_Signature
-        (Value_Type         => Types.Values.Bounded.String_Type,
-         Read_Context_Type  => Bounded_Values_IO.Read_Context_Type,
-         Write_Context_Type => Bounded_Values_IO.Write_Context_Type);
-   end Values;
-   use Values;
+   package Block_IO_Impl renames Blocks.Local_IO;
+   package Block_IO      renames Block_IO_Impl.IO_Signature;
 
    package BTrees is new DSA.Gen_BTrees
      (Keys                     => Types.Keys.Keys_Signature,
-      Values                   => Bounded_Values_Signature,
+      Values                   => Values.Values_Signature,
       Default_Allow_Duplicates => Default_Allow_Duplicates,
       Block_IO                 => Block_IO);
 

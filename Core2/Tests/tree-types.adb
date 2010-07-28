@@ -1,62 +1,48 @@
+with DB.Maps.Tag_Map;
 with DB.Types.Values.Bounded.Streams;
 
 package body Tree.Types is
+
+   overriding
+   function New_Value
+     (Params : not null access DB.Maps.Value_Parameters_Type)
+      return Value_Type is
+   begin
+      return (DB.Maps.Value_Utils.String_Values.New_Value (Params) with
+              null record);
+   end New_Value;
+
+
+   function New_Value
+     (S : String)
+      return Value_Type is
+   begin
+      return (DB.Maps.Value_Utils.String_Values.New_Value (S) with
+              null record);
+   end New_Value;
+
 
    function New_Value
      (S : DB.Types.Values.Indefinite_Buffer_Type)
       return Value_Type is
    begin
-      return Value_Type'(S => Values_Impl.New_String (S));
+      return New_Value (String (S));
    end New_Value;
-
-
-   procedure Write
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Value  : in              Value_Type)
-   is
-      use Values_Impl;
-   begin
-      Indefinite_Buffer_Type'Write (Stream, To_Buffer (Value.S));
-   end Write;
-
-
-   procedure Read
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Value  : out             Value_Type)
-   is
-      use Values_Impl;
-      Length : constant Length_Type := Length_Type
-         (DB.Types.Values.Bounded.Streams.Remaining
-          (DB.Types.Values.Bounded.Streams.Stream_Type
-           (Stream.all)));
-      Buffer : Indefinite_Buffer_Type (1 .. Length);
-   begin
-      Indefinite_Buffer_Type'Read (Stream, Buffer);
-      Value.S := New_String (Buffer);
-   end Read;
 
 
    function From_Bounded
      (S : DB.Types.Values.Bounded.String_Type)
-      return Value_Type
-   is
-      V : Value_Type;
+      return Value_Type is
    begin
-      V.S := Values_Impl.New_String (DB.Types.Values.Bounded.To_Buffer (S));
-      --V.S := S;
-      return V;
+      return New_Value (DB.Types.Values.Bounded.To_Buffer (S));
    end From_Bounded;
 
 
    function From_Unbounded
      (S : DB.Types.Values.Unbounded.String_Type)
-      return Value_Type
-   is
-      V : Value_Type;
+      return Value_Type is
    begin
-      V.S := S;
-      --V.S := Values_Impl.New_String (DB.Types.Values.Bounded.To_Buffer (S));
-      return V;
+      return New_Value (DB.Types.Values.Unbounded.To_Buffer (S));
    end From_Unbounded;
 
 
@@ -64,8 +50,8 @@ package body Tree.Types is
      (V : Value_Type)
       return DB.Types.Values.Bounded.String_Type is
    begin
-      return DB.Types.Values.Bounded.New_String (Values_Impl.To_Buffer (V.S));
-      --return V.S;
+      return DB.Types.Values.Bounded.New_String
+              (DB.Types.Values.Bounded.Indefinite_Buffer_Type (V.Image));
    end To_Bounded;
 
 
@@ -73,31 +59,9 @@ package body Tree.Types is
      (V : Value_Type)
       return DB.Types.Values.Unbounded.String_Type is
    begin
-      --return DB.Types.Values.Unbounded.New_String (Values_Impl.To_Buffer (V.S));
-      return V.S;
+      return DB.Types.Values.Unbounded.New_String
+              (DB.Types.Values.Unbounded.Indefinite_Buffer_Type (V.Image));
    end To_Unbounded;
-
-
-   overriding
-   function Equals
-     (Left, Right : Value_Type)
-      return Boolean is
-   begin
-      return Values_Impl."=" (Left.S, Right.S);
-   end Equals;
-
-
-   overriding
-   function Image (V : Value_Type) return String is
-   begin
-      declare
-         Len : constant DB.Types.Values.Length_Type
-             := Values_Impl.Length (V.S);
-      begin
-         return "'"& To_Strings.To_String (V.S) &"' "&
-                "["& Len'Img &"]";
-      end;
-   end Image;
 
 
    function Null_Value return Value_Type is
@@ -124,5 +88,8 @@ package body Tree.Types is
       return KV.Value;
    end;
 
+begin
+   DB.Maps.Tag_Map.Register (Value_Type'Tag);
+   DB.Maps.Tag_Map.Seal;
 end Tree.Types;
 

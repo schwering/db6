@@ -15,8 +15,7 @@ package body DB.Maps is
    is
       use type Ada.Tags.Tag;
    begin
-      return Left'Tag = Right'Tag and then
-             Left.Equals (Right);
+      return Left'Tag = Right'Tag and then Left.Equals (Right);
    end Equals;
 
 

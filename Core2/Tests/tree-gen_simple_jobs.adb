@@ -1,6 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Strings.Fixed;
+with Ada.Tags;
 
 with DB.Blocks;
 
@@ -19,12 +20,12 @@ package body Tree.Gen_Simple_Jobs is
          raise Stop_Now;
       end if;
       declare
-         Val   : Value_Type := Null_Value;
+         Val   : DB.Maps.Value_Type'Class := Null_Value;
          State : DB.Maps.State_Type := DB.Maps.Failure;
       begin
          Map.Search(Types.Key(KV), Val, State);
          if State /= DB.Maps.Success or else
-            not Equals(Types.Value(KV), Val) then
+            not Types.Value(KV).Equals(Val) then
             Put_Line("Look up failed "& State'Img);
             Put_Line("Key   = """& To_String(Types.Key(KV)) &"""");
             Put_Line("Value = """& To_String(Types.Value(KV)) &"""");
@@ -39,12 +40,12 @@ package body Tree.Gen_Simple_Jobs is
    is
       use type DB.Blocks.Size_Type;
       KV    : constant Key_Value_Type := Next_Entry;
-      Val   : Value_Type := Null_Value;
+      Val   : DB.Maps.Value_Type'Class := Null_Value;
       State : DB.Maps.State_Type := DB.Maps.Success;
    begin
       Map.Delete(Types.Key(KV), Val, State);
       if State /= DB.Maps.Success or else
-         not Equals(Types.Value(KV), Val) then
+         not Types.Value(KV).Equals(Val) then
          Put_Line("Deletion failed "& State'Img);
          Put_Line("Key   = """& To_String(Types.Key(KV)) &"""");
          Put_Line("Value = """& To_String(Types.Value(KV)) &"""");
@@ -58,17 +59,17 @@ package body Tree.Gen_Simple_Jobs is
    is
       use type DB.Blocks.Size_Type;
       KV    : constant Key_Value_Type := Next_Entry;
-      Val   : Value_Type := Null_Value;
+      Val   : DB.Maps.Value_Type'Class := Null_Value;
       State : DB.Maps.State_Type := DB.Maps.Success;
    begin
       Map.Search(Types.Key(KV), Val, State);
       if State /= DB.Maps.Success or else
-         not Equals(Types.Value(KV), Val) then
+         not Types.Value(KV).Equals(Val) then
          Put_Line("Look up failed "& State'Img);
          Put_Line("Key   = """& To_String(Types.Key(KV)) &"""");
          Put_Line("Value = """& To_String(Types.Value(KV)) &"""");
          Put_Line("Value = """& To_String(Val) &"""");
-         Put_Line("Equal = "& Boolean'Image(Equals(Types.Value(KV), Val)));
+         Put_Line("Equal = "& Boolean'Image(Types.Value(KV).Equals(Val)));
          raise Stop_Now;
       end if;
    end Search;
@@ -78,7 +79,7 @@ package body Tree.Gen_Simple_Jobs is
    is
       use type DB.Blocks.Size_Type;
       KV    : constant Key_Value_Type := Next_Entry;
-      Val   : Value_Type := Null_Value;
+      Val   : DB.Maps.Value_Type'Class := Null_Value;
       State : DB.Maps.State_Type := DB.Maps.Failure;
    begin
       Map.Search(Types.Key(KV), Val, State);

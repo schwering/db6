@@ -122,7 +122,7 @@ package body Tree.Args is
                exit;
             end if;
          end loop;
-         Concurrency_Degree := 10;
+         Concurrency_Degree := 1;
          if To = 0 then
             Short_Job_Execution_Count := Types.Count_Type(To_Number
                                              (S(From .. S'Last)));

@@ -16,7 +16,7 @@ procedure Tree.Map is
     --DB.Maps.New_Map (Test_Data.Max_Key_Size,
     --                 Test_Data.Max_Value_Size);
 
-   Null_Value : Types.Value_Type := Types.Null_Value;
+   Null_Value : Types.Value_Type'Class := Types.Null_Value;
 
    package Simple_Jobs is new Gen_Simple_Jobs
      (Next_Entry      => Test_Data.Random_Entry,

@@ -6,7 +6,6 @@
 
 with DB.DSA.Gen_BTrees.Gen_Check;
 with DB.DSA.Gen_BTrees.Gen_Stats;
-with DB.Types.Values.Bounded.Streams;
 
 package body DB.Maps.Bounded is
 
@@ -96,10 +95,10 @@ package body DB.Maps.Bounded is
       return Boolean
    is
       use type BTrees.State_Type;
-      State  : BTrees.State_Type;
-      String : aliased Types.Values.Bounded.String_Type;
+      State         : BTrees.State_Type;
+      Value_Wrapper : Values.Value_Wrapper_Type;
    begin
-      BTrees.Search (Map.Self.Tree, Key, String, State);
+      BTrees.Search (Map.Self.Tree, Key, Value_Wrapper, State);
       return State = BTrees.Success;
    end Contains;
 
@@ -110,15 +109,13 @@ package body DB.Maps.Bounded is
       Value :    out Value_Type'Class;
       State :    out State_Type)
    is
-      S      : BTrees.State_Type;
-      String : aliased Types.Values.Bounded.String_Type;
-      Stream : aliased Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
+      S             : BTrees.State_Type;
+      Value_Wrapper : Values.Value_Wrapper_Type;
    begin
-      BTrees.Search (Map.Tree, Key, String, S);
+      BTrees.Search (Map.Tree, Key, Value_Wrapper, S);
       State := To_State (S);
       if State = Success then
-         Read (Stream'Access, Value);
+         Value := Value_Wrapper.Ref.all;
       end if;
    end Search;
 
@@ -129,15 +126,13 @@ package body DB.Maps.Bounded is
       Value :    out Value_Type'Class;
       State :    out State_Type)
    is
-      S      : BTrees.State_Type;
-      String : aliased Types.Values.Bounded.String_Type;
-      Stream : aliased Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
+      S             : BTrees.State_Type;
+      Value_Wrapper : Values.Value_Wrapper_Type;
    begin
-      BTrees.Search_Minimum (Map.Tree, Key, String, S);
+      BTrees.Search_Minimum (Map.Tree, Key, Value_Wrapper, S);
       State := To_State (S);
       if State = Success then
-         Read (Stream'Access, Value);
+         Value := Value_Wrapper.Ref.all;
       end if;
    end Search_Minimum;
 
@@ -159,14 +154,11 @@ package body DB.Maps.Bounded is
       Allow_Duplicates : in     Boolean;
       State            :    out State_Type)
    is
-      S      : BTrees.State_Type;
-      String : aliased Types.Values.Bounded.String_Type :=
-         Types.Values.Bounded.Empty_String;
-      Stream : aliased Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
+      S             : BTrees.State_Type;
+      Value_Wrapper : constant Values.Value_Wrapper_Type :=
+         Values.New_Value_Wrapper (Value);
    begin
-      Write (Stream'Access, Value);
-      BTrees.Insert (Map.Tree, Key, String, Allow_Duplicates, S);
+      BTrees.Insert (Map.Tree, Key, Value_Wrapper, Allow_Duplicates, S);
       State := To_State (S);
    end Insert;
 
@@ -177,15 +169,13 @@ package body DB.Maps.Bounded is
       Value :    out Value_Type'Class;
       State :    out State_Type)
    is
-      S      : BTrees.State_Type;
-      String : aliased Types.Values.Bounded.String_Type;
-      Stream : aliased Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
+      S             : BTrees.State_Type;
+      Value_Wrapper : Values.Value_Wrapper_Type;
    begin
-      BTrees.Delete (Map.Tree, Key, String, S);
+      BTrees.Delete (Map.Tree, Key, Value_Wrapper, S);
       State := To_State (S);
       if State = Success then
-         Read (Stream'Access, Value);
+         Value := Value_Wrapper.Ref.all;
       end if;
    end Delete;
 
@@ -267,15 +257,13 @@ package body DB.Maps.Bounded is
       Value  :    out Value_Type'Class;
       State  :    out State_Type)
    is
-      S      : BTrees.State_Type;
-      String : aliased Types.Values.Bounded.String_Type;
-      Stream : aliased Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
+      S             : BTrees.State_Type;
+      Value_Wrapper : Values.Value_Wrapper_Type;
    begin
-      BTrees.Next (Cursor.Map.Tree, Cursor.Cursor, Key, String, S);
+      BTrees.Next (Cursor.Map.Tree, Cursor.Cursor, Key, Value_Wrapper, S);
       State := To_State (S);
       if State = Success then
-         Read (Stream'Access, Value);
+         Value := Value_Wrapper.Ref.all;
       end if;
    end Next;
 
@@ -286,15 +274,13 @@ package body DB.Maps.Bounded is
       Value  :    out Value_Type'Class;
       State  :    out State_Type)
    is
-      S      : BTrees.State_Type;
-      String : aliased Types.Values.Bounded.String_Type;
-      Stream : aliased Types.Values.Bounded.Streams.Stream_Type :=
-         Types.Values.Bounded.Streams.New_Stream (String'Unchecked_Access);
+      S             : BTrees.State_Type;
+      Value_Wrapper : Values.Value_Wrapper_Type;
    begin
-      BTrees.Delete (Cursor.Map.Tree, Cursor.Cursor, Key, String, S);
+      BTrees.Delete (Cursor.Map.Tree, Cursor.Cursor, Key, Value_Wrapper, S);
       State := To_State (S);
       if State = Success then
-         Read (Stream'Access, Value);
+         Value := Value_Wrapper.Ref.all;
       end if;
    end Delete;
 
@@ -341,12 +327,10 @@ package body DB.Maps.Bounded is
       end Key_To_String;
 
       function Value_To_String
-        (Value : Types.Values.Bounded.String_Type)
-         return String
-      is
-         pragma Unreferenced (Value);
+        (Value : Values.Value_Wrapper_Type)
+         return String is
       begin
-         return "(BoundedString)";
+         return Value.Ref.Image;
       end Value_To_String;
 
       procedure Check is new BTrees.Gen_Check

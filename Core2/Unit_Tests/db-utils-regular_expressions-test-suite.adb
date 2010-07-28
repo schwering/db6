@@ -12,15 +12,16 @@ package body DB.Utils.Regular_Expressions.Test.Suite is
 
    function Suite return Access_Test_Suite
    is
+      Name : constant String := "Regular_Expressions";
       Ret : constant Access_Test_Suite := new Test_Suite;
    begin
-      Ret.Add_Test (Caller.Create ("Empty_Regexp test",
+      Ret.Add_Test (Caller.Create (Name & ": Empty_Regexp",
                                    Test_Empty_Regexp'Access));
-      Ret.Add_Test (Caller.Create ("Union test",
+      Ret.Add_Test (Caller.Create (Name & ": Union",
                                    Test_Union'Access));
-      Ret.Add_Test (Caller.Create ("Intersection test",
+      Ret.Add_Test (Caller.Create (Name & ": Intersection",
                                    Test_Intersection'Access));
-      Ret.Add_Test (Caller.Create ("Difference test",
+      Ret.Add_Test (Caller.Create (Name & ": Difference",
                                    Test_Difference'Access));
       return Ret;
    end Suite;
