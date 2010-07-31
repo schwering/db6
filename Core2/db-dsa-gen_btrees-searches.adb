@@ -4,6 +4,25 @@
 -- to find the key.
 -- During all this time, nothing is locked.
 --
+--
+-- Design Notes:
+--
+-- The semantics of the Search_Node procedure are a little bit tricky because it
+-- is used for the Search operation and Cursor's Search_Lower_Bound and
+-- Recalibrate. While in the first case, we want an exact match and only and
+-- exact match, in the second case we want the minimum existent key that is
+-- greater than the parameter Key.  From this position on we move to the right
+-- to satisfy the condition.
+--
+-- Care needs to be taken to handle empty nodes correctly. For this reason,
+-- Search_Node still sets State to Success only if an exact match is found, but
+-- it also sets Index if State = Failure:
+-- If Index <= degree of the node, it has found a greater (State = Failure) or
+-- equal (State = Success) key. Otherwise, if Index > degree of the node (which
+-- is the case if the node is empty and Index = 1), it has determined that there
+-- is no node that contains the parameter Key. This implies that the minimum
+-- greater key lies in a node right from the current node if it even exists.
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
@@ -32,7 +51,6 @@ package body Searches is
             N_A := Scan_Node (N, Key);
          end loop;
       end Find_Leaf;
-
    begin
       Find_Leaf;
       loop
@@ -42,12 +60,13 @@ package body Searches is
          begin
             if Nodes.Is_Valid (I) then
                case Keys.Compare (Key, Nodes.Key (N, I)) is
+                  when Utils.Less =>
+                     Index := I;
+                     State := Failure;
+                     return;
                   when Utils.Equal =>
                      Index := I;
                      State := Success;
-                     return;
-                  when Utils.Less =>
-                     State := Failure;
                      return;
                   when Utils.Greater =>
                      raise Tree_Error;
@@ -55,6 +74,7 @@ package body Searches is
             end if;
          end;
          if not Nodes.Is_Valid (Nodes.Link (N)) then
+            Index := 1;
             State := Failure;
             return;
          end if;
@@ -64,6 +84,7 @@ package body Searches is
          begin
             Nodes.Get_High_Key (N, High_Key, Has_High_Key);
             if Has_High_Key and then Key < High_Key then
+               Index := 1;
                State := Failure;
                return;
             end if;

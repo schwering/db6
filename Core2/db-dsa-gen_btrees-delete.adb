@@ -101,6 +101,7 @@ begin
             State := Success;
          end;
       else
+         Unlock (Tree, N_A);
          Stacks.Finalize (Stack);
          State := Failure;
          return;

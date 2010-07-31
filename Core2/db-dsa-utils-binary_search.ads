@@ -2,7 +2,7 @@
 --
 -- Binary search implementations.
 --
--- References:
+-- Design Notes:
 --
 -- The problem in the Find_Less_Or_Equal*-searches is that we need additional
 -- comparisons to assure that if the I-th element is supposed to be the smallest
@@ -12,7 +12,7 @@
 -- the branching body, the Uniform_Find_Less_Or_Equal_In_Container modifies the
 -- Compare function so that K = K_I iff K <= K_I and K_{I-1} < K.
 --
--- Design Notes:
+-- References:
 --
 -- [Knuth] The Art of Computer Programming: Searching and Sorting (vol 3)
 -- (for uniform binary search: pp. 414-415)

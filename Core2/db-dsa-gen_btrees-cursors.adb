@@ -2,6 +2,19 @@
 --
 -- see spec
 --
+-- Design Notes:
+--
+-- In the Next operation, the State variable has multiple meanings. At the
+-- outermost level, i.e. not in the nested subprograms, State = Success means
+-- that there exists a next Key/Value pair. In the nested subprograms however,
+-- State = Success means that the subprogram finished successfully.
+--
+-- An example: in the nested Move_To_Next procedure in the case that we've
+-- surpassed the last Key in the tree, it sets Final := True and State :=
+-- Success. This means that Move_To_Next worked correctly and as expected, but
+-- that the final value of State will be Failure because there is no next
+-- Key/Value pair.
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
@@ -236,10 +249,30 @@ package body Cursors is
          end if;
 
          declare
+            use type Nodes.Degree_Type;
             Old_Key : constant Keys.Key_Type := Cursor.Key;
          begin
-            Searches.Search_Node (Tree, Old_Key, Cursor.Node, Cursor.Index,
-                                  State);
+            Searches.Search_Node
+               (Tree, Old_Key, Cursor.Node, Cursor.Index, State);
+
+            if Cursor.Index <= Nodes.Degree (Cursor.Node) then
+               State := Success;
+            else
+               -- Move right until a non-empty node is found.
+               loop
+                  if Nodes.Degree (Cursor.Node) > 0 then
+                     Cursor.Index := 1;
+                     State := Success;
+                     exit;
+                  end if;
+                  if not Nodes.Is_Valid (Nodes.Link (Cursor.Node)) then
+                     State := Failure;
+                     exit;
+                  end if;
+                  Read_Node (Tree, Nodes.Valid_Link (Cursor.Node), Cursor.Node);
+               end loop;
+            end if;
+
             if State /= Success then
                Cursor.Final := True;
                return;
@@ -247,18 +280,15 @@ package body Cursors is
             Init_Contexts_And_Key;
 
             -- Move to next key since we don't what to visit one twice.
-            if Cursor.Key <= Old_Key then
+            while Cursor.Key <= Old_Key loop
                Move_To_Next;
                if Cursor.Final then
                   return;
                end if;
-            end if;
+            end loop;
 
             -- Move on until Lower_Bound is satisfied.
-            loop
-               if Is_Satisfied (Cursor, Cursor.Lower_Bound) then
-                  return;
-               end if;
+            while not Is_Satisfied (Cursor, Cursor.Lower_Bound) loop
                Move_To_Next;
                if Cursor.Final then
                   return;
@@ -294,27 +324,50 @@ package body Cursors is
       procedure Search_Concrete_Lower_Bound
       is
          pragma Precondition (not Cursor.Has_Node);
-         FB : constant Bound_Type := Cursor.Lower_Bound;
+         pragma Precondition (Cursor.Lower_Bound.Comparison /= Less);
+         pragma Precondition (Cursor.Lower_Bound.Comparison /= Less_Or_Equal);
+         use type Nodes.Degree_Type;
       begin
-         Searches.Search_Node (Tree, FB.Key, Cursor.Node, Cursor.Index, State);
+         Searches.Search_Node
+            (Tree, Cursor.Lower_Bound.Key, Cursor.Node, Cursor.Index, State);
+
+         if Cursor.Index <= Nodes.Degree (Cursor.Node) then
+            State := Success;
+         else
+            -- Move right until a non-empty node is found.
+            loop
+               if Nodes.Degree (Cursor.Node) > 0 then
+                  Cursor.Index := 1;
+                  State := Success;
+                  exit;
+               end if;
+               if not Nodes.Is_Valid (Nodes.Link (Cursor.Node)) then
+                  State := Failure;
+                  exit;
+               end if;
+               Read_Node (Tree, Nodes.Valid_Link (Cursor.Node), Cursor.Node);
+            end loop;
+         end if;
+
          if State /= Success then
             Cursor.Final := True;
             return;
          end if;
          Init_Contexts_And_Key;
 
-         case FB.Comparison is
+         case Cursor.Lower_Bound.Comparison is
             when Less | Less_Or_Equal =>
-               pragma Assert (False);
-               null;
-            when Equal | Greater =>
-               if not Key_Matches (Cursor.Key, FB.Comparison, FB.Key) then
-                  Move_To_Next;
-               else
+               raise Tree_Error;
+            when Equal =>
+               if Cursor.Key = Cursor.Lower_Bound.Key then
                   State := Success;
+               else
+                  State := Failure;
                end if;
-            when Greater_Or_Equal =>
-               State := Success;
+            when Greater_Or_Equal | Greater =>
+               while not Is_Satisfied (Cursor, Cursor.Lower_Bound) loop
+                  Move_To_Next;
+               end loop;
          end case;
       end Search_Concrete_Lower_Bound;
 
@@ -372,7 +425,7 @@ package body Cursors is
       pragma Precondition (Cursor.Owning_Tree = Tree.Self);
    begin
       Lock_Mutex (Cursor);
-      if not Cursor.Has_Node then
+      if Cursor.Final or not Cursor.Has_Node then
          State := Failure;
          Unlock_Mutex (Cursor);
          return;

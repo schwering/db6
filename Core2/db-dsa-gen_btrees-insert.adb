@@ -88,6 +88,7 @@ begin
       if not Nodes.Is_Valid (I) then
          I := Nodes.Degree (N_Old) + 1;
       elsif not Allow_Duplicates and then Nodes.Key (N_Old, I) = Key then
+         Unlock (Tree, N_A);
          Stacks.Finalize (Stack);
          State := Failure;
          return;
