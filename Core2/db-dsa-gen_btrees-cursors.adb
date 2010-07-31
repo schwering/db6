@@ -15,6 +15,13 @@
 -- that the final value of State will be Failure because there is no next
 -- Key/Value pair.
 --
+-- Locking the leaves seems to be a good idea to enforce that the following
+-- invariant holds: the previous key is less than or equal to the current key.
+-- However, this is given even without locking, because if the currently visited
+-- node is split during the visit, the cursor would just continue at the node
+-- which has been the right neighbor before the split. It thereby might skip
+-- some new entries, but the order would be consistent.
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
