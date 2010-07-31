@@ -15,6 +15,12 @@ package body DB.Maps.Bounded.Test.Suite is
       Name : constant String := "Maps.Bounded";
       Ret  : constant Access_Test_Suite := new Test_Suite;
    begin
+      Ret.Add_Test (Caller.Create (Name & ": Create",
+                                   Test_Create'Access));
+      Ret.Add_Test (Caller.Create (Name & ": Open",
+                                   Test_Open'Access));
+      Ret.Add_Test (Caller.Create (Name & ": Cursor",
+                                   Test_Cursor'Access));
       return Ret;
    end Suite;
 

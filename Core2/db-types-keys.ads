@@ -78,6 +78,8 @@ package DB.Types.Keys is
 
    function Short_Delimiter (Left, Right : Key_Type) return Key_Type;
 
+   function Image (Key : Key_Type) return String;
+
    package Keys_Signature is new Blocks.Gen_Keys_Signature
      (Key_Type           => Key_Type,
       Read_Context_Type  => Read_Context_Type,

@@ -27,14 +27,7 @@ package DB.Utils.Gen_Binary_Heaps.Gen_Test is
    overriding
    procedure Tear_Down (T : in out Test_Type);
 
-   procedure Test_Clear (T : in out Test_Type);
-   procedure Test_Is_Empty (T : in out Test_Type);
-
-   procedure Test_Extract_Min (T : in out Test_Type);
-   procedure Test_Insert (T : in out Test_Type);
-
-   procedure Test_Inserts (T : in out Test_Type);
-   procedure Test_Extract_Mins (T : in out Test_Type);
+   procedure Tests (T : in out Test_Type);
 
 
    -- The following usually goes to the suite, but for AI reasons we can't do
@@ -42,10 +35,7 @@ package DB.Utils.Gen_Binary_Heaps.Gen_Test is
 
    package Caller is new AUnit.Test_Caller (Test_Type);
 
-   Test_Extract_Mins_Access : Caller.Test_Method := Test_Extract_Mins'Access;
-   Test_Inserts_Access      : Caller.Test_Method := Test_Inserts'Access;
-   Test_Clear_Access        : Caller.Test_Method := Test_Clear'Access;
-   Test_Is_Empty_Access     : Caller.Test_Method := Test_Is_Empty'Access;
+   Tests_Ref : Caller.Test_Method := Tests'Access;
 
 end DB.Utils.Gen_Binary_Heaps.Gen_Test;
 

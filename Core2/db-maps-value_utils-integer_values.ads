@@ -1,13 +1,13 @@
 -- Abstract:
 --
--- String value implementation.
--- It uses String'Read/Write. The length is stored as 2 byte integer.
+-- Integer value implementation.
+-- It uses Integer'Read/Write.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Streams;
 
-package DB.Maps.Value_Utils.String_Values is
+package DB.Maps.Value_Utils.Integer_Values is
 
    type Value_Type is new Maps.Value_Type with private;
 
@@ -16,7 +16,7 @@ package DB.Maps.Value_Utils.String_Values is
      (Params : not null access Value_Parameters_Type)
       return Value_Type;
 
-   function New_Value (S : String) return Value_Type;
+   function New_Value (I : Integer) return Value_Type;
 
    overriding
    function Size_Bound
@@ -41,23 +41,10 @@ package DB.Maps.Value_Utils.String_Values is
 
 
 private
-   package AF renames Ada.Finalization;
-
-   type String_Ref_Type is access String;
-
    type Value_Type is new Maps.Value_Type with
       record
-         Str : String_Ref_Type;
+         Int : Integer;
       end record;
 
-   overriding
-   procedure Initialize (Value : in out Value_Type);
-
-   overriding
-   procedure Adjust (Value : in out Value_Type);
-
-   overriding
-   procedure Finalize (Value : in out Value_Type);
-
-end DB.Maps.Value_Utils.String_Values;
+end DB.Maps.Value_Utils.Integer_Values;
 

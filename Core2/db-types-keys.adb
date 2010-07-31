@@ -195,5 +195,13 @@ package body DB.Types.Keys is
       --Times.Skip (Context.Time_Context, Block, Cursor);
    end Skip;
 
+
+   function Image (Key : Key_Type) return String is
+   begin
+      return "('"& String (Rows.To_Buffer (Key.Row)) &"', "&
+                   String (Columns.To_Buffer (Key.Column)) &"', "&
+                   Times.Number_Type'Image (Key.Time) &")";
+   end Image;
+
 end DB.Types.Keys;
 

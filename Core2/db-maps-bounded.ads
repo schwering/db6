@@ -21,7 +21,9 @@ package DB.Maps.Bounded is
 
    type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with private;
 
-   function New_Map (Allow_Duplicates : in Boolean) return Map_Type;
+   function New_Map
+     (Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
+      return Map_Type;
 
    overriding
    procedure Create (Map : in out Map_Type; ID : in String);

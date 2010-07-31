@@ -2,9 +2,16 @@
 --
 -- see spec
 --
+-- Design Notes:
+--
+-- Set_Up and Tear_Down store/restore the state of the tag map before the test
+-- ran.
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Tags; use Ada.Tags;
+with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
@@ -16,7 +23,20 @@ package body DB.Maps.Tag_Map.Test is
    type T4 is tagged null record;
    type Some_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Very_Long_Name is tagged null record;
 
-   procedure Test_Register (T : in out Test_Type)
+
+   procedure Set_Up (T : in out Test_Type) is
+   begin
+      Utils.Store (T.State);
+   end;
+
+
+   procedure Tear_Down (T : in out Test_Type) is
+   begin
+      Utils.Restore (T.State);
+   end;
+
+
+   procedure Test_Register (T : in out Test_Type'Class)
    is
       pragma Unreferenced (T);
    begin
@@ -34,7 +54,7 @@ package body DB.Maps.Tag_Map.Test is
    end;
 
 
-   procedure Test_Seal (T : in out Test_Type)
+   procedure Test_Seal (T : in out Test_Type'Class)
    is
       pragma Unreferenced (T);
    begin
@@ -45,7 +65,7 @@ package body DB.Maps.Tag_Map.Test is
    end;
 
 
-   procedure Test_Map (T : in out Test_Type)
+   procedure Test_Map (T : in out Test_Type'Class)
    is
       pragma Unreferenced (T);
    begin
@@ -69,7 +89,18 @@ package body DB.Maps.Tag_Map.Test is
       exception
          when Tag_Error => null;
       end;
+   exception
+      when E : others =>
+         Put_Line (Exception_Information (E));
    end;
+
+
+   procedure Tests (T : in out Test_Type) is
+   begin
+      Test_Register (T);
+      Test_Seal (T);
+      Test_Map (T);
+   end Tests;
 
 end DB.Maps.Tag_Map.Test;
 

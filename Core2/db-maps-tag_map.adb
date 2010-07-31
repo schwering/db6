@@ -197,5 +197,12 @@ package body DB.Maps.Tag_Map is
       return Map (Tid).Tag;
    end To_Tag;
 
+
+   procedure Clear is
+   begin
+      Free_All;
+      Sealed := False;
+   end Clear;
+
 end DB.Maps.Tag_Map;
 

@@ -9,11 +9,9 @@ with Ada.Exceptions; use Ada.Exceptions;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
-
 package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
 
    Heap_Size : constant := 100;
-
 
    procedure Set_Up (T : in out Test_Type) is
    begin
@@ -31,7 +29,7 @@ package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
    end;
 
 
-   procedure Test_Extract_Min (T : in out Test_Type) is
+   procedure Extract_Min (T : in out Test_Type'Class) is
    begin
       if Size (T.Heap.all) >= 2 then
          declare
@@ -63,7 +61,7 @@ package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
    end;
 
 
-   procedure Test_Insert (T : in out Test_Type) is
+   procedure Insert (T : in out Test_Type'Class) is
    begin
       T.Last := Succ (T.Last);
       if Size (T.Heap.all) < Capacity (T.Heap.all) then
@@ -84,7 +82,7 @@ package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
    end;
 
 
-   procedure Test_Clear (T : in out Test_Type)
+   procedure Clear (T : in out Test_Type'Class)
    is
       Cnt : Natural := 0;
       procedure Free (I : in out Item_Type)
@@ -104,7 +102,7 @@ package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
    end;
 
 
-   procedure Test_Is_Empty (T : in out Test_Type) is
+   procedure Is_Empty (T : in out Test_Type'Class) is
    begin
       for I in 1 .. Size (T.Heap.all) loop
          declare
@@ -117,22 +115,29 @@ package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
    end;
 
 
-   procedure Test_Inserts (T : in out Test_Type)
-   is
+   procedure Inserts (T : in out Test_Type'Class) is
    begin
       for I in 1 .. Heap_Size + 10 loop
-         T.Test_Insert;
+         Insert (T);
       end loop;
    end;
 
 
-   procedure Test_Extract_Mins (T : in out Test_Type)
-   is
+   procedure Extract_Mins (T : in out Test_Type'Class) is
    begin
       for I in 1 .. Heap_Size + 10 loop
-         T.Test_Insert;
+         Insert (T);
       end loop;
    end;
+
+
+   procedure Tests (T : in out Test_Type) is
+   begin
+      Extract_Mins (T);
+      Inserts (T);
+      Clear (T);
+      Is_Empty (T);
+   end Tests;
 
 end DB.Utils.Gen_Binary_Heaps.Gen_Test;
 

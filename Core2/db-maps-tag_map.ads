@@ -20,6 +20,8 @@ package DB.Maps.Tag_Map is
    function To_Tid (Tag : Ada.Tags.Tag) return Tid_Type;
    function To_Tag (Tid : Tid_Type) return Ada.Tags.Tag;
 
+   procedure Clear;
+
 private
    Max_Tag_Length : constant := 128;
 
@@ -44,11 +46,12 @@ private
          Next : Node_Ref_Type;
       end record;
 
+   type Map_Type is array (Tid_Type) of Item_Type;
+
    Sealed : Boolean       := False;
    Head   : Node_Ref_Type := null;
    Tail   : Node_Ref_Type := null;
-
-   Map : array (Tid_Type) of Item_Type;
+   Map    : Map_Type;
 
 end DB.Maps.Tag_Map;
 
