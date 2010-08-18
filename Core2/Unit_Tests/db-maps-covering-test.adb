@@ -17,10 +17,10 @@ with DB.Maps.Value_Utils.Integer_Values;
 with DB.Maps.Value_Utils.String_Values;
 with DB.Types.Keys; use DB.Types.Keys;
 
-package body DB.Maps.Bounded.Test is
+package body DB.Maps.Covering.Test is
 
-   File_Name : constant String := "unit_test_bounded_map";
-   Loop_Count : constant := 100;
+   File_Name : constant String := "unit_test_covering_map";
+   Loop_Count : constant := 1000;
 
    function New_Key (Row, Col : String; Time : Natural) return Key_Type is
    begin
@@ -88,6 +88,36 @@ package body DB.Maps.Bounded.Test is
    begin
       Tag_Map.Utils.Restore (T.State);
    end Tear_Down;
+
+
+   procedure Test_Cover (T : in out Test_Type)
+   is
+      pragma Unreferenced (T);
+   begin
+      declare
+         use Utils.Regular_Expressions;
+         Guard : constant Slice_Array_Type :=
+           ((Compile ("a*b"), null),
+            (Compile ("b"), null),
+            (Compile ("ab*"), null),
+            (Compile ("c"), null),
+            (Compile ("(aa)*(bb)*"), null),
+            (Compile ("(bb)*(aa)*"), null));
+         R : constant Regexp_Type := Compile ("a(a|b)b");
+         Cov : constant Cover_Type := Cover (R, Guard);
+         U : Regexp_Type := Empty_Regexp;
+      begin
+         for I in Cov'Range loop
+            U := Union (U, Guard (Cov (I)).Guard);
+         end loop;
+         Assert (Is_Subset (R, U), "R is not a subset of U, even though "&
+                                   "U should cover it.");
+         Assert (Cov (1) = 1, "First element isn't Regexp 1");
+         Assert (Cov (2) = 3, "First element isn't Regexp 3");
+         Assert (Cov'Length = 2, "We have "& Cov'Length'Img &" elements "&
+                                 "in the cover instead of 2.");
+      end;
+   end;
 
 
    procedure Inserts
@@ -164,16 +194,52 @@ package body DB.Maps.Bounded.Test is
    end;
 
 
+   procedure Configure_Map (Map : in out Map_Type'Class)
+   is
+      use Utils.Regular_Expressions;
+   begin
+      Map.Add_Slice
+        ("((BMW|.*X3.*))|(.*Auto.*)|(.*wagen.*)",
+         "btree", "unit_test_car");
+      Map.Add_Slice
+        ("(Artificial Intelligence.*)|(.*Russel)|(.*Norvig)",
+         "btree", "unit_test_ai");
+      Map.Add_Slice
+        ("(.*Kraft.*)|(.*Stoiber.*)",
+         "btree", "unit_test_politics");
+      Map.Add_Slice
+        ("(.*Hogan.*)|(.*Newkirk.*)",
+         "btree", "unit_test_kvh1");
+      Map.Add_Slice
+        ("(.*Klink.*)|(.*Schultz.*)",
+         "btree", "unit_test_kvh2");
+      Map.Add_Slice
+        ("Halleluja",
+         "btree", "unit_test_mist");
+   end;
+
+
    procedure Test_Create (T : in out Test_Type)
    is
       pragma Unreferenced (T);
       Map : Map_Type := New_Map;
    begin
+      Configure_Map (Map);
       Create (Map, File_Name);
+      Assert (Map.Slices'Length = 6, "We have "& Map.Slices'Length'Img &
+                                     " slices instead of 6");
+      Assert (Map.Cover'Length = 6, "Cover has size "& Map.Cover'Length'Img &
+                                    " instead of 6");
       Inserts (Map, Allow_Duplicates => False);
       Anti_Inserts (Map);
       Searches (Map);
       Finalize (Map);
+   exception
+      when E : others =>
+         Test_Utils.Unlink (File_Name);
+         Put_Line ("Cover has size "& Map.Cover'Length'Img & " instead of 6");
+         Put_Line (Exception_Information (E));
+         raise;
    end;
 
 
@@ -211,12 +277,19 @@ package body DB.Maps.Bounded.Test is
          V : Value_Utils.Integer_Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
+         Prev_Init : Boolean := False;
+         Prev_Key  : Key_Type;
       begin
          loop
             C.Next (K, V, S);
             exit when S /= Success;
+            Assert (not Prev_Init or else Prev_Key <= K,
+                    "Previous key "& Types.Keys.Image (Prev_Key) &" is not "&
+                    "less than or equal to "& Types.Keys.Image (K));
             C.Pause;
             N := N + 1;
+            Prev_Key  := K;
+            Prev_Init := True;
          end loop;
          Assert (N = Loop_Count, "Met "& N'Img &" items where "&
                                  Loop_Count'Img &" were expected");
@@ -352,6 +425,7 @@ package body DB.Maps.Bounded.Test is
       end;
 
    begin
+      Configure_Map (Map);
       Create (Map, File_Name);
       Inserts (Map, Allow_Duplicates => True);
       Single_Cursor_Pause;
@@ -373,5 +447,5 @@ package body DB.Maps.Bounded.Test is
          raise;
    end;
 
-end DB.Maps.Bounded.Test;
+end DB.Maps.Covering.Test;
 

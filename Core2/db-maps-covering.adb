@@ -14,16 +14,16 @@ with Unicode.CES;
 
 with DB.Blocks.Gen_ASCII_Layer;
 with DB.Blocks.Local_IO;
+with DB.Maps.Bounded;
+with DB.Utils.Print; use DB.Utils;
 
 package body DB.Maps.Covering is
 
    function Cover
-     (R   : RE.Regexp_Type;
-      Map : Map_Type'Class)
+     (R      : RE.Regexp_Type;
+      Slices : Slice_Array_Type)
       return Cover_Type
    is
-      pragma Precondition (Map.Slices /= null);
-
       type Booleans_Type is array (Positive range <>) of Boolean;
 
       function Booleans_To_Cover
@@ -44,7 +44,6 @@ package body DB.Maps.Covering is
          return Cover;
       end Booleans_To_Cover;
 
-      Slices          : Slice_Array_Type renames Map.Slices.all;
       Take            : Booleans_Type (Slices'Range) := (others => False);
       Size            : Natural                      := 0;
       Already_Covered : RE.Regexp_Type               := RE.Empty_Regexp;
@@ -61,12 +60,13 @@ package body DB.Maps.Covering is
          begin
             if Has_Benefit then
                Take (I)        := True;
+               Print ("Take ("& I'Img &") = True");
                Size            := Size + 1;
                Already_Covered := RE.Union (Already_Covered, Guard);
             end if;
          end;
       end loop;
-      pragma Assert (RE.Is_Subset (Already_Covered, R));
+      pragma Assert (RE.Is_Subset (R, Already_Covered));
       return Booleans_To_Cover (Take, Size);
    end Cover;
 
@@ -75,7 +75,7 @@ package body DB.Maps.Covering is
    is
       R : constant RE.Regexp_Type := RE.Compile (Regexp);
    begin
-      return Cover (R, Map);
+      return Cover (R, Map.Slices.all);
    end Cover;
 
 
@@ -85,8 +85,16 @@ package body DB.Maps.Covering is
    begin
       for I in Map.Slices'Range loop
          Union := RE.Union (Union, Map.Slices (I).Guard);
+         if not RE.Is_Subset (Map.Slices (I).Guard, Union) then
+            Print ("Doof");
+         end if;
       end loop;
-      return Cover (Union, Map);
+      for I in Map.Slices'Range loop
+         if not RE.Is_Subset (Map.Slices (I).Guard, Union) then
+            Print ("Kapott");
+         end if;
+      end loop;
+      return Cover (Union, Map.Slices.all);
    end Total_Cover;
 
 
@@ -132,7 +140,6 @@ package body DB.Maps.Covering is
       function EOF
         (From : File_Type)
          return Boolean;
-
    end XML;
 
 
@@ -299,6 +306,7 @@ package body DB.Maps.Covering is
          Reader.Parse (File);
       end Read;
 
+
       overriding
       procedure Next_Char
         (From : in out File_Type;
@@ -320,7 +328,9 @@ package body DB.Maps.Covering is
    end XML;
 
 
-   function New_Map (Allow_Duplicates : in Boolean) return Map_Type is
+   function New_Map
+     (Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
+      return Map_Type is
    begin
       return Map_Type'(AF.Limited_Controlled with
                        Initialized      => False,
@@ -338,7 +348,7 @@ package body DB.Maps.Covering is
       Pred : Node_Ref_Type := Map.Config;
       Node : constant Node_Ref_Type :=
         new Node_Type'(Guard_Length => Guard'Length,
-                       Impl_Length  => ID'Length,
+                       Impl_Length  => Impl'Length,
                        ID_Length    => ID'Length,
                        Guard        => Guard,
                        Impl         => Impl,
@@ -381,8 +391,17 @@ package body DB.Maps.Covering is
       begin
          while Node /= null loop
             Map.Slices (I).Guard := RE.Compile (Node.Guard);
-            Map.Slices (I).Map   := new Base_Map_Type'
-              (Maps.New_Map (Node.Impl, Map.Allow_Duplicates));
+            declare
+               Impl    : constant String := Node.Impl;
+               Dupes   : constant Boolean := Map.Allow_Duplicates;
+               --Map_Ref : constant Base_Map_Ref_Type := new Base_Map_Type'
+                 --(Maps.New_Map (Impl, Dupes));
+               -- TODO XXX either fix New_Map or add a access-returning New_Map
+               Map_Ref : constant Base_Map_Ref_Type := new
+                  Bounded.Map_Type'(Bounded.New_Map (Dupes));
+            begin
+               Map.Slices (I).Map := Map_Ref;
+            end;
             Init_Sub_Map (Map.Slices (I).Map.all, Node.ID);
             Node := Node.Next;
             I := I + 1;

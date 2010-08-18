@@ -22,6 +22,8 @@ package DB.Utils.Regular_Expressions.Test is
    procedure Test_Union (T : in out Test_Type);
    procedure Test_Intersection (T : in out Test_Type);
    procedure Test_Difference (T : in out Test_Type);
+   procedure Test_Union2 (T : in out Test_Type);
+   procedure Test_Long (T : in out Test_Type);
 
 private
    type Regexp_Ref_Type is access Regexp_Type;

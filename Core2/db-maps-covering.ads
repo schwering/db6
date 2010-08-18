@@ -20,7 +20,9 @@ package DB.Maps.Covering is
    type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with private;
 
    not overriding
-   function New_Map (Allow_Duplicates : in Boolean) return Map_Type;
+   function New_Map
+     (Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
+      return Map_Type;
 
    not overriding
    procedure Add_Slice
@@ -204,6 +206,11 @@ private
    -- instead of
    --    for I in Cover'Range loop ... Slices (Cover (I)) ... end loop;
    type Cover_Ref_Type is access Cover_Type;
+
+   function Cover
+     (R      : RE.Regexp_Type;
+      Slices : Slice_Array_Type)
+      return Cover_Type;
 
    type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with
       record

@@ -5,6 +5,8 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Unchecked_Deallocation;
+with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
@@ -138,6 +140,80 @@ package body DB.Utils.Regular_Expressions.Test is
                                Difference (T.Regexp (I), T.Regexp (J))),
                     "Empty \not\subseteq ("& I'Img &" \ "& J'Img &")");
          end loop;
+      end loop;
+   end;
+
+
+   procedure Test_Union2 (T : in out Test_Type)
+   is
+      pragma Unreferenced (T);
+      Rs : array (Positive range <>) of Regexp_Type :=
+        (Compile ("((BMW|.*X3.*))|(.*Auto.*)|(.*wagen.*)"),
+         Compile ("(Artificial Intelligence.*)|(.*Russel)|(.*Norvig)"),
+         Compile ("(.*Kraft.*)|(.*Stoiber.*)"),
+         Compile ("(.*Hogan.*)|(.*Newkirk.*)"),
+         Compile ("(.*Klink.*)|(.*Schultz.*)"),
+         Compile ("Halleluja"));
+      R : Regexp_Type := Empty_Regexp;
+   begin
+      for J in Rs'Range loop
+         R := Union (R, Rs (J));
+         if J = 2 then
+            Assert (Is_Subset (Compile ("Artificial Intelligence"),
+                               Compile ("Artificial Intelligence.*")), "");
+            Assert (Is_Subset (Compile ("Artificial Intelligence.*"),
+                               Compile ("Artificial Intelligence.*")), "");
+            Assert (Is_Subset (Compile ("Artificial Intelligence.*"), Rs (2)), "");
+            Assert (Is_Subset (Compile ("Artificial Intelligence"), R), "");
+            Assert (Is_Subset (Compile ("Russel"), R), "");
+            Assert (Is_Subset (Compile ("Norvig"), R), "");
+            Assert (Is_Subset (Compile (".*Russel"), R), "");
+            Assert (Is_Subset (Compile (".*Norvig"), R), "");
+            Assert (Is_Subset (Compile ("BMW"), R), "");
+            Assert (Is_Subset (Compile (".*X3"), R), "");
+            Assert (Is_Subset (Compile (".*Auto"), R), "");
+            Assert (Is_Subset (Compile (".*wagen"), R), "");
+            Assert (Is_Subset (Compile ("X3.*"), R), "");
+            Assert (Is_Subset (Compile ("Auto.*"), R), "");
+            Assert (Is_Subset (Compile ("wagen.*"), R), "");
+            Assert (Is_Subset (Compile (".*X3.*"), R), "");
+            Assert (Is_Subset (Compile (".*Auto.*"), R), "");
+            Assert (Is_Subset (Compile (".*wagen.*"), R), "");
+            Assert (Is_Subset (Compile ("Artificial IntelligenceABC"), R), "");
+            Assert (Is_Subset (Compile ("Artificial Intelligence.*"), R), "");
+         end if;
+         Assert (Is_Subset (Rs (J), R),
+                 "Regexp"& J'Img &" not a subset of union");
+      end loop;
+      for J in Rs'Range loop
+         Assert (Is_Subset (Rs (J), R),
+                 "Regexp"& J'Img &" not a subset of union");
+      end loop;
+   end Test_Union2;
+
+
+   procedure Test_Long (T : in out Test_Type)
+   is
+      pragma Unreferenced (T);
+      I : Integer := 1500;
+   begin
+      while I <= 2000 loop
+         I := I + 50;
+         declare
+            S : constant String (1 .. I) := (others => 'a');
+         begin
+            declare
+               R : constant Regexp_Type := Compile (S);
+               pragma Unreferenced (R);
+            begin
+               null;
+            end;
+         exception
+            when E : others =>
+               Put_Line (Exception_Information (E));
+               Assert (False, "Caught exception at length "& I'Img);
+               raise;
+         end;
       end loop;
    end;
 

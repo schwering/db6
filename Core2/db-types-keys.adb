@@ -199,7 +199,7 @@ package body DB.Types.Keys is
    function Image (Key : Key_Type) return String is
    begin
       return "('"& String (Rows.To_Buffer (Key.Row)) &"', "&
-                   String (Columns.To_Buffer (Key.Column)) &"', "&
+              "'"& String (Columns.To_Buffer (Key.Column)) &"', "&
                    Times.Number_Type'Image (Key.Time) &")";
    end Image;
 

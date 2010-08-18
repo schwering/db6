@@ -41,6 +41,8 @@
 
 with Ada.Unchecked_Deallocation;
 
+with DB.Utils.Growing_Arrays;
+
 package body DB.Utils.Regular_Expressions is
 
    Open_Paren    : constant Character := '(';
@@ -1165,7 +1167,7 @@ package body DB.Utils.Regular_Expressions is
       --  Creates the primary table
 
       declare
-         Table : Regexp_Array_Access;
+         Table       : Regexp_Array_Access;
          Num_States  : State_Index;
          Start_State : State_Index;
          End_State   : State_Index;
@@ -1289,21 +1291,43 @@ package body DB.Utils.Regular_Expressions is
    is
       pragma Warnings (Off, Num_States);
 
-      Last_Index : constant State_Index := First_Table'Last (1);
-      type Meta_State is array (1 .. Last_Index) of Boolean;
+      type Meta_State is array (1 .. First_Table'Last) of Boolean;
+      pragma Pack (Meta_State);
+      type Meta_State_Array is array (State_Index range <>) of Meta_State;
+      type Meta_State_Array_Access is access Meta_State_Array;
+      type Boolean_Array_Access is access Boolean_Array;
 
-      Table : Regexp_Array (1 .. Last_Index, 0 .. Alphabet_Size) :=
-                (others => (others => 0));
-
-      Meta_States : array (1 .. Last_Index + 1) of Meta_State :=
-                      (others => (others => False));
+      Table       : Regexp_Array_Access     := null;
+      Meta_States : Meta_State_Array_Access := null;
+      Is_Final    : Boolean_Array_Access    := null;
 
       Temp_State_Not_Null : Boolean;
 
-      Is_Final : Boolean_Array (0 .. Last_Index) := (others => False);
+      Current_State : State_Index := 1;
+      Nb_State      : State_Index := 1;
 
-      Current_State       : State_Index := 1;
-      Nb_State            : State_Index := 1;
+
+      --procedure Array_Set is new Growing_Arrays.Gen_Array_Set
+        --(Index_Type        => State_Index,
+         --Item_Type         => Meta_State,
+         --Array_Type        => Meta_State_Array,
+         --Array_Access_Type => Meta_State_Array_Access,
+         --Default_Item      => Meta_State'(others => False));
+
+      --procedure Array_Set is new Growing_Arrays.Gen_Array_Set
+        --(Index_Type        => State_Index,
+         --Item_Type         => Boolean,
+         --Array_Type        => Boolean_Array,
+         --Array_Access_Type => Boolean_Array_Access,
+         --Default_Item      => False);
+
+      --procedure Array_Set is new Growing_Arrays.Gen_Array_2d_Set
+        --(First_Index_Type  => State_Index,
+         --Second_Index_Type => Column_Index,
+         --Item_Type         => State_Index,
+         --Array_Type        => Regexp_Array,
+         --Array_Access_Type => Regexp_Array_Access,
+         --Default_Item      => 0);
 
       procedure Closure
         (State : in out Meta_State;
@@ -1338,6 +1362,15 @@ package body DB.Utils.Regular_Expressions is
    --  Start of processing for Create_Secondary_Table
 
    begin
+      Table := new Regexp_Array (1 .. First_Table'Last + 100, 0 .. Alphabet_Size);
+      Table.all := (others => (others => 0));
+
+      Meta_States := new Meta_State_Array (1 .. First_Table'Last + 100);
+      Meta_States.all := (others => (others => False));
+
+      Is_Final := new Boolean_Array (0 .. First_Table'Last + 100);
+      Is_Final.all := (others => False);
+
       --  Create a new state
 
       Closure (Meta_States (Current_State), Start_State);
@@ -1349,6 +1382,7 @@ package body DB.Utils.Regular_Expressions is
 
          if Meta_States (Current_State)(End_State) then
             Is_Final (Current_State) := True;
+            --Array_Set (Is_Final, Current_State, True);
          end if;
 
          --  For every character in the regexp, calculate the possible
@@ -1356,14 +1390,14 @@ package body DB.Utils.Regular_Expressions is
 
          for Column in 0 .. Alphabet_Size loop
             Meta_States (Nb_State + 1) := (others => False);
+            --Array_Set (Meta_States, Nb_State + 1, (others => False));
             Temp_State_Not_Null := False;
 
             for K in Meta_States (Current_State)'Range loop
                if Meta_States (Current_State)(K)
                  and then First_Table (K, Column) /= 0
                then
-                  Closure
-                    (Meta_States (Nb_State + 1), First_Table (K, Column));
+                  Closure (Meta_States (Nb_State + 1), First_Table (K, Column));
                   Temp_State_Not_Null := True;
                end if;
             end loop;
@@ -1377,6 +1411,7 @@ package body DB.Utils.Regular_Expressions is
                for K in 1 .. Nb_State loop
                   if Meta_States (K) = Meta_States (Nb_State + 1) then
                      Table (Current_State, Column) := K;
+                     --Array_Set (Table, Current_State, Column, K);
                      exit;
                   end if;
                end loop;
@@ -1386,6 +1421,7 @@ package body DB.Utils.Regular_Expressions is
                if Table (Current_State, Column) = 0 then
                   Nb_State := Nb_State + 1;
                   Table (Current_State, Column) := Nb_State;
+                  --Array_Set (Table, Current_State, Column, Nb_State);
                end if;
             end if;
          end loop;
@@ -1393,11 +1429,16 @@ package body DB.Utils.Regular_Expressions is
          Current_State := Current_State + 1;
       end loop;
 
-      --  Returns the regexp
 
       declare
-         R : Regexp_Access;
+         procedure Free is new Ada.Unchecked_Deallocation
+           (Meta_State_Array, Meta_State_Array_Access);
+         procedure Free is new Ada.Unchecked_Deallocation
+           (Boolean_Array, Boolean_Array_Access);
+         procedure Free is new Ada.Unchecked_Deallocation
+           (Regexp_Array, Regexp_Array_Access);
 
+         R : Regexp_Access;
       begin
          R := new Regexp_Value (Alphabet_Size => Alphabet_Size,
                                 Num_States    => Nb_State);
@@ -1410,6 +1451,10 @@ package body DB.Utils.Regular_Expressions is
                R.States (State, K) := Table (State, K);
             end loop;
          end loop;
+
+         Free (Meta_States);
+         Free (Is_Final);
+         Free (Table);
 
          return (Ada.Finalization.Controlled with
                  R        => R,
