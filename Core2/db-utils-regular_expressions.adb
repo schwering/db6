@@ -40,6 +40,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Unchecked_Deallocation;
+with Ada.Strings.Unbounded;
 
 with DB.Utils.Growing_Arrays;
 
@@ -1307,27 +1308,27 @@ package body DB.Utils.Regular_Expressions is
       Nb_State      : State_Index := 1;
 
 
-      --procedure Array_Set is new Growing_Arrays.Gen_Array_Set
-        --(Index_Type        => State_Index,
-         --Item_Type         => Meta_State,
-         --Array_Type        => Meta_State_Array,
-         --Array_Access_Type => Meta_State_Array_Access,
-         --Default_Item      => Meta_State'(others => False));
+      procedure Grow is new Growing_Arrays.Gen_Grow
+        (Index_Type        => State_Index,
+         Item_Type         => Meta_State,
+         Array_Type        => Meta_State_Array,
+         Array_Access_Type => Meta_State_Array_Access,
+         Default_Item      => Meta_State'(others => False));
 
-      --procedure Array_Set is new Growing_Arrays.Gen_Array_Set
-        --(Index_Type        => State_Index,
-         --Item_Type         => Boolean,
-         --Array_Type        => Boolean_Array,
-         --Array_Access_Type => Boolean_Array_Access,
-         --Default_Item      => False);
+      procedure Grow is new Growing_Arrays.Gen_Grow
+        (Index_Type        => State_Index,
+         Item_Type         => Boolean,
+         Array_Type        => Boolean_Array,
+         Array_Access_Type => Boolean_Array_Access,
+         Default_Item      => False);
 
-      --procedure Array_Set is new Growing_Arrays.Gen_Array_2d_Set
-        --(First_Index_Type  => State_Index,
-         --Second_Index_Type => Column_Index,
-         --Item_Type         => State_Index,
-         --Array_Type        => Regexp_Array,
-         --Array_Access_Type => Regexp_Array_Access,
-         --Default_Item      => 0);
+      procedure Grow is new Growing_Arrays.Gen_Grow_2d
+        (First_Index_Type  => State_Index,
+         Second_Index_Type => Column_Index,
+         Item_Type         => State_Index,
+         Array_Type        => Regexp_Array,
+         Array_Access_Type => Regexp_Array_Access,
+         Default_Item      => 0);
 
       procedure Closure
         (State : in out Meta_State;
@@ -1362,13 +1363,13 @@ package body DB.Utils.Regular_Expressions is
    --  Start of processing for Create_Secondary_Table
 
    begin
-      Table := new Regexp_Array (1 .. First_Table'Last + 100, 0 .. Alphabet_Size);
+      Table := new Regexp_Array (1 .. 1, 0 .. Alphabet_Size);
       Table.all := (others => (others => 0));
 
-      Meta_States := new Meta_State_Array (1 .. First_Table'Last + 100);
+      Meta_States := new Meta_State_Array (1 .. 1);
       Meta_States.all := (others => (others => False));
 
-      Is_Final := new Boolean_Array (0 .. First_Table'Last + 100);
+      Is_Final := new Boolean_Array (0 .. 0);
       Is_Final.all := (others => False);
 
       --  Create a new state
@@ -1380,17 +1381,17 @@ package body DB.Utils.Regular_Expressions is
          --  If this new meta-state includes the primary table end state,
          --  then this meta-state will be a final state in the regexp
 
+         Grow (Is_Final, Current_State);
          if Meta_States (Current_State)(End_State) then
             Is_Final (Current_State) := True;
-            --Array_Set (Is_Final, Current_State, True);
          end if;
 
          --  For every character in the regexp, calculate the possible
          --  transitions from Current_State
 
          for Column in 0 .. Alphabet_Size loop
+            Grow (Meta_States, Nb_State + 1);
             Meta_States (Nb_State + 1) := (others => False);
-            --Array_Set (Meta_States, Nb_State + 1, (others => False));
             Temp_State_Not_Null := False;
 
             for K in Meta_States (Current_State)'Range loop
@@ -1405,23 +1406,20 @@ package body DB.Utils.Regular_Expressions is
             --  If at least one transition existed
 
             if Temp_State_Not_Null then
+               Grow (Table, Nb_State + 1, Column);
 
                --  Check if this new state corresponds to an old one
-
                for K in 1 .. Nb_State loop
                   if Meta_States (K) = Meta_States (Nb_State + 1) then
                      Table (Current_State, Column) := K;
-                     --Array_Set (Table, Current_State, Column, K);
                      exit;
                   end if;
                end loop;
 
                --  If not, create a new state
-
                if Table (Current_State, Column) = 0 then
                   Nb_State := Nb_State + 1;
                   Table (Current_State, Column) := Nb_State;
-                  --Array_Set (Table, Current_State, Column, Nb_State);
                end if;
             end if;
          end loop;
@@ -1630,6 +1628,11 @@ package body DB.Utils.Regular_Expressions is
          Rev_Map : Reverse_Mapping;
          Offset  : State_Index)
       is
+         type Map_Delta is array (Positive range <>) of Character;
+
+         function Map_Diff (Map1, Map2 : Mapping) return Map_Delta;
+         --  Determines the characters that are not in both mappings.
+
          function T (State : State_Index) return State_Index;
          --  Transforms a state from the input DFA to the union NFA.
 
@@ -1637,6 +1640,34 @@ package body DB.Utils.Regular_Expressions is
          --  Transforms a column from the input DFA to the union NFA.
 
          pragma Inline (T);
+
+         function Map_Diff (Map1, Map2 : Mapping) return Map_Delta
+         is
+            Length : Natural := 0;
+         begin
+            for Char in Mapping'Range loop
+               if (Map1 (Char) /= 0 and Map2 (Char) = 0) or
+                  (Map1 (Char) = 0 and Map2 (Char) /= 0)
+               then
+                  Length := Length + 1;
+               end if;
+            end loop;
+            declare
+               Diff : Map_Delta (1 .. Length);
+               J    : Natural := 0;
+            begin
+               for Char in Mapping'Range loop
+                  if Map1 (Char) /= 0 and Map2 (Char) = 0 then
+                     J := J + 1;
+                     Diff (J) := Char;
+                  elsif Map1 (Char) = 0 and Map2 (Char) /= 0 then
+                     J := J + 1;
+                     Diff (J) := Char;
+                  end if;
+               end loop;
+               return Diff;
+            end;
+         end Map_Diff;
 
          function T (State : State_Index) return State_Index is
          begin
@@ -1648,23 +1679,24 @@ package body DB.Utils.Regular_Expressions is
             if Column = 0 then
                return 0;
             else
-               pragma Assert (Column in Rev_Map'Range);
                return Map (Rev_Map (Column));
             end if;
          end T;
 
-         DFA          : Regexp_Array renames R.R.States;
-         DFA_Is_Final : Boolean_Array renames R.R.Is_Final;
+         DFA                : Regexp_Array renames R.R.States;
+         DFA_Is_Final       : Boolean_Array renames R.R.Is_Final;
+         DFA_Map            : Mapping renames R.R.Map;
+         Chars_New_In_Union : constant Map_Delta := Map_Diff (DFA_Map, Map);
       begin
          pragma Assert (NFA_Start_State not in
                         T (DFA'First (1)) .. T (DFA'Last (1)));
          pragma Assert (NFA_End_State not in
                         T (DFA'First (1)) .. T (DFA'Last (1)));
 
-         for Next_Epsilon_Column in Epsilon_Column .. Column_Index'Last loop
-            if NFA (NFA_Start_State, Next_Epsilon_Column) = 0 then
-               NFA (NFA_Start_State, Next_Epsilon_Column) :=
-                  T (R.R.Start_State);
+         --  Epsilon transition from union's start state to member's start.
+         for Eps_Col in Epsilon_Column .. Column_Index'Last loop
+            if NFA (NFA_Start_State, Eps_Col) = 0 then
+               NFA (NFA_Start_State, Eps_Col) := T (R.R.Start_State);
                exit;
             end if;
          end loop;
@@ -1672,12 +1704,31 @@ package body DB.Utils.Regular_Expressions is
          for State in DFA'Range (1) loop
             for Column in DFA'Range (2) loop
                if DFA (State, Column) /= 0 then
-                  pragma Assert (T (State) in NFA'Range (1));
-                  pragma Assert (T (Column) in NFA'Range (2));
+
+                  --  Directly map a transition delta(q,s) = p to the union.
                   NFA (T (State), T (Column)) := T (DFA (State, Column));
+
+                  if Column = 0 then
+                     --  The mapping in the union has changed; there might be
+                     --  characters in it there weren't before. These were
+                     --  mapped to Column = 0 before, but now the aren't.
+                     --  So we need to introduce transitions for these new
+                     --  characters explicitly.
+                     for J in Chars_New_In_Union'Range loop
+                        declare
+                           Char : constant Character := Chars_New_In_Union (J);
+                        begin
+                           if Map (Char) /= 0 and DFA_Map (Char) = 0 then
+                              NFA (T (State), Map (Char)) := T (DFA (State, 0));
+                           end if;
+                        end;
+                     end loop;
+
+                  end if;
                end if;
             end loop;
 
+            --  Epsilon transition from final state to union's end state.
             if DFA_Is_Final (State) then
                NFA (T (State), Epsilon_Column) := NFA_End_State;
             end if;
@@ -1700,6 +1751,7 @@ package body DB.Utils.Regular_Expressions is
       Epsilon_Column  := Alphabet_Size + 1;
       Add_DFA (L, L_Rev_Map, Offset => 0);
       Add_DFA (R, R_Rev_Map, Offset => L.R.Num_States);
+
       declare
          R : Regexp;
       begin
@@ -1847,6 +1899,54 @@ package body DB.Utils.Regular_Expressions is
    begin
       return Is_Empty (Difference (L, R));
    end Is_Subset;
+
+   ----------
+   -- Draw --
+   ----------
+
+   function Draw (N : String; R : Regexp) return String
+   is
+      use Ada.Strings.Unbounded;
+      S : Unbounded_String := Null_Unbounded_String;
+
+      procedure Append (Appendum : String);
+      procedure Append_Line (Appendum : String);
+
+      procedure Append (Appendum : String) is
+      begin
+         Append (S, Appendum);
+      end Append;
+
+      procedure Append_Line (Appendum : String) is
+      begin
+         Append (Appendum & ASCII.LF);
+      end Append_Line;
+
+      Rev_Map : Reverse_Mapping := Create_Reverse_Mapping (R);
+   begin
+      Append_Line ("digraph """& N &""" {");
+      for J in R.R.Is_Final'Range loop
+         if R.R.Is_Final (J) then
+            Append_Line (J'Img &" [shape=box];");
+         end if;
+      end loop;
+      for Source in R.R.States'Range (1) loop
+         for Symbol in R.R.States'Range (2) loop
+            declare
+               Target : constant State_Index := R.R.States (Source, Symbol);
+            begin
+               if Symbol = 0 then
+                  Append_Line (Source'Img &" -> "& Target'Img &";");
+               else
+                  Append_Line (Source'Img &" -> "& Target'Img &
+                               " [label=""'"& Rev_Map (Symbol) &"'""];");
+               end if;
+            end;
+         end loop;
+      end loop;
+      Append_Line ("}");
+      return To_String (S);
+   end Draw;
 
 end DB.Utils.Regular_Expressions;
 

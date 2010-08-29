@@ -180,6 +180,9 @@ package DB.Utils.Regular_Expressions is
    --  Hence it suffices to check whether (Lang(L) \ Lang(R)) is empty.
    --  The function is the same as Is_Empty (Difference (L, R)).
 
+   function Draw (N : String; R : Regexp) return String;
+   --  Draws the DFA for debugging purposes.
+
 private
    type Regexp_Value;
 
