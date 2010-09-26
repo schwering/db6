@@ -74,6 +74,11 @@ generic
      (File : in out File_Type);
    -- Properly closes a File. If this fails, an IO_Error is raised.
 
+   with procedure Unlink
+     (ID : in String);
+   -- Deletes the file denoted by ID. If this fails or is not allowed, an
+   -- IO_Error is raised.
+
    with procedure Read
      (File    : in out File_Type;
       Address : in     Valid_Address_Type;

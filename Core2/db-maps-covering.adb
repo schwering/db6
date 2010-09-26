@@ -15,6 +15,7 @@ with Unicode.CES;
 with DB.Blocks.Gen_ASCII_Layer;
 with DB.Blocks.Local_IO;
 with DB.Maps.Bounded;
+with DB.Utils.Print; use DB.Utils;
 
 package body DB.Maps.Covering is
 
@@ -167,12 +168,14 @@ package body DB.Maps.Covering is
 
       procedure Write (File : in out File_Type; Config_Head : in Node_Ref_Type)
       is
-         function Length (N : Node_Ref_Type) return Natural
+         function Length return Natural
          is
+            N   : Node_Ref_Type := Config_Head;
             Len : Natural := 0;
          begin
             while N /= null loop
                Len := Len + 1;
+               N   := N.Next;
             end loop;
             return Len;
          end Length;
@@ -180,7 +183,7 @@ package body DB.Maps.Covering is
          N : Node_Ref_Type := Config_Head;
       begin
          Write (File, "<table cnt=""");
-         Write (File, Length (Config_Head));
+         Write (File, Length);
          Write (File, """>");
          while N /= null loop
             Write (File, "<slice ");
@@ -220,7 +223,7 @@ package body DB.Maps.Covering is
             pragma Unreferenced (Local_Name);
          begin
             if QName = "slice" then
-               for I in 1 .. Sax.Attributes.Get_Length (Atts) loop
+               for I in 0 .. Sax.Attributes.Get_Length (Atts) - 1 loop
                   declare
                      P : constant Node_Ref_Type := Handler.Current;
                      K : constant String := Sax.Attributes.Get_QName (Atts, I);
@@ -253,9 +256,10 @@ package body DB.Maps.Covering is
                         Free (Handler.Impl);
                         Free (Handler.ID);
 
-                        P.Next := Handler.Current;
                         if P = null then -- It's the first element.
                            Config_Head := Handler.Current;
+                        else
+                           P.Next := Handler.Current;
                         end if;
                      end if;
                   end;
@@ -272,7 +276,7 @@ package body DB.Maps.Covering is
       overriding
       procedure Next_Char
         (From : in out File_Type;
-         C : out Unicode.Unicode_Char) is
+         C    :    out Unicode.Unicode_Char) is
       begin
          C := From.Char;
          Lookahead (From);
@@ -388,8 +392,17 @@ package body DB.Maps.Covering is
       end Create;
 
       procedure Init_Map is new Gen_Init_Map (Create);
+
+      XML_File : XML.File_Type;
    begin
+      XML.Create (ID, XML_File);
+      XML.Write (XML_File, Map.Config);
+      XML.Close (XML_File);
       Init_Map (Map);
+   exception
+      when others =>
+         XML.Close (XML_File);
+         raise;
    end Create;
 
 
@@ -420,8 +433,17 @@ package body DB.Maps.Covering is
       end Open;
 
       procedure Init_Map is new Gen_Init_Map (Open);
+
+      XML_File : XML.File_Type;
    begin
+      XML.Open (ID, XML_File);
+      XML.Read (XML_File, Map.Config);
+      XML.Close (XML_File);
       Init_Map (Map);
+   exception
+      when others =>
+         XML.Close (XML_File);
+         raise;
    end Open;
 
 

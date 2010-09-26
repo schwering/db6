@@ -25,7 +25,9 @@ package DB.Blocks.Memory_IO is
 
    procedure Open (ID : in String; File : out File_Type);
 
-   procedure Close (File : in out File_Type) is null;
+   procedure Close (File : in out File_Type);
+
+   procedure Unlink (ID : in String) is null;
 
    function Succ (Address : Valid_Address_Type) return Valid_Address_Type;
 
@@ -76,6 +78,7 @@ package DB.Blocks.Memory_IO is
       Create_And_Open_Temporary  => Create_And_Open_Temporary,
       Open                       => Open,
       Close                      => Close,
+      Unlink                     => Unlink,
       Read                       => Read,
       Write                      => Write,
       Write_New_Block            => Write_New_Block,

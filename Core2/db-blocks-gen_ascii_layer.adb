@@ -163,6 +163,13 @@ package body DB.Blocks.Gen_ASCII_Layer is
    end Close;
 
 
+   procedure Unlink
+     (ID : in String) is
+   begin
+      Block_IO.Unlink (ID);
+   end Unlink;
+
+
    procedure Set_Mode
      (File : in out File_Type;
       Mode : in     Mode_Type) is

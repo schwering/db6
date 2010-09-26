@@ -4,6 +4,8 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Unchecked_Deallocation;
+
 package body DB.Blocks.Memory_IO is
 
    Max_File_Count : constant := 10;
@@ -67,7 +69,8 @@ package body DB.Blocks.Memory_IO is
 
    procedure Create_And_Open_Temporary (ID : in String; File : out File_Type) is
    begin
-      raise IO_Error;
+      Create (ID, File);
+      Unlink (ID);
    end Create_And_Open_Temporary;
 
 
@@ -81,6 +84,36 @@ package body DB.Blocks.Memory_IO is
       end loop;
       raise IO_Error;
    end Open;
+
+
+   procedure Close (File : in out File_Type)
+   is
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Entry_Type, Entry_Ref_Type);
+      procedure Free is new Ada.Unchecked_Deallocation
+        (File_Object_Type, File_Type);
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Item_Type, Item_Ref_Type);
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Item_Ref_Array_Type, Item_Ref_Array_Ref_Type);
+   begin
+      if File = null then
+         return;
+      end if;
+
+      for I in Files'Range loop
+         if Files (I).File /= File then
+            for J in Files (I).File.Buffer'Range loop
+               Free (Files (I).File.Buffer (J));
+            end loop;
+            Free (Files (I).File.Buffer);
+            Free (Files (I).File);
+            Free (Files (I));
+            Files (I) := null;
+            return;
+         end if;
+      end loop;
+    end Close;
 
 
    function Succ (Address : Valid_Address_Type) return Valid_Address_Type is

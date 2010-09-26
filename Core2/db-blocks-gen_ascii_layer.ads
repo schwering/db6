@@ -29,6 +29,9 @@ package DB.Blocks.Gen_ASCII_Layer is
      (ID    : in  String;
       File  : out File_Type);
 
+   procedure Unlink
+     (ID : in String);
+
    procedure Close
      (File : in out File_Type);
 

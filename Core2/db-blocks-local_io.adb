@@ -26,10 +26,10 @@ package body DB.Blocks.Local_IO is
          Create (ID, File);
       exception
          when others =>
-            Low_Level_IO.Unlink (ID);
+            Unlink (ID);
             raise;
       end;
-      Low_Level_IO.Unlink (ID);
+      Unlink (ID);
    end Create_And_Open_Temporary;
 
 
@@ -45,6 +45,12 @@ package body DB.Blocks.Local_IO is
    begin
       Low_Level_IO.Close (File.FD);
    end Close;
+
+
+   procedure Unlink (ID : String) is
+   begin
+      Low_Level_IO.Unlink (ID);
+   end Unlink;
 
 
    function Succ (Address : Valid_Address_Type) return Valid_Address_Type is

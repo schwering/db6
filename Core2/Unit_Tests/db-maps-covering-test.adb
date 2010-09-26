@@ -251,8 +251,12 @@ package body DB.Maps.Covering.Test is
       pragma Unreferenced (T);
       Map : Map_Type := New_Map;
    begin
-      Configure_Map (Map);
+      --Configure_Map (Map);
       Open (Map, Meta_File_Name);
+      Assert (Map.Slices'Length = 5, "We have "& Map.Slices'Length'Img &
+                                     " slices instead of 5");
+      Assert (Map.Cover'Length = 5, "Cover has size "& Map.Cover'Length'Img &
+                                    " instead of 5");
       Inserts (Map, Allow_Duplicates => True);
       Searches (Map);
       Deletes (Map, Anti_Search => False);
@@ -441,9 +445,7 @@ package body DB.Maps.Covering.Test is
       Configure_Map (Map);
       Create (Map, Meta_File_Name);
       Inserts (Map, Allow_Duplicates => True);
-      Print ("Ok");
       Single_Cursor_Pause;
-      Print ("Ok");
       Single_Cursor_Delete;
       Empty;
       Inserts (Map, Allow_Duplicates => True);

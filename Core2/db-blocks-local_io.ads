@@ -36,6 +36,8 @@ package DB.Blocks.Local_IO is
 
    procedure Close (File : in out File_Type);
 
+   procedure Unlink (ID : in String);
+
    function Succ
      (Address : Valid_Address_Type)
       return Valid_Address_Type;
@@ -106,6 +108,7 @@ package DB.Blocks.Local_IO is
       Create_And_Open_Temporary  => Create_And_Open_Temporary,
       Open                       => Open,
       Close                      => Close,
+      Unlink                     => Unlink,
       Read                       => Read,
       Write                      => Write,
       Write_New_Block            => Write_New_Block,
