@@ -35,6 +35,7 @@ package DB is
    -- Raised in DB.IO and its child packages.
 
    Tree_Error : exception;
+   Map_Error  : exception renames Tree_Error;
    -- This exception is only raised when there are extremely serious
    -- errors in the tree such as dangling references to child or neighbor
    -- nodes.

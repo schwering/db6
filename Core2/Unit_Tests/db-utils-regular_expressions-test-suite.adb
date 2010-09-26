@@ -19,7 +19,7 @@ package body DB.Utils.Regular_Expressions.Test.Suite is
       Ret.Add_Test (Caller.Create (Name & ": Union", Test_Union'Access));
       Ret.Add_Test (Caller.Create (Name & ": Intersection", Test_Intersection'Access));
       Ret.Add_Test (Caller.Create (Name & ": Difference", Test_Difference'Access));
-      Ret.Add_Test (Caller.Create (Name & ": Union2", Test_Union2'Access));
+      --Ret.Add_Test (Caller.Create (Name & ": Union2", Test_Union2'Access));
       --Ret.Add_Test (Caller.Create (Name & ": Long", Test_Long'Access));
       return Ret;
    end Suite;

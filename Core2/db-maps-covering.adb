@@ -15,7 +15,6 @@ with Unicode.CES;
 with DB.Blocks.Gen_ASCII_Layer;
 with DB.Blocks.Local_IO;
 with DB.Maps.Bounded;
-with DB.Utils.Print; use DB.Utils;
 
 package body DB.Maps.Covering is
 
@@ -60,7 +59,6 @@ package body DB.Maps.Covering is
          begin
             if Has_Benefit then
                Take (I)        := True;
-               Print ("Take ("& I'Img &") = True");
                Size            := Size + 1;
                Already_Covered := RE.Union (Already_Covered, Guard);
             end if;
@@ -85,14 +83,6 @@ package body DB.Maps.Covering is
    begin
       for I in Map.Slices'Range loop
          Union := RE.Union (Union, Map.Slices (I).Guard);
-         if not RE.Is_Subset (Map.Slices (I).Guard, Union) then
-            Print ("Doof");
-         end if;
-      end loop;
-      for I in Map.Slices'Range loop
-         if not RE.Is_Subset (Map.Slices (I).Guard, Union) then
-            Print ("Kapott");
-         end if;
       end loop;
       return Cover (Union, Map.Slices.all);
    end Total_Cover;
@@ -101,24 +91,11 @@ package body DB.Maps.Covering is
    package XML is
       type File_Type is limited private;
 
-      procedure Create
-        (ID   : in     String;
-         File : in out File_Type);
-
-      procedure Open
-        (ID   : in     String;
-         File : in out File_Type);
-
-      procedure Close
-        (File : in out File_Type);
-
-      procedure Write
-        (File        : in out File_Type;
-         Config_Head : in     Node_Ref_Type);
-
-      procedure Read
-        (File        : in out File_Type;
-         Config_Head :    out Node_Ref_Type);
+      procedure Create (ID : in String; File : in out File_Type);
+      procedure Open (ID : in String; File : in out File_Type);
+      procedure Close (File : in out File_Type);
+      procedure Write (File : in out File_Type; Config_Head : in Node_Ref_Type);
+      procedure Read (File : in out File_Type; Config_Head : out Node_Ref_Type);
 
    private
       package ASCII_IO is new Blocks.Gen_ASCII_Layer
@@ -137,9 +114,7 @@ package body DB.Maps.Covering is
          C    :    out Unicode.Unicode_Char);
 
       overriding
-      function EOF
-        (From : File_Type)
-         return Boolean;
+      function EOF (From : File_Type) return Boolean;
    end XML;
 
 
@@ -154,17 +129,13 @@ package body DB.Maps.Covering is
       end Lookahead;
 
 
-      procedure Create
-        (ID   : in     String;
-         File : in out File_Type) is
+      procedure Create (ID : in String; File : in out File_Type) is
       begin
          ASCII_IO.Create (ID, File.File);
       end;
 
 
-      procedure Open
-        (ID   : in     String;
-         File : in out File_Type) is
+      procedure Open (ID : in String; File : in out File_Type) is
       begin
          ASCII_IO.Open (ID, File.File);
          Lookahead (File);
@@ -172,16 +143,13 @@ package body DB.Maps.Covering is
 
 
       overriding
-      procedure Close
-        (File : in out File_Type) is
+      procedure Close (File : in out File_Type) is
       begin
          ASCII_IO.Close (File.File);
       end Close;
 
 
-      procedure Write
-        (File : in out File_Type;
-         S    : in     String) is
+      procedure Write (File : in out File_Type; S : in String) is
       begin
          for I in S'Range loop
             ASCII_IO.Write (File.File, S (I));
@@ -189,9 +157,7 @@ package body DB.Maps.Covering is
       end Write;
 
 
-      procedure Write
-        (File : in out File_Type;
-         N    : in     Natural)
+      procedure Write (File : in out File_Type; N : in Natural)
       is
          S : constant String := Natural'Image (N);
       begin
@@ -199,9 +165,7 @@ package body DB.Maps.Covering is
       end Write;
 
 
-      procedure Write
-        (File        : in out File_Type;
-         Config_Head : in     Node_Ref_Type)
+      procedure Write (File : in out File_Type; Config_Head : in Node_Ref_Type)
       is
          function Length (N : Node_Ref_Type) return Natural
          is
@@ -230,9 +194,7 @@ package body DB.Maps.Covering is
       end Write;
 
 
-      procedure Read
-        (File        : in out File_Type;
-         Config_Head :    out Node_Ref_Type)
+      procedure Read (File : in out File_Type; Config_Head : out Node_Ref_Type)
       is
          type String_Ref_Type is access String;
 
@@ -310,7 +272,7 @@ package body DB.Maps.Covering is
       overriding
       procedure Next_Char
         (From : in out File_Type;
-         C    :    out Unicode.Unicode_Char) is
+         C : out Unicode.Unicode_Char) is
       begin
          C := From.Char;
          Lookahead (From);
@@ -318,9 +280,7 @@ package body DB.Maps.Covering is
 
 
       overriding
-      function EOF
-        (From : File_Type)
-         return Boolean is
+      function EOF (From : File_Type) return Boolean is
       begin
          return From.EOF;
       end;
@@ -366,10 +326,15 @@ package body DB.Maps.Covering is
    end Add_Slice;
 
 
-   procedure Init_Map
-     (Map          : in out Map_Type;
-      Init_Sub_Map : access procedure (Map : in out Maps.Map_Type'Class;
-                                       ID  : in     String))
+   generic
+      with procedure Init_Sub_Map
+         (Map : in out Maps.Map_Type'Class;
+          ID  : in     String);
+   procedure Gen_Init_Map
+     (Map : in out Map_Type);
+
+   procedure Gen_Init_Map
+     (Map : in out Map_Type)
    is
       --pragma Precondition (Map.Config /= null);
       --pragma Postcondition (Map.Slices /= null);
@@ -387,9 +352,8 @@ package body DB.Maps.Covering is
 
       declare
          Node : Node_Ref_Type := Map.Config;
-         I    : Natural := 1;
       begin
-         while Node /= null loop
+         for I in Map.Slices'Range loop
             Map.Slices (I).Guard := RE.Compile (Node.Guard);
             declare
                Impl    : constant String := Node.Impl;
@@ -404,13 +368,13 @@ package body DB.Maps.Covering is
             end;
             Init_Sub_Map (Map.Slices (I).Map.all, Node.ID);
             Node := Node.Next;
-            I := I + 1;
          end loop;
+         pragma Assert (Node = null);
       end;
 
       Map.Cover := new Cover_Type'(Total_Cover (Map));
       Map.Initialized := True;
-   end Init_Map;
+   end Gen_Init_Map;
 
 
    procedure Create (Map : in out Map_Type; ID : in String)
@@ -420,10 +384,12 @@ package body DB.Maps.Covering is
 
       procedure Create (Map : in out Maps.Map_Type'Class; ID : in String) is
       begin
-         Map.Create (ID);
+         Maps.Create (Map, ID);
       end Create;
+
+      procedure Init_Map is new Gen_Init_Map (Create);
    begin
-      Init_Map (Map, Create'Access);
+      Init_Map (Map);
    end Create;
 
 
@@ -436,8 +402,10 @@ package body DB.Maps.Covering is
       begin
          Map.Create_Temporary (ID);
       end Create;
+
+      procedure Init_Map is new Gen_Init_Map (Create);
    begin
-      Init_Map (Map, Create'Access);
+      Init_Map (Map);
    end Create_Temporary;
 
 
@@ -450,8 +418,10 @@ package body DB.Maps.Covering is
       begin
          Map.Open (ID);
       end Open;
+
+      procedure Init_Map is new Gen_Init_Map (Open);
    begin
-      Init_Map (Map, Open'Access);
+      Init_Map (Map);
    end Open;
 
 
@@ -562,6 +532,7 @@ package body DB.Maps.Covering is
             return;
          end if;
       end loop;
+      raise Map_Error;
    end Search;
 
 
@@ -572,8 +543,7 @@ package body DB.Maps.Covering is
       State :    out State_Type) is
    begin
       if Map.Cover'Length = 0 then
-         State := Failure;
-         return;
+         raise Map_Error;
       end if;
       Map.Slices (Map.Cover (Map.Cover'First)).Map.Search_Minimum
         (Key, Value, State);
@@ -594,6 +564,7 @@ package body DB.Maps.Covering is
             end if;
          end;
       end loop;
+      raise Map_Error;
    end Search_Minimum;
 
 
@@ -603,13 +574,20 @@ package body DB.Maps.Covering is
       Value : in     Value_Type'Class;
       State :    out State_Type)
    is
-      C : constant String := Col_Image (Key);
+      C       : constant String := Col_Image (Key);
+      Matched : Boolean := False;
    begin
+      State := Failure;
       for I in Map.Slices'Range loop
          if Matches (C, Map.Slices (I).Guard) then
+            Matched := True;
             Map.Slices (I).Map.Insert (Key, Value, State);
+            exit when State /= Success;
          end if;
       end loop;
+      if not Matched then
+         raise Map_Error;
+      end if;
    end Insert;
 
 
@@ -620,14 +598,20 @@ package body DB.Maps.Covering is
       Allow_Duplicates : in     Boolean;
       State            :    out State_Type)
    is
-      C : constant String := Col_Image (Key);
+      C       : constant String := Col_Image (Key);
+      Matched : Boolean := False;
    begin
+      State := Failure;
       for I in Map.Slices'Range loop
          if Matches (C, Map.Slices (I).Guard) then
-            Map.Slices (I).Map.Insert
-               (Key, Value, Allow_Duplicates, State);
+            Matched := True;
+            Map.Slices (I).Map.Insert (Key, Value, Allow_Duplicates, State);
+            exit when State /= Success;
          end if;
       end loop;
+      if not Matched then
+         raise Map_Error;
+      end if;
    end Insert;
 
 
@@ -637,13 +621,20 @@ package body DB.Maps.Covering is
       Value :    out Value_Type'Class;
       State :    out State_Type)
    is
-      C : constant String := Col_Image (Key);
+      C       : constant String := Col_Image (Key);
+      Matched : Boolean := False;
    begin
+      State := Failure;
       for I in Map.Slices'Range loop
          if Matches (C, Map.Slices (I).Guard) then
+            Matched := True;
             Map.Slices (I).Map.Delete (Key, Value, State);
+            exit when State /= Success;
          end if;
       end loop;
+      if not Matched then
+         raise Map_Error;
+      end if;
    end Delete;
 
 
@@ -669,6 +660,7 @@ package body DB.Maps.Covering is
       Heaps.Clear (Heap.all, Free_Heap_Item'Access);
       Free (Heap);
    end Free_Heap;
+
 
    function New_Cursor
      (Map         : Map_Type;

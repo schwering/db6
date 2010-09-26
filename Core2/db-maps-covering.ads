@@ -7,6 +7,7 @@
 
 with Ada.Finalization;
 
+with DB.Maps.Bounded;
 with DB.Utils.Gen_Binary_Heaps;
 with DB.Utils.Regular_Expressions;
 
@@ -186,7 +187,9 @@ private
          Next  : Node_Ref_Type;
       end record;
 
-   subtype Base_Map_Type is Maps.Map_Type'Class;
+   subtype Base_Map_Type is Maps.Bounded.Map_Type;
+   -- XXX TODO should be synonym for Maps.Map_Type'Class, but the dispatching
+   -- doesn't work some reason
    type Base_Map_Ref_Type is access Base_Map_Type;
 
    type Slice_Type is

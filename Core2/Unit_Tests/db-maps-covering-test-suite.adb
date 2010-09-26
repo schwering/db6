@@ -15,10 +15,10 @@ package body DB.Maps.Covering.Test.Suite is
       Name : constant String := "Maps.Covering";
       Ret  : constant Access_Test_Suite := new Test_Suite;
    begin
-      --Ret.Add_Test (Caller.Create (Name & ": Cover", Test_Cover'Access));
-      --Ret.Add_Test (Caller.Create (Name & ": Create", Test_Create'Access));
-      --Ret.Add_Test (Caller.Create (Name & ": Open", Test_Open'Access));
-      --Ret.Add_Test (Caller.Create (Name & ": Cursor", Test_Cursor'Access));
+      Ret.Add_Test (Caller.Create (Name & ": Cover", Test_Cover'Access));
+      Ret.Add_Test (Caller.Create (Name & ": Create", Test_Create'Access));
+      Ret.Add_Test (Caller.Create (Name & ": Open", Test_Open'Access));
+      Ret.Add_Test (Caller.Create (Name & ": Cursor", Test_Cursor'Access));
       return Ret;
    end Suite;
 

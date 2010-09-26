@@ -16,11 +16,30 @@ with DB.Maps.Test_Utils;
 with DB.Maps.Value_Utils.Integer_Values;
 with DB.Maps.Value_Utils.String_Values;
 with DB.Types.Keys; use DB.Types.Keys;
+with DB.Utils.Print; use DB.Utils;
 
 package body DB.Maps.Covering.Test is
 
-   File_Name : constant String := "unit_test_covering_map";
+   package Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (256);
+
+   Meta_File_Name : constant String := "unit_test_covering_map";
+   Map_File_Names : constant array (Positive range <>) of Strings.Bounded_String :=
+     (Strings.To_Bounded_String ("unit_test_bmw"),
+      Strings.To_Bounded_String ("unit_test_ai"),
+      Strings.To_Bounded_String ("unit_test_politics"),
+      Strings.To_Bounded_String ("unit_test_kvh1"),
+      Strings.To_Bounded_String ("unit_test_mist"));
    Loop_Count : constant := 1000;
+
+
+   procedure Unlink_Files is
+   begin
+      for I in Map_File_Names'Range loop
+         Test_Utils.Unlink (Strings.To_String (Map_File_Names (I)));
+      end loop;
+      Test_Utils.Unlink (Meta_File_Name);
+   end Unlink_Files;
+
 
    function New_Key (Row, Col : String; Time : Natural) return Key_Type is
    begin
@@ -32,25 +51,19 @@ package body DB.Maps.Covering.Test is
 
    function New_Key (I : Integer) return Key_Type
    is
-      package Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (256);
       use Strings;
-
       type Pool_Type is array (Natural range <>) of Bounded_String;
 
      Pool : constant Pool_Type :=
        (To_Bounded_String ("Halleluja"),
-        To_Bounded_String ("BMW"),
-        To_Bounded_String ("Der neue X3"),
-        To_Bounded_String ("Sportwagen"),
-        To_Bounded_String ("Automotive Software"),
-        To_Bounded_String ("Artificial Intelligence: A Modern Approach"),
-        To_Bounded_String ("Stuart Russel"),
-        To_Bounded_String ("Peter Norvig"),
-        To_Bounded_String ("Hannelore Kraft"),
-        To_Bounded_String ("Edmund Stoiber"),
-        To_Bounded_String ("Oberst Wilhelm Klink"),
-        To_Bounded_String ("Corporal Newkirk"),
-        To_Bounded_String ("Feldwebel Georg Schultz"),
+        To_Bounded_String ("BMW Z4"),
+        To_Bounded_String ("BMWs neuer 1er steht in der BILD"),
+        To_Bounded_String ("AI book Artificial Intelligence: A Modern Approach"),
+        To_Bounded_String ("AI Stuart Russel"),
+        To_Bounded_String ("AI Peter Norvig"),
+        To_Bounded_String ("Krafts Hannelore"),
+        To_Bounded_String ("Stoibers Edmund"),
+        To_Bounded_String ("Klink, Oberst Wilhelm"),
         To_Bounded_String ("Schultzi ist ein Genie"),
         To_Bounded_String ("Hogan"));
 
@@ -130,7 +143,8 @@ package body DB.Maps.Covering.Test is
          Map.Insert (New_Key (I), New_Value (I), Allow_Duplicates, S);
          Assert (S = Success, "Insertion failed: "&
                               Types.Keys.Image (New_Key (I)) &"  /  "&
-                              New_Value (I).Image);
+                              New_Value (I).Image &" (duplicates allowed = "&
+                              Allow_Duplicates'Img &")");
          declare
             V : Value_Utils.Integer_Values.Value_Type;
          begin
@@ -198,25 +212,15 @@ package body DB.Maps.Covering.Test is
    is
       use Utils.Regular_Expressions;
    begin
-      Map.Add_Slice
-        ("((BMW|.*X3.*))|(.*Auto.*)|(.*wagen.*)",
-         "btree", "unit_test_car");
-      Map.Add_Slice
-        ("(Artificial Intelligence.*)|(.*Russel)|(.*Norvig)",
-         "btree", "unit_test_ai");
-      Map.Add_Slice
-        ("(.*Kraft.*)|(.*Stoiber.*)",
-         "btree", "unit_test_politics");
-      Map.Add_Slice
-        ("(.*Hogan.*)|(.*Newkirk.*)",
-         "btree", "unit_test_kvh1");
-      Map.Add_Slice
-        ("(.*Klink.*)|(.*Schultz.*)",
-         "btree", "unit_test_kvh2");
-      Map.Add_Slice
-        ("Halleluja",
-         "btree", "unit_test_mist");
+      Map.Add_Slice ("BMW.*", "btree", Strings.To_String (Map_File_Names (1)));
+      Map.Add_Slice ("AI.*", "btree", Strings.To_String (Map_File_Names (2)));
+      Map.Add_Slice ("(Kraft.*)|(Stoiber.*)", "btree",
+                     Strings.To_String (Map_File_Names (3)));
+      Map.Add_Slice ("(Hogan.*)|(Klink.*)", "btree",
+                     Strings.To_String (Map_File_Names (4)));
+      Map.Add_Slice (".*", "btree", Strings.To_String (Map_File_Names (5)));
    end;
+
 
 
    procedure Test_Create (T : in out Test_Type)
@@ -225,20 +229,19 @@ package body DB.Maps.Covering.Test is
       Map : Map_Type := New_Map;
    begin
       Configure_Map (Map);
-      Create (Map, File_Name);
-      Assert (Map.Slices'Length = 6, "We have "& Map.Slices'Length'Img &
-                                     " slices instead of 6");
-      Assert (Map.Cover'Length = 6, "Cover has size "& Map.Cover'Length'Img &
-                                    " instead of 6");
+      Create (Map, Meta_File_Name);
+      Assert (Map.Slices'Length = 5, "We have "& Map.Slices'Length'Img &
+                                     " slices instead of 5");
+      Assert (Map.Cover'Length = 5, "Cover has size "& Map.Cover'Length'Img &
+                                    " instead of 5");
       Inserts (Map, Allow_Duplicates => False);
       Anti_Inserts (Map);
       Searches (Map);
       Finalize (Map);
    exception
       when E : others =>
-         Test_Utils.Unlink (File_Name);
-         Put_Line ("Cover has size "& Map.Cover'Length'Img & " instead of 6");
          Put_Line (Exception_Information (E));
+         Unlink_Files;
          raise;
    end;
 
@@ -248,17 +251,19 @@ package body DB.Maps.Covering.Test is
       pragma Unreferenced (T);
       Map : Map_Type := New_Map;
    begin
-      Open (Map, File_Name);
+      Configure_Map (Map);
+      Open (Map, Meta_File_Name);
       Inserts (Map, Allow_Duplicates => True);
       Searches (Map);
       Deletes (Map, Anti_Search => False);
       Searches (Map);
       Deletes (Map, Anti_Search => True);
       Finalize (Map);
-      Test_Utils.Unlink (File_Name);
+      Unlink_Files;
    exception
       when E : others =>
-         Test_Utils.Unlink (File_Name);
+         Put_Line (Exception_Information (E));
+         Unlink_Files;
          raise;
    end;
 
@@ -273,23 +278,23 @@ package body DB.Maps.Covering.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
+         P : Key_Type;
          K : Key_Type;
          V : Value_Utils.Integer_Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
-         Prev_Init : Boolean := False;
-         Prev_Key  : Key_Type;
       begin
          loop
             C.Next (K, V, S);
             exit when S /= Success;
-            Assert (not Prev_Init or else Prev_Key <= K,
-                    "Previous key "& Types.Keys.Image (Prev_Key) &" is not "&
+            Assert (N = 0 or else P <= K,
+                    "Previous key "& Types.Keys.Image (P) &" is not "&
                     "less than or equal to "& Types.Keys.Image (K));
             C.Pause;
-            N := N + 1;
-            Prev_Key  := K;
-            Prev_Init := True;
+            if N = 0 or else P /= K then
+               N := N + 1;
+            end if;
+            P := K;
          end loop;
          Assert (N = Loop_Count, "Met "& N'Img &" items where "&
                                  Loop_Count'Img &" were expected");
@@ -301,6 +306,7 @@ package body DB.Maps.Covering.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
+         P : Key_Type;
          K : Key_Type;
          V : Value_Utils.Integer_Values.Value_Type;
          S : State_Type;
@@ -314,7 +320,10 @@ package body DB.Maps.Covering.Test is
             exit when S /= Success;
             C.Delete (K, V, S);
             Assert (S = Success, "Deletion was not successful");
-            N := N + 1;
+            if N = 0 or else P /= K then
+               N := N + 1;
+            end if;
+            P := K;
          end loop;
          C.Delete (K, V, S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
@@ -327,6 +336,7 @@ package body DB.Maps.Covering.Test is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
          K : Key_Type;
+         P : Key_Type;
          V : Value_Utils.Integer_Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
@@ -340,7 +350,10 @@ package body DB.Maps.Covering.Test is
             C.Pause;
             C.Delete (K, V, S);
             Assert (S = Success, "Deletion was not successful");
-            N := N + 1;
+            if N = 0 or else P /= K then
+               N := N + 1;
+            end if;
+            P := K;
          end loop;
          C.Delete (K, V, S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
@@ -426,9 +439,11 @@ package body DB.Maps.Covering.Test is
 
    begin
       Configure_Map (Map);
-      Create (Map, File_Name);
+      Create (Map, Meta_File_Name);
       Inserts (Map, Allow_Duplicates => True);
+      Print ("Ok");
       Single_Cursor_Pause;
+      Print ("Ok");
       Single_Cursor_Delete;
       Empty;
       Inserts (Map, Allow_Duplicates => True);
@@ -439,11 +454,11 @@ package body DB.Maps.Covering.Test is
       Single_Cursor_Pause_Delete;
       Empty;
       Finalize (Map);
-      Test_Utils.Unlink (File_Name);
+      Unlink_Files;
    exception
-      when others =>
-         Test_Utils.Unlink (File_Name);
-         Assert (False, "3");
+      when E : others =>
+         Put_Line (Exception_Information (E));
+         Unlink_Files;
          raise;
    end;
 
