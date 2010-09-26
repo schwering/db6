@@ -15,6 +15,7 @@
 --  * Each DFA has a specific start state (formerly, start state was 1).
 --  * Gen_Product_DFA, which builds a product DFA.
 --  * The DFAs use reference-counting.
+--  * The power set construction is top-level now and grows the DFA dynamically.
 --
 -- I had to copy the whole package because one cannot (and shouldn't) make child
 -- packages of system packages (System.Regexp) nor renamed packages

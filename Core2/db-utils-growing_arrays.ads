@@ -13,10 +13,9 @@ package DB.Utils.Growing_Arrays is
       type Array_Type is array (Index_Type range <>) of Item_Type;
       type Array_Access_Type is access Array_Type;
       Default_Item : in Item_Type;
-   procedure Gen_Array_Set
+   procedure Gen_Grow
      (Arr   : in out Array_Access_Type;
-      Index : in     Index_Type;
-      Item  : in     Item_Type);
+      Index : in     Index_Type);
 
    generic
       type First_Index_Type is range <>;
@@ -26,11 +25,10 @@ package DB.Utils.Growing_Arrays is
                                 Second_Index_Type range <>) of Item_Type;
       type Array_Access_Type is access Array_Type;
       Default_Item : in Item_Type;
-   procedure Gen_Array_2d_Set
+   procedure Gen_Grow_2d
      (Arr    : in out Array_Access_Type;
       Index1 : in     First_Index_Type;
-      Index2 : in     Second_Index_Type;
-      Item   : in     Item_Type);
+      Index2 : in     Second_Index_Type);
 
 end DB.Utils.Growing_Arrays;
 

@@ -20,9 +20,11 @@ package body DB.Utils.Growing_Arrays is
    function Gen_New_From_Index (I : Index_Type) return Index_Type is
    begin
       if I < 0 then
-         return I * 3 / 2 - 10;
+         return I - 1;
+         --return I * 3 / 2 - 10;
       else
-         return I * 2 / 3 - 10;
+         return I - 1;
+         --return I * 2 / 3 - 10;
       end if;
    end Gen_New_From_Index;
 
@@ -30,17 +32,18 @@ package body DB.Utils.Growing_Arrays is
    function Gen_New_To_Index (I : Index_Type) return Index_Type is
    begin
       if I < 0 then
-         return I * 2 / 3 + 10;
+         return I + 1;
+         --return I * 2 / 3 + 10;
       else
-         return I * 3 / 2 + 10;
+         return I + 1;
+         --return I * 3 / 2 + 10;
       end if;
    end Gen_New_To_Index;
 
 
-   procedure Gen_Array_Set
+   procedure Gen_Grow
      (Arr   : in out Array_Access_Type;
-      Index : in     Index_Type;
-      Item  : in     Item_Type)
+      Index : in     Index_Type)
    is
       procedure Free is new Ada.Unchecked_Deallocation
         (Array_Type, Array_Access_Type);
@@ -67,15 +70,13 @@ package body DB.Utils.Growing_Arrays is
       elsif Index > Arr'Last then
          Grow (Arr'First, New_To_Index (Index));
       end if;
-      Arr (Index) := Item;
-   end Gen_Array_Set;
+   end Gen_Grow;
 
 
-   procedure Gen_Array_2d_Set
+   procedure Gen_Grow_2d
      (Arr    : in out Array_Access_Type;
       Index1 : in     First_Index_Type;
-      Index2 : in     Second_Index_Type;
-      Item   : in     Item_Type)
+      Index2 : in     Second_Index_Type)
    is
       procedure Free is new Ada.Unchecked_Deallocation
         (Array_Type, Array_Access_Type);
@@ -137,9 +138,7 @@ package body DB.Utils.Growing_Arrays is
 
       pragma Assert (Index1 in Arr'Range (1));
       pragma Assert (Index2 in Arr'Range (2));
-
-      Arr (Index1, Index2) := Item;
-   end Gen_Array_2d_Set;
+   end Gen_Grow_2d;
 
 end DB.Utils.Growing_Arrays;
 

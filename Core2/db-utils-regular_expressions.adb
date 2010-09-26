@@ -122,7 +122,6 @@ package body DB.Utils.Regular_Expressions is
      (Map           : Mapping;
       Alphabet_Size : Column_Index;
       First_Table   : Regexp_Array_Access;
-      Num_States    : State_Index;
       Start_State   : State_Index;
       End_State     : State_Index)
       return        Regexp;
@@ -1186,8 +1185,8 @@ package body DB.Utils.Regular_Expressions is
 
          --  Creates the secondary table
 
-         R := Create_Secondary_Table
-           (Map, Alphabet_Size, Table, Num_States, Start_State, End_State);
+         R := Create_Secondary_Table (Map, Alphabet_Size, Table,
+                                      Start_State, End_State);
          Free (Table);
          return R;
       end;
@@ -1286,12 +1285,9 @@ package body DB.Utils.Regular_Expressions is
      (Map           : Mapping;
       Alphabet_Size : Column_Index;
       First_Table   : Regexp_Array_Access;
-      Num_States    : State_Index;
       Start_State   : State_Index;
       End_State     : State_Index) return Regexp
    is
-      pragma Warnings (Off, Num_States);
-
       type Meta_State is array (1 .. First_Table'Last) of Boolean;
       pragma Pack (Meta_State);
       type Meta_State_Array is array (State_Index range <>) of Meta_State;
@@ -1643,35 +1639,28 @@ package body DB.Utils.Regular_Expressions is
 
          function Map_Diff (Map1, Map2 : Mapping) return Map_Delta
          is
+            Diff   : Map_Delta (1 .. Mapping'Length);
             Length : Natural := 0;
          begin
             for Char in Mapping'Range loop
-               if (Map1 (Char) /= 0 and Map2 (Char) = 0) or
-                  (Map1 (Char) = 0 and Map2 (Char) /= 0)
-               then
+               if Map1 (Char) /= 0 and Map2 (Char) = 0 then
                   Length := Length + 1;
+                  Diff (Length) := Char;
+               elsif Map1 (Char) = 0 and Map2 (Char) /= 0 then
+                  Length := Length + 1;
+                  Diff (Length) := Char;
                end if;
             end loop;
-            declare
-               Diff : Map_Delta (1 .. Length);
-               J    : Natural := 0;
-            begin
-               for Char in Mapping'Range loop
-                  if Map1 (Char) /= 0 and Map2 (Char) = 0 then
-                     J := J + 1;
-                     Diff (J) := Char;
-                  elsif Map1 (Char) = 0 and Map2 (Char) /= 0 then
-                     J := J + 1;
-                     Diff (J) := Char;
-                  end if;
-               end loop;
-               return Diff;
-            end;
+            return Diff (1 .. Length);
          end Map_Diff;
 
          function T (State : State_Index) return State_Index is
          begin
-            return Offset + State;
+            if State = 0 then
+               return 0;
+            else
+               return Offset + State;
+            end if;
          end T;
 
          function T (Column : Column_Index) return Column_Index is
@@ -1703,28 +1692,24 @@ package body DB.Utils.Regular_Expressions is
 
          for State in DFA'Range (1) loop
             for Column in DFA'Range (2) loop
-               if DFA (State, Column) /= 0 then
+               --  Directly map a transition delta(q,s) = p to the union.
+               NFA (T (State), T (Column)) := T (DFA (State, Column));
 
-                  --  Directly map a transition delta(q,s) = p to the union.
-                  NFA (T (State), T (Column)) := T (DFA (State, Column));
-
-                  if Column = 0 then
-                     --  The mapping in the union has changed; there might be
-                     --  characters in it there weren't before. These were
-                     --  mapped to Column = 0 before, but now the aren't.
-                     --  So we need to introduce transitions for these new
-                     --  characters explicitly.
-                     for J in Chars_New_In_Union'Range loop
-                        declare
-                           Char : constant Character := Chars_New_In_Union (J);
-                        begin
-                           if Map (Char) /= 0 and DFA_Map (Char) = 0 then
-                              NFA (T (State), Map (Char)) := T (DFA (State, 0));
-                           end if;
-                        end;
-                     end loop;
-
-                  end if;
+               if Column = 0 then
+                  --  The mapping in the union has changed; there might be
+                  --  characters in it there weren't before. These were
+                  --  mapped to Column = 0 before, but now the aren't.
+                  --  So we need to introduce transitions for these new
+                  --  characters explicitly.
+                  for J in Chars_New_In_Union'Range loop
+                     declare
+                        Char : constant Character := Chars_New_In_Union (J);
+                     begin
+                        if Map (Char) /= 0 and DFA_Map (Char) = 0 then
+                           NFA (T (State), Map (Char)) := T (DFA (State, 0));
+                        end if;
+                     end;
+                  end loop;
                end if;
             end loop;
 
@@ -1755,7 +1740,7 @@ package body DB.Utils.Regular_Expressions is
       declare
          R : Regexp;
       begin
-         R := Create_Secondary_Table (Map, Alphabet_Size, NFA, NFA'Length (1),
+         R := Create_Secondary_Table (Map, Alphabet_Size, NFA,
                                       NFA_Start_State, NFA_End_State);
          Free (NFA);
          return R;
