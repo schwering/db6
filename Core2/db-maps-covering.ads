@@ -187,9 +187,10 @@ private
          Next  : Node_Ref_Type;
       end record;
 
-   subtype Base_Map_Type is Maps.Bounded.Map_Type;
+   --subtype Base_Map_Type is Maps.Map_Type'Class;
    -- XXX TODO should be synonym for Maps.Map_Type'Class, but the dispatching
    -- doesn't work some reason
+   subtype Base_Map_Type is Maps.Bounded.Map_Type;
    type Base_Map_Ref_Type is access Base_Map_Type;
 
    type Slice_Type is

@@ -16,7 +16,6 @@ with DB.Maps.Test_Utils;
 with DB.Maps.Value_Utils.Integer_Values;
 with DB.Maps.Value_Utils.String_Values;
 with DB.Types.Keys; use DB.Types.Keys;
-with DB.Utils.Print; use DB.Utils;
 
 package body DB.Maps.Covering.Test is
 

@@ -362,8 +362,8 @@ package body DB.Maps.Covering is
             declare
                Impl    : constant String := Node.Impl;
                Dupes   : constant Boolean := Map.Allow_Duplicates;
-               --Map_Ref : constant Base_Map_Ref_Type := new Base_Map_Type'
-                 --(Maps.New_Map (Impl, Dupes));
+               --Map_Ref : constant Base_Map_Ref_Type :=
+                  --new Base_Map_Type'(Maps.New_Map ("btree", Dupes));
                -- TODO XXX either fix New_Map or add a access-returning New_Map
                Map_Ref : constant Base_Map_Ref_Type := new
                   Bounded.Map_Type'(Bounded.New_Map (Dupes));
@@ -401,14 +401,12 @@ package body DB.Maps.Covering is
       Init_Map (Map);
    exception
       when others =>
-         XML.Close (XML_File);
          raise;
    end Create;
 
 
    procedure Create_Temporary (Map : in out Map_Type; ID : in String)
    is
-      pragma Unreferenced (ID);
       pragma Precondition (not Map.Initialized);
 
       procedure Create (Map : in out Maps.Map_Type'Class; ID : in String) is
@@ -424,7 +422,6 @@ package body DB.Maps.Covering is
 
    procedure Open (Map : in out Map_Type; ID : in String)
    is
-      pragma Unreferenced (ID);
       pragma Precondition (not Map.Initialized);
 
       procedure Open (Map : in out Maps.Map_Type'Class; ID : in String) is
@@ -894,7 +891,6 @@ package body DB.Maps.Covering is
          Map.Slices (I).Map.Stats (Emit);
       end loop;
    end Stats;
-
 
 end DB.Maps.Covering;
 
