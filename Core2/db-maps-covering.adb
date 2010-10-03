@@ -296,7 +296,7 @@ package body DB.Maps.Covering is
      (Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
       return Map_Type is
    begin
-      return Map_Type'(AF.Limited_Controlled with
+      return Map_Type'(Maps.Map_Type with
                        Initialized      => False,
                        Allow_Duplicates => Allow_Duplicates,
                        others           => <>);
@@ -362,11 +362,8 @@ package body DB.Maps.Covering is
             declare
                Impl    : constant String := Node.Impl;
                Dupes   : constant Boolean := Map.Allow_Duplicates;
-               --Map_Ref : constant Base_Map_Ref_Type :=
-                  --new Base_Map_Type'(Maps.New_Map ("btree", Dupes));
-               -- TODO XXX either fix New_Map or add a access-returning New_Map
-               Map_Ref : constant Base_Map_Ref_Type := new
-                  Bounded.Map_Type'(Bounded.New_Map (Dupes));
+               Map_Ref : constant Base_Map_Ref_Type :=
+                  new Base_Map_Type'(Maps.New_Map (Impl, Dupes));
             begin
                Map.Slices (I).Map := Map_Ref;
             end;
@@ -383,7 +380,6 @@ package body DB.Maps.Covering is
 
    procedure Create (Map : in out Map_Type; ID : in String)
    is
-      pragma Unreferenced (ID);
       pragma Precondition (not Map.Initialized);
 
       procedure Create (Map : in out Maps.Map_Type'Class; ID : in String) is
@@ -399,9 +395,6 @@ package body DB.Maps.Covering is
       XML.Write (XML_File, Map.Config);
       XML.Close (XML_File);
       Init_Map (Map);
-   exception
-      when others =>
-         raise;
    end Create;
 
 
@@ -704,7 +697,7 @@ package body DB.Maps.Covering is
                                                        Lower_Bound,
                                                        Upper_Bound));
       end loop;
-      return Cursor_Type'(AF.Limited_Controlled with
+      return Cursor_Type'(Maps.Cursor_Type with
                           Initialized => True,
                           Map         => Map.Self,
                           Cursors     => Cursors,

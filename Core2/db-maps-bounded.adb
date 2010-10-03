@@ -28,7 +28,7 @@ package body DB.Maps.Bounded is
      (Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
       return Map_Type is
    begin
-      return Map_Type'(AF.Limited_Controlled with
+      return Map_Type'(Maps.Map_Type with
                        Initialized      => False,
                        Allow_Duplicates => Allow_Duplicates,
                        others           => <>);
@@ -228,7 +228,8 @@ package body DB.Maps.Bounded is
       B_Lower_Bound : constant BTrees.Bound_Type := To_Bound (Lower_Bound);
       B_Upper_Bound : constant BTrees.Bound_Type := To_Bound (Upper_Bound);
    begin
-      return Cursor_Type'(Initialized => True,
+      return Cursor_Type'(Maps.Cursor_Type with
+                          Initialized => True,
                           Map         => Map.Self,
                           Cursor      => BTrees.New_Cursor
                             (Tree        => Map.Tree,

@@ -11,7 +11,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with AUnit.Assertions; use AUnit.Assertions;
 
 with DB.Maps.Tag_Map;
-with DB.Maps.Tag_Map.Utils;
 with DB.Maps.Test_Utils;
 with DB.Maps.Value_Utils.Integer_Values;
 with DB.Maps.Value_Utils.String_Values;
@@ -78,10 +77,10 @@ package body DB.Maps.Covering.Test is
    end New_Value;
 
 
-   function New_Value (S : String) return Maps.Value_Type'Class is
-   begin
-      return Value_Utils.String_Values.New_Value (S);
-   end New_Value;
+   --function New_Value (S : String) return Maps.Value_Type'Class is
+   --begin
+      --return Value_Utils.String_Values.New_Value (S);
+   --end New_Value;
 
 
    overriding
@@ -221,7 +220,6 @@ package body DB.Maps.Covering.Test is
    end;
 
 
-
    procedure Test_Create (T : in out Test_Type)
    is
       pragma Unreferenced (T);
@@ -286,6 +284,7 @@ package body DB.Maps.Covering.Test is
          V : Value_Utils.Integer_Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
+         pragma Warnings (Off, P);
       begin
          loop
             C.Next (K, V, S);
@@ -314,6 +313,7 @@ package body DB.Maps.Covering.Test is
          V : Value_Utils.Integer_Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
+         pragma Warnings (Off, P);
       begin
          C.Delete (K, V, S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&
@@ -343,6 +343,7 @@ package body DB.Maps.Covering.Test is
          V : Value_Utils.Integer_Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
+         pragma Warnings (Off, P);
       begin
          C.Delete (K, V, S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&

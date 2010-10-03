@@ -5,20 +5,16 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Finalization;
-
 with DB.Maps.Bounded;
 with DB.Utils.Gen_Binary_Heaps;
 with DB.Utils.Regular_Expressions;
 
 package DB.Maps.Covering is
 
-   package AF renames Ada.Finalization;
-
    ----------
    -- Map initialization operations.
 
-   type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with private;
+   type Map_Type is new Maps.Map_Type with private;
 
    not overriding
    function New_Map
@@ -132,8 +128,7 @@ package DB.Maps.Covering is
    ----------
    -- Cursor operations.
 
-   type Cursor_Type is new AF.Limited_Controlled and Maps.Cursor_Type with
-      private;
+   type Cursor_Type is new Maps.Cursor_Type with private;
 
    overriding
    function New_Cursor
@@ -187,10 +182,7 @@ private
          Next  : Node_Ref_Type;
       end record;
 
-   --subtype Base_Map_Type is Maps.Map_Type'Class;
-   -- XXX TODO should be synonym for Maps.Map_Type'Class, but the dispatching
-   -- doesn't work some reason
-   subtype Base_Map_Type is Maps.Bounded.Map_Type;
+   subtype Base_Map_Type is Maps.Map_Type'Class;
    type Base_Map_Ref_Type is access Base_Map_Type;
 
    type Slice_Type is
@@ -216,7 +208,7 @@ private
       Slices : Slice_Array_Type)
       return Cover_Type;
 
-   type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with
+   type Map_Type is new Maps.Map_Type with
       record
          Initialized      : Boolean;
          Allow_Duplicates : Boolean;
@@ -246,7 +238,7 @@ private
    package Heaps is new Utils.Gen_Binary_Heaps (Heap_Item_Type, "<");
    type Heap_Ref_Type is access Heaps.Heap_Type;
 
-   type Cursor_Type is new AF.Limited_Controlled and Maps.Cursor_Type with
+   type Cursor_Type is new Maps.Cursor_Type with
       record
          Initialized : Boolean;
          Map         : Map_Ref_Type;

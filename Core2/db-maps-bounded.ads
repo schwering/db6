@@ -5,8 +5,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Finalization;
-
 with DB.DSA.Gen_BTrees;
 with DB.Blocks;
 with DB.Blocks.Local_IO;
@@ -14,12 +12,10 @@ with DB.Maps.Values;
 
 package DB.Maps.Bounded is
 
-   package AF renames Ada.Finalization;
-
    ----------
    -- Map initialization operations.
 
-   type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with private;
+   type Map_Type is new Maps.Map_Type with private;
 
    not overriding
    function New_Map
@@ -178,7 +174,7 @@ private
    pragma Controlled (Map_Ref_Type);
    for Map_Ref_Type'Storage_Size use 0;
 
-   type Map_Type is new AF.Limited_Controlled and Maps.Map_Type with
+   type Map_Type is new Maps.Map_Type with
       record
          Initialized      : Boolean;
          Allow_Duplicates : Boolean;

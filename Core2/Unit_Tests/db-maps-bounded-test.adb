@@ -5,13 +5,10 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Strings.Bounded;
-with Ada.Exceptions; use Ada.Exceptions;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
 with DB.Maps.Tag_Map;
-with DB.Maps.Tag_Map.Utils;
 with DB.Maps.Test_Utils;
 with DB.Maps.Value_Utils.Integer_Values;
 with DB.Maps.Value_Utils.String_Values;
@@ -66,10 +63,10 @@ package body DB.Maps.Bounded.Test is
    end New_Value;
 
 
-   function New_Value (S : String) return Maps.Value_Type'Class is
-   begin
-      return Value_Utils.String_Values.New_Value (S);
-   end New_Value;
+   --function New_Value (S : String) return Maps.Value_Type'Class is
+   --begin
+      --return Value_Utils.String_Values.New_Value (S);
+   --end New_Value;
 
 
    overriding
@@ -191,7 +188,7 @@ package body DB.Maps.Bounded.Test is
       Finalize (Map);
       Test_Utils.Unlink (File_Name);
    exception
-      when E : others =>
+      when others =>
          Test_Utils.Unlink (File_Name);
          raise;
    end;

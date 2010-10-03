@@ -43,6 +43,8 @@ with DB.Types.Times;
 
 package DB.Maps is
 
+   package AF renames Ada.Finalization;
+
    type Serializable_Type is interface;
 
    procedure Write
@@ -124,7 +126,7 @@ package DB.Maps is
    ----------
    -- Map initialization operations.
 
-   type Map_Type is limited interface;
+   type Map_Type is abstract new AF.Limited_Controlled with private;
 
    Default_Allow_Duplicates : constant Boolean := True;
 
@@ -263,7 +265,7 @@ package DB.Maps is
    type Comparison_Type is (Less, Less_Or_Equal, Equal, Greater_Or_Equal,
       Greater);
    type Bound_Type is private;
-   type Cursor_Type is limited interface;
+   type Cursor_Type is abstract new AF.Limited_Controlled with private;
 
    function Positive_Infinity_Bound
       return Bound_Type;
@@ -317,6 +319,10 @@ private
                                    Serializable_Type and
                                    Comparable_Type and
                                    Printable_Type with null record;
+
+   type Map_Type is abstract new AF.Limited_Controlled with null record;
+
+   type Cursor_Type is abstract new AF.Limited_Controlled with null record;
 
    type Infinity_Type is (Positive_Infinity, Negative_Infinity);
 
