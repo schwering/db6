@@ -51,7 +51,9 @@ package body DB.Utils.Smart_Pointers.Test is
                        Assert (Ref (Ptr.all) /= null, "Ref Ptr.all = null");
 
          A := B;       Assert (Ref (A) = Ref (B), "Refs A /= B");
+         pragma Warnings (Off);
          B := B;       Assert (Ref (B) = Ref (B), "Refs B /= B");
+         pragma Warnings (On);
          Ptr.all := B; Assert (Ref (Ptr.all) = Ref (B), "Refs Ptr.all /= B");
          C := B;       Assert (Ref (C) = Ref (B), "Refs C /= B");
          D := B;       Assert (Ref (D) = Ref (B), "Refs D /= B");
