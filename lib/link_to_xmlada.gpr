@@ -1,4 +1,5 @@
-with "/usr/gnat/lib/gnat/xmlada.gpr";
+-- with "/usr/gnat/lib/gnat/xmlada.gpr";
+with "/usr/local/lib/gnat/xmlada.gpr";
 
 --library
 project Link_To_XMLAda is

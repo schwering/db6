@@ -1,7 +1,7 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
 with "../lib/link_to_xmlada";
-with "../lib/zlib";
+--with "../lib/zlib";
 with "../attributes";
 
 --library

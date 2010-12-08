@@ -1,0 +1,6 @@
+with "/usr/gnat/lib/gnat/aws.gpr";
+
+--library
+project Link_To_AWS is
+end Link_To_AWS;
+
