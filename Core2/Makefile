@@ -1,11 +1,4 @@
-TEST=$(shell gprbuild)
-ifneq ($(TEST),) #Gnat 2009
-	GPRBUILD=gprbuild -j2
-	GPRCLEAN=gprclean
-else # older Gnat
-	GPRBUILD=gprmake
-	GPRCLEAN=
-endif
+include ../Makefile.inc
 
 all: tests_debug unit_tests_debug
 #all: tests_debug tests_release unit_tests_debug unit_tests_release

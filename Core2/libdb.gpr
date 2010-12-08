@@ -2,7 +2,7 @@
 
 with "../lib/link_to_xmlada";
 with "../lib/zlib";
-with "attributes";
+with "../attributes";
 
 --library
 project LibDB is
