@@ -1,0 +1,23 @@
+* Gen_BTrees.Reorganize
+* Distributed_IO:
+        assemble/disassemble baut Adressen
+        oip = own IP address
+        ctr = counter that increments with each network operation
+        Write (in addr, in block): Alle muessen bestaetigen
+                S := disassemble(addr)
+            (*) for all (ip, addr) in S:
+                -> Send ip (oip, ctr,  addr, block)
+                for all:
+                <- Recv (ip, ctr, addr)
+                S := S \ {(ip, addr)}
+                delay
+                if |S| > 0 then go to (*)
+        Write_New (out addr, in block):
+                addr := assemble(S)
+        Read (in addr, out block): Einer muss antworten
+                S := disassemble(addr)
+                for all (ip, addr) in S:
+                -> Send ip (oip, ctr, addr, block)
+                <- Recv (ip, ctr, block)
+
+
