@@ -95,22 +95,29 @@ int udp_send(const udp_socket *sock, const void *buf, size_t nbytes)
 			sock->addrinfo->ai_addr, sock->addrinfo->ai_addrlen);
 }
 
+int udp_sendto(const udp_socket *sock, const void *buf, size_t nbytes,
+		const udp_peer *sender)
+{
+	return sendto(sock->fd, buf, nbytes, 0, (struct sockaddr *)sender,
+			sizeof *sender);
+}
+
 int udp_recv(const udp_socket *sock, void *buf, size_t nbytes)
 {
 	return recv(sock->fd, buf, nbytes, 0);
 }
 
 int udp_recvfrom(const udp_socket *sock, void *buf, size_t nbytes,
-		udp_sender *sender)
+		udp_peer *sender)
 {
-	size_t addr_len;
+	socklen_t addr_len;
 
-	addr_len = sizeof sender;
+	addr_len = sizeof *sender;
 	return recvfrom(sock->fd, buf, nbytes, 0, (struct sockaddr *)sender,
 			&addr_len);
 }
 
-void udp_sender_ip(const udp_sender *sender, char str[INET6_ADDRSTRLEN])
+char *udp_peer_ip(const udp_peer *sender, char str[INET6_ADDRSTRLEN])
 {
 	struct sockaddr *addr;
 	void *in_addr;
@@ -121,6 +128,7 @@ void udp_sender_ip(const udp_sender *sender, char str[INET6_ADDRSTRLEN])
 	else
 		in_addr = &(((struct sockaddr_in6 *)addr)->sin6_addr);
 	inet_ntop(sender->ss_family, in_addr, str, INET6_ADDRSTRLEN);
+	return str;
 }
 
 void udp_close(udp_socket *sock)
