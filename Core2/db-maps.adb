@@ -34,6 +34,21 @@ package body DB.Maps is
    end New_Map;
 
 
+   function New_Map_Ref
+     (Implementation   : in String;
+      Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
+      return Map_Ref_Type is
+   begin
+      if Implementation = "btree" then
+         return new Bounded.Map_Type'(Bounded.New_Map (Allow_Duplicates));
+      elsif Implementation = "covering" then
+         return new Covering.Map_Type'(Covering.New_Map (Allow_Duplicates));
+      else
+         raise Program_Error;
+      end if;
+   end New_Map_Ref;
+
+
    function New_Map
      (Max_Key_Size     : in Blocks.Size_Type;
       Max_Value_Size   : in Blocks.Size_Type;
