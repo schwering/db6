@@ -23,6 +23,7 @@ project Attributes is
             Ada_Sw := Ada_Sw & "-O2" & "-gnatp";
          when "debug" =>
             Ada_Sw := Ada_Sw &
+                "-gnat05" &
                 "-g" &             -- debug info (needed for traceback)
                 "-fno-inline" &    -- no inlining
                 "-gnata" &         -- assertions on

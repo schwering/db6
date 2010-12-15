@@ -1,9 +1,9 @@
 TEST=$(shell gprbuild)
 ifneq ($(TEST),) #Gnat 2009
-	GPRBUILD=gprbuild -gnat05 -j2
+	GPRBUILD=gprbuild -j2
 	GPRCLEAN=gprclean
 else # older Gnat
-	GPRBUILD=gprmake -gnat05
+	GPRBUILD=gprmake
 	GPRCLEAN=
 endif
 
