@@ -1,12 +1,19 @@
 with Ada.Text_IO;
 
+with AWS.Messages;
 with AWS.Server;
 with AWS.Status;
 with AWS.Response;
 
 with DB.Maps;
 
-with REST.Maps;
+with REST.Delete;
+with REST.Get;
+with REST.Head;
+with REST.Options;
+with REST.Post;
+with REST.Put;
+
 with REST.Error_Log;
 
 procedure REST.Main is
@@ -17,30 +24,28 @@ procedure REST.Main is
              S (S'First .. S'First + T'Length - 1) = T;
    end Starts_With;
 
-   function Handler (Request : AWS.Status.Data) return AWS.Response.Data
-   is
-      URI  : constant String := AWS.Status.URI (Request);
-      User : constant String := AWS.Status.Authorization_Name (Request);
+
+   function Handler (Request : AWS.Status.Data) return AWS.Response.Data is
+      use AWS.Status;
    begin
-      if Starts_With (URI, "/private") then
-         if User /= "" then
-            return AWS.Response.Build
-              (Content_Type => "text/html",
-               Message_Body => "<h1>RESTful Dingsbums</h1>" &
-                               "<p>Hallo "& User &", du alter L&uuml;mmel, du " &
-                               "bist auf "& URI &"!</p>");
-         else
-            return AWS.Response.Authenticate
-              (Realm => "RESTful Dingsbums",
-               Mode  => AWS.Response.Basic);
-         end if;
-      else
-         return AWS.Response.Build
-           (Content_Type => "text/html",
-            Message_Body => "<h1>RESTful Dingsbums</h1>" &
-                            "<p>Hallo du alter L&uuml;mmel, du " &
-                            "bist auf "& URI &"!</p>");
-      end if;
+      case AWS.Status.Method (Request) is
+         when DELETE =>
+            return REST.Delete (Request);
+         when GET =>
+            return REST.Get (Request);
+         when HEAD =>
+            return REST.Head (Request);
+         when OPTIONS =>
+            return REST.Options (Request);
+         when POST =>
+            return REST.Post (Request);
+         when PUT =>
+            return REST.Put (Request);
+         when TRACE | CONNECT | EXTENSION_METHOD =>
+            Error_Log.Push ("Invalid request");
+            return AWS.Response.Acknowledge (AWS.Messages.S404,
+                                             "Unsupported operation");
+      end case;
    end Handler;
 
    WS : AWS.Server.HTTP;

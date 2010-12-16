@@ -1,3 +1,10 @@
+-- Abstract:
+--
+-- The design of the logger is broken. Who is first, the error or the
+-- registration of the handler? So currently, Push simply prints the message.
+--
+-- Copyright 2008, 2009, 2010 Christoph Schwering
+
 with Ada.Exceptions;
 
 package REST.Error_Log is
@@ -7,18 +14,6 @@ package REST.Error_Log is
    function Has return Boolean;
    function Top return String;
    procedure Pop;
-
-private
-   type Node_Type;
-   type Node_Ref_Type is access Node_Type;
-   type Node_Type (Length : Natural) is
-      record
-         Message : String (1 .. Length);
-         Next    : Node_Ref_Type := null;
-      end record;
-
-   Head : Node_Ref_Type := null;
-   Tail : Node_Ref_Type := null;
 
 end REST.Error_Log;
 

@@ -8,13 +8,13 @@ package body REST.Maps is
    end;
 
 begin
-   for I in Names'Range loop
+   for I in Infos'Range loop
       declare
          Map : Map_Ref_Type;
       begin
-         Map := DB.Maps.New_Map_Ref ("covered");
-         DB.Maps.Open (Map.all, Map_Names.To_String (Names (I)));
-         Maps.Insert (Names (I), Map);
+         Map := DB.Maps.New_Map_Ref (Infos (I).Impl);
+         DB.Maps.Open (Map.all, Map_Names.To_String (Infos (I).Name));
+         Maps.Insert (Infos (I).Name, Map);
       exception
          when E : others =>
             Error_Log.Push (E);
