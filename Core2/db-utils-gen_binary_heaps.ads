@@ -27,6 +27,7 @@ package DB.Utils.Gen_Binary_Heaps is
 
    function Is_Empty (Heap : Heap_Type) return Boolean;
    function Size (Heap : Heap_Type) return Natural;
+   function Get (Heap : Heap_Type; I : Positive) return Item_Type;
    function Capacity (Heap : Heap_Type) return Natural;
 
 private

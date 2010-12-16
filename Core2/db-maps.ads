@@ -126,19 +126,20 @@ package DB.Maps is
    ----------
    -- Map initialization operations.
 
+   type Implementation_Type is (BTree, Multi);
    type Map_Type is abstract new AF.Limited_Controlled with private;
    type Map_Ref_Type is access Map_Type'Class;
 
    Default_Allow_Duplicates : constant Boolean := True;
 
    function New_Map
-     (Implementation   : in String;
+     (Implementation   : in Implementation_Type;
       Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
       return Map_Type'Class;
    -- Initializes a map object living on the stack.
 
    function New_Map_Ref
-     (Implementation   : in String;
+     (Implementation   : in Implementation_Type;
       Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
       return Map_Ref_Type;
    -- Initializes a map object living on the heap.

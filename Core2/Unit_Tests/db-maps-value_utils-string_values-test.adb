@@ -67,7 +67,8 @@ package body DB.Maps.Value_Utils.String_Values.Test is
       pragma Unreferenced (T);
       Value       : constant Value_Type := New_Value ("huhu du kleiner Piepel");
       Size_Stream : aliased Size_Streams.Stream_Type;
-      Size_Bound  : Ada.Streams.Stream_Element_Offset := Value.Size_Bound;
+      Size_Bound  : constant Ada.Streams.Stream_Element_Offset :=
+         Value.Size_Bound;
    begin
       Write (Size_Stream'Access, Value);
       Assert (Size_Bound = Size_Stream.Size, "Size bound ="& Size_Bound'Img &

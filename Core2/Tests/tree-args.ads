@@ -1,3 +1,5 @@
+with DB.Maps;
+
 with Tree.Jobs;
 with Tree.Types;
 
@@ -10,7 +12,7 @@ package Tree.Args is
       return String;
 
    function Implementation
-      return String;
+      return DB.Maps.Implementation_Type;
 
    function Generator
       return Types.Generator_Type;

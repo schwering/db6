@@ -14,8 +14,6 @@ with Unicode.CES;
 
 with DB.Blocks.Gen_ASCII_Layer;
 with DB.Blocks.Local_IO;
-with DB.Maps.Bounded;
-with DB.Utils.Print; use DB.Utils;
 
 package body DB.Maps.Covering is
 
@@ -182,7 +180,7 @@ package body DB.Maps.Covering is
 
          N : Node_Ref_Type := Config_Head;
       begin
-         Write (File, "<table cnt=""");
+         Write (File, "<table count=""");
          Write (File, Length);
          Write (File, """>");
          while N /= null loop
@@ -306,16 +304,17 @@ package body DB.Maps.Covering is
    procedure Add_Slice
      (Map   : in out Map_Type;
       Guard : in     String;
-      Impl  : in     String;
+      Impl  : in     Implementation_Type;
       ID    : in     String)
    is
-      Pred : Node_Ref_Type := Map.Config;
-      Node : constant Node_Ref_Type :=
+      Pred     : Node_Ref_Type := Map.Config;
+      Impl_Str : constant String := Implementation_Type'Image (Impl);
+      Node     : constant Node_Ref_Type :=
         new Node_Type'(Guard_Length => Guard'Length,
-                       Impl_Length  => Impl'Length,
+                       Impl_Length  => Impl_Str'Length,
                        ID_Length    => ID'Length,
                        Guard        => Guard,
-                       Impl         => Impl,
+                       Impl         => Impl_Str,
                        ID           => ID,
                        Next         => null);
    begin
@@ -360,7 +359,8 @@ package body DB.Maps.Covering is
          for I in Map.Slices'Range loop
             Map.Slices (I).Guard := RE.Compile (Node.Guard);
             declare
-               Impl    : constant String := Node.Impl;
+               Impl    : constant Implementation_Type :=
+                  Implementation_Type'Value (Node.Impl);
                Dupes   : constant Boolean := Map.Allow_Duplicates;
                Map_Ref : constant Base_Map_Ref_Type :=
                   new Base_Map_Type'(Maps.New_Map (Impl, Dupes));
@@ -401,6 +401,7 @@ package body DB.Maps.Covering is
    procedure Create_Temporary (Map : in out Map_Type; ID : in String)
    is
       pragma Precondition (not Map.Initialized);
+      pragma Unreferenced (ID);
 
       procedure Create (Map : in out Maps.Map_Type'Class; ID : in String) is
       begin
@@ -831,10 +832,15 @@ package body DB.Maps.Covering is
       Value  :    out Value_Type'Class;
       State  :    out State_Type)
    is
+      pragma Unreferenced (Cursor);
+      pragma Unreferenced (Key);
+      pragma Unreferenced (Value);
+      pragma Unreferenced (State);
    begin
       -- TODO implement
       -- XXX How should it behave?!
       null;
+      raise Map_Error;
    end Delete;
 
 

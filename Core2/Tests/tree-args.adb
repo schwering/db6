@@ -28,7 +28,7 @@ package body Tree.Args is
 
 
    function Pop_Argument (I : Positive) return String is
-      Arg : constant String := Ada.Command_Line.Argument(Offset + I);
+      Arg : constant String := Ada.Command_Line.Argument (Offset + I);
    begin
       Offset := Offset + 1;
       return Arg;
@@ -37,19 +37,20 @@ package body Tree.Args is
 
    function File_Name return String is
    begin
-      return Ada.Command_Line.Argument(Offset + 1);
+      return Ada.Command_Line.Argument (Offset + 1);
    end File_Name;
 
 
-   function Implementation return String is
+   function Implementation return DB.Maps.Implementation_Type is
    begin
-      return Ada.Command_Line.Argument(Offset + 2);
+      return DB.Maps.Implementation_Type'Value
+        (Ada.Command_Line.Argument (Offset + 2));
    end Implementation;
 
 
    function Generator return Types.Generator_Type
    is
-      S : constant String := Ada.Command_Line.Argument(Offset + 3);
+      S : constant String := Ada.Command_Line.Argument (Offset + 3);
    begin
       if S = "pseudorandom" then
          return Types.Pseudo_Random_Gen;
@@ -69,7 +70,7 @@ package body Tree.Args is
 
    function Init_Offset return Types.Count_Type is
    begin
-      return Types.Count_Type(To_Number(Ada.Command_Line.Argument(Offset + 4)));
+      return Types.Count_Type (To_Number (Ada.Command_Line.Argument (Offset + 4)));
    end Init_Offset;
 
 
@@ -88,7 +89,7 @@ package body Tree.Args is
                   return Map(I).Short_Job;
                end if;
             end loop;
-            Put_Line("Couldn't look up "& Jobs.To_String(D));
+            Put_Line ("Couldn't look up "& Jobs.To_String (D));
             raise Parse_Error;
          end Retrieve;
 
@@ -107,12 +108,12 @@ package body Tree.Args is
             end if;
          end loop;
          if To = 0 then
-            Description := Jobs.To_Description(S);
-            return Jobs.New_Job(Description, Retrieve(Description), 1, 1, True);
+            Description := Jobs.To_Description (S);
+            return Jobs.New_Job(Description, Retrieve (Description), 1, 1, True);
          end if;
 
-         Description := Jobs.To_Description(S(From .. To - 1));
-         Short_Job   := Retrieve(Description);
+         Description := Jobs.To_Description (S (From .. To - 1));
+         Short_Job   := Retrieve (Description);
 
          From := To + 1;
          To   := 0;
@@ -124,12 +125,12 @@ package body Tree.Args is
          end loop;
          Concurrency_Degree := 1;
          if To = 0 then
-            Short_Job_Execution_Count := Types.Count_Type(To_Number
-                                             (S(From .. S'Last)));
+            Short_Job_Execution_Count := Types.Count_Type (To_Number
+                                             (S (From .. S'Last)));
             Reset                     := True;
          else
-            Short_Job_Execution_Count := Types.Count_Type(To_Number
-                                             (S(From .. To - 1)));
+            Short_Job_Execution_Count := Types.Count_Type (To_Number
+                                             (S (From .. To - 1)));
 
             --From := To + 1;
             --To   := 0;
@@ -142,9 +143,9 @@ package body Tree.Args is
             --Concurrency_Degree := Positive(To_Number(S(From .. To - 1)));
 
             From := To + 1;
-            if S(From .. S'Last) = "Reset" then
+            if S (From .. S'Last) = "Reset" then
                Reset := True;
-            elsif S(From .. S'Last) = "Cont" then
+            elsif S (From .. S'Last) = "Cont" then
                Reset := False;
             else
                raise Parse_Error;
@@ -159,7 +160,7 @@ package body Tree.Args is
       Long_Job : Jobs.Long_Job_Type(Offset+5..Ada.Command_Line.Argument_Count);
    begin
       for I in Long_Job'Range loop
-         Long_Job(I) := New_Job(Ada.Command_Line.Argument(I));
+         Long_Job (I) := New_Job (Ada.Command_Line.Argument (I));
       end loop;
       return Long_Job;
    end Create_Jobs_From_Command_Line;

@@ -149,6 +149,12 @@ package body DB.Utils.Gen_Binary_Heaps is
    end Size;
 
 
+   function Get (Heap : Heap_Type; I : Positive) return Item_Type is
+   begin
+      return Heap.Buffer (I);
+   end Get;
+
+
    function Capacity (Heap : Heap_Type) return Natural is
    begin
       return Heap.Capacity;

@@ -1907,7 +1907,7 @@ package body DB.Utils.Regular_Expressions is
          Append (Appendum & ASCII.LF);
       end Append_Line;
 
-      Rev_Map : Reverse_Mapping := Create_Reverse_Mapping (R);
+      Rev_Map : constant Reverse_Mapping := Create_Reverse_Mapping (R);
    begin
       Append_Line ("digraph """& N &""" {");
       for J in R.R.Is_Final'Range loop

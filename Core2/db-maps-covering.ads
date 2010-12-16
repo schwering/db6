@@ -5,7 +5,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Maps.Bounded;
 with DB.Utils.Gen_Binary_Heaps;
 with DB.Utils.Regular_Expressions;
 
@@ -25,7 +24,7 @@ package DB.Maps.Covering is
    procedure Add_Slice
      (Map   : in out Map_Type;
       Guard : in     String;
-      Impl  : in     String;
+      Impl  : in     Implementation_Type;
       ID    : in     String);
 
    overriding

@@ -20,32 +20,31 @@ package body DB.Maps is
 
 
    function New_Map
-     (Implementation   : in String;
+     (Implementation   : in Implementation_Type;
       Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
       return Map_Type'Class is
    begin
-      if Implementation = "btree" then
-         return Bounded.New_Map (Allow_Duplicates);
-      elsif Implementation = "covering" then
-         return Covering.New_Map (Allow_Duplicates);
-      else
-         raise Program_Error;
-      end if;
+      case Implementation is
+         when BTree =>
+            return Bounded.New_Map (Allow_Duplicates);
+         when Multi =>
+            return Covering.New_Map (Allow_Duplicates);
+      end case;
    end New_Map;
 
 
    function New_Map_Ref
-     (Implementation   : in String;
+     (Implementation   : in Implementation_Type;
       Allow_Duplicates : in Boolean := Default_Allow_Duplicates)
       return Map_Ref_Type is
    begin
-      if Implementation = "btree" then
-         return new Bounded.Map_Type'(Bounded.New_Map (Allow_Duplicates));
-      elsif Implementation = "covering" then
-         return new Covering.Map_Type'(Covering.New_Map (Allow_Duplicates));
-      else
-         raise Program_Error;
-      end if;
+      case Implementation is
+         when BTree =>
+            return new Bounded.Map_Type'(Bounded.New_Map (Allow_Duplicates));
+         when Multi =>
+            return new Covering.Map_Type'
+              (Covering.New_Map (Allow_Duplicates));
+      end case;
    end New_Map_Ref;
 
 

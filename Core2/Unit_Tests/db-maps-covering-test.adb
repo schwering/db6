@@ -10,6 +10,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
+with DB.Maps;
 with DB.Maps.Tag_Map;
 with DB.Maps.Test_Utils;
 with DB.Maps.Value_Utils.Integer_Values;
@@ -208,15 +209,16 @@ package body DB.Maps.Covering.Test is
 
    procedure Configure_Map (Map : in out Map_Type'Class)
    is
+      use type DB.Maps.Implementation_Type;
       use Utils.Regular_Expressions;
    begin
-      Map.Add_Slice ("BMW.*", "btree", Strings.To_String (Map_File_Names (1)));
-      Map.Add_Slice ("AI.*", "btree", Strings.To_String (Map_File_Names (2)));
-      Map.Add_Slice ("(Kraft.*)|(Stoiber.*)", "btree",
+      Map.Add_Slice ("BMW.*", BTree, Strings.To_String (Map_File_Names (1)));
+      Map.Add_Slice ("AI.*", BTree, Strings.To_String (Map_File_Names (2)));
+      Map.Add_Slice ("(Kraft.*)|(Stoiber.*)", BTree,
                      Strings.To_String (Map_File_Names (3)));
-      Map.Add_Slice ("(Hogan.*)|(Klink.*)", "btree",
+      Map.Add_Slice ("(Hogan.*)|(Klink.*)", BTree,
                      Strings.To_String (Map_File_Names (4)));
-      Map.Add_Slice (".*", "btree", Strings.To_String (Map_File_Names (5)));
+      Map.Add_Slice (".*", BTree, Strings.To_String (Map_File_Names (5)));
    end;
 
 
