@@ -4,14 +4,18 @@ with AWS.Server;
 with AWS.Status;
 with AWS.Response;
 
-procedure Server
-is
+with DB.Maps;
+
+with REST.Maps;
+with REST.Error_Log;
+
+procedure REST.Main is
+
    function Starts_With (S, T : String) return Boolean is
    begin
       return S'Length >= T'Length and then
              S (S'First .. S'First + T'Length - 1) = T;
    end Starts_With;
-
 
    function Handler (Request : AWS.Status.Data) return AWS.Response.Data
    is
@@ -54,5 +58,5 @@ begin
    begin
       Ada.Text_IO.Get (C);
    end;
-end Server;
+end REST.Main;
 

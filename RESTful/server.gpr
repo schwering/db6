@@ -6,7 +6,7 @@ with "../lib/link_to_aws";
 
 project Server is
 
-   for Main use ("server");
+   for Main use ("rest-main");
    for Source_Dirs use (".");
    for Object_Dir use "bin/"& Attributes.Build;
    for Exec_Dir   use "bin/"& Attributes.Build;
