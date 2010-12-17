@@ -1,4 +1,22 @@
-* Gen_BTrees.Reorganize
+* Gen_BTrees
+      * Reorganize implementieren:
+        Ein Task, der immer wieder ueber den B-Baum laeuft,
+        unterlaufene Blaetter merget, hintere Bloecke in vordere
+        freigewordene Bloecke kopiert und dabei heftig lockt.
+        Das ganze koennte Deadlocks verhindern, indem es anfangs
+        alle fuer eine Verschiebeoperation notwendigen Bloecke
+        lockt, dies nach einem Timeout aber abbricht, bei Erfolg
+        aber nochmal auf Konsistenz prueft; im Nicht-Erfolgsfall
+        wuerde das ganze einfach neustarten.
+      * Overflow-Pages:
+        Wenn ein Wert (oder auch der Schluessel?) zu grosz ist,
+        soll er in weitere Seiten ueberlaufen. Das wuerde aber
+        viele Aenderungen in den formalen generischen Parametern
+        nach sich ziehen (man braeuchte Iteratoren-aehnliche
+        Dinger zum Serialisieren). Auszerdem wuerde es das Problem,
+        dass grosze Datenmengen bei mehreren Eintraegen in B-Baeumen
+        nicht mehrfach gespeichert werden, nicht beheben.
+
 * Distributed_IO:
         assemble/disassemble baut Adressen
         oip = own IP address
