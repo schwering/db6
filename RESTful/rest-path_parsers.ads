@@ -22,10 +22,9 @@ package REST.Path_Parsers is
 
    type Iterator_Type is private;
 
-   Final : constant Iterator_Type;
-
    procedure Next (Path : in String; Iterator : in out Iterator_Type);
    function Value (Path : String; Iterator : Iterator_Type) return String;
+   function Is_Final (Iterator : Iterator_Type) return Boolean;
 
 private
    Initial : constant Integer := 0;
@@ -36,6 +35,8 @@ private
       end record;
 
    Final : constant Iterator_Type := Iterator_Type'(I => -1);
+
+   pragma Inline (Is_Final);
 
 end REST.Path_Parsers;
 

@@ -45,5 +45,11 @@ package body REST.Path_Parsers is
       return Path (Iterator.I + 1 .. Path'Last);
    end Value;
 
+
+   function Is_Final (Iterator : Iterator_Type) return Boolean is
+   begin
+      return Iterator = Final;
+   end Is_Final;
+
 end REST.Path_Parsers;
 

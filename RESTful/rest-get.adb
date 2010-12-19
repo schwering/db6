@@ -21,7 +21,7 @@ is
       Append (S, "<ul>");
       loop
          Next (P, I);
-         exit when I = Final;
+         exit when Is_Final (I);
          Append (S, "<li> "& Value (P, I));
       end loop;
       Append (S, "<li> end");
