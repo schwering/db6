@@ -11,7 +11,7 @@ with DB.Blocks.Streams; use DB.Blocks.Streams;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
-package body DB.Maps.Value_Utils.String_Values.Test is
+package body DB.Maps.Values.Strings.Test is
 
    procedure Test_Write_Read (T : in out Test_Type)
    is
@@ -75,5 +75,5 @@ package body DB.Maps.Value_Utils.String_Values.Test is
               " and written size "& Size_Stream.Size'Img &" differ");
    end;
 
-end DB.Maps.Value_Utils.String_Values.Test;
+end DB.Maps.Values.Strings.Test;
 

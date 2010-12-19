@@ -6,13 +6,13 @@
 
 with AUnit.Test_Caller;
 
-package body DB.Maps.Value_Utils.String_Values.Test.Suite is
+package body DB.Maps.Values.Strings.Test.Suite is
 
    package Caller is new AUnit.Test_Caller (Test_Type);
 
    function Suite return Access_Test_Suite
    is
-      Name : constant String := "Value_Utils.String_Values";
+      Name : constant String := "Values.Strings";
       Ret  : constant Access_Test_Suite := new Test_Suite;
    begin
       Ret.Add_Test (Caller.Create (Name & ": Write/read",
@@ -22,5 +22,5 @@ package body DB.Maps.Value_Utils.String_Values.Test.Suite is
       return Ret;
    end Suite;
 
-end DB.Maps.Value_Utils.String_Values.Test.Suite;
+end DB.Maps.Values.Strings.Test.Suite;
 

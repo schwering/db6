@@ -10,8 +10,8 @@ with AUnit.Assertions; use AUnit.Assertions;
 
 with DB.Maps.Tag_Map;
 with DB.Maps.Test_Utils;
-with DB.Maps.Value_Utils.Integer_Values;
-with DB.Maps.Value_Utils.String_Values;
+with DB.Maps.Values.Integers;
+with DB.Maps.Values.Strings;
 with DB.Types.Keys; use DB.Types.Keys;
 
 package body DB.Maps.Bounded.Test is
@@ -59,13 +59,13 @@ package body DB.Maps.Bounded.Test is
 
    function New_Value (I : Integer) return Maps.Value_Type'Class is
    begin
-      return Value_Utils.Integer_Values.New_Value (I);
+      return Values.Integers.New_Value (I);
    end New_Value;
 
 
    --function New_Value (S : String) return Maps.Value_Type'Class is
    --begin
-      --return Value_Utils.String_Values.New_Value (S);
+      --return Values.Strings.New_Value (S);
    --end New_Value;
 
 
@@ -74,8 +74,8 @@ package body DB.Maps.Bounded.Test is
    begin
       Tag_Map.Utils.Store (T.State);
       Tag_Map.Clear;
-      Tag_Map.Register (Value_Utils.Integer_Values.Value_Type'Tag);
-      Tag_Map.Register (Value_Utils.String_Values.Value_Type'Tag);
+      Tag_Map.Register (Values.Integers.Value_Type'Tag);
+      Tag_Map.Register (Values.Strings.Value_Type'Tag);
       Tag_Map.Seal;
    end Set_Up;
 
@@ -99,7 +99,7 @@ package body DB.Maps.Bounded.Test is
                               Types.Keys.Image (New_Key (I)) &"  /  "&
                               New_Value (I).Image);
          declare
-            V : Value_Utils.Integer_Values.Value_Type;
+            V : Values.Integers.Value_Type;
          begin
             Map.Search (New_Key (I), V, S);
             Assert (S = Success, Types.Keys.Image (New_Key (I)) &" is not in "&
@@ -125,7 +125,7 @@ package body DB.Maps.Bounded.Test is
 
    procedure Searches (Map : in out Maps.Map_Type'Class)
    is
-      V : Value_Utils.Integer_Values.Value_Type;
+      V : Values.Integers.Value_Type;
       S : State_Type;
    begin
       for I in 1 .. Loop_Count loop
@@ -139,7 +139,7 @@ package body DB.Maps.Bounded.Test is
    procedure Deletes (Map         : in out Maps.Map_Type'Class;
                       Anti_Search : in     Boolean)
    is
-      V : Value_Utils.Integer_Values.Value_Type;
+      V : Values.Integers.Value_Type;
       S : State_Type;
    begin
       for I in 1 .. Loop_Count loop
@@ -205,7 +205,7 @@ package body DB.Maps.Bounded.Test is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
          K : Key_Type;
-         V : Value_Utils.Integer_Values.Value_Type;
+         V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin
@@ -226,7 +226,7 @@ package body DB.Maps.Bounded.Test is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
          K : Key_Type;
-         V : Value_Utils.Integer_Values.Value_Type;
+         V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin
@@ -251,7 +251,7 @@ package body DB.Maps.Bounded.Test is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
          K : Key_Type;
-         V : Value_Utils.Integer_Values.Value_Type;
+         V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin
@@ -277,7 +277,7 @@ package body DB.Maps.Bounded.Test is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
          K : Key_Type;
-         V : Value_Utils.Integer_Values.Value_Type;
+         V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
          M : Natural := 0;
@@ -314,7 +314,7 @@ package body DB.Maps.Bounded.Test is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
          K : Key_Type;
-         V : Value_Utils.Integer_Values.Value_Type;
+         V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin
@@ -334,7 +334,7 @@ package body DB.Maps.Bounded.Test is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
          K : Key_Type;
-         V : Value_Utils.Integer_Values.Value_Type;
+         V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin

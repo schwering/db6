@@ -3,7 +3,7 @@ with Ada.Streams;
 with Tree.To_Strings;
 
 with DB.Maps;
-with DB.Maps.Value_Utils.String_Values;
+with DB.Maps.Values.Strings;
 
 with DB.Types.Keys;
 with DB.Types.Values.Bounded;
@@ -39,7 +39,7 @@ package Tree.Types is
    ----------
    -- Value_Type
 
-   type Value_Type is new DB.Maps.Value_Utils.String_Values.Value_Type with
+   type Value_Type is new DB.Maps.Values.Strings.Value_Type with
       null record;
 
    overriding

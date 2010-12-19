@@ -8,7 +8,7 @@ package body Tree.Types is
      (Params : not null access DB.Maps.Value_Parameters_Type)
       return Value_Type is
    begin
-      return (DB.Maps.Value_Utils.String_Values.New_Value (Params) with
+      return (DB.Maps.Values.Strings.New_Value (Params) with
               null record);
    end New_Value;
 
@@ -17,7 +17,7 @@ package body Tree.Types is
      (S : String)
       return Value_Type is
    begin
-      return (DB.Maps.Value_Utils.String_Values.New_Value (S) with
+      return (DB.Maps.Values.Strings.New_Value (S) with
               null record);
    end New_Value;
 

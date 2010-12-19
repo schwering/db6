@@ -6,7 +6,7 @@
 
 with AUnit.Test_Fixtures;
 
-package DB.Maps.Value_Utils.String_Values.Test is
+package DB.Maps.Values.Strings.Test is
 
    type Test_Type is new AUnit.Test_Fixtures.Test_Fixture with private;
 
@@ -16,5 +16,5 @@ package DB.Maps.Value_Utils.String_Values.Test is
 private
    type Test_Type is new AUnit.Test_Fixtures.Test_Fixture with null record;
 
-end DB.Maps.Value_Utils.String_Values.Test;
+end DB.Maps.Values.Strings.Test;
 

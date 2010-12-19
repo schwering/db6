@@ -7,7 +7,7 @@
 
 with Ada.Streams;
 
-package DB.Maps.Value_Utils.String_Values is
+package DB.Maps.Values.Strings is
 
    type Value_Type is new Maps.Value_Type with private;
 
@@ -59,5 +59,5 @@ private
    overriding
    procedure Finalize (Value : in out Value_Type);
 
-end DB.Maps.Value_Utils.String_Values;
+end DB.Maps.Values.Strings;
 

@@ -7,7 +7,7 @@
 
 with Ada.Streams;
 
-package DB.Maps.Value_Utils.Integer_Values is
+package DB.Maps.Values.Integers is
 
    type Value_Type is new Maps.Value_Type with private;
 
@@ -46,5 +46,5 @@ private
          Int : Integer;
       end record;
 
-end DB.Maps.Value_Utils.Integer_Values;
+end DB.Maps.Values.Integers;
 

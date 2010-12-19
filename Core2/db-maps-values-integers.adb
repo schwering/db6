@@ -6,7 +6,7 @@
 
 with DB.Blocks;
 
-package body DB.Maps.Value_Utils.Integer_Values is
+package body DB.Maps.Values.Integers is
 
    function New_Value
      (Params : not null access DB.Maps.Value_Parameters_Type)
@@ -68,5 +68,5 @@ package body DB.Maps.Value_Utils.Integer_Values is
       return S (F .. S'Last);
    end Image;
 
-end DB.Maps.Value_Utils.Integer_Values;
+end DB.Maps.Values.Integers;
 

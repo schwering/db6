@@ -6,7 +6,7 @@
 
 with Ada.Unchecked_Deallocation;
 
-package body DB.Maps.Value_Utils.String_Values is
+package body DB.Maps.Values.Strings is
 
    type Length_Type is mod 2**16;
    for Length_Type'Size use 16;
@@ -106,5 +106,5 @@ package body DB.Maps.Value_Utils.String_Values is
       return Value.Str.all;
    end Image;
 
-end DB.Maps.Value_Utils.String_Values;
+end DB.Maps.Values.Strings;
 
