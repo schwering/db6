@@ -9,6 +9,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 package DB.Utils.Timers is
+   pragma Elaborate_Body;
 
    type Ticks_Type is mod 2**64;
    type Time_Type is mod 2**64;

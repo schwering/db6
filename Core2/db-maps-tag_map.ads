@@ -9,6 +9,7 @@
 with Ada.Tags;
 
 package DB.Maps.Tag_Map is
+   pragma Elaborate_Body;
 
    type Tid_Type is range 1 .. 8; -- mod 2**3;
    for Tid_Type'Size use 8;

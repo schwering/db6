@@ -11,7 +11,7 @@ with Ada.Unchecked_Deallocation;
 with DB.Blocks.Streams;
 with DB.Maps.Tag_Map;
 
-package body DB.Maps.Values is
+package body DB.Maps.Abstract_Value_Serialization is
 
    function New_Value_Wrapper
      (Value : Value_Class_Type)
@@ -131,5 +131,5 @@ package body DB.Maps.Values is
       Write (Stream'Access, Value.Ref.all);
    end Write;
 
-end DB.Maps.Values;
+end DB.Maps.Abstract_Value_Serialization;
 

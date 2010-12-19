@@ -69,7 +69,7 @@
 --  be used by other predefined packages. User access to this package is via
 --  a renaming of this package in GNAT.Regexp (file g-regexp.ads).
 
-with Ada.Finalization;
+private with Ada.Finalization;
 
 package DB.Utils.Regular_Expressions is
    pragma Preelaborate;

@@ -20,7 +20,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Containers.Ordered_Sets;
+private with Ada.Containers.Ordered_Sets;
 
 generic
    type Item_Type is private;

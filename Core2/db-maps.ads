@@ -42,6 +42,7 @@ with DB.Types.Keys;
 with DB.Types.Times;
 
 package DB.Maps is
+   --pragma Preelaborate;
 
    package AF renames Ada.Finalization;
 

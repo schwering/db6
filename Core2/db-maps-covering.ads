@@ -5,10 +5,11 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.Utils.Gen_Binary_Heaps;
-with DB.Utils.Regular_Expressions;
+private with DB.Utils.Gen_Binary_Heaps;
+private with DB.Utils.Regular_Expressions;
 
 package DB.Maps.Covering is
+   pragma Elaborate_Body;
 
    ----------
    -- Map initialization operations.

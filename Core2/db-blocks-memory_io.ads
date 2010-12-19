@@ -5,7 +5,7 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with DB.Blocks.Gen_IO_Signature;
-with DB.Locks.Mutexes;
+private with DB.Locks.Mutexes;
 
 package DB.Blocks.Memory_IO is
    pragma Preelaborate;

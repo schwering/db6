@@ -4,12 +4,13 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Finalization;
+private with Ada.Finalization;
 
 generic
    type Item_Type (<>) is limited private;
    type Item_Ref_Type is access Item_Type;
 package DB.Utils.Gen_Smart_Pointers is
+   pragma Preelaborate;
 
    type Smart_Pointer_Type is private;
 

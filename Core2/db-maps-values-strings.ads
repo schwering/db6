@@ -8,6 +8,7 @@
 with Ada.Streams;
 
 package DB.Maps.Values.Strings is
+   pragma Elaborate_Body;
 
    type Value_Type is new Maps.Value_Type with private;
 

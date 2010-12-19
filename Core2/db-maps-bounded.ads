@@ -5,12 +5,13 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with DB.DSA.Gen_BTrees;
 with DB.Blocks;
-with DB.Blocks.Local_IO;
-with DB.Maps.Values;
+private with DB.DSA.Gen_BTrees;
+private with DB.Blocks.Local_IO;
+private with DB.Maps.Abstract_Value_Serialization;
 
 package DB.Maps.Bounded is
+   pragma Elaborate_Body;
 
    ----------
    -- Map initialization operations.
@@ -166,7 +167,7 @@ private
 
    package BTrees is new DSA.Gen_BTrees
      (Keys                     => Types.Keys.Keys_Signature,
-      Values                   => Values.Values_Signature,
+      Values                   => Abstract_Value_Serialization.Values_Signature,
       Default_Allow_Duplicates => Default_Allow_Duplicates,
       Block_IO                 => Block_IO);
 
