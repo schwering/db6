@@ -8,6 +8,8 @@ with REST.Error_Log;
 with REST.Maps;
 with REST.Path_Parsers;
 
+with JSON;
+
 function REST.Get (Request : AWS.Status.Data) return AWS.Response.Data
 is
    URL : constant AWS.URL.Object := AWS.Status.URI (Request);
