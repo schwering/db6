@@ -5,6 +5,5 @@
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 package DB.Maps.Values is
-   --pragma Preelaborate;
 end DB.Maps.Values;
 

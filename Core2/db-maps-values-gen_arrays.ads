@@ -1,14 +1,17 @@
 -- Abstract:
 --
--- String value implementation.
--- It String'Read and String'Write attributes.
+-- Array value implementation.
+-- It uses the formal parameter's 'Read and 'Write attributes.
 -- The length is stored as 2 byte integer.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
 with Ada.Streams;
 
-package DB.Maps.Values.Strings is
+generic
+   type Item_Type is (<>);
+   type Array_Type is array (Positive range <>) of Item_Type;
+package DB.Maps.Values.Gen_Arrays is
 
    type Value_Type is new Maps.Value_Type with private;
 
@@ -17,7 +20,7 @@ package DB.Maps.Values.Strings is
      (Params : not null access Value_Parameters_Type)
       return Value_Type;
 
-   function New_Value (S : String) return Value_Type;
+   function New_Value (S : Array_Type) return Value_Type;
 
    overriding
    function Size_Bound
@@ -44,11 +47,11 @@ package DB.Maps.Values.Strings is
 private
    package AF renames Ada.Finalization;
 
-   type String_Ref_Type is access String;
+   type Array_Ref_Type is access Array_Type;
 
    type Value_Type is new Maps.Value_Type with
       record
-         Str : String_Ref_Type;
+         Str : Array_Ref_Type;
       end record;
 
    overriding
@@ -60,5 +63,5 @@ private
    overriding
    procedure Finalize (Value : in out Value_Type);
 
-end DB.Maps.Values.Strings;
+end DB.Maps.Values.Gen_Arrays;
 
