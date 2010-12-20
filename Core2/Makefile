@@ -1,7 +1,9 @@
 include ../Makefile.inc
 
-all: tests_debug unit_tests_debug
-#all: tests_debug tests_release unit_tests_debug unit_tests_release
+all: debug
+
+debug: tests_debug unit_tests_debug
+release: tests_release unit_tests_release
 
 libdb_debug:
 	$(GPRBUILD) -p -Plibdb -XBUILD=debug -XKIND=static

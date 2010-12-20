@@ -20,7 +20,10 @@ project Attributes is
       Ada_Sw := ();
       case Build is
          when "release" =>
-            Ada_Sw := Ada_Sw & "-O2" & "-gnatp";
+            Ada_Sw := Ada_Sw &
+                "-O2" &
+                "-gnat05" &
+                "-gnatp";
          when "debug" =>
             Ada_Sw := Ada_Sw &
                 "-gnat05" &
