@@ -70,5 +70,11 @@ package body DB.Maps.Values.Gen_Integers is
       return S (F .. S'Last);
    end Image;
 
+
+   function Value (Value : Value_Type) return Integer_Type is
+   begin
+      return Value.Int;
+   end Value;
+
 end DB.Maps.Values.Gen_Integers;
 

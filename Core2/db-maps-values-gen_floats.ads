@@ -41,6 +41,7 @@ package DB.Maps.Values.Gen_Floats is
    overriding
    function Image (Value : Value_Type) return String;
 
+   function Value (Value : Value_Type) return Float_Type;
 
 private
    type Value_Type is new Maps.Value_Type with

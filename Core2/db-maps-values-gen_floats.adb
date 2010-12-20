@@ -70,5 +70,11 @@ package body DB.Maps.Values.Gen_Floats is
       return S (F .. S'Last);
    end Image;
 
+
+   function Value (Value : Value_Type) return Float_Type is
+   begin
+      return Value.Real;
+   end Value;
+
 end DB.Maps.Values.Gen_Floats;
 
