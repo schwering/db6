@@ -16,18 +16,38 @@ package body DB.DSA.Utils.Gen_Queues is
    end Succ;
 
 
-   procedure Enqueue (Q : in out Queue_Type; Item : in Item_Type) is
+   procedure Enqueue
+     (Q    : in out Queue_Type;
+      Item : in     Item_Type) is
    begin
       Q.Enqueue (Item);
    end Enqueue;
 
 
+   procedure Enqueue
+     (Q     : in out Queue_Type;
+      Items : in     Item_Array_Type;
+      Last  :    out Natural) is
+   begin
+      Q.Enqueue (Items, Last);
+   end Enqueue;
+
+
    procedure Dequeue
      (Q       : in out Queue_Type;
-      Success :    out Boolean;
-      Item    :    out Item_Type) is
+      Item    :    out Item_Type;
+      Success :    out Boolean) is
    begin
-      Q.Dequeue (Success, Item);
+      Q.Dequeue (Item, Success);
+   end Dequeue;
+
+
+   procedure Dequeue
+     (Q     : in out Queue_Type;
+      Items :    out Item_Array_Type;
+      Last  :    out Natural) is
+   begin
+      Q.Dequeue (Items, Last);
    end Dequeue;
 
 
@@ -56,13 +76,38 @@ package body DB.DSA.Utils.Gen_Queues is
 
 
    protected body Queue_Type is
+
       entry Enqueue (Item : in Item_Type) when not Is_Full is
       begin
          Arr (Tail) := Item;
-         Tail      := Succ (Tail);
+         Tail       := Succ (Tail);
       end Enqueue;
 
-      entry Dequeue (Success : out Boolean; Item : out Item_Type)
+
+      entry Enqueue (Items : in Item_Array_Type; Last : out Natural)
+         when not Is_Full
+      is
+         From     : Index_Type;
+         Max_To   : Index_Type;
+         Count    : Natural;
+         To       : Index_Type;
+      begin
+         if Head <= Tail then
+            From   := Tail;
+            Max_To := Arr'Last;
+         else
+            From   := Tail;
+            Max_To := Head - 1;
+         end if;
+         Count := Natural'Min (Items'Length, Max_To - From + 1);
+         To    := From + Count - 1;
+         Last  := Items'First + Count - 1;
+         Tail  := Succ (To);
+         Arr (From .. To) := Items (Items'First .. Last);
+      end Enqueue;
+
+
+      entry Dequeue (Item : out Item_Type; Success : out Boolean)
          when Final or not Is_Empty is
       begin
          if not Is_Empty then
@@ -74,20 +119,47 @@ package body DB.DSA.Utils.Gen_Queues is
          end if;
       end Dequeue;
 
+
+      entry Dequeue (Items : out Item_Array_Type; Last : out Natural)
+         when Final or not Is_Empty
+      is
+         From     : Index_Type;
+         Max_To   : Index_Type;
+         Count    : Natural;
+         To       : Index_Type;
+      begin
+         if Head <= Tail then
+            From   := Head;
+            Max_To := Tail - 1;
+         else
+            From   := Head;
+            Max_To := Arr'Last;
+         end if;
+         Count := Natural'Min (Items'Length, Max_To - From + 1);
+         To    := From + Count - 1;
+         Last  := Items'First + Count - 1;
+         Head  := Succ (To);
+         Items (Items'First .. Last) := Arr (From .. To);
+      end Dequeue;
+
+
       procedure Mark_Final is
       begin
          Final := True;
       end Mark_Final;
+
 
       function Is_Full return Boolean is
       begin
          return Head = Succ (Tail);
       end Is_Full;
 
+
       function Is_Empty return Boolean is
       begin
          return Head = Tail;
       end Is_Empty;
+
 
       function Size return Natural is
       begin
@@ -97,6 +169,7 @@ package body DB.DSA.Utils.Gen_Queues is
             return Natural (Arr'Last) - Natural (Head) + Natural (Tail);
          end if;
       end Size;
+
    end Queue_Type;
 
 end DB.DSA.Utils.Gen_Queues;

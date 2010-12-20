@@ -160,15 +160,15 @@ is
                Key_Values : Key_Values_Ref_Type;
                Success    : Boolean;
             begin
-               Queues.Dequeue (Queue, Success, Key_Values);
+               Queues.Dequeue (Queue, Key_Values, Success);
                exit when not Success;
                declare
                   procedure Next_Value
                     (Value   : out Intermediate_Value_Type;
                      Success : out Boolean) is
                   begin
-                     Value_Queues.Dequeue (Key_Values.Value_Queue, Success,
-                                           Value);
+                     Value_Queues.Dequeue (Key_Values.Value_Queue,
+                                           Value, Success);
                   end Next_Value;
 
                   Out_Key   : Out_Key_Type;
