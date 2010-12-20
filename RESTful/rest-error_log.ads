@@ -9,11 +9,8 @@ with Ada.Exceptions;
 
 package REST.Error_Log is
 
-   procedure Push (Msg : in String);
-   procedure Push (Exc : in Ada.Exceptions.Exception_Occurrence);
-   function Has return Boolean;
-   function Top return String;
-   procedure Pop;
+   procedure Log (Msg : in String);
+   procedure Log (Exc : in Ada.Exceptions.Exception_Occurrence);
 
 end REST.Error_Log;
 

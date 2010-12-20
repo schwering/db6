@@ -1,32 +1,10 @@
 with Ada.Calendar;
 with Ada.Calendar.Formatting;
 with Ada.Text_IO;
-with Ada.Unchecked_Deallocation;
 
 package body REST.Error_Log is
 
-   type Node_Type;
-   type Node_Ref_Type is access Node_Type;
-   type Node_Type (Length : Natural) is
-      record
-         Message : String (1 .. Length);
-         Next    : Node_Ref_Type := null;
-      end record;
-
-
-   protected Logger is
-      procedure Push (Msg : in String);
-      function Has return Boolean;
-      function Top return String;
-      procedure Pop;
-
-   private
-      Head : Node_Ref_Type := null;
-      Tail : Node_Ref_Type := null;
-   end Logger;
-
-
-   procedure Push (Msg : in String) is
+   function Now return String is
       package C renames Ada.Calendar;
       package CF renames Ada.Calendar.Formatting;
 
@@ -48,90 +26,29 @@ package body REST.Error_Log is
          Strip (CF.Minute_Number'Image (CF.Minute (Now))) & ":" &
          Strip (CF.Second_Number'Image (CF.Second (Now)));
    begin
-      --Logger.Push (Msg);
-      Ada.Text_IO.Put_Line ("Error caught ("& Now_Str &"):");
+      return Now_Str;
+   end Now;
+
+
+   procedure Log_To_Stdout (Msg : in String) is
+   begin
+      Ada.Text_IO.Put_Line ("Error caught ("& Now &"):");
       Ada.Text_IO.Put_Line (Msg);
       Ada.Text_IO.New_Line;
-   end Push;
+   end Log_To_Stdout;
 
 
-   procedure Push (Exc : in Ada.Exceptions.Exception_Occurrence) is
+   procedure Log_To_Stdout (Exc : in Ada.Exceptions.Exception_Occurrence) is
    begin
-      Push (Ada.Exceptions.Exception_Information (Exc));
-   end Push;
+      Log (Ada.Exceptions.Exception_Information (Exc));
+   end Log_To_Stdout;
 
 
-   function Has return Boolean is
-   begin
-      return Logger.Has;
-   end Has;
+   procedure Log (Msg : in String)
+      renames Log_To_Stdout;
 
-
-   function Top return String is
-   begin
-      return Logger.Top;
-   end Top;
-
-
-   procedure Pop is
-   begin
-      Logger.Pop;
-   end Pop;
-
-
-   protected body Logger is
-
-      procedure Push (Msg : in String) is
-         Node : constant Node_Ref_Type := new Node_Type'
-           (Length  => Msg'Length,
-            Message => Msg,
-            Next    => null);
-      begin
-         if Head = null then
-            pragma Assert (Tail = null);
-            Head := Node;
-            Tail := Node;
-         else
-            Tail.Next := Node;
-            Tail      := Node;
-         end if;
-      end Push;
-
-
-      function Has return Boolean is
-      begin
-         return Head /= null;
-      end Has;
-
-
-      function Top return String is
-      begin
-         if Head = null then
-            raise Constraint_Error;
-         end if;
-
-         return Head.Message;
-      end Top;
-
-
-      procedure Pop
-      is
-         procedure Free is new Ada.Unchecked_Deallocation
-           (Node_Type, Node_Ref_Type);
-          Node : Node_Ref_Type := Head;
-      begin
-         if Head = null then
-            raise Constraint_Error;
-         end if;
-
-         if Head = Tail then
-            Tail := null;
-         end if;
-         Head := Head.Next;
-         Free (Node);
-      end Pop;
-
-   end Logger;
+   procedure Log (Exc : in Ada.Exceptions.Exception_Occurrence)
+      renames Log_To_Stdout;
 
 end REST.Error_Log;
 

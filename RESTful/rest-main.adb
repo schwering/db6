@@ -42,7 +42,7 @@ procedure REST.Main is
          when PUT =>
             return Method.Put (Request);
          when TRACE | CONNECT | EXTENSION_METHOD =>
-            Error_Log.Push ("Invalid request");
+            Error_Log.Log ("Invalid request");
             return AWS.Response.Acknowledge (AWS.Messages.S404,
                                              "Unsupported operation");
       end case;

@@ -17,7 +17,7 @@ begin
          Maps.Insert (Infos (I).Name, Map);
       exception
          when E : others =>
-            Error_Log.Push (E);
+            Error_Log.Log (E);
       end;
    end loop;
 end REST.Maps;

@@ -30,7 +30,7 @@ is
       return To_String (S);
    exception
       when E : others =>
-         Error_Log.Push (E);
+         Error_Log.Log (E);
          return "error";
    end;
 
