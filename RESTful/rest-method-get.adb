@@ -5,12 +5,11 @@ with AWS.Response;
 with AWS.URL;
 
 with REST.Error_Log;
+with REST.JSON;
 with REST.Maps;
 with REST.Path_Parsers;
 
-with JSON;
-
-function REST.Get (Request : AWS.Status.Data) return AWS.Response.Data
+function REST.Method.Get (Request : AWS.Status.Data) return AWS.Response.Data
 is
    URL : constant AWS.URL.Object := AWS.Status.URI (Request);
 
@@ -41,5 +40,5 @@ begin
       Message_Body => "<p>" & AWS.URL.Path (AWS.Status.URI (Request)) &
                       "<p>" & AWS.URL.Pathname (AWS.Status.URI (Request)) &
                       "<p>" & Parse (AWS.URL.Pathname (AWS.Status.URI (Request))));
-end REST.Get;
+end REST.Method.Get;
 

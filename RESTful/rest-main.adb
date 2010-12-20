@@ -7,12 +7,12 @@ with AWS.Response;
 
 with DB.Maps;
 
-with REST.Delete;
-with REST.Get;
-with REST.Head;
-with REST.Options;
-with REST.Post;
-with REST.Put;
+with REST.Method.Delete;
+with REST.Method.Get;
+with REST.Method.Head;
+with REST.Method.Options;
+with REST.Method.Post;
+with REST.Method.Put;
 
 with REST.Error_Log;
 
@@ -30,17 +30,17 @@ procedure REST.Main is
    begin
       case AWS.Status.Method (Request) is
          when DELETE =>
-            return REST.Delete (Request);
+            return Method.Delete (Request);
          when GET =>
-            return REST.Get (Request);
+            return Method.Get (Request);
          when HEAD =>
-            return REST.Head (Request);
+            return Method.Head (Request);
          when OPTIONS =>
-            return REST.Options (Request);
+            return Method.Options (Request);
          when POST =>
-            return REST.Post (Request);
+            return Method.Post (Request);
          when PUT =>
-            return REST.Put (Request);
+            return Method.Put (Request);
          when TRACE | CONNECT | EXTENSION_METHOD =>
             Error_Log.Push ("Invalid request");
             return AWS.Response.Acknowledge (AWS.Messages.S404,

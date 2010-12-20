@@ -13,7 +13,7 @@ with DB.Maps.Values.Long_Floats;
 with DB.Maps.Values.Long_Integers;
 with DB.Maps.Values.Strings;
 
-package JSON is
+package REST.JSON is
    pragma Elaborate_Body;
 
    package AS renames Ada.Streams;
@@ -27,6 +27,12 @@ package JSON is
    subtype Float_Value_Type is DB.Maps.Values.Long_Floats.Value_Type'Class;
    subtype Integer_Value_Type is DB.Maps.Values.Long_Integers.Value_Type'Class;
    subtype String_Value_Type is DB.Maps.Values.Strings.Value_Type'Class;
+
+   procedure Start_JSON
+     (Resource : in out Stream_Type);
+
+   procedure End_JSON
+     (Resource : in out Stream_Type);
 
    procedure Put_Float
      (Resource : in out Stream_Type;
@@ -78,60 +84,14 @@ package JSON is
       To       : in     AS.Stream_Element_Offset) is null;
 
 private
-   type Marker_Type is (JSON_Array_End, JSON_Object_End);
-
-   type JSON_Type is (JSON_Number, JSON_String, JSON_Boolean, JSON_Null,
-                      JSON_Object, JSON_Array);
-
-   type String_Ref_Type is access String;
-
-   type Number_Type (Is_Real : Boolean := False) is
-      record
-         case Is_Real is
-            when False => Int  : Long_Integer;
-            when True  => Real : Long_Float;
-         end case;
-      end record;
-
-   type Value_Type (Kind : JSON_Type := JSON_Null) is
-      record
-         case Kind is
-            when JSON_Boolean => B : Boolean;
-            when JSON_Number  => N : Number_Type;
-            when JSON_String  => S : String_Ref_Type;
-            when JSON_Null    => null;
-            when JSON_Object  => null;
-            when JSON_Array   => null;
-         end case;
-      end record;
-
-   type Key_Value_Type is
-      record
-         Key   : String_Ref_Type;
-         Value : Value_Type;
-      end record;
-
-   type Item_Kind_Type is (Key_Value, Marker);
-
-   type Item_Type (Is_Key_Value : Boolean := True) is
-      record
-         case Is_Key_Value is
-            when True  => Key_Value : Key_Value_Type;
-            when False => Marker    : Marker_Type;
-         end case;
-      end record;
-
    package Queues is new DB.DSA.Utils.Gen_Queues
-     (Queue_Size => 100,
-      Item_Type  => Item_Type);
+     (Queue_Size => 1024,
+      Item_Type  => AS.Stream_Element);
 
    type Stream_Type is new ARS.Stream_Type with
       record
-         Queue  : Queues.Queue_Type;
-         Buffer : String_Ref_Type := null;
-         Init   : Boolean := False;
-         Final  : Boolean := False;
+         Queue : Queues.Queue_Type;
       end record;
 
-end JSON;
+end REST.JSON;
 
