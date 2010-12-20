@@ -57,6 +57,12 @@ package body DB.DSA.Utils.Gen_Queues is
    end Mark_Final;
 
 
+   function Is_Final (Q : Queue_Type) return Boolean is
+   begin
+      return Q.Is_Final;
+   end Is_Final;
+
+
    function Is_Full (Q : Queue_Type) return Boolean is
    begin
       return Q.Is_Full;
@@ -147,6 +153,12 @@ package body DB.DSA.Utils.Gen_Queues is
       begin
          Final := True;
       end Mark_Final;
+
+
+      function Is_Final return Boolean is
+      begin
+         return Final and Is_Empty;
+      end Is_final;
 
 
       function Is_Full return Boolean is

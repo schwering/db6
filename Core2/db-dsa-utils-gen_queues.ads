@@ -49,6 +49,11 @@ package DB.DSA.Utils.Gen_Queues is
    -- anymore. The consequence is that active and subsequent Dequeue statements
    -- won't block anymore.
 
+   function Is_Final (Q : Queue_Type) return Boolean;
+   -- Indicates whether the queue is final and empty. Initially, this is false
+   -- and gets true when someone first called Mark_Final and all items were
+   -- dequeued (before or after Mark_Final).
+
    function Is_Full (Q : Queue_Type) return Boolean;
    function Is_Empty (Q : Queue_Type) return Boolean;
    function Size (Q : Queue_Type) return Natural;
@@ -70,6 +75,9 @@ private
 
       procedure Mark_Final;
       pragma Inline (Mark_Final);
+
+      function Is_Final return Boolean;
+      pragma Inline (Is_Final);
 
       function Is_Full return Boolean;
       pragma Inline (Is_Full);
