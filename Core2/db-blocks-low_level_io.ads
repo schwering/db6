@@ -13,10 +13,16 @@ package DB.Blocks.Low_Level_IO is
    pragma Preelaborate;
 
    type Open_Kind_Type is (Create, Read_Only, Read_Write);
+
    type File_Descriptor_Type is range -1 .. Integer'Last;
+
    type Lock_Kind_Type is (Exclusive, Shared);
+
    type Seek_Kind_Type is (From_Beginning, From_Position, From_End);
+
    type File_Position_Type is mod 2**64;
+   for File_Position_Type'Size use 64;
+
    subtype Size_Type is Natural;
    subtype Signed_Size_Type is Integer;
 

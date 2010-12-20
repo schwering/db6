@@ -254,7 +254,11 @@ private
       RW_Node_Size : constant := RO_Node_Size * 6 / 4;
 
       type Degree_Type is range 0 .. Blocks.Block_Size;
+      for Degree_Type'Size use Blocks.Base_Position_Type'Size;
+
       type Level_Type is range 0 .. 255;
+      for Level_Type'Size use 8;
+
       subtype Index_Type is Degree_Type range 0 .. Degree_Type'Last;
       subtype Valid_Index_Type is Index_Type range 1 .. Index_Type'Last;
 
