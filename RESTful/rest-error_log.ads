@@ -1,7 +1,6 @@
 -- Abstract:
 --
--- The design of the logger is broken. Who is first, the error or the
--- registration of the handler? So currently, Push simply prints the message.
+-- The design of the logger is broken.
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 

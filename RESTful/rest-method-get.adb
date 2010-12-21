@@ -4,6 +4,7 @@ with AWS.Status;
 with AWS.Response;
 with AWS.URL;
 
+with REST.BSON;
 with REST.Error_Log;
 with REST.JSON;
 with REST.Maps;

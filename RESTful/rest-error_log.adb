@@ -45,10 +45,10 @@ package body REST.Error_Log is
 
 
    procedure Log (Msg : in String)
-      renames Log_To_Stdout;
+   renames Log_To_Stdout;
 
    procedure Log (Exc : in Ada.Exceptions.Exception_Occurrence)
-      renames Log_To_Stdout;
+   renames Log_To_Stdout;
 
 end REST.Error_Log;
 
