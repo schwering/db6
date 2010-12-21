@@ -68,7 +68,8 @@ private
 
    type Stream_Type is new ARS.Stream_Type with
       record
-         Queue : Queues.Queue_Type;
+         Queue  : Queues.Queue_Type;
+         Indent : Natural := 0;
       end record;
 
 end REST.JSON;
