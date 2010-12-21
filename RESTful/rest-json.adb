@@ -4,6 +4,8 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with DB.Maps.Values.Strings;
+
 package body REST.JSON is
 
    procedure Emit
@@ -24,73 +26,13 @@ package body REST.JSON is
    end Emit;
 
 
-   procedure Start_JSON
-     (Resource : in out Stream_Type) is
+   procedure Start_Anonymous_Object (Resource : in out Stream_Type) is
    begin
       Emit (Resource, "{");
-   end Start_JSON;
+   end Start_Anonymous_Object;
 
 
-   procedure End_JSON
-     (Resource : in out Stream_Type) is
-   begin
-      Emit (Resource, "}");
-      Queues.Mark_Final (Resource.Queue);
-   end End_JSON;
-
-
-   procedure Put_Float
-     (Resource : in out Stream_Type;
-      Key      : in     String;
-      Float    : in     Float_Value_Type) is
-   begin
-      Emit (Resource, """");
-      Emit (Resource, Key);
-      Emit (Resource, """=");
-      Emit (Resource, Float.Image);
-      Emit (Resource, ",");
-   end Put_Float;
-
-
-   procedure Put_Integer
-     (Resource : in out Stream_Type;
-      Key      : in     String;
-      Integer  : in     Integer_Value_Type) is
-   begin
-      Emit (Resource, """");
-      Emit (Resource, Key);
-      Emit (Resource, """=");
-      Emit (Resource, Integer.Image);
-      Emit (Resource, ",");
-   end Put_Integer;
-
-
-   procedure Put_String
-     (Resource : in out Stream_Type;
-      Key      : in     String;
-      Str      : in     String_Value_Type) is
-   begin
-      Emit (Resource, """");
-      Emit (Resource, Key);
-      Emit (Resource, """=""");
-      Emit (Resource, Str.Image);
-      Emit (Resource, """,");
-   end Put_String;
-
-
-   procedure Put_Null
-     (Resource : in out Stream_Type;
-      Key      : in     String) is
-   begin
-      Emit (Resource, """");
-      Emit (Resource, Key);
-      Emit (Resource, """=");
-      Emit (Resource, "null");
-      Emit (Resource, ",");
-   end Put_Null;
-
-
-   procedure Put_Object
+   procedure Start_Object
      (Resource : in out Stream_Type;
       Key      : in     String) is
    begin
@@ -98,7 +40,7 @@ package body REST.JSON is
       Emit (Resource, Key);
       Emit (Resource, """=");
       Emit (Resource, "{");
-   end Put_Object;
+   end Start_Object;
 
 
    procedure End_Object (Resource : in out Stream_Type) is
@@ -107,7 +49,13 @@ package body REST.JSON is
    end End_Object;
 
 
-   procedure Put_Array
+   procedure Start_Anonymous_Array (Resource : in out Stream_Type) is
+   begin
+      Emit (Resource, "[");
+   end Start_Anonymous_Array;
+
+
+   procedure Start_Array
      (Resource : in out Stream_Type;
       Key      : in     String) is
    begin
@@ -115,13 +63,32 @@ package body REST.JSON is
       Emit (Resource, Key);
       Emit (Resource, """=");
       Emit (Resource, "[");
-   end Put_Array;
+   end Start_Array;
 
 
    procedure End_Array (Resource : in out Stream_Type) is
    begin
       Emit (Resource, "],");
    end End_Array;
+
+
+   procedure Put_Value
+     (Resource : in out Stream_Type;
+      Key      : in     String;
+      Value    : in     DB.Maps.Value_Type'Class) is
+   begin
+      Emit (Resource, """");
+      Emit (Resource, Key);
+      Emit (Resource, """=");
+      if Value in DB.Maps.Values.Strings.Value_Type'Class then
+         Emit (Resource, """");
+         Emit (Resource, Value.Image);
+         Emit (Resource, """");
+      else
+         Emit (Resource, Value.Image);
+      end if;
+      Emit (Resource, ",");
+   end Put_Value;
 
 
    procedure Read

@@ -8,10 +8,8 @@ with Ada.Streams;
 
 with AWS.Resources.Streams;
 
+with DB.Maps;
 private with DB.DSA.Utils.Gen_Queues;
-with DB.Maps.Values.Long_Floats;
-with DB.Maps.Values.Long_Integers;
-with DB.Maps.Values.Strings;
 
 package REST.JSON is
    pragma Elaborate_Body;
@@ -24,46 +22,26 @@ package REST.JSON is
    ----------
    -- Operations to manipulate the content of the stream.
 
-   subtype Float_Value_Type is DB.Maps.Values.Long_Floats.Value_Type'Class;
-   subtype Integer_Value_Type is DB.Maps.Values.Long_Integers.Value_Type'Class;
-   subtype String_Value_Type is DB.Maps.Values.Strings.Value_Type'Class;
+   procedure Start_Anonymous_Object (Resource : in out Stream_Type);
 
-   procedure Start_JSON
-     (Resource : in out Stream_Type);
-
-   procedure End_JSON
-     (Resource : in out Stream_Type);
-
-   procedure Put_Float
-     (Resource : in out Stream_Type;
-      Key      : in     String;
-      Float    : in     Float_Value_Type);
-
-   procedure Put_Integer
-     (Resource : in out Stream_Type;
-      Key      : in     String;
-      Integer  : in     Integer_Value_Type);
-
-   procedure Put_String
-     (Resource : in out Stream_Type;
-      Key      : in     String;
-      Str      : in     String_Value_Type);
-
-   procedure Put_Null
-     (Resource : in out Stream_Type;
-      Key      : in     String);
-
-   procedure Put_Object
-     (Resource : in out Stream_Type;
-      Key      : in     String);
-
-   procedure Put_Array
+   procedure Start_Object
      (Resource : in out Stream_Type;
       Key      : in     String);
 
    procedure End_Object (Resource : in out Stream_Type);
 
+   procedure Start_Anonymous_Array (Resource : in out Stream_Type);
+
+   procedure Start_Array
+     (Resource : in out Stream_Type;
+      Key      : in     String);
+
    procedure End_Array (Resource : in out Stream_Type);
+
+   procedure Put_Value
+     (Resource : in out Stream_Type;
+      Key      : in     String;
+      Value    : in     DB.Maps.Value_Type'Class);
 
    ----------
    -- Operations to read the stream.
