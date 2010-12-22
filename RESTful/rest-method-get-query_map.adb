@@ -11,7 +11,9 @@ with AWS.Response;
 with AWS.URL;
 
 with REST.Error_Log;
-with REST.JSON;
+with REST.Output_Formats;
+with REST.Output_Formats.JSON;
+--with REST.Output_Formats.BSON;
 with REST.Maps;
 with REST.Path_Parsers;
 
@@ -80,30 +82,19 @@ begin
       end Upper_Bound;
 
       Map    : constant Maps.Map_Ref_Type := Maps.Map_By_Name (Map_Name);
-      Cursor : DB.Maps.Cursor_Type'Class := Map.New_Cursor
+      Cursor : constant DB.Maps.Cursor_Ref_Type := Map.New_Cursor_Ref
         (Thread_Safe => False,
          Lower_Bound => Lower_Bound,
          Upper_Bound => Upper_Bound);
+      Stream : Output_Formats.Stream_Ref_Type :=
+        new Output_Formats.JSON.Stream_Type;
    begin
-      for I in 1 .. Count loop
-         declare
-            use type DB.Maps.State_Type;
-            Key   : DB.Maps.Key_Type;
-            Value : DB.Maps.Value_Wrapper_Type;
-            State : DB.Maps.State_Type;
-         begin
-            Cursor.Next (Key, Value, State);
-            exit when State = DB.Maps.Failure;
-         end;
-      end loop;
+      Output_Formats.Initialize_Stream
+        (Stream, Cursor, Free_On_Close => True, Max_Objects => Count);
+      Response := AWS.Response.Stream
+        (Content_Type => Stream.Content_Type,
+         Handle       => Stream);
+      Success := True;
    end;
-
-   Response := AWS.Response.Build
-     (Content_Type => "text/plain",
-      Message_Body => "map='"& Map_Name &"'"& ASCII.LF &
-                      "from='"& From &"'"& ASCII.LF &
-                      "count='"& Count'Img &"'"& ASCII.LF &
-                      "rev='"& Rev'Img &"'"& ASCII.LF);
-   Success := True;
 end Query_Map;
 
