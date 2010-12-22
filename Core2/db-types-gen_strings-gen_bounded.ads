@@ -21,6 +21,10 @@ package DB.Types.Gen_Strings.Gen_Bounded is
 
    Empty_String : constant String_Type;
 
+   Max_String : constant String_Type;
+   -- A string compared to whom all other strings are less. The unbounded string
+   -- implementation has no such constant!
+
    function Compare
      (Left, Right : String_Type)
       return Utils.Comparison_Result_Type;
@@ -157,6 +161,9 @@ private
 
    Empty_String : constant String_Type :=
       String_Type'(Length => 0, others => <>);
+
+   Max_String : constant String_Type :=
+      String_Type'(Length => Max_Length, Buffer => (others => Item_Type'Last));
 
    pragma Inline (New_String);
    pragma Inline (To_Index);
