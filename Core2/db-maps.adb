@@ -67,6 +67,28 @@ package body DB.Maps is
    end New_Map;
 
 
+   function New_Cursor_Ref
+     (Map         : Map_Type;
+      Thread_Safe : Boolean;
+      Lower_Bound : Bound_Type;
+      Upper_Bound : Bound_Type)
+      return Cursor_Ref_Type
+   is
+      function New_Cursor_Ref_Fix
+        (Map         : Map_Type'Class;
+         Thread_Safe : Boolean;
+         Lower_Bound : Bound_Type;
+         Upper_Bound : Bound_Type)
+         return Cursor_Ref_Type is
+      begin
+         return new Cursor_Type'Class'(New_Cursor
+           (Map, Thread_Safe, Lower_Bound, Upper_Bound));
+      end New_Cursor_Ref_Fix;
+   begin
+      return New_Cursor_Ref_Fix (Map, Thread_Safe, Lower_Bound, Upper_Bound);
+   end New_Cursor_Ref;
+
+
    function Positive_Infinity_Bound return Bound_Type is
    begin
       return Bound_Type'(Concrete => False, Infinity => Positive_Infinity);
@@ -125,135 +147,129 @@ package body DB.Maps is
    -- So we create the *_Fix versions which take a 'Class object and hence
    -- aren't class members.
 
-   procedure Search_Fix
-     (Map   : in out Map_Type'Class;
-      Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type)
-   is
-      Value_Wrapper : Value_Wrapper_Type;
-   begin
-      Search (Map, Key, Value_Wrapper, State);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
-   end Search_Fix;
-
-
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
       Value :    out Value_Type'Class;
-      State :    out State_Type) is
+      State :    out State_Type)
+   is
+      procedure Search_Fix
+        (Map   : in out Map_Type'Class;
+         Key   : in     Key_Type;
+         Value :    out Value_Type'Class;
+         State :    out State_Type)
+      is
+         Value_Wrapper : Value_Wrapper_Type;
+      begin
+         Search (Map, Key, Value_Wrapper, State);
+         if State = Success then
+            Value := Value_Wrapper.Ref.all;
+         end if;
+      end Search_Fix;
+      pragma Inline (Search_Fix);
    begin
       Search_Fix (Map, Key, Value, State);
    end Search;
-
-
-   procedure Search_Minimum_Fix
-     (Map   : in out Map_Type'Class;
-      Key   :    out Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type)
-   is
-      Value_Wrapper : Value_Wrapper_Type;
-   begin
-      Map.Search_Minimum (Key, Value_Wrapper, State);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
-   end Search_Minimum_Fix;
 
 
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
       Value :    out Value_Type'Class;
-      State :    out State_Type) is
+      State :    out State_Type)
+   is
+      procedure Search_Minimum_Fix
+        (Map   : in out Map_Type'Class;
+         Key   :    out Key_Type;
+         Value :    out Value_Type'Class;
+         State :    out State_Type)
+      is
+         Value_Wrapper : Value_Wrapper_Type;
+      begin
+         Map.Search_Minimum (Key, Value_Wrapper, State);
+         if State = Success then
+            Value := Value_Wrapper.Ref.all;
+         end if;
+      end Search_Minimum_Fix;
+      pragma Inline (Search_Minimum_Fix);
    begin
       Search_Minimum_Fix (Map, Key, Value, State);
    end Search_Minimum;
-
-
-   procedure Delete_Fix
-     (Map   : in out Map_Type'Class;
-      Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type)
-   is
-      Value_Wrapper : Value_Wrapper_Type;
-   begin
-      Delete (Map, Key, Value_Wrapper, State);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
-   end Delete_Fix;
 
 
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
       Value :    out Value_Type'Class;
-      State :    out State_Type) is
+      State :    out State_Type)
+   is
+      procedure Delete_Fix
+        (Map   : in out Map_Type'Class;
+         Key   : in     Key_Type;
+         Value :    out Value_Type'Class;
+         State :    out State_Type)
+      is
+         Value_Wrapper : Value_Wrapper_Type;
+      begin
+         Delete (Map, Key, Value_Wrapper, State);
+         if State = Success then
+            Value := Value_Wrapper.Ref.all;
+         end if;
+      end Delete_Fix;
+      pragma Inline (Delete_Fix);
    begin
       Delete_Fix (Map, Key, Value, State);
    end Delete;
-
-
-   procedure Next_Fix
-     (Cursor : in out Cursor_Type'Class;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
-      State  :    out State_Type)
-   is
-      Value_Wrapper : Value_Wrapper_Type;
-   begin
-      Next (Cursor, Key, Value_Wrapper, State);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
-   end Next_Fix;
 
 
    procedure Next
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
-      State  :    out State_Type) is
+      State  :    out State_Type)
+   is
+      procedure Next_Fix
+        (Cursor : in out Cursor_Type'Class;
+         Key    :    out Key_Type;
+         Value  :    out Value_Type'Class;
+         State  :    out State_Type)
+      is
+         Value_Wrapper : Value_Wrapper_Type;
+      begin
+         Next (Cursor, Key, Value_Wrapper, State);
+         if State = Success then
+            Value := Value_Wrapper.Ref.all;
+         end if;
+      end Next_Fix;
+      pragma Inline (Next_Fix);
    begin
       Next_Fix (Cursor, Key, Value, State);
    end Next;
-
-
-   procedure Delete_Fix
-     (Cursor : in out Cursor_Type'Class;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
-      State  :    out State_Type)
-   is
-      Value_Wrapper : Value_Wrapper_Type;
-   begin
-      Delete (Cursor, Key, Value_Wrapper, State);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
-   end Delete_Fix;
 
 
    procedure Delete
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
-      State  :    out State_Type) is
+      State  :    out State_Type)
+   is
+      procedure Delete_Fix
+        (Cursor : in out Cursor_Type'Class;
+         Key    :    out Key_Type;
+         Value  :    out Value_Type'Class;
+         State  :    out State_Type)
+      is
+         Value_Wrapper : Value_Wrapper_Type;
+      begin
+         Delete (Cursor, Key, Value_Wrapper, State);
+         if State = Success then
+            Value := Value_Wrapper.Ref.all;
+         end if;
+      end Delete_Fix;
+      pragma Inline (Delete_Fix);
    begin
       Delete_Fix (Cursor, Key, Value, State);
    end Delete;
-
-
-   pragma Inline (Search_Fix);
-   pragma Inline (Search_Minimum_Fix);
-   pragma Inline (Delete_Fix);
-   pragma Inline (Next_Fix);
 
 end DB.Maps;
 

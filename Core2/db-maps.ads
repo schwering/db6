@@ -305,6 +305,7 @@ package DB.Maps is
       Greater);
    type Bound_Type is private;
    type Cursor_Type is abstract new AF.Limited_Controlled with private;
+   type Cursor_Ref_Type is access Cursor_Type'Class;
 
    function Positive_Infinity_Bound
       return Bound_Type;
@@ -329,6 +330,13 @@ package DB.Maps is
       Upper_Bound : Bound_Type)
       return Cursor_Type'Class
    is abstract;
+
+   function New_Cursor_Ref
+     (Map         : Map_Type;
+      Thread_Safe : Boolean;
+      Lower_Bound : Bound_Type;
+      Upper_Bound : Bound_Type)
+      return Cursor_Ref_Type;
 
    procedure Set_Thread_Safety
      (Cursor  : in out Cursor_Type;
