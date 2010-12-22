@@ -5,14 +5,16 @@ with DB.Maps;
 
 package REST.Maps is
 
+   subtype Map_Ref_Type is DB.Maps.Map_Ref_Type;
+
+   function Map_By_Name (Name : String) return Map_Ref_Type;
+
+private
    package Map_Names is new Ada.Strings.Bounded.Generic_Bounded_Length (32);
    subtype Map_Name_Type is Map_Names.Bounded_String;
 
-   subtype Map_Ref_Type is DB.Maps.Map_Ref_Type;
+   function Map_By_Name (Name : Map_Name_Type) return Map_Ref_Type;
 
-   function Map (Name : Map_Name_Type) return Map_Ref_Type;
-
-private
    type Map_Info_Type is
       record
          Name : Map_Name_Type;

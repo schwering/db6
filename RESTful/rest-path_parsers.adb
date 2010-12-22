@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009, 2010 Christoph Schwering
+
 package body REST.Path_Parsers is
 
    procedure Next (Path : in String; Iterator : in out Iterator_Type) is
@@ -28,13 +34,13 @@ package body REST.Path_Parsers is
    function Value (Path : String; Iterator : Iterator_Type) return String is
    begin
       if Iterator.I = Initial then
-         raise Constraint_Error;
+         raise URL_Path_Error;
       end if;
       if Iterator = Final then
-         raise Constraint_Error;
+         raise URL_Path_Error;
       end if;
       if Path (Iterator.I) /= '/' then
-         raise Constraint_Error;
+         raise URL_Path_Error;
       end if;
 
       for I in Iterator.I + 1 .. Path'Last loop
@@ -50,6 +56,37 @@ package body REST.Path_Parsers is
    begin
       return Iterator = Final;
    end Is_Final;
+
+
+   function Element
+     (URL     : AWS.URL.Object;
+      N       : Positive;
+      Default : String := "")
+      return String is
+   begin
+      return Element (AWS.URL.Pathname (URL), N, Default);
+   end Element;
+
+
+   function Element
+     (Path    : String;
+      N       : Positive;
+      Default : String := "")
+      return String
+   is
+      Iterator : Iterator_Type;
+      Index    : Natural := 0;
+   begin
+      loop
+         Next (Path, Iterator);
+         exit when Is_Final (Iterator);
+         Index := Index + 1;
+         if Index = N then
+            return Value (Path, Iterator);
+         end if;
+      end loop;
+      return Default;
+   end Element;
 
 end REST.Path_Parsers;
 
