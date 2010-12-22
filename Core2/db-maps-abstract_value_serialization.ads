@@ -17,8 +17,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Finalization;
-
 with DB.Blocks;
 with DB.Blocks.Gen_Values_Signature;
 
@@ -27,25 +25,6 @@ package DB.Maps.Abstract_Value_Serialization is
    pragma Elaborate_Body;
 
    subtype Value_Class_Type is Value_Type'Class;
-   type Value_Class_Ref_Type is access Value_Class_Type'Class;
-
-   type Value_Wrapper_Type is new Ada.Finalization.Controlled with
-      record
-         Ref : Value_Class_Ref_Type;
-      end record;
-
-   function New_Value_Wrapper
-     (Value : Value_Class_Type)
-      return Value_Wrapper_Type;
-
-   overriding
-   procedure Initialize (Value : in out Value_Wrapper_Type);
-
-   overriding
-   procedure Adjust (Value : in out Value_Wrapper_Type);
-
-   overriding
-   procedure Finalize (Value : in out Value_Wrapper_Type);
 
    type Read_Context_Type is null record;
    type Write_Context_Type is null record;

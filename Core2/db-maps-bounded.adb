@@ -98,7 +98,7 @@ package body DB.Maps.Bounded is
    is
       use type BTrees.State_Type;
       State         : BTrees.State_Type;
-      Value_Wrapper : Abstract_Value_Serialization.Value_Wrapper_Type;
+      Value_Wrapper : Value_Wrapper_Type;
    begin
       BTrees.Search (Map.Self.Tree, Key, Value_Wrapper, State);
       return State = BTrees.Success;
@@ -108,34 +108,26 @@ package body DB.Maps.Bounded is
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
+      Value :    out Value_Wrapper_Type;
       State :    out State_Type)
    is
-      S             : BTrees.State_Type;
-      Value_Wrapper : Abstract_Value_Serialization.Value_Wrapper_Type;
+      S : BTrees.State_Type;
    begin
-      BTrees.Search (Map.Tree, Key, Value_Wrapper, S);
+      BTrees.Search (Map.Tree, Key, Value, S);
       State := To_State (S);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
    end Search;
 
 
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
-      Value :    out Value_Type'Class;
+      Value :    out Value_Wrapper_Type;
       State :    out State_Type)
    is
-      S             : BTrees.State_Type;
-      Value_Wrapper : Abstract_Value_Serialization.Value_Wrapper_Type;
+      S : BTrees.State_Type;
    begin
-      BTrees.Search_Minimum (Map.Tree, Key, Value_Wrapper, S);
+      BTrees.Search_Minimum (Map.Tree, Key, Value, S);
       State := To_State (S);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
    end Search_Minimum;
 
 
@@ -157,8 +149,8 @@ package body DB.Maps.Bounded is
       State            :    out State_Type)
    is
       S             : BTrees.State_Type;
-      Value_Wrapper : constant Abstract_Value_Serialization.Value_Wrapper_Type :=
-         Abstract_Value_Serialization.New_Value_Wrapper (Value);
+      Value_Wrapper : constant Value_Wrapper_Type :=
+         New_Value_Wrapper (Value);
    begin
       BTrees.Insert (Map.Tree, Key, Value_Wrapper, Allow_Duplicates, S);
       State := To_State (S);
@@ -168,17 +160,13 @@ package body DB.Maps.Bounded is
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
+      Value :    out Value_Wrapper_Type;
       State :    out State_Type)
    is
-      S             : BTrees.State_Type;
-      Value_Wrapper : Abstract_Value_Serialization.Value_Wrapper_Type;
+      S : BTrees.State_Type;
    begin
-      BTrees.Delete (Map.Tree, Key, Value_Wrapper, S);
+      BTrees.Delete (Map.Tree, Key, Value, S);
       State := To_State (S);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
    end Delete;
 
 
@@ -257,34 +245,26 @@ package body DB.Maps.Bounded is
    procedure Next
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
+      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type)
    is
-      S             : BTrees.State_Type;
-      Value_Wrapper : Abstract_Value_Serialization.Value_Wrapper_Type;
+      S : BTrees.State_Type;
    begin
-      BTrees.Next (Cursor.Map.Tree, Cursor.Cursor, Key, Value_Wrapper, S);
+      BTrees.Next (Cursor.Map.Tree, Cursor.Cursor, Key, Value, S);
       State := To_State (S);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
    end Next;
 
 
    procedure Delete
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
+      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type)
    is
-      S             : BTrees.State_Type;
-      Value_Wrapper : Abstract_Value_Serialization.Value_Wrapper_Type;
+      S : BTrees.State_Type;
    begin
-      BTrees.Delete (Cursor.Map.Tree, Cursor.Cursor, Key, Value_Wrapper, S);
+      BTrees.Delete (Cursor.Map.Tree, Cursor.Cursor, Key, Value, S);
       State := To_State (S);
-      if State = Success then
-         Value := Value_Wrapper.Ref.all;
-      end if;
    end Delete;
 
 
@@ -330,7 +310,7 @@ package body DB.Maps.Bounded is
       end Key_To_String;
 
       function Value_To_String
-        (Value : Abstract_Value_Serialization.Value_Wrapper_Type)
+        (Value : Value_Wrapper_Type)
          return String is
       begin
          return Value.Ref.Image;

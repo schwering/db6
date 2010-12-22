@@ -6,47 +6,11 @@
 
 with Ada.Tags;
 with Ada.Tags.Generic_Dispatching_Constructor;
-with Ada.Unchecked_Deallocation;
 
 with DB.Blocks.Streams;
 with DB.Maps.Tag_Map;
 
 package body DB.Maps.Abstract_Value_Serialization is
-
-   function New_Value_Wrapper
-     (Value : Value_Class_Type)
-      return Value_Wrapper_Type is
-   begin
-      return Value_Wrapper_Type'(Ada.Finalization.Controlled with
-                                 Ref => new Value_Class_Type'(Value));
-   end New_Value_Wrapper;
-
-
-   procedure Initialize (Value : in out Value_Wrapper_Type) is
-   begin
-      Value.Ref := null;
-   end Initialize;
-
-
-   procedure Adjust (Value : in out Value_Wrapper_Type) is
-   begin
-      if Value.Ref /= null then
-         Value.Ref := new Value_Class_Type'(Value.Ref.all);
-      end if;
-   end Adjust;
-
-
-   procedure Free is new Ada.Unchecked_Deallocation
-     (Value_Class_Type, Value_Class_Ref_Type);
-
-
-   procedure Finalize (Value : in out Value_Wrapper_Type) is
-   begin
-      if Value.Ref /= null then
-         Free (Value.Ref);
-      end if;
-   end Finalize;
-
 
    function New_Read_Context return Read_Context_Type is
    begin
@@ -82,12 +46,7 @@ package body DB.Maps.Abstract_Value_Serialization is
          Blocks.Streams.New_Stream (Block'Unrestricted_Access,
                                     Cursor'Unrestricted_Access);
    begin
-      if Value.Ref /= null then
-         Free (Value.Ref);
-      end if;
-
       Tag_Map.Tid_Type'Read (Stream'Access, Tid);
-
       declare
          function Constructor is new Ada.Tags.Generic_Dispatching_Constructor
            (Value_Type, Value_Parameters_Type, New_Value);
@@ -96,7 +55,7 @@ package body DB.Maps.Abstract_Value_Serialization is
          P   : aliased Value_Parameters_Type := (null record);
          V   : constant Value_Class_Type     := Constructor (Tag, P'Access);
       begin
-         Value.Ref := new Value_Class_Type'(V);
+         Value := New_Value_Wrapper (V);
          -- Now Value.Ref.all is the prototype of the object.
          Read (Stream'Access, Value.Ref.all);
       end;

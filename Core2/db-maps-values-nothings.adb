@@ -4,8 +4,6 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Unchecked_Deallocation;
-
 package body DB.Maps.Values.Nothings is
 
    function New_Value
@@ -26,7 +24,9 @@ package body DB.Maps.Values.Nothings is
 
    function Size_Bound
       (Value : Value_Type)
-       return Ada.Streams.Stream_Element_Offset is
+       return Ada.Streams.Stream_Element_Offset
+   is
+      pragma Unreferenced (Value);
    begin
       return 0;
    end Size_Bound;
@@ -48,13 +48,18 @@ package body DB.Maps.Values.Nothings is
    end Read;
 
 
-   function Equals (A, B : Value_Type) return Boolean is
+   function Equals (A, B : Value_Type) return Boolean
+   is
+      pragma Unreferenced (A);
+      pragma Unreferenced (B);
    begin
       return True;
    end Equals;
 
 
-   function Image (Value : Value_Type) return String is
+   function Image (Value : Value_Type) return String
+   is
+      pragma Unreferenced (Value);
    begin
       return "null";
    end Image;

@@ -40,6 +40,7 @@ with Ada.Streams;
 with DB.Blocks;
 with DB.Types.Keys;
 with DB.Types.Times;
+with DB.Utils.Gen_Auto_Pointers;
 
 package DB.Maps is
 
@@ -89,10 +90,12 @@ package DB.Maps is
    subtype Time_Type is Types.Times.Number_Type;
 
 
-   type Value_Type is abstract new Ada.Finalization.Controlled and
+   type Value_Type is abstract new AF.Controlled and
                                    Serializable_Type and
                                    Comparable_Type and
-                                   Printable_Type with private;
+                                   Printable_Type with null record;
+
+   type Value_Ref_Type is access Value_Type'Class;
 
    type Value_Parameters_Type is null record;
 
@@ -108,6 +111,16 @@ package DB.Maps is
      --(Value : in out Value_Type)
    --is abstract;
    -- The Finalize is called whenever a value's life-cycle ends in the map.
+
+   package Value_Wrappers is new Utils.Gen_Auto_Pointers
+     (Value_Type'Class, Value_Ref_Type);
+
+   subtype Value_Wrapper_Type is Value_Wrappers.Auto_Pointer_Type;
+
+   function New_Value_Wrapper
+     (Value : Value_Type'Class)
+      return Value_Wrapper_Type
+   renames Value_Wrappers.New_Auto_Pointer;
 
 
    function To_Key
@@ -191,7 +204,20 @@ package DB.Maps is
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
+      Value :    out Value_Wrapper_Type;
+      State :    out State_Type)
+   is abstract;
+
+   procedure Search
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
       Value :    out Value_Type'Class;
+      State :    out State_Type);
+
+   procedure Search_Minimum
+     (Map   : in out Map_Type;
+      Key   :    out Key_Type;
+      Value :    out Value_Wrapper_Type;
       State :    out State_Type)
    is abstract;
 
@@ -199,8 +225,7 @@ package DB.Maps is
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
       Value :    out Value_Type'Class;
-      State :    out State_Type)
-   is abstract;
+      State :    out State_Type);
 
    procedure Insert
      (Map   : in out Map_Type;
@@ -220,9 +245,15 @@ package DB.Maps is
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
+      Value :    out Value_Wrapper_Type;
       State :    out State_Type)
    is abstract;
+
+   procedure Delete
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value :    out Value_Type'Class;
+      State :    out State_Type);
 
 
    ----------
@@ -311,7 +342,20 @@ package DB.Maps is
    procedure Next
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
+      Value  :    out Value_Wrapper_Type;
+      State  :    out State_Type)
+   is abstract;
+
+   procedure Next
+     (Cursor : in out Cursor_Type;
+      Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
+      State  :    out State_Type);
+
+   procedure Delete
+     (Cursor : in out Cursor_Type;
+      Key    :    out Key_Type;
+      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type)
    is abstract;
 
@@ -319,15 +363,9 @@ package DB.Maps is
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
       Value  :    out Value_Type'Class;
-      State  :    out State_Type)
-   is abstract;
+      State  :    out State_Type);
 
 private
-   type Value_Type is abstract new Ada.Finalization.Controlled and
-                                   Serializable_Type and
-                                   Comparable_Type and
-                                   Printable_Type with null record;
-
    type Map_Type is abstract new AF.Limited_Controlled with null record;
 
    type Cursor_Type is abstract new AF.Limited_Controlled with null record;

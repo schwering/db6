@@ -67,14 +67,14 @@ package DB.Maps.Bounded is
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
+      Value :    out Value_Wrapper_Type;
       State :    out State_Type);
 
    overriding
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
-      Value :    out Value_Type'Class;
+      Value :    out Value_Wrapper_Type;
       State :    out State_Type);
 
    overriding
@@ -96,7 +96,7 @@ package DB.Maps.Bounded is
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
+      Value :    out Value_Wrapper_Type;
       State :    out State_Type);
 
 
@@ -151,14 +151,14 @@ package DB.Maps.Bounded is
    procedure Next
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
+      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type);
 
    overriding
    procedure Delete
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
+      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type);
 
 private
