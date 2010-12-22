@@ -4,7 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-with Ada.Finalization;
+private with Ada.Finalization;
 
 generic
    type Item_Type (<>) is private;
@@ -14,6 +14,7 @@ package DB.Utils.Gen_Auto_Pointers is
 
    type Auto_Pointer_Type is tagged private;
 
+   function New_Auto_Pointer (Ref : Item_Ref_Type) return Auto_Pointer_Type;
    function New_Auto_Pointer (Item : Item_Type) return Auto_Pointer_Type;
    function Ref (Pointer : Auto_Pointer_Type) return Item_Ref_Type;
 

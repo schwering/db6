@@ -24,35 +24,35 @@ package body DB.Utils.Gen_Smart_Pointers is
 
    overriding
    procedure Initialize
-     (Ref : in out Smart_Pointer_Type) is
+     (Pointer : in out Smart_Pointer_Type) is
    begin
-      Ref.Ref       := null;
-      Ref.Ref_Count := new Natural'(1);
+      Pointer.Ref       := null;
+      Pointer.Ref_Count := new Natural'(1);
    end Initialize;
 
 
    overriding
    procedure Adjust
-     (Ref : in out Smart_Pointer_Type) is
+     (Pointer : in out Smart_Pointer_Type) is
    begin
-      Ref.Ref_Count.all := Ref.Ref_Count.all + 1;
+      Pointer.Ref_Count.all := Pointer.Ref_Count.all + 1;
    end Adjust;
 
 
    overriding
    procedure Finalize
-     (Ref : in out Smart_Pointer_Type)
+     (Pointer : in out Smart_Pointer_Type)
    is
       procedure Free is new Ada.Unchecked_Deallocation
         (Natural, Natural_Ref_Type);
       procedure Free is new Ada.Unchecked_Deallocation
         (Item_Type, Item_Ref_Type);
    begin
-      Ref.Ref_Count.all := Ref.Ref_Count.all - 1;
-      if Ref.Ref_Count.all = 0 then
-         Free (Ref.Ref_Count);
-         if Ref.Ref /= null then
-            Free (Ref.Ref);
+      Pointer.Ref_Count.all := Pointer.Ref_Count.all - 1;
+      if Pointer.Ref_Count.all = 0 then
+         Free (Pointer.Ref_Count);
+         if Pointer.Ref /= null then
+            Free (Pointer.Ref);
          end if;
       end if;
    end Finalize;

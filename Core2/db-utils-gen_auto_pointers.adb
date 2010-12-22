@@ -12,10 +12,17 @@ package body DB.Utils.Gen_Auto_Pointers is
      (Item_Type, Item_Ref_Type);
 
 
+   function New_Auto_Pointer (Ref : Item_Ref_Type) return Auto_Pointer_Type is
+   begin
+      return Auto_Pointer_Type'(AF.Controlled with
+                                Ptr => Ref);
+   end New_Auto_Pointer;
+
+
    function New_Auto_Pointer (Item : Item_Type) return Auto_Pointer_Type is
    begin
       return Auto_Pointer_Type'(AF.Controlled with
-                           Ptr => new Item_Type'(Item));
+                                Ptr => new Item_Type'(Item));
    end New_Auto_Pointer;
 
 

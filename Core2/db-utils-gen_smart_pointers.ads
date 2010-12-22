@@ -12,7 +12,7 @@ generic
 package DB.Utils.Gen_Smart_Pointers is
    pragma Preelaborate;
 
-   type Smart_Pointer_Type is private;
+   type Smart_Pointer_Type is tagged private;
 
    function New_Smart_Pointer (Ref : Item_Ref_Type) return Smart_Pointer_Type;
    function Ref (Pointer : Smart_Pointer_Type) return Item_Ref_Type;
@@ -28,15 +28,15 @@ private
 
    overriding
    procedure Initialize
-     (Ref : in out Smart_Pointer_Type);
+     (Pointer : in out Smart_Pointer_Type);
 
    overriding
    procedure Adjust
-     (Ref : in out Smart_Pointer_Type);
+     (Pointer : in out Smart_Pointer_Type);
 
    overriding
    procedure Finalize
-     (Ref : in out Smart_Pointer_Type);
+     (Pointer : in out Smart_Pointer_Type);
 
 end DB.Utils.Gen_Smart_Pointers;
 
