@@ -19,6 +19,7 @@ package body REST.Output_Formats is
       N_Objects        : Natural := 0;
       Last_Key         : DB.Maps.Key_Type;
       Last_Initialized : Boolean := False;
+      Cancelled        : Boolean := False;
    begin
       accept Initialize
         (Stream_Ref : in Stream_Ref_Type;
@@ -32,6 +33,7 @@ package body REST.Output_Formats is
 
       loop
          <<Next_Iteration>>
+         Log.Info ("Next in cursor");
          declare
             use type DB.Maps.Keys.Rows.String_Type;
             use type DB.Maps.Keys.Columns.String_Type;
@@ -40,8 +42,19 @@ package body REST.Output_Formats is
             Value : DB.Maps.Value_Wrapper_Type;
             State : DB.Maps.State_Type;
          begin
+            select
+               accept Stop do
+                  Log.Info ("Cancelling thread");
+                  Cancelled := True;
+                  requeue Stop;
+               end Stop;
+            else
+               null;
+            end select;
+            exit when Cancelled;
             exit when N_Objects > Max_Objects;
             exit when Queues.Is_Final (Stream.Queue);
+
             Stream.Cursor.Next (Key, Value, State);
             exit when State /= DB.Maps.Success;
 
@@ -58,6 +71,7 @@ package body REST.Output_Formats is
             elsif Last_Key.Row /= Key.Row then
                Stream.End_Object;
                N_Objects := N_Objects + 1;
+               Log.Info ("Completed object "& N_Objects'Img);
                Stream.Start_Object (DB.Maps.Row_To_String (Key.Row));
             end if;
 
@@ -75,6 +89,15 @@ package body REST.Output_Formats is
       end if;
 
       Stream.End_Array;
+      Queues.Mark_Final (Stream.Queue);
+
+      Log.Info ("Stopping thread");
+      accept Stop;
+
+   exception
+      when E : others =>
+         Log.Error (E);
+         Queues.Mark_Final (Stream.Queue);
    end Populator_Type;
 
 
@@ -116,25 +139,39 @@ package body REST.Output_Formats is
 
       Queues.Dequeue (Resource.Queue, Q_Buf, Q_Last);
       Last := AS.Stream_Element_Offset (Q_Last);
+      Log.Info ("Read "& Last'Img);
    end Read;
 
 
    procedure Close (Resource : in out Stream_Type) is
    begin
-      Log.Info ("Closing stream");
-      abort Resource.Populator;
+      Log.Info ("Closing stream (queue final = "&
+        Queues.Is_Final (Resource.Queue)'Img &")");
+      -- How should the server be stopped if he is trying to Enqueue something
+      -- and the queue is full? We would either have to abort or have a timeout
+      -- in the enqueue statement. The latter sucks because the vast majority
+      -- of enqueue operations succeeds. We already have enough concurrency
+      -- overhead.
+      Resource.Populator.Stop;
       Queues.Mark_Final (Resource.Queue);
       if Resource.Free_On_Close then
          declare
-            procedure Free is new Ada.Unchecked_Deallocation
-              (Stream_Type'Class, Stream_Ref_Type);
+            --procedure Free is new Ada.Unchecked_Deallocation
+              --(Stream_Type'Class, Stream_Ref_Type);
             procedure Free is new Ada.Unchecked_Deallocation
               (DB.Maps.Cursor_Type'Class, DB.Maps.Cursor_Ref_Type);
          begin
             Free (Resource.Cursor);
-            Free (Resource.Self);
+            --Free (Resource.Self);
          end;
       end if;
+      declare
+      begin
+         raise Constraint_Error;
+      exception
+         when E : others =>
+            Log.Error (E);
+      end;
    end Close;
 
 

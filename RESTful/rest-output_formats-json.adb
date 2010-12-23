@@ -6,6 +6,8 @@
 
 with DB.Maps.Values.Strings;
 
+with REST.Log;
+
 package body REST.Output_Formats.JSON is
 
    function Content_Type (Stream : Stream_Type) return String is

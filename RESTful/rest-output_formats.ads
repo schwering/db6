@@ -133,6 +133,7 @@ private
       entry Initialize
         (Stream_Ref : in Stream_Ref_Type;
          Max_Objs   : in Natural);
+      entry Stop;
    end Populator_Type;
 
    type Stream_Type is abstract new ARS.Stream_Type with

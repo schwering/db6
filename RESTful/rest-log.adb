@@ -32,26 +32,34 @@ package body REST.Log is
 
    procedure Log_To_Stdout (Msg : in String) is
    begin
-      Ada.Text_IO.Put_Line ("Error caught ("& Now &"):");
+      Ada.Text_IO.Put_Line (Kind &" ("& Now &"):");
       Ada.Text_IO.Put_Line (Msg);
       Ada.Text_IO.New_Line;
    end Log_To_Stdout;
 
 
-   procedure Log_To_Stdout (Exc : in Ada.Exceptions.Exception_Occurrence) is
-   begin
-      Log_To_Stdout (Ada.Exceptions.Exception_Information (Exc));
-   end Log_To_Stdout;
-
-
    procedure Info (Msg : in String)
-   renames Log_To_Stdout;
+   is
+      procedure Log is new Log_To_Stdout ("Info");
+   begin
+      Log (Msg);
+   end Info;
+
 
    procedure Error (Msg : in String)
-   renames Log_To_Stdout;
+   is
+      procedure Log is new Log_To_Stdout ("Error");
+   begin
+      Log (Msg);
+   end Error;
+
 
    procedure Error (Exc : in Ada.Exceptions.Exception_Occurrence)
-   renames Log_To_Stdout;
+   is
+      procedure Log is new Log_To_Stdout ("Exception");
+   begin
+      Log (Ada.Exceptions.Exception_Information (Exc));
+   end Error;
 
 end REST.Log;
 

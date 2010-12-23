@@ -10,7 +10,6 @@ with AWS.Status;
 with AWS.Response;
 with AWS.URL;
 
-with REST.Log;
 with REST.Output_Formats;
 with REST.Output_Formats.JSON;
 --with REST.Output_Formats.BSON;
@@ -86,14 +85,15 @@ begin
         (Thread_Safe => False,
          Lower_Bound => Lower_Bound,
          Upper_Bound => Upper_Bound);
-      Stream : Output_Formats.Stream_Ref_Type :=
+      Stream : constant Output_Formats.Stream_Ref_Type :=
         new Output_Formats.JSON.Stream_Type;
    begin
       Output_Formats.Initialize_Stream
         (Stream, Cursor, Free_On_Close => True, Max_Objects => Count);
       Response := AWS.Response.Stream
         (Content_Type => Stream.Content_Type,
-         Handle       => Stream);
+         Handle       => Stream,
+         Server_Close => False);
       Success := True;
    end;
 end Query_Map;
