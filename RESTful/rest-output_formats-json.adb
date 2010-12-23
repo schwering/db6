@@ -35,8 +35,8 @@ package body REST.Output_Formats.JSON is
 
 
    procedure Indent (Resource : in out Stream_Type) is
-      Whitespace : constant String (1 .. Resource.Indent) :=
-        (others => ' ');
+      Whitespace : constant String (1 .. Resource.Indent + 1) :=
+        (1 => ASCII.LF, others => ' ');
    begin
       Emit (Resource, Whitespace);
    end Indent;
@@ -44,7 +44,7 @@ package body REST.Output_Formats.JSON is
 
    procedure Start_Anonymous_Object (Resource : in out Stream_Type) is
    begin
-      Indent (Resource);
+      --Indent (Resource);
       Emit (Resource, "{");
       Resource.Indent := Resource.Indent + 1;
    end Start_Anonymous_Object;
@@ -73,7 +73,7 @@ package body REST.Output_Formats.JSON is
 
    procedure Start_Anonymous_Array (Resource : in out Stream_Type) is
    begin
-      Indent (Resource);
+      --Indent (Resource);
       Emit (Resource, "[");
       Resource.Indent := Resource.Indent + 1;
    end Start_Anonymous_Array;

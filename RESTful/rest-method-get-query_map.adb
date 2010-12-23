@@ -93,7 +93,7 @@ begin
       Response := AWS.Response.Stream
         (Content_Type => Stream.Content_Type,
          Handle       => Stream,
-         Server_Close => False);
+         Server_Close => True);
       Success := True;
    end;
 end Query_Map;

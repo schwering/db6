@@ -129,6 +129,7 @@ package body REST.Output_Formats is
       Q_Buf : Queues.Item_Array_Type
         (Natural (Buffer'First) .. Natural (Buffer'Last));
       for Q_Buf'Address use Buffer'Address;
+      Q_From : Positive := Q_Buf'First;
       Q_Last : Natural;
    begin
       pragma Assert (Buffer'Size = Q_Buf'Size);
@@ -137,7 +138,12 @@ package body REST.Output_Formats is
          return;
       end if;
 
-      Queues.Dequeue (Resource.Queue, Q_Buf, Q_Last);
+      loop
+         Queues.Dequeue (Resource.Queue, Q_Buf (Q_From .. Q_Buf'Last), Q_Last);
+         exit when Q_Last < Q_From;
+         Q_From := Q_Last + 1;
+      end loop;
+
       Last := AS.Stream_Element_Offset (Q_Last);
       Log.Info ("Read "& Last'Img);
    end Read;
@@ -165,13 +171,6 @@ package body REST.Output_Formats is
             --Free (Resource.Self);
          end;
       end if;
-      declare
-      begin
-         raise Constraint_Error;
-      exception
-         when E : others =>
-            Log.Error (E);
-      end;
    end Close;
 
 
