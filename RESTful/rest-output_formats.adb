@@ -17,7 +17,7 @@ package body REST.Output_Formats is
       Stream           : Stream_Ref_Type;
       Max_Objects      : Positive;
       N_Objects        : Natural := 0;
-      Last_Key         : DB.Maps.Key_Type;
+      Last_Key         : DB.Maps.Key_Type := DB.Maps.Keys.Null_Key;
       Last_Initialized : Boolean := False;
       Cancelled        : Boolean := False;
    begin

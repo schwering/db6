@@ -41,8 +41,9 @@ package DB.Types.Keys is
          Time_Context   : Times.Write_Context_Type;
       end record;
 
-
    Is_Context_Free_Serialization : constant Boolean;
+
+   function Null_Key return Key_Type;
 
    function "<"  (Left, Right : Key_Type) return Boolean;
    function "<=" (Left, Right : Key_Type) return Boolean;
@@ -91,6 +92,7 @@ private
       Column_Serialization.Is_Context_Free_Serialization and
       Times.Is_Context_Free_Serialization;
 
+   pragma Inline (Null_Key);
    pragma Inline (New_Read_Context);
    pragma Inline (New_Write_Context);
 

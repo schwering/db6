@@ -39,7 +39,6 @@ with Ada.Streams;
 
 with DB.Blocks;
 with DB.Types.Keys;
-with DB.Types.Times;
 with DB.Utils.Gen_Auto_Pointers;
 
 package DB.Maps is

@@ -18,6 +18,10 @@
 --   ...
 -- ]
 --
+-- By the way: Even though it seems not to be documentated, AWS frees the stream
+-- that is handed over to AWS.Response.Build, at least if Server_Close is set to
+-- True.
+--
 -- Design Notes:
 --
 -- We have a consumer-producer-scenario here:

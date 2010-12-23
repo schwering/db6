@@ -6,6 +6,12 @@
 
 package body DB.Types.Keys is
 
+   function Null_Key return Key_Type is
+   begin
+      return (Rows.Empty_String, Columns.Empty_String, Times.Number_Type'Last);
+   end Null_Key;
+
+
    function "<" (Left, Right : Rows.String_Type) return Boolean
    renames Rows."<";
    function "=" (Left, Right : Rows.String_Type) return Boolean
