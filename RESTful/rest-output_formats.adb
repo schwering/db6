@@ -63,7 +63,7 @@ package body REST.Output_Formats is
                Last_Key.Column = Key.Column
             then
                -- We only take the most up-to-date version of each key.
-               goto Next_Iteration;
+               null;--goto Next_Iteration;
             end if;
 
             if not Last_Initialized then

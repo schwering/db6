@@ -44,9 +44,13 @@ package body REST.Output_Formats.JSON is
 
    procedure Start_Anonymous_Object (Resource : in out Stream_Type) is
    begin
+      if Resource.Comma then
+         Emit (Resource, ",");
+      end if;
       --Indent (Resource);
       Emit (Resource, "{");
       Resource.Indent := Resource.Indent + 1;
+      Resource.Comma  := False;
    end Start_Anonymous_Object;
 
 
@@ -54,12 +58,16 @@ package body REST.Output_Formats.JSON is
      (Resource : in out Stream_Type;
       Key      : in     String) is
    begin
+      if Resource.Comma then
+         Emit (Resource, ",");
+      end if;
       Indent (Resource);
       Emit (Resource, """");
       Emit (Resource, Key);
       Emit (Resource, """ : ");
       Emit (Resource, "{");
       Resource.Indent := Resource.Indent + 1;
+      Resource.Comma  := False;
    end Start_Object;
 
 
@@ -67,15 +75,20 @@ package body REST.Output_Formats.JSON is
    begin
       Resource.Indent := Resource.Indent - 1;
       Indent (Resource);
-      Emit (Resource, "},");
+      Emit (Resource, "}");
+      Resource.Comma := True;
    end End_Object;
 
 
    procedure Start_Anonymous_Array (Resource : in out Stream_Type) is
    begin
+      if Resource.Comma then
+         Emit (Resource, ",");
+      end if;
       --Indent (Resource);
       Emit (Resource, "[");
       Resource.Indent := Resource.Indent + 1;
+      Resource.Comma  := False;
    end Start_Anonymous_Array;
 
 
@@ -83,12 +96,16 @@ package body REST.Output_Formats.JSON is
      (Resource : in out Stream_Type;
       Key      : in     String) is
    begin
+      if Resource.Comma then
+         Emit (Resource, ",");
+      end if;
       Indent (Resource);
       Emit (Resource, """");
       Emit (Resource, Key);
       Emit (Resource, """ : ");
       Emit (Resource, "[");
       Resource.Indent := Resource.Indent + 1;
+      Resource.Comma := False;
    end Start_Array;
 
 
@@ -96,7 +113,8 @@ package body REST.Output_Formats.JSON is
    begin
       Resource.Indent := Resource.Indent - 1;
       Indent (Resource);
-      Emit (Resource, "],");
+   Emit (Resource, "]");
+   Resource.Comma := True;
    end End_Array;
 
 
@@ -105,6 +123,9 @@ package body REST.Output_Formats.JSON is
       Key      : in     String;
       Value    : in     DB.Maps.Value_Type'Class) is
    begin
+      if Resource.Comma then
+         Emit (Resource, ",");
+      end if;
       Indent (Resource);
       Emit (Resource, """");
       Emit (Resource, Key);
@@ -116,8 +137,7 @@ package body REST.Output_Formats.JSON is
       else
          Emit (Resource, Value.Image);
       end if;
-      Emit (Resource, ",");
-      Resource.Indent := Resource.Indent + 1;
+      Resource.Comma := True;
    end Put_Value;
 
 end REST.Output_Formats.JSON;

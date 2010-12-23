@@ -53,6 +53,7 @@ private
    type Stream_Type is new Output_Formats.Stream_Type with
       record
          Indent : Natural := 0;
+         Comma  : Boolean := False;
       end record;
 
 end REST.Output_Formats.JSON;
