@@ -112,32 +112,18 @@ package body DB.Maps is
    end New_Bound;
 
 
-   function To_Key
-     (Row  : Row_Type'Class;
-      Col  : Column_Type'Class;
-      Time : Time_Type)
-      return Key_Type
-   is
-      use Keys;
+   function Row_To_String (Row : Keys.Rows.String_Type) return String is
    begin
-      return Key_Type'(Row    => Rows.New_String
-                                  (Rows.Indefinite_Buffer_Type (Row.Image)),
-                       Column => Columns.New_String
-                                   (Rows.Indefinite_Buffer_Type (Col.Image)),
-                       Time   => Time);
-   end To_Key;
+      return String (DB.Types.Keys.Rows.To_Buffer (Row));
+   end Row_To_String;
 
 
-   procedure From_Key
-     (Row  : out Row_Type'Class;
-      Col  : out Column_Type'Class;
-      Time : out Time_Type;
-      Key  : in  Key_Type) is
+   function Column_To_String
+     (Column : Keys.Columns.String_Type)
+      return String is
    begin
-      Row.Set (String (Keys.Rows.To_Buffer (Key.Row)));
-      Col.Set (String (Keys.Columns.To_Buffer (Key.Column)));
-      Time := Key.Time;
-   end From_Key;
+      return String (DB.Types.Keys.Columns.To_Buffer (Column));
+   end Column_To_String;
 
 
    ----------

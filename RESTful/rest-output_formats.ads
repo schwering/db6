@@ -132,13 +132,13 @@ private
    task type Populator_Type is
       entry Initialize
         (Stream_Ref : in Stream_Ref_Type;
-         Cursor_Ref : in DB.Maps.Cursor_Ref_Type;
          Max_Objs   : in Natural);
    end Populator_Type;
 
    type Stream_Type is abstract new ARS.Stream_Type with
       record
          Queue         : Queues.Queue_Type;
+         Cursor        : DB.Maps.Cursor_Ref_Type;
          Populator     : Populator_Type;
          Self          : Stream_Ref_Type := null;
          Initialized   : Boolean := False;

@@ -78,17 +78,11 @@ package DB.Maps is
    is abstract;
 
 
-   type String_Type is interface and Printable_Type;
-
-   procedure Set (S : in out String_Type; Value : in String)
-   is abstract;
-
    package Keys renames Types.Keys;
    subtype Key_Type is Keys.Key_Type;
-   subtype Row_Type is String_Type;
-   subtype Column_Type is String_Type;
-   subtype Time_Type is Types.Times.Number_Type;
 
+   function Row_To_String (Row : Keys.Rows.String_Type) return String;
+   function Column_To_String (Column : Keys.Columns.String_Type) return String;
 
    type Value_Type is abstract new AF.Controlled and
                                    Serializable_Type and
@@ -121,19 +115,6 @@ package DB.Maps is
      (Value : Value_Type'Class)
       return Value_Wrapper_Type
    renames Value_Wrappers.New_Auto_Pointer;
-
-
-   function To_Key
-     (Row  : Row_Type'Class;
-      Col  : Column_Type'Class;
-      Time : Time_Type)
-      return Key_Type;
-
-   procedure From_Key
-     (Row  : out Row_Type'Class;
-      Col  : out Column_Type'Class;
-      Time : out Time_Type;
-      Key  : in  Key_Type);
 
 
    ----------
@@ -395,8 +376,6 @@ private
    pragma Inline (Positive_Infinity_Bound);
    pragma Inline (Negative_Infinity_Bound);
    pragma Inline (New_Bound);
-   pragma Inline (To_Key);
-   pragma Inline (From_Key);
 
 end DB.Maps;
 
