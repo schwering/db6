@@ -29,7 +29,11 @@ package body DB.DSA.Utils.Gen_Queues is
       Items : in     Item_Array_Type;
       Last  :    out Natural) is
    begin
-      Q.Enqueue (Items, Last);
+      if Items'Length = 0 then
+         Last := Items'Last;
+      else
+         Q.Enqueue (Items, Last);
+      end if;
    end Enqueue;
 
 
@@ -47,7 +51,11 @@ package body DB.DSA.Utils.Gen_Queues is
       Items :    out Item_Array_Type;
       Last  :    out Natural) is
    begin
-      Q.Dequeue (Items, Last);
+      if Items'Length = 0 then
+         Last := Items'Last;
+      else
+         Q.Dequeue (Items, Last);
+      end if;
    end Dequeue;
 
 
@@ -93,10 +101,10 @@ package body DB.DSA.Utils.Gen_Queues is
       entry Enqueue (Items : in Item_Array_Type; Last : out Natural)
          when not Is_Full
       is
-         From     : Index_Type;
-         Max_To   : Index_Type;
-         Count    : Natural;
-         To       : Index_Type;
+         From   : Index_Type;
+         Max_To : Index_Type;
+         Count  : Natural;
+         To     : Index_Type;
       begin
          if Head <= Tail then
             From   := Tail;
