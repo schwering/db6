@@ -10,7 +10,7 @@ with AWS.Status;
 with AWS.Response;
 with AWS.URL;
 
-with REST.Error_Log;
+with REST.Log;
 with REST.Output_Formats;
 with REST.Output_Formats.JSON;
 --with REST.Output_Formats.BSON;

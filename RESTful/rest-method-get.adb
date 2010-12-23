@@ -10,7 +10,7 @@
 with AWS.Status;
 with AWS.Response;
 
-with REST.Error_Log;
+with REST.Log;
 
 function REST.Method.Get (Request : AWS.Status.Data) return AWS.Response.Data
 is
@@ -55,7 +55,7 @@ begin
       end;
    end loop;
 
-   Error_Log.Log ("No handler found");
+   Log.Error ("No handler found");
    return AWS.Response.Build
      (Content_Type => "text/html",
       Message_Body => "<p>No handler in REST.Method.Get found</p>");

@@ -40,7 +40,7 @@ begin
    Success := True;
 exception
    when E : others =>
-      Error_Log.Log (E);
+      Log.Error (E);
       Success := False;
 end;
 

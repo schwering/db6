@@ -2,7 +2,7 @@ with Ada.Calendar;
 with Ada.Calendar.Formatting;
 with Ada.Text_IO;
 
-package body REST.Error_Log is
+package body REST.Log is
 
    function Now return String is
       package C renames Ada.Calendar;
@@ -40,15 +40,18 @@ package body REST.Error_Log is
 
    procedure Log_To_Stdout (Exc : in Ada.Exceptions.Exception_Occurrence) is
    begin
-      Log (Ada.Exceptions.Exception_Information (Exc));
+      Log_To_Stdout (Ada.Exceptions.Exception_Information (Exc));
    end Log_To_Stdout;
 
 
-   procedure Log (Msg : in String)
+   procedure Info (Msg : in String)
    renames Log_To_Stdout;
 
-   procedure Log (Exc : in Ada.Exceptions.Exception_Occurrence)
+   procedure Error (Msg : in String)
    renames Log_To_Stdout;
 
-end REST.Error_Log;
+   procedure Error (Exc : in Ada.Exceptions.Exception_Occurrence)
+   renames Log_To_Stdout;
+
+end REST.Log;
 

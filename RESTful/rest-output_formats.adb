@@ -8,6 +8,8 @@ with Ada.Unchecked_Deallocation;
 
 with DB.Types.Keys;
 
+with REST.Log;
+
 package body REST.Output_Formats is
 
    task body Populator_Type
@@ -119,6 +121,7 @@ package body REST.Output_Formats is
 
    procedure Close (Resource : in out Stream_Type) is
    begin
+      Log.Info ("Closing stream");
       abort Resource.Populator;
       Queues.Mark_Final (Resource.Queue);
       if Resource.Free_On_Close then
