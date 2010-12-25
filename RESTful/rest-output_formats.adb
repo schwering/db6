@@ -51,7 +51,7 @@ package body REST.Output_Formats is
                null;
             end select;
             exit when Cancelled;
-            exit when N_Objects > Max_Objects;
+            exit when N_Objects >= Max_Objects;
             exit when Queues.Is_Final (Stream.Queue);
 
             Stream.Cursor.Next (Key, Value, State);
@@ -70,6 +70,7 @@ package body REST.Output_Formats is
             elsif Last_Key.Row /= Key.Row then
                Stream.End_Object;
                N_Objects := N_Objects + 1;
+               exit when N_Objects >= Max_Objects;
                Stream.Start_Object (DB.Maps.Row_To_String (Key.Row));
             end if;
 
