@@ -29,11 +29,10 @@ package body REST.Output_Formats is
          Max_Objects := Max_Objs;
       end Initialize;
 
-      Stream.Start_Anonymous_Array;
+      Stream.Start_Anonymous_Object;
 
       loop
          <<Next_Iteration>>
-         Log.Info ("Next in cursor");
          declare
             use type DB.Maps.Keys.Rows.String_Type;
             use type DB.Maps.Keys.Columns.String_Type;
@@ -46,7 +45,7 @@ package body REST.Output_Formats is
                accept Stop do
                   Log.Info ("Cancelling thread");
                   Cancelled := True;
-                  requeue Stop;
+                  requeue Stop; -- for final Stop
                end Stop;
             else
                null;
@@ -63,7 +62,7 @@ package body REST.Output_Formats is
                Last_Key.Column = Key.Column
             then
                -- We only take the most up-to-date version of each key.
-               null;--goto Next_Iteration;
+               goto Next_Iteration;
             end if;
 
             if not Last_Initialized then
@@ -71,7 +70,6 @@ package body REST.Output_Formats is
             elsif Last_Key.Row /= Key.Row then
                Stream.End_Object;
                N_Objects := N_Objects + 1;
-               Log.Info ("Completed object "& N_Objects'Img);
                Stream.Start_Object (DB.Maps.Row_To_String (Key.Row));
             end if;
 
@@ -88,10 +86,9 @@ package body REST.Output_Formats is
          Stream.End_Object;
       end if;
 
-      Stream.End_Array;
+      Stream.End_Object;
       Queues.Mark_Final (Stream.Queue);
 
-      Log.Info ("Stopping thread");
       accept Stop;
 
    exception

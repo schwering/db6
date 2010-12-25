@@ -8,9 +8,10 @@
 with Ada.Streams;
 
 generic
-   type Float_Type is digits <>;
+   type P_Float_Type is digits <>;
 package DB.Maps.Values.Gen_Floats is
 
+   subtype Float_Type is P_Float_Type;
    type Value_Type is new Maps.Value_Type with private;
 
    overriding

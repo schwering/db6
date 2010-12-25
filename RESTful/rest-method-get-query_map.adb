@@ -12,7 +12,6 @@ with AWS.URL;
 
 with REST.Output_Formats;
 with REST.Output_Formats.JSON;
---with REST.Output_Formats.BSON;
 with REST.Maps;
 with REST.Path_Parsers;
 
@@ -40,7 +39,7 @@ is
    Count_S  : constant String := AWS.URL.Parameter (URL, Count_Param);
    Count    : constant Positive := Count_String_To_Positive (Count_S);
    Rev      : constant Boolean := AWS.URL.Parameter (URL, Reverse_Param) = "1";
-   Incl     : constant Boolean := AWS.URL.Parameter (URL, Incl_Param) = "1";
+   Incl     : constant Boolean := AWS.URL.Parameter (URL, Excl_Param) /= "1";
 begin
    if Map_Name = "" then
       Success := False;

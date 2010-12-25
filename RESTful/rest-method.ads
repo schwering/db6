@@ -11,7 +11,10 @@ package REST.Method is
    From_Param    : constant String := "q";
    Count_Param   : constant String := "n";
    Reverse_Param : constant String := "rev";
-   Incl_Param    : constant String := "incl";
+   Excl_Param    : constant String := "excl";
+   Row_Param     : constant String := "row";
+   Column_Param  : constant String := "col";
+   Value_Param   : constant String := "val";
 
    function Make_Key
      (Key : String;

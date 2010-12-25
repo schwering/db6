@@ -4,6 +4,9 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Characters.Handling;
+
+with DB.Maps.Values.Booleans;
 with DB.Maps.Values.Strings;
 
 package body REST.Output_Formats.JSON is
@@ -33,7 +36,7 @@ package body REST.Output_Formats.JSON is
 
 
    procedure Indent (Resource : in out Stream_Type) is
-      Whitespace : constant String (1 .. Resource.Indent + 1) :=
+      Whitespace : constant String (1 .. Resource.Indent * 3 + 1) :=
         (1 => ASCII.LF, others => ' ');
    begin
       Emit (Resource, Whitespace);
@@ -132,6 +135,8 @@ package body REST.Output_Formats.JSON is
          Emit (Resource, """");
          Emit (Resource, Value.Image);
          Emit (Resource, """");
+      elsif Value in DB.Maps.Values.Booleans.Value_Type'Class then
+         Emit (Resource, Ada.Characters.Handling.To_Lower (Value.Image));
       else
          Emit (Resource, Value.Image);
       end if;

@@ -8,9 +8,10 @@
 with Ada.Streams;
 
 generic
-   type Integer_Type is (<>);
+   type P_Integer_Type is (<>);
 package DB.Maps.Values.Gen_Integers is
 
+   subtype Integer_Type is P_Integer_Type;
    type Value_Type is new Maps.Value_Type with private;
 
    overriding

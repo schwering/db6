@@ -7,6 +7,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with AWS.Messages;
 with AWS.Status;
 with AWS.Response;
 
@@ -57,7 +58,8 @@ begin
 
    Log.Error ("No handler found");
    return AWS.Response.Build
-     (Content_Type => "text/html",
-      Message_Body => "<p>No handler in REST.Method.Get found</p>");
+     (Status_Code  => AWS.Messages.S500,
+      Content_Type => "text/plain",
+      Message_Body => "No handler in REST.Method.Get found");
 end REST.Method.Get;
 
