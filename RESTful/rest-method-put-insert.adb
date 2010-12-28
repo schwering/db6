@@ -20,7 +20,7 @@ with DB.Maps.Values.Strings;
 with REST.Maps;
 with REST.Path_Parsers;
 
-separate (REST.Method.Post)
+separate (REST.Method.Put)
 procedure Insert
    (Request  : in  AWS.Status.Data;
     Response : out AWS.Response.Data;
