@@ -15,11 +15,11 @@ with REST.Log;
 
 function REST.Method.Post (Request : AWS.Status.Data) return AWS.Response.Data
 is
-   procedure Query_Map
+   procedure Insert
      (Request  : in  AWS.Status.Data;
       Response : out AWS.Response.Data;
       Success  : out Boolean);
-   procedure Query_Map
+   procedure Insert
       (Request  : in  AWS.Status.Data;
        Response : out AWS.Response.Data;
        Success  : out Boolean)
@@ -41,7 +41,7 @@ is
        Success  : out Boolean);
 
    Handlers : constant array (Positive range <>) of Handler_Type :=
-     (Query_Map'Access,
+     (Insert'Access,
       Debug'Access);
 begin
    for I in Handlers'Range loop

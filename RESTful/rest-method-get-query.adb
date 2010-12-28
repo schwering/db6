@@ -16,7 +16,7 @@ with REST.Maps;
 with REST.Path_Parsers;
 
 separate (REST.Method.Get)
-procedure Query_Map
+procedure Query
    (Request  : in  AWS.Status.Data;
     Response : out AWS.Response.Data;
     Success  : out Boolean)
@@ -57,18 +57,13 @@ begin
       function Lower_Bound return DB.Maps.Bound_Type is
       begin
          if From = "" then
-            Log.Info ("UB: > neg infty");
             return DB.Maps.Negative_Infinity_Bound;
          else
             case From_Incl is
                when False =>
-                  Log.Info ("LB: > "& From);
-                  return DB.Maps.New_Bound
-                    (DB.Maps.Greater, From_Key);
+                  return DB.Maps.New_Bound (DB.Maps.Greater, From_Key);
                when True =>
-                  Log.Info ("LB: >= "& From);
-                  return DB.Maps.New_Bound
-                    (DB.Maps.Greater_Or_Equal, From_Key);
+                  return DB.Maps.New_Bound (DB.Maps.Greater_Or_Equal, From_Key);
             end case;
          end if;
       end Lower_Bound;
@@ -76,18 +71,13 @@ begin
       function Upper_Bound return DB.Maps.Bound_Type is
       begin
          if To = "" then
-            Log.Info ("UB: < pos infty");
             return DB.Maps.Positive_Infinity_Bound;
          else
             case To_Incl is
                when False =>
-                  Log.Info ("UB: < "& To);
-                  return DB.Maps.New_Bound
-                    (DB.Maps.Less, To_Key);
+                  return DB.Maps.New_Bound (DB.Maps.Less, To_Key);
                when True =>
-                  Log.Info ("UB: <= "& To);
-                  return DB.Maps.New_Bound
-                    (DB.Maps.Less_Or_Equal, To_Key);
+                  return DB.Maps.New_Bound (DB.Maps.Less_Or_Equal, To_Key);
             end case;
          end if;
       end Upper_Bound;
@@ -100,7 +90,6 @@ begin
       Stream : constant Output_Formats.Stream_Ref_Type :=
         new Output_Formats.JSON.Stream_Type;
    begin
-      Log.Info ("Max_Objects: <= "& Count'Img);
       Output_Formats.Initialize_Stream
         (Stream, Cursor, Free_On_Close => True, Max_Objects => Count);
       Response := AWS.Response.Stream
@@ -109,5 +98,5 @@ begin
          Server_Close => True);
       Success := True;
    end;
-end Query_Map;
+end Query;
 
