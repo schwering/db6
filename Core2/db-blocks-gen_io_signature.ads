@@ -108,6 +108,14 @@ generic
    -- (relative to the history), the higher is the probability that the block
    -- will be read in near future again.
 
+   with procedure Try_Lock
+     (File    : in out File_Type;
+      Address : in     Valid_Address_Type;
+      Timeout : in     Duration := 0.0;
+      Success :    out Boolean);
+   -- Tries to lock the block at the given Address in Timeout seconds. Blocks
+   -- until the lock is available or Timeout seconds have elapsed.
+
    with procedure Lock
      (File    : in out File_Type;
       Address : in     Valid_Address_Type);

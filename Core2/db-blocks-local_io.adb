@@ -158,9 +158,10 @@ package body DB.Blocks.Local_IO is
    procedure Try_Lock
      (File    : in out File_Type;
       Address : in     Valid_Address_Type;
+      Timeout : in     Duration := 0.0;
       Success :    out Boolean) is
    begin
-      Mutex_Sets.Try_Lock (File.Mutex_Set, Address, Success);
+      Mutex_Sets.Try_Lock (File.Mutex_Set, Address, Timeout, Success);
    end Try_Lock;
 
 

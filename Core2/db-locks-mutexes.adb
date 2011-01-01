@@ -15,9 +15,20 @@ package body DB.Locks.Mutexes is
 
    procedure Try_Lock
      (M       : in out Mutex_Type;
+      Timeout : in     Duration := 0.0;
       Success :    out Boolean) is
    begin
-      M.Try_Lock (Success);
+      if Timeout = 0.0 then
+         M.Try_Lock (Success);
+      else
+         select
+            M.Lock;
+            Success := True;
+         or
+            delay Timeout;
+            Success := False;
+         end select;
+      end if;
    end Try_Lock;
 
 

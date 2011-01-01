@@ -38,6 +38,7 @@ package DB.Locks.Gen_Mutex_Sets is
    procedure Try_Lock
      (MS      : in out Mutex_Set_Type;
       Item    : in     Item_Type;
+      Timeout : in     Duration := 0.0;
       Success :    out Boolean);
 
    procedure Unlock

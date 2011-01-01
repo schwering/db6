@@ -30,7 +30,7 @@ package body <PKG>.Test is
       pragma Unreferenced (T);
    begin
       null;
-   end TEST_XYZ;
+   end Test_XYZ;
 
 end <PKG>.Test;
 

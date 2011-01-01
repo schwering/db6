@@ -33,6 +33,16 @@ package body DB.Blocks.Memory_IO is
          return Block;
       end Read;
 
+      procedure Try_Lock (Success : out Boolean) is
+      begin
+         if Locked then
+            Success := False;
+         else
+            Locked  := True;
+            Success := True;
+         end if;
+      end Try_Lock;
+
       entry Lock when not Locked is
       begin
          Locked := True;
@@ -239,6 +249,26 @@ package body DB.Blocks.Memory_IO is
          Locks.Mutexes.Unlock (File.Mutex);
          raise;
    end Write_New_Block;
+
+
+   procedure Try_Lock
+     (File    : in out File_Type;
+      Address : in     Valid_Address_Type;
+      Timeout : in     Duration := 0.0;
+      Success :    out Boolean) is
+   begin
+      if Timeout = 0.0 then
+         File.Buffer (Address).Try_Lock (Success);
+      else
+         select
+            File.Buffer (Address).Lock;
+            Success := True;
+         or
+            delay Timeout;
+            Success := False;
+         end select;
+      end if;
+   end Try_Lock;
 
 
    procedure Lock (File : in out File_Type; Address : in Valid_Address_Type) is

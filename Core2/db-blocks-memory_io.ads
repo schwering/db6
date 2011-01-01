@@ -56,6 +56,12 @@ package DB.Blocks.Memory_IO is
       Block          : in     Block_Type;
       Cache_Priority : in     Natural := Natural'First);
 
+   procedure Try_Lock
+     (File    : in out File_Type;
+      Address : in     Valid_Address_Type;
+      Timeout : in     Duration := 0.0;
+      Success :    out Boolean);
+
    procedure Lock (File : in out File_Type; Address : in Valid_Address_Type);
 
    procedure Unlock (File : in out File_Type; Address : in Valid_Address_Type);
@@ -82,6 +88,7 @@ package DB.Blocks.Memory_IO is
       Read                       => Read,
       Write                      => Write,
       Write_New_Block            => Write_New_Block,
+      Try_Lock                   => Try_Lock,
       Lock                       => Lock,
       Unlock                     => Unlock);
 
@@ -93,6 +100,7 @@ private
    protected type Item_Type is
       procedure Write (Block : in Blocks.Block_Type);
       function Read return Blocks.Block_Type;
+      procedure Try_Lock (Success : out Boolean);
       entry Lock;
       procedure Unlock;
       function Is_Locked return Boolean;

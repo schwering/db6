@@ -14,6 +14,7 @@ package DB.Locks.Mutexes is
 
    procedure Try_Lock
      (M       : in out Mutex_Type;
+      Timeout : in     Duration := 0.0;
       Success :    out Boolean);
 
    procedure Unlock

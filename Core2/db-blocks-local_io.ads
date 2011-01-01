@@ -76,6 +76,7 @@ package DB.Blocks.Local_IO is
    procedure Try_Lock
      (File    : in out File_Type;
       Address : in     Valid_Address_Type;
+      Timeout : in     Duration := 0.0;
       Success :    out Boolean);
 
    procedure Lock
@@ -112,6 +113,7 @@ package DB.Blocks.Local_IO is
       Read                       => Read,
       Write                      => Write,
       Write_New_Block            => Write_New_Block,
+      Try_Lock                   => Try_Lock,
       Lock                       => Lock,
       Unlock                     => Unlock);
 
