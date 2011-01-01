@@ -2,7 +2,7 @@
 --
 -- see spec
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Tags;
 with Ada.Tags.Generic_Dispatching_Constructor;

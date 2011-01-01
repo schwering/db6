@@ -18,7 +18,7 @@
 -- Reset call. Reset's job is to set the Remove flag to False again and it is
 -- called in the Unlock entry, i.e. before anyone can enter Wait_Lock.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 private with Ada.Containers.Ordered_Sets;
 

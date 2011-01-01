@@ -17,7 +17,7 @@
 -- [Knuth] The Art of Computer Programming: Searching and Sorting (vol 3)
 -- (for uniform binary search: pp. 414-415)
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 package DB.DSA.Utils.Binary_Search is
    pragma Pure;

@@ -3,7 +3,7 @@
 -- Maps implementation using normal Gen_BTrees with Types.Keys and
 -- Types.Values.Covering.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 private with DB.Utils.Gen_Binary_Heaps;
 private with DB.Utils.Regular_Expressions;

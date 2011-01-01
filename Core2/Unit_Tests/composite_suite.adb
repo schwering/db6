@@ -2,7 +2,7 @@
 --
 -- The composition of all test suites.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.Maps.Bounded.Test.Suite;
 with DB.Maps.Covering.Test.Suite;

@@ -3,7 +3,7 @@
 -- Float and enumeration value implementation.
 -- It uses the formal parameter's 'Read and 'Write attributes.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Streams;
 

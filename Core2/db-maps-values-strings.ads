@@ -4,7 +4,7 @@
 -- It String'Read and String'Write attributes.
 -- The length is stored as 2 byte integer.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Streams;
 

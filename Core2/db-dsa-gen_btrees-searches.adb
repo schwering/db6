@@ -23,7 +23,7 @@
 -- is no node that contains the parameter Key. This implies that the minimum
 -- greater key lies in a node right from the current node if it even exists.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
 package body Searches is

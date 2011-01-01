@@ -2,7 +2,7 @@
 --
 -- see spec
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Unchecked_Deallocation;
 with Ada.Exceptions; use Ada.Exceptions;

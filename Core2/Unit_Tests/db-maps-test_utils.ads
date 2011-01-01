@@ -2,7 +2,7 @@
 --
 -- Test utilities.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 package DB.Maps.Test_Utils is
 

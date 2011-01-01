@@ -3,7 +3,7 @@
 -- Calculates statistics of a BTree.
 -- The keys are: Count, Degree, Size, Waste.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 generic
 package DB.DSA.Gen_BTrees.Gen_Stats is

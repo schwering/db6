@@ -2,7 +2,7 @@
 --
 -- Some utility functions for dynamically growing arrays.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 package DB.Utils.Growing_Arrays is
    pragma Pure;

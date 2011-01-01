@@ -2,7 +2,7 @@
 --
 -- Root package of miscellaneous utilities.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.Utils;
 

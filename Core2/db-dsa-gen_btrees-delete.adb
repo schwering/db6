@@ -42,7 +42,7 @@
 -- "the greatest key ever stored in the node". But this would waste pretty much
 -- space.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
 procedure Delete

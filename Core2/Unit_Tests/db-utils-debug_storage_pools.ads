@@ -2,7 +2,7 @@
 --
 -- Storage pool that just forwards to DB.Utils.Global_Pool.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with System;
 with System.Storage_Pools;

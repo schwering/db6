@@ -32,7 +32,7 @@
 --    type.
 -- 3. Forgot it. Is there even a third approach?
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Finalization;
 with Ada.Streams;

@@ -2,7 +2,7 @@
 --
 -- Runs the main test suite.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with AUnit.Run;
 with AUnit.Reporter.Text;

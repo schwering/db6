@@ -6,7 +6,7 @@
 --
 -- The core is the separate Gen_Map_Reduce.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Unchecked_Deallocation;
 

@@ -2,7 +2,7 @@
 --
 -- Base package for strings of a generic type.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 generic
    type Item_Type is (<>);

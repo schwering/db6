@@ -7,7 +7,7 @@
 -- See db-blocks-low_level_io-c.c for C wrapper functions. Most calls are
 -- directly system calls.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 package DB.Blocks.Low_Level_IO is
    pragma Preelaborate;

@@ -2,7 +2,7 @@
 --
 -- Main memory IO implementation.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.Blocks.Gen_IO_Signature;
 private with DB.Locks.Mutexes;

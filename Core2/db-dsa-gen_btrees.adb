@@ -2,7 +2,7 @@
 --
 -- see spec
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.DSA.Utils.Gen_Stacks;
 with DB.Utils.Global_Pool;
@@ -174,10 +174,6 @@ package body DB.DSA.Gen_BTrees is
       procedure Count
         (Tree  : in out Tree_Type;
          Count :    out Count_Type);
-
-      procedure Reorganize
-        (Tree  : in out Tree_Type;
-         State :    out State_Type);
    end Misc;
 
 
@@ -441,10 +437,11 @@ package body DB.DSA.Gen_BTrees is
       Count :    out Count_Type)
    renames Misc.Count;
 
+
    procedure Reorganize
      (Tree  : in out Tree_Type;
       State :    out State_Type)
-   renames Misc.Reorganize;
+   is separate;
 
 
    package body Nodes is separate;

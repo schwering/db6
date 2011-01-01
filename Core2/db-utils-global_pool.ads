@@ -3,7 +3,7 @@
 -- Just provides a simple way to access the global pool object:
 -- DB.Utils.Global_Pool.Global_Storage_Pool
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with System.Storage_Pools;
 

@@ -14,7 +14,7 @@
 -- Since the insertion heavily relies on the nested Stacks package, check its
 -- documentation for information about locking etc.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
 procedure Insert

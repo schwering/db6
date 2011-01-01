@@ -2,7 +2,7 @@
 --
 -- Bounded size Storage_Pools.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with System.Pool_Global;
 with System.Storage_Elements;

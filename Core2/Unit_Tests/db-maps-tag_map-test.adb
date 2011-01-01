@@ -7,7 +7,7 @@
 -- Set_Up and Tear_Down store/restore the state of the tag map before the test
 -- ran.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Tags; use Ada.Tags;
 with Ada.Exceptions; use Ada.Exceptions;

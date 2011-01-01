@@ -5,7 +5,7 @@
 -- response. If no handler wants to handle the request, an error is logged and a
 -- short error response is performed.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with AWS.Messages;
 with AWS.Status;
@@ -20,6 +20,16 @@ is
       Response : out AWS.Response.Data;
       Success  : out Boolean);
    procedure Query
+      (Request  : in  AWS.Status.Data;
+       Response : out AWS.Response.Data;
+       Success  : out Boolean)
+   is separate;
+
+   procedure Range_Query
+     (Request  : in  AWS.Status.Data;
+      Response : out AWS.Response.Data;
+      Success  : out Boolean);
+   procedure Range_Query
       (Request  : in  AWS.Status.Data;
        Response : out AWS.Response.Data;
        Success  : out Boolean)
@@ -42,6 +52,7 @@ is
 
    Handlers : constant array (Positive range <>) of Handler_Type :=
      (Query'Access,
+      Range_Query'Access,
       Debug'Access);
 begin
    for I in Handlers'Range loop

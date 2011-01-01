@@ -2,7 +2,7 @@
 --
 -- Binary heap test fixture.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with AUnit.Test_Caller;
 with AUnit.Test_Fixtures;

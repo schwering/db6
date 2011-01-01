@@ -2,7 +2,7 @@
 --
 -- Creates simple comparison functions based on a Compare function.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 generic
    type Item_Type (<>) is limited private;

@@ -2,7 +2,7 @@
 --
 -- see spec
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
 package body Initialization is

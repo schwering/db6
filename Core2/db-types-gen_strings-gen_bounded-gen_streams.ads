@@ -4,7 +4,7 @@
 -- Note that the stream must not live longer than the string that it writes to
 -- and reads from.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Streams;
 

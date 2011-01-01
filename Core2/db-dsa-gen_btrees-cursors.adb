@@ -22,7 +22,7 @@
 -- which has been the right neighbor before the split. It thereby might skip
 -- some new entries, but the order would be consistent.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
 package body Cursors is

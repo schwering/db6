@@ -18,7 +18,7 @@
 -- DB.Utils              -- Data structures that are rather trivial and other
 --                          helpers.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 package DB is
    pragma Pure;

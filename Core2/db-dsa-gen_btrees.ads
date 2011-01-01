@@ -51,7 +51,7 @@
 -- debugging mode: Tree_Error for tree inconsitencies etc., and other exceptions
 -- depending on the generic actual parameters, usually IO_Error.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.Blocks;
 with DB.Blocks.Gen_IO_Signature;

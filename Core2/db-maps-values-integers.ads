@@ -2,7 +2,7 @@
 --
 -- Normal integer (usually 32bit) value implementation.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.Maps.Values.Gen_Integers;
 

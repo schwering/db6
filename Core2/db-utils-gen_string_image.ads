@@ -2,7 +2,7 @@
 --
 -- Image (to-string) function any kinds of strings that does not type-checking.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 generic
    type Object_Type is limited private;

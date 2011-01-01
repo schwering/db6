@@ -2,7 +2,7 @@
 --
 -- Key type. A key consists of a row, a column and a timestamp.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.Blocks;
 with DB.Blocks.Gen_Keys_Signature;

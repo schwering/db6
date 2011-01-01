@@ -3,7 +3,7 @@
 -- Maps implementation using normal Gen_BTrees with Types.Keys and
 -- Maps.Values.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.Blocks;
 private with DB.DSA.Gen_BTrees;

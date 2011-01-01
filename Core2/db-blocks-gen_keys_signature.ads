@@ -9,7 +9,7 @@
 -- that this allows for types Key_Type and Value_Type instead of some ugly
 -- generic Object_Type or so.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.Utils;
 

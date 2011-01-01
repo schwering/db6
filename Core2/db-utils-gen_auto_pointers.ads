@@ -2,7 +2,7 @@
 --
 -- A automatically copying and deallocating pointer wrapper.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 private with Ada.Finalization;
 

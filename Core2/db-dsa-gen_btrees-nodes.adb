@@ -12,7 +12,7 @@
 -- doesn't, it has no high key. Otherwise, the high key is the (temporally) last
 -- key contained in the node.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with DB.DSA.Utils.Binary_Search;
 

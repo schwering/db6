@@ -5,7 +5,7 @@
 -- response. If no handler wants to handle the request, an error is logged and a
 -- short error response is performed.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with AWS.Messages;
 with AWS.Status;

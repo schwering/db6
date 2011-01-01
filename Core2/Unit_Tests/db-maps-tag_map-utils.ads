@@ -10,7 +10,7 @@
 --    ...
 --  * restore(S2)    <----   S2's memory has been freed
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 package DB.Maps.Tag_Map.Utils is
 

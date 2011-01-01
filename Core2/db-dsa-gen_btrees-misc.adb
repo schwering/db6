@@ -2,7 +2,7 @@
 --
 -- see spec
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
 package body Misc is
@@ -65,14 +65,6 @@ package body Misc is
 --         end;
 --      end loop;
 --   end Count;
-
-
-   procedure Reorganize
-     (Tree  : in out Tree_Type;
-      State :    out State_Type) is
-   begin
-      null;
-   end Reorganize;
 
 end Misc;
 

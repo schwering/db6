@@ -6,7 +6,7 @@
 --
 -- See db-utils-timers-c.c for C functions.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 package DB.Utils.Timers is
    pragma Elaborate_Body;

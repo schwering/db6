@@ -2,7 +2,7 @@
 --
 -- A generic thread-safe (protected) fixed-size queue.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 generic
    Queue_Size : in Positive;

@@ -88,7 +88,7 @@
 -- * XXX Expect exceptions from Lock/Unlock or not? Or only from Lock but not
 --   Unlock? Or success-parameter? Very difficult.
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 separate (DB.DSA.Gen_BTrees)
 package body Stacks is

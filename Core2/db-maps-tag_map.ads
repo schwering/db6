@@ -4,7 +4,7 @@
 -- tags when the considered set of tags is limited.
 -- The assigned Tid (type identifier) to a tag depends on 
 --
--- Copyright 2008, 2009, 2010 Christoph Schwering
+-- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Tags;
 
