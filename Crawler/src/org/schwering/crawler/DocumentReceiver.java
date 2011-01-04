@@ -28,7 +28,7 @@ class DocumentReceiver {
 		}
 		URLConnection conn;
 		try {
-			conn = url.getURL().openConnection();
+			conn = url.getURI().toURL().openConnection();
 		} catch (IOException exc) {
 			throw new DocumentConnectionException(exc);
 		}

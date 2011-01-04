@@ -43,7 +43,7 @@ class DocumentParser {
 		for (String link : links) {
 			try {
 				DocumentUrl newUrl;
-				if (DocumentUrl.isURL(link)) {
+				if (DocumentUrl.isURI(link)) {
 					newUrl = new DocumentUrl(link);
 				} else {
 					newUrl = new DocumentUrl(doc.getURL(), link);

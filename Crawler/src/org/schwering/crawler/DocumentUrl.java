@@ -1,6 +1,7 @@
 package org.schwering.crawler;
 
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,21 +19,25 @@ public class DocumentUrl {
 	private String host;
 	private String file;
 	private String[] domainLevels;
-	private URL url;
+	private URI uri;
 	
 	public DocumentUrl(String url) throws DocumentUrlException {
-		this(toURL(url));
+		this(toURI(url));
 	}
 	
 	public DocumentUrl(URL url) throws DocumentUrlException {
-		this(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
+		this(toURI(url));
+	}
+	
+	public DocumentUrl(URI uri) throws DocumentUrlException {
+		this(uri.getScheme(), uri.getHost(), uri.getPort(), uri.getPath());
 	}
 	
 	public DocumentUrl(DocumentUrl docUrl, String toFile) throws DocumentUrlException {
-		this(docUrl.getURL().getProtocol(), 
-				docUrl.getURL().getHost(), 
-				docUrl.getURL().getPort(), 
-				navigate(docUrl.getURL().getFile(), toFile));
+		this(docUrl.getURI().getScheme(), 
+				docUrl.getURI().getHost(), 
+				docUrl.getURI().getPort(), 
+				navigate(docUrl.getURI().getPath(), toFile));
 	}
 	
 	private DocumentUrl(String protocol, String host, int port, String file) 
@@ -49,8 +54,9 @@ public class DocumentUrl {
 		}
 		
 		try {
-			this.url = new URL(getProtocol(), getHost(), getPort(), getFile());
-		} catch (MalformedURLException exc) {
+			this.uri = new URI(getProtocol() +"://"+ getHost() +":"+ getPort() +
+                                        "/"+ getFile());
+		} catch (URISyntaxException exc) {
 			throw new DocumentUrlException(exc);
 		}
 	}
@@ -90,20 +96,20 @@ public class DocumentUrl {
 		return file;
 	}
 	
-	public URL getURL() {
-		return url;
+	public URI getURI() {
+		return uri;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return obj != null && 
 			obj instanceof DocumentUrl && 
-			url.equals(((DocumentUrl)obj).getURL());
+			uri.equals(((DocumentUrl)obj).getURI());
 	}
 
 	@Override
 	public int hashCode() {
-		return url.hashCode();
+		return uri.hashCode();
 	}
 
 	@Override
@@ -114,20 +120,28 @@ public class DocumentUrl {
 			":"+ getFile();
 	}
 	
-	public static boolean isURL(String url) {
+	public static boolean isURI(String uri) {
 		try {
-			toURL(url);
+			toURI(uri);
 			return true;
 		} catch (DocumentUrlException exc) {
 			return false;
 		}
 	}
 
-	private static URL toURL(String url) throws DocumentUrlException {
+	private static URI toURI(String uri) throws DocumentUrlException {
 		try {
-			return new URL(url);
-		} catch (MalformedURLException exc) {
-			throw new DocumentUrlException(url);
+			return new URI(uri);
+		} catch (URISyntaxException exc) {
+			throw new DocumentUrlException(uri);
+		}
+	}
+	
+	private static URI toURI(URL uri) throws DocumentUrlException {
+		try {
+			return uri.toURI();
+		} catch (URISyntaxException exc) {
+			throw new DocumentUrlException(exc);
 		}
 	}
 	
