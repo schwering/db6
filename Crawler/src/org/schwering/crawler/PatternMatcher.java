@@ -10,17 +10,17 @@ import java.util.regex.Pattern;
 public class PatternMatcher {
 	private final Set<String> allowed = new HashSet<String>();
 	private final List<Pattern> patterns = new LinkedList<Pattern>();
-	
+
 	public PatternMatcher(String regex) {
 		addPattern(regex);
 	}
-	
+
 	public PatternMatcher(Collection<String> regexes) {
 		for (String regex : regexes) {
 			addPattern(regex);
 		}
 	}
-	
+
 	public void addPattern(String regex) {
 		if (!allowed.contains(regex)) {
 			Pattern p = Pattern.compile(regex);
@@ -28,7 +28,7 @@ public class PatternMatcher {
 			patterns.add(p);
 		}
 	}
-	
+
 	public boolean matches(String str) {
 		for (Pattern p : patterns) {
 			if (p.matcher(str).matches()) {

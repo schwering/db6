@@ -6,15 +6,15 @@ public class DocumentException extends Exception {
 	public DocumentException() {
 		super();
 	}
-	
+
 	public DocumentException(String msg) {
 		super(msg);
 	}
-	
+
 	public DocumentException(Throwable t) {
 		super(t);
 	}
-	
+
 	public DocumentException(String msg, Throwable t) {
 		super(msg +" ("+ t.getMessage() +")", t);
 	}

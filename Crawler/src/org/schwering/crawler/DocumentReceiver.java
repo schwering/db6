@@ -6,22 +6,22 @@ import java.net.ContentHandler;
 import java.net.URLConnection;
 
 class DocumentReceiver {
-	private static final PatternMatcher ACCEPTED_CONTENT_TYPE_PATTERN = 
+	private static final PatternMatcher ACCEPTED_CONTENT_TYPE_PATTERN =
 		new PatternMatcher("text/.*");
-	
+
 	static {
-		ContentHandlerFactory fac = 
+		ContentHandlerFactory fac =
 			new ContentHandlerFactory(ACCEPTED_CONTENT_TYPE_PATTERN);
 		URLConnection.setContentHandlerFactory(fac);
 	}
-	
+
 	private DocumentUrl url;
 	private String content;
-	
+
 	public DocumentReceiver(String url) throws DocumentException {
 		this(new DocumentUrl(url));
 	}
-	
+
 	public DocumentReceiver(DocumentUrl url) throws DocumentException {
 		if (url == null) {
 			throw new DocumentUrlException();
@@ -38,7 +38,7 @@ class DocumentReceiver {
 		conn.setRequestProperty("User-Agent", Crawler.USER_AGENT);
 		String contentType = getContentType(conn);
 		if (!ACCEPTED_CONTENT_TYPE_PATTERN.matches(contentType)) {
-			throw new DocumentException("URL "+ url +" invalid content type "+ 
+			throw new DocumentException("URL "+ url +" invalid content type "+
 					contentType);
 		}
 		Object content;
@@ -53,18 +53,18 @@ class DocumentReceiver {
 		this.url = new DocumentUrl(conn.getURL());
 		this.content = (String)content;
 	}
-	
+
 	public DocumentUrl getURL() {
 		return url;
 	}
-	
+
 	public String getContent() {
 		return content;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj != null && obj instanceof DocumentReceiver ? 
+		return obj != null && obj instanceof DocumentReceiver ?
 				((DocumentReceiver)obj).url.equals(url) : false;
 	}
 
@@ -72,7 +72,7 @@ class DocumentReceiver {
 	public int hashCode() {
 		return url.hashCode();
 	}
-	
+
 	private static String getContentType(URLConnection conn) {
 		String contentType = conn.getContentType();
 		if (contentType == null) {
@@ -85,8 +85,8 @@ class DocumentReceiver {
 			return contentType;
 		}
 	}
-	
-	private static class ContentHandlerFactory 
+
+	private static class ContentHandlerFactory
 	implements java.net.ContentHandlerFactory {
 		private static class TextContentHandler extends ContentHandler {
 			@Override
@@ -101,16 +101,16 @@ class DocumentReceiver {
 				return sb.toString();
 			}
 		}
-		
+
 		private static final ContentHandler HANDLER_INSTANCE =
 			new TextContentHandler();
-		
+
 		private PatternMatcher contentTypePatterns;
 
 		private ContentHandlerFactory(PatternMatcher contentTypePatterns) {
 			this.contentTypePatterns = contentTypePatterns;
 		}
-		
+
 		@Override
 		public ContentHandler createContentHandler(String contentType) {
 			if (contentType != null && contentTypePatterns.matches(contentType)) {

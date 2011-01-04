@@ -46,14 +46,14 @@ public class Main {
 //		"http://de.wikipedia.org/wiki/Y",
 //		"http://de.wikipedia.org/wiki/Z",
 	};
-	
+
 	private int count = 0;
-	
+
 	public static void main(String[] args) {
 		BasicConfigurator.configure();
 		new Main();
 	}
-	
+
 	private Main() {
 		Collection<DocumentUrl> rootUrls = new LinkedList<DocumentUrl>();
 		for (int i = 0; i < rootStrings.length; i++) {
@@ -65,20 +65,20 @@ public class Main {
 				return;
 			}
 		}
-		
+
 		Crawler crawler = new Crawler(rootUrls);
-		
+
 		UrlFilter fileTypeFilter = new UrlGuessedContentTypeFilter(new PatternMatcher("text/.*"));
 //		URLFilter hostPatternFilter = new URLHostPatternFilter(new PatternMatcher("schwering.ath.cx"));
 //		URLFilter hostPatternFilter = new URLHostPatternFilter(new PatternMatcher("de.wikipedia.org"));
 //		URLFilter filePatternFilter = new URLFilePatternFilter(new PatternMatcher("(/wiki/.*)|"));
 		UrlFilter historyFilter = new UrlHistoryFilter(crawler);
 		UrlFilter filter = new UrlFilterConjunction(new UrlFilter[] {
-//				hostPatternFilter, 
+//				hostPatternFilter,
 //				filePatternFilter,
-				fileTypeFilter, 
+				fileTypeFilter,
 				historyFilter });
-		
+
 		CrawlerListener listener = new CrawlerListener() {
 			public void found(DocumentUrl url) {
 				Thread t = Thread.currentThread();
@@ -88,10 +88,10 @@ public class Main {
 					count++;
 				}
 			}
-			
+
 			public void followed(DocumentUrl url, Collection<DocumentUrl> links) {
 			}
-			
+
 			public void finished() {
 				System.out.println("Finished, could start a new crawler.");
 			}
@@ -102,7 +102,7 @@ public class Main {
 		crawler.start();
 		supervise();
 	}
-	
+
 	private void supervise() {
 		final int SLEEP_TIME = 10;
 		for (int i = 0; i < 3*60*60/SLEEP_TIME; i++){

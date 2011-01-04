@@ -6,11 +6,11 @@ package org.schwering.crawler;
 public class UrlHostCountFilter implements UrlFilter {
 //	private final Set<String> hosts = new HashSet<String>();
 //	private final int limit;
-	
+
 	public UrlHostCountFilter(int limit) {
 //		this.limit = limit;
 	}
-	
+
 	@Override
 	public boolean accept(DocumentUrl url) {
 //		String host = url.getHost();

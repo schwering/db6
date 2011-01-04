@@ -6,15 +6,15 @@ public class DocumentUrlException extends DocumentException {
 	public DocumentUrlException() {
 		super();
 	}
-	
+
 	public DocumentUrlException(String msg) {
 		super(msg);
 	}
-	
+
 	public DocumentUrlException(Throwable t) {
 		super(t);
 	}
-	
+
 	public DocumentUrlException(String msg, Throwable t) {
 		super(msg, t);
 	}

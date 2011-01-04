@@ -6,7 +6,7 @@ public class UrlFilterConjunction implements UrlFilter {
 	public UrlFilterConjunction(UrlFilter f1, UrlFilter f2) {
 		filters = new UrlFilter[] { f1, f2 };
 	}
-	
+
 	public UrlFilterConjunction(UrlFilter[] filters) {
 		this.filters = filters;
 	}
