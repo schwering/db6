@@ -93,8 +93,14 @@ package body DB.Maps.Covering is
       procedure Create (ID : in String; File : in out File_Type);
       procedure Open (ID : in String; File : in out File_Type);
       procedure Close (File : in out File_Type);
-      procedure Write (File : in out File_Type; Config_Head : in Node_Ref_Type);
-      procedure Read (File : in out File_Type; Config_Head : out Node_Ref_Type);
+      procedure Write
+        (File             : in out File_Type;
+         Allow_Duplicates : in     Boolean;
+         Config_Head      : in     Node_Ref_Type);
+      procedure Read
+        (File             : in out File_Type;
+         Allow_Duplicates :    out Boolean;
+         Config_Head      :    out Node_Ref_Type);
 
    private
       package ASCII_IO is new Blocks.Gen_ASCII_Layer
@@ -156,33 +162,17 @@ package body DB.Maps.Covering is
       end Write;
 
 
-      procedure Write (File : in out File_Type; N : in Natural)
+      procedure Write
+        (File             : in out File_Type;
+         Allow_Duplicates : in     Boolean;
+         Config_Head      : in     Node_Ref_Type)
       is
-         S : constant String := Natural'Image (N);
-      begin
-         Write (File, S (S'First + 1 .. S'Last));
-      end Write;
-
-
-      procedure Write (File : in out File_Type; Config_Head : in Node_Ref_Type)
-      is
-         function Length return Natural
-         is
-            N   : Node_Ref_Type := Config_Head;
-            Len : Natural := 0;
-         begin
-            while N /= null loop
-               Len := Len + 1;
-               N   := N.Next;
-            end loop;
-            return Len;
-         end Length;
-
          N : Node_Ref_Type := Config_Head;
       begin
-         Write (File, "<table count=""");
-         Write (File, Length);
-         Write (File, """>");
+         Write (File, "<table ");
+         Write (File, "allow_duplicates=""" &
+                      Boolean'Image (Allow_Duplicates) &
+                      """>");
          while N /= null loop
             Write (File, "<slice ");
             Write (File, "guard="""& N.Guard &""" ");
@@ -195,7 +185,10 @@ package body DB.Maps.Covering is
       end Write;
 
 
-      procedure Read (File : in out File_Type; Config_Head : out Node_Ref_Type)
+      procedure Read
+        (File             : in out File_Type;
+         Allow_Duplicates :    out Boolean;
+         Config_Head      :    out Node_Ref_Type)
       is
          type String_Ref_Type is access String;
 
@@ -220,7 +213,20 @@ package body DB.Maps.Covering is
             pragma Unreferenced (Namespace_URI);
             pragma Unreferenced (Local_Name);
          begin
-            if QName = "slice" then
+            if QName = "table" then
+               for I in 0 .. Sax.Attributes.Get_Length (Atts) - 1 loop
+                  declare
+                     K : constant String := Sax.Attributes.Get_QName (Atts, I);
+                     V : constant String := Sax.Attributes.Get_Value (Atts, I);
+                  begin
+                     if K = "allow_duplicates" then
+                        Allow_Duplicates := Boolean'Value (V);
+                     else
+                        raise IO_Error;
+                     end if;
+                  end;
+               end loop;
+            elsif QName = "slice" then
                for I in 0 .. Sax.Attributes.Get_Length (Atts) - 1 loop
                   declare
                      P : constant Node_Ref_Type := Handler.Current;
@@ -392,7 +398,7 @@ package body DB.Maps.Covering is
       XML_File : XML.File_Type;
    begin
       XML.Create (ID, XML_File);
-      XML.Write (XML_File, Map.Config);
+      XML.Write (XML_File, Map.Allow_Duplicates, Map.Config);
       XML.Close (XML_File);
       Init_Map (Map);
    end Create;
@@ -428,7 +434,7 @@ package body DB.Maps.Covering is
       XML_File : XML.File_Type;
    begin
       XML.Open (ID, XML_File);
-      XML.Read (XML_File, Map.Config);
+      XML.Read (XML_File, Map.Allow_Duplicates, Map.Config);
       XML.Close (XML_File);
       Init_Map (Map);
    exception
