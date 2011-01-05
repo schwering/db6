@@ -6,15 +6,15 @@ public class DocumentConnectionException extends DocumentException {
 	public DocumentConnectionException() {
 		super();
 	}
-	
+
 	public DocumentConnectionException(String msg) {
 		super(msg);
 	}
-	
+
 	public DocumentConnectionException(Throwable t) {
 		super(t);
 	}
-	
+
 	public DocumentConnectionException(String msg, Throwable t) {
 		super(msg, t);
 	}

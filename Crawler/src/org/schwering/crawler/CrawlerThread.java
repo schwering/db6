@@ -9,14 +9,14 @@ class CrawlerThread extends Thread {
 	private final UrlQueue queue;
 	private UrlFilter filter;
 	private CrawlerThreadListener listener;
-	
-	public CrawlerThread(UrlQueue queue, UrlFilter filter, 
+
+	public CrawlerThread(UrlQueue queue, UrlFilter filter,
 			CrawlerThreadListener listener) {
 		this.queue = queue;
 		this.filter = filter;
 		this.listener = listener;
 	}
-	
+
 	public void run() {
 		logger.debug("Thread started.");
 		DocumentUrl url;
@@ -46,11 +46,11 @@ class CrawlerThread extends Thread {
 		}
 		logger.error("Thread terminated.");
 	}
-	
+
 	public void setFilter(UrlFilter filter) {
 		this.filter = filter;
 	}
-	
+
 	public void setListener(CrawlerThreadListener listener) {
 		this.listener = listener;
 	}

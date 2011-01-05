@@ -11,12 +11,12 @@ public class UrlHistoryFilter implements UrlFilter {
 	private static class Counter {
 		int cnt = 0;
 	}
-	
-	private final Set<DocumentUrl> set = 
+
+	private final Set<DocumentUrl> set =
 		Collections.synchronizedSet(new HashSet<DocumentUrl>());
-	private final Map<DocumentUrl, Counter> map = 
+	private final Map<DocumentUrl, Counter> map =
 		Collections.synchronizedMap(new HashMap<DocumentUrl, Counter>());
-	
+
 	public UrlHistoryFilter(Crawler crawler) {
 		crawler.addListener(new CrawlerListener() {
 			@Override
@@ -24,7 +24,7 @@ public class UrlHistoryFilter implements UrlFilter {
 			}
 
 			@Override
-			public void followed(DocumentUrl url, 
+			public void followed(DocumentUrl url,
 					Collection<DocumentUrl> links) {
 			}
 
@@ -34,11 +34,11 @@ public class UrlHistoryFilter implements UrlFilter {
 			}
 		});
 	}
-	
+
 	public Set<DocumentUrl> getHistory() {
 		return Collections.unmodifiableSet(set);
 	}
-	
+
 	@Override
 	public boolean accept(DocumentUrl url) {
 		if (set.contains(url)) {

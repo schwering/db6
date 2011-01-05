@@ -1,6 +1,7 @@
 package org.schwering.crawler;
 
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,57 +9,62 @@ import java.util.Map;
 public class DocumentUrl {
 	private static final Map<String, Integer> protocolToPort =
 		new HashMap<String, Integer>();
-		
+
 	static {
 		protocolToPort.put("http", 80);
 	}
-	
+
 	private String protocol;
 	private int port;
 	private String host;
 	private String file;
 	private String[] domainLevels;
-	private URL url;
-	
+	private URI uri;
+
 	public DocumentUrl(String url) throws DocumentUrlException {
-		this(toURL(url));
+		this(toURI(url));
 	}
-	
+
 	public DocumentUrl(URL url) throws DocumentUrlException {
-		this(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
+		this(toURI(url));
 	}
-	
+
+	public DocumentUrl(URI uri) throws DocumentUrlException {
+		this(uri.getScheme(), uri.getHost(), uri.getPort(), uri.getPath());
+	}
+
 	public DocumentUrl(DocumentUrl docUrl, String toFile) throws DocumentUrlException {
-		this(docUrl.getURL().getProtocol(), 
-				docUrl.getURL().getHost(), 
-				docUrl.getURL().getPort(), 
-				navigate(docUrl.getURL().getFile(), toFile));
+		this(docUrl.getURI().getScheme(),
+				docUrl.getURI().getHost(),
+				docUrl.getURI().getPort(),
+				navigate(docUrl.getURI().getPath(), toFile));
 	}
-	
-	private DocumentUrl(String protocol, String host, int port, String file) 
+
+	private DocumentUrl(String protocol, String host, int port, String file)
 	throws DocumentUrlException {
 		this.protocol = normalizeProtocol(protocol);
 		this.port = port != -1 ? port : protocolToPort.get(getProtocol());
 		this.host = normalizeHost(host);
 		this.file = normalizeFile(file);
-		
+
 		String[] hostTokens = getHost().split("\\.");
 		this.domainLevels = new String[hostTokens.length];
 		for (int i = 0; i < hostTokens.length; i++) {
 			this.domainLevels[i] = hostTokens[hostTokens.length - 1 - i];
 		}
-		
+
 		try {
-			this.url = new URL(getProtocol(), getHost(), getPort(), getFile());
-		} catch (MalformedURLException exc) {
+			this.uri = new URI(getProtocol() +"://"+ getHost() +":"+ getPort() +
+                                        "/"+ getFile());
+		} catch (URISyntaxException exc) {
 			throw new DocumentUrlException(exc);
 		}
 	}
-	
+
 	public int getDomainLevel() {
 		return domainLevels.length;
 	}
-	
+
 	public String getDomainId(int n) {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 1; i <= n; i++) {
@@ -69,41 +75,41 @@ public class DocumentUrl {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getDomainId() {
 		return getDomainId(getDomainLevel());
 	}
-	
+
 	public String getProtocol() {
 		return protocol;
 	}
-	
+
 	public int getPort() {
 		return port;
 	}
-	
+
 	public String getHost() {
 		return host;
 	}
-	
+
 	public String getFile() {
 		return file;
 	}
-	
-	public URL getURL() {
-		return url;
+
+	public URI getURI() {
+		return uri;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		return obj != null && 
-			obj instanceof DocumentUrl && 
-			url.equals(((DocumentUrl)obj).getURL());
+		return obj != null &&
+			obj instanceof DocumentUrl &&
+			uri.equals(((DocumentUrl)obj).getURI());
 	}
 
 	@Override
 	public int hashCode() {
-		return url.hashCode();
+		return uri.hashCode();
 	}
 
 	@Override
@@ -113,24 +119,32 @@ public class DocumentUrl {
 			":"+ getPort() +
 			":"+ getFile();
 	}
-	
-	public static boolean isURL(String url) {
+
+	public static boolean isURI(String uri) {
 		try {
-			toURL(url);
+			toURI(uri);
 			return true;
 		} catch (DocumentUrlException exc) {
 			return false;
 		}
 	}
 
-	private static URL toURL(String url) throws DocumentUrlException {
+	private static URI toURI(String uri) throws DocumentUrlException {
 		try {
-			return new URL(url);
-		} catch (MalformedURLException exc) {
-			throw new DocumentUrlException(url);
+			return new URI(uri);
+		} catch (URISyntaxException exc) {
+			throw new DocumentUrlException(uri);
 		}
 	}
-	
+
+	private static URI toURI(URL uri) throws DocumentUrlException {
+		try {
+			return uri.toURI();
+		} catch (URISyntaxException exc) {
+			throw new DocumentUrlException(exc);
+		}
+	}
+
 	private static String getParent(String path) {
 		if (path.length() == 0 || path.equals("/")) {
 			return "/";
@@ -145,7 +159,7 @@ public class DocumentUrl {
 			return path.substring(0, i+1);
 		}
 	}
-	
+
 	private static String navigate(String base, String app) {
 		if (app.startsWith("/")) {
 			return app;
@@ -155,20 +169,20 @@ public class DocumentUrl {
 			return getParent(base) + app;
 		}
 	}
-	
+
 	private static String normalizeProtocol(String protocol) {
 		return protocol.toLowerCase();
 	}
-	
+
 	private static String normalizeHost(String host) {
 		return host.toLowerCase();
 	}
-	
+
 	private static String normalizeFile(String file) {
 		if (file == null || file.length() == 0) {
 			return "/";
 		}
-		
+
 		String params = "";
 		int i;
 		if ((i = file.indexOf('?')) != -1) {
@@ -192,7 +206,7 @@ public class DocumentUrl {
 				file = file.substring(0, i) + file.substring(i+2);
 			}
 		}
-		
+
 		return file + params;
 	}
 }

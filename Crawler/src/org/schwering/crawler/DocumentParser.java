@@ -9,7 +9,7 @@ class DocumentParser {
 	throws DocumentException {
 		return extractLinks(new DocumentReceiver(url));
 	}
-	
+
 	static final Collection<DocumentUrl> extractLinks(DocumentReceiver doc) {
 		String content = doc.getContent();
 		Set<String> links = new HashSet<String>();
@@ -25,7 +25,7 @@ class DocumentParser {
 					to = content.indexOf('\'', from);
 				} else {
 					from += 5;
-					to = min(content.indexOf(' ', from), 
+					to = min(content.indexOf(' ', from),
 							content.indexOf('>', from));
 				}
 				if (to == -1) {
@@ -38,12 +38,12 @@ class DocumentParser {
 		} catch (IndexOutOfBoundsException exc) {
 			// nothing, might come from invalid documents
 		}
-		
+
 		Set<DocumentUrl> urls = new HashSet<DocumentUrl>();
 		for (String link : links) {
 			try {
 				DocumentUrl newUrl;
-				if (DocumentUrl.isURL(link)) {
+				if (DocumentUrl.isURI(link)) {
 					newUrl = new DocumentUrl(link);
 				} else {
 					newUrl = new DocumentUrl(doc.getURL(), link);
@@ -55,7 +55,7 @@ class DocumentParser {
 		}
 		return urls;
 	}
-	
+
 	private static int min(int i, int j) {
 		return (i < j && i >= 0) ? i : j;
 	}
