@@ -224,6 +224,17 @@ package body DB.DSA.Gen_BTrees is
    end Write_New_Node;
 
 
+   procedure Try_Lock
+     (Tree    : in out Tree_Type;
+      N_A     : in     Nodes.Valid_Address_Type;
+      Timeout : in     Duration := 0.0;
+      Success :    out Boolean) is
+   begin
+      Block_IO.Try_Lock (Tree.File, Block_IO.Valid_Address_Type (N_A),
+                         Timeout, Success);
+   end Try_Lock;
+
+
    procedure Lock
      (Tree : in out Tree_Type;
       N_A  : in     Nodes.Valid_Address_Type) is
