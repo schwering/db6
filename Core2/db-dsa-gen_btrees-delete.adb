@@ -106,6 +106,10 @@ begin
          State := Failure;
          return;
       end if;
+   exception
+      when others =>
+         Unlock (Tree, N_A);
+         raise;
    end;
 
    Stacks.Finalize (Stack);

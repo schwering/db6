@@ -16,6 +16,8 @@ package Tree.Gen_Simple_Jobs is
    Stop_Now : exception;
 
    procedure Insert;
+   procedure Replace;
+   procedure Append;
    procedure Delete;
    procedure Search;
    procedure Antisearch;
@@ -30,6 +32,8 @@ private
    type Short_Job_Type is not null access procedure;
 
    Insert_Access     : Short_Job_Type := Insert'Access;
+   Replace_Access    : Short_Job_Type := Replace'Access;
+   Append_Access     : Short_Job_Type := Append'Access;
    Delete_Access     : Short_Job_Type := Delete'Access;
    Search_Access     : Short_Job_Type := Search'Access;
    Antisearch_Access : Short_Job_Type := Antisearch'Access;
@@ -42,6 +46,8 @@ private
 
    Job_Map : constant Jobs.Map_Type
            := ((Jobs.To_Description("Insert"),     Convert(Insert_Access)),
+               (Jobs.To_Description("Replace"),    Convert(Replace_Access)),
+               (Jobs.To_Description("Append"),     Convert(Append_Access)),
                (Jobs.To_Description("Delete"),     Convert(Delete_Access)),
                (Jobs.To_Description("Search"),     Convert(Search_Access)),
                (Jobs.To_Description("Antisearch"), Convert(Antisearch_Access)),

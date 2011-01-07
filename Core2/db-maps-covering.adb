@@ -611,11 +611,12 @@ package body DB.Maps.Covering is
 
 
    procedure Insert
-     (Map              : in out Map_Type;
-      Key              : in     Key_Type;
-      Value            : in     Value_Type'Class;
-      Allow_Duplicates : in     Boolean;
-      State            :    out State_Type)
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type)
    is
       C       : constant String := Col_Image (Key);
       Matched : Boolean := False;
@@ -624,7 +625,7 @@ package body DB.Maps.Covering is
       for I in Map.Slices'Range loop
          if Matches (C, Map.Slices (I).Guard) then
             Matched := True;
-            Map.Slices (I).Map.Insert (Key, Value, Allow_Duplicates, State);
+            Map.Slices (I).Map.Insert (Key, Value, Existed, Old_Value, State);
             exit when State /= Success;
          end if;
       end loop;
@@ -632,6 +633,77 @@ package body DB.Maps.Covering is
          raise Map_Error;
       end if;
    end Insert;
+
+
+   procedure Replace
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type)
+   is
+      C       : constant String := Col_Image (Key);
+      Matched : Boolean := False;
+   begin
+      State := Failure;
+      for I in Map.Slices'Range loop
+         if Matches (C, Map.Slices (I).Guard) then
+            Matched := True;
+            Map.Slices (I).Map.Replace (Key, Value, State);
+            exit when State /= Success;
+         end if;
+      end loop;
+      if not Matched then
+         raise Map_Error;
+      end if;
+   end Replace;
+
+
+   procedure Replace
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type)
+   is
+      C       : constant String := Col_Image (Key);
+      Matched : Boolean := False;
+   begin
+      State := Failure;
+      for I in Map.Slices'Range loop
+         if Matches (C, Map.Slices (I).Guard) then
+            Matched := True;
+            Map.Slices (I).Map.Replace (Key, Value, Existed, Old_Value, State);
+            exit when State /= Success;
+         end if;
+      end loop;
+      if not Matched then
+         raise Map_Error;
+      end if;
+   end Replace;
+
+
+   procedure Append
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type)
+   is
+      C       : constant String := Col_Image (Key);
+      Matched : Boolean := False;
+   begin
+      State := Failure;
+      for I in Map.Slices'Range loop
+         if Matches (C, Map.Slices (I).Guard) then
+            Matched := True;
+            Map.Slices (I).Map.Append (Key, Value, State);
+            exit when State /= Success;
+         end if;
+      end loop;
+      if not Matched then
+         raise Map_Error;
+      end if;
+   end Append;
 
 
    procedure Delete

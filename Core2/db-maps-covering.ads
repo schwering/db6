@@ -86,11 +86,35 @@ package DB.Maps.Covering is
 
    overriding
    procedure Insert
-     (Map              : in out Map_Type;
-      Key              : in     Key_Type;
-      Value            : in     Value_Type'Class;
-      Allow_Duplicates : in     Boolean;
-      State            :    out State_Type);
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type);
+
+   overriding
+   procedure Replace
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type);
+
+   overriding
+   procedure Replace
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type);
+
+   overriding
+   procedure Append
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type);
 
    overriding
    procedure Delete

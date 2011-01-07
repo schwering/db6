@@ -103,7 +103,6 @@ package DB.DSA.Map_Reduce is
       with package Intermediate_Keys is new Blocks.Gen_Keys_Signature (<>);
       with package Intermediate_Values is new Blocks.Gen_Values_Signature (<>);
       with package Intermediate_Block_IO is new Blocks.Gen_IO_Signature (<>);
-      Allow_Intermediate_Duplicates : in Boolean := True;
 
       with procedure Map
         (Key   : in     In_Key_Type;

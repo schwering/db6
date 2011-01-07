@@ -132,18 +132,35 @@ package body DB.Maps.Covering.Test is
    end;
 
 
-   procedure Inserts
-     (Map : in out Maps.Map_Type'Class;
-      Allow_Duplicates : in Boolean)
+   procedure Inserts (Map : in out Maps.Map_Type'Class)
    is
       S : State_Type;
    begin
       for I in 1 .. Loop_Count loop
-         Map.Insert (New_Key (I), New_Value (I), Allow_Duplicates, S);
+         Map.Insert (New_Key (I), New_Value (I), S);
          Assert (S = Success, "Insertion failed: "&
                               Types.Keys.Image (New_Key (I)) &"  /  "&
-                              New_Value (I).Image &" (duplicates allowed = "&
-                              Allow_Duplicates'Img &")");
+                              New_Value (I).Image);
+         declare
+            V : Values.Integers.Value_Type;
+         begin
+            Map.Search (New_Key (I), V, S);
+            Assert (S = Success, Types.Keys.Image (New_Key (I)) &" is not in "&
+                                 "the map");
+         end;
+      end loop;
+   end;
+
+
+   procedure Appends (Map : in out Maps.Map_Type'Class)
+   is
+      S : State_Type;
+   begin
+      for I in 1 .. Loop_Count loop
+         Map.Append (New_Key (I), New_Value (I), S);
+         Assert (S = Success, "Append failed: "&
+                              Types.Keys.Image (New_Key (I)) &"  /  "&
+                              New_Value (I).Image);
          declare
             V : Values.Integers.Value_Type;
          begin
@@ -160,8 +177,7 @@ package body DB.Maps.Covering.Test is
       S : State_Type;
    begin
       for I in 1 .. Loop_Count loop
-         Map.Insert
-           (New_Key (I), New_Value (I), Allow_Duplicates => False, State => S);
+         Map.Insert (New_Key (I), New_Value (I), S);
          Assert (S = Failure, "Duplicate insertion successful: "&
                               Types.Keys.Image (New_Key (I)) &"  /  "&
                               New_Value (I).Image);
@@ -233,7 +249,7 @@ package body DB.Maps.Covering.Test is
                                      " slices instead of 5");
       Assert (Map.Cover'Length = 5, "Cover has size "& Map.Cover'Length'Img &
                                     " instead of 5");
-      Inserts (Map, Allow_Duplicates => False);
+      Inserts (Map);
       Anti_Inserts (Map);
       Searches (Map);
       Finalize (Map);
@@ -256,7 +272,7 @@ package body DB.Maps.Covering.Test is
                                      " slices instead of 5");
       Assert (Map.Cover'Length = 5, "Cover has size "& Map.Cover'Length'Img &
                                     " instead of 5");
-      Inserts (Map, Allow_Duplicates => True);
+      Appends (Map);
       Searches (Map);
       Deletes (Map, Anti_Search => False);
       Searches (Map);
@@ -446,12 +462,12 @@ package body DB.Maps.Covering.Test is
    begin
       Configure_Map (Map);
       Create (Map, Meta_File_Name);
-      Inserts (Map, Allow_Duplicates => True);
+      Appends (Map);
       Single_Cursor_Pause;
       Single_Cursor_Delete;
       Empty;
-      Inserts (Map, Allow_Duplicates => True);
-      Inserts (Map, Allow_Duplicates => True);
+      Appends (Map);
+      Appends (Map);
       Double_Cursor;
       Half_Cursor_Delete (Even => True);
       Half_Cursor_Delete (Even => False);

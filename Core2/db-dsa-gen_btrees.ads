@@ -24,7 +24,7 @@
 -- writing, not both operation types. A context object handed to a
 -- Read/Write_Key/Value is either initialized with its default values or has
 -- been modified by a previous Read/Write_Key/Value call.
--- Since entries E_1 .. E_N are written in a strictly sequentially, it is
+-- Since entries E_1 .. E_N are written strictly sequentially, it is
 -- guaranteed that the write operation of E_1 is performed with a new context
 -- object and the following N - 1 write operations are with the same object.
 -- As a consequence, a trivial choice for Key/Values.Read/Write_Context_Types
@@ -64,7 +64,6 @@ generic
    with package Keys is new Blocks.Gen_Keys_Signature (<>);
    with package Values is new Blocks.Gen_Values_Signature (<>);
    with package Block_IO is new Blocks.Gen_IO_Signature (<>);
-   Default_Allow_Duplicates : in Boolean := False;
 package DB.DSA.Gen_BTrees is
    pragma Preelaborate;
 
@@ -132,17 +131,54 @@ package DB.DSA.Gen_BTrees is
       Key   : in     Keys.Key_Type;
       Value : in     Values.Value_Type;
       State :    out State_Type);
-   -- Synonym for Insert (Tree, Key, Value, Default_Allow_Duplicates, State).
-   -- (A default argument for Allow_Duplicates doesn't work well.)
+   -- Inserts a new Key / Value pair into the Tree. If there already is Key
+   -- contained in Tree, it does not modify Tree and sets State = Failure.
+   -- This procedure might block because of Block_IO.Lock until the lock becomes
+   -- available.
 
    procedure Insert
-     (Tree             : in out Tree_Type;
-      Key              : in     Keys.Key_Type;
-      Value            : in     Values.Value_Type;
-      Allow_Duplicates : in     Boolean;
-      State            :    out State_Type);
-   -- Inserts a Key / Value pair or sets State = Failure if such a key already
-   -- exists.
+     (Tree      : in out Tree_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
+      Existed   :    out Boolean;
+      Old_Value :    out Values.Value_Type;
+      State     :    out State_Type);
+   -- Inserts a new Key / Value pair into the Tree. If there already is Key
+   -- contained in Tree, it does not modify Tree, sets Old_Value to the
+   -- respective value and sets State = Failure.
+   -- This procedure might block because of Block_IO.Lock until the lock becomes
+   -- available.
+
+   procedure Replace
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
+      State :    out State_Type);
+   -- Inserts a new Key / Value pair into the Tree. If Key is already contained
+   -- in Tree, its associated value is replaced with Value.
+   -- This procedure might block because of Block_IO.Lock until the lock becomes
+   -- available.
+
+   procedure Replace
+     (Tree      : in out Tree_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
+      Existed   :    out Boolean;
+      Old_Value :    out Values.Value_Type;
+      State     :    out State_Type);
+   -- Inserts a new Key / Value pair into the Tree. If Key is already contained
+   -- in Tree, its associated value is replaced with Value.
+   -- This procedure might block because of Block_IO.Lock until the lock becomes
+   -- available.
+
+   procedure Append
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
+      State :    out State_Type);
+   -- Inserts a new Key / Value pair into the Tree. If Key is already contained
+   -- in Tree, these old Key / value pairs will coexist with the new Key / Value
+   -- pair.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
    -- available.
 
@@ -154,7 +190,7 @@ package DB.DSA.Gen_BTrees is
    -- Deletes the Key / Value pair or sets State = Failure if no such key
    -- exists.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
-   -- availble.
+   -- available.
 
 
    ----------
@@ -465,7 +501,7 @@ private
          Key   : Keys.Key_Type;
          Value : Values.Value_Type)
          return RW_Node_Type;
-      -- Returns the node that results from the substitution of (Key, Value) at
+      -- Returns the node that results from the insertion of (Key, Value) at
       -- position Index. This function is defined for leaves.
 
       function Substitution
@@ -483,7 +519,7 @@ private
          Key   : Keys.Key_Type;
          Value : Values.Value_Type)
          return RW_Node_Type;
-      -- Returns the node that results from the insertion of (Key, Value) at
+      -- Returns the node that results from the substitution of (Key, Value) at
       -- position Index. This function is defined for leaves.
 
       function Deletion

@@ -218,11 +218,35 @@ package DB.Maps is
    is abstract;
 
    procedure Insert
-     (Map              : in out Map_Type;
-      Key              : in     Key_Type;
-      Value            : in     Value_Type'Class;
-      Allow_Duplicates : in     Boolean;
-      State            :    out State_Type)
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type)
+   is abstract;
+
+   procedure Replace
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type)
+   is abstract;
+
+   procedure Replace
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type)
+   is abstract;
+
+   procedure Append
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type)
    is abstract;
 
    procedure Delete

@@ -135,26 +135,75 @@ package body DB.Maps.Bounded is
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
       Value : in     Value_Type'Class;
-      State :    out State_Type) is
+      State :    out State_Type)
+   is
+      VW : constant Value_Wrapper_Type := New_Value_Wrapper (Value);
+      S  : BTrees.State_Type;
    begin
-      Insert (Map, Key, Value, Map.Allow_Duplicates, State);
+      BTrees.Insert (Map.Tree, Key, VW, S);
+      State := To_State (S);
    end Insert;
 
 
    procedure Insert
-     (Map              : in out Map_Type;
-      Key              : in     Key_Type;
-      Value            : in     Value_Type'Class;
-      Allow_Duplicates : in     Boolean;
-      State            :    out State_Type)
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type)
    is
-      S             : BTrees.State_Type;
-      Value_Wrapper : constant Value_Wrapper_Type :=
-         New_Value_Wrapper (Value);
+      VW : constant Value_Wrapper_Type := New_Value_Wrapper (Value);
+      S  : BTrees.State_Type;
    begin
-      BTrees.Insert (Map.Tree, Key, Value_Wrapper, Allow_Duplicates, S);
+      BTrees.Insert (Map.Tree, Key, VW, Existed, Old_Value, S);
       State := To_State (S);
    end Insert;
+
+
+   procedure Replace
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type)
+   is
+      VW : constant Value_Wrapper_Type := New_Value_Wrapper (Value);
+      S  : BTrees.State_Type;
+   begin
+      BTrees.Replace (Map.Tree, Key, VW, S);
+      State := To_State (S);
+   end Replace;
+
+
+   procedure Replace
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type)
+   is
+      VW : constant Value_Wrapper_Type := New_Value_Wrapper (Value);
+      S  : BTrees.State_Type;
+   begin
+      BTrees.Replace (Map.Tree, Key, VW, Existed, Old_Value, S);
+      State := To_State (S);
+   end Replace;
+
+
+   procedure Append
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type)
+   is
+      VW : constant Value_Wrapper_Type := New_Value_Wrapper (Value);
+      S  : BTrees.State_Type;
+   begin
+      BTrees.Append (Map.Tree, Key, VW, S);
+      State := To_State (S);
+   end Append;
+
 
 
    procedure Delete

@@ -86,11 +86,35 @@ package DB.Maps.Bounded is
 
    overriding
    procedure Insert
-     (Map              : in out Map_Type;
-      Key              : in     Key_Type;
-      Value            : in     Value_Type'Class;
-      Allow_Duplicates : in     Boolean;
-      State            :    out State_Type);
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type);
+
+   overriding
+   procedure Replace
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type);
+
+   overriding
+   procedure Replace
+     (Map       : in out Map_Type;
+      Key       : in     Key_Type;
+      Value     : in     Value_Type'Class;
+      Existed   :    out Boolean;
+      Old_Value :    out Value_Wrapper_Type;
+      State     :    out State_Type);
+
+   overriding
+   procedure Append
+     (Map   : in out Map_Type;
+      Key   : in     Key_Type;
+      Value : in     Value_Type'Class;
+      State :    out State_Type);
 
    overriding
    procedure Delete
@@ -166,10 +190,9 @@ private
    package Block_IO      renames Block_IO_Impl.IO_Signature;
 
    package BTrees is new DSA.Gen_BTrees
-     (Keys                     => Types.Keys.Keys_Signature,
-      Values                   => Abstract_Value_Serialization.Values_Signature,
-      Default_Allow_Duplicates => Default_Allow_Duplicates,
-      Block_IO                 => Block_IO);
+     (Keys     => Types.Keys.Keys_Signature,
+      Values   => Abstract_Value_Serialization.Values_Signature,
+      Block_IO => Block_IO);
 
    type Map_Ref_Type is access all Map_Type;
    pragma Controlled (Map_Ref_Type);

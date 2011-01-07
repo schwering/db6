@@ -34,10 +34,9 @@ package body DB.DSA.Map_Reduce is
       use Key_Comparisons;
 
       package Intermediate_BTrees is new Gen_BTrees
-        (Keys                     => Intermediate_Keys,
-         Values                   => Intermediate_Values,
-         Block_IO                 => Intermediate_Block_IO,
-         Default_Allow_Duplicates => Allow_Intermediate_Duplicates);
+        (Keys     => Intermediate_Keys,
+         Values   => Intermediate_Values,
+         Block_IO => Intermediate_Block_IO);
 
       type Cursor_Ref_Type is access Intermediate_BTrees.Cursor_Type;
       procedure Free is new Ada.Unchecked_Deallocation

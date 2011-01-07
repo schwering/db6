@@ -127,6 +127,43 @@ package body DB.DSA.Gen_BTrees is
    end Searches;
 
 
+   package Insertions is
+      procedure Insert
+        (Tree  : in out Tree_Type;
+         Key   : in     Keys.Key_Type;
+         Value : in     Values.Value_Type;
+         State :    out State_Type);
+
+      procedure Insert
+        (Tree      : in out Tree_Type;
+         Key       : in     Keys.Key_Type;
+         Value     : in     Values.Value_Type;
+         Existed   :    out Boolean;
+         Old_Value :    out Values.Value_Type;
+         State     :    out State_Type);
+
+      procedure Replace
+        (Tree  : in out Tree_Type;
+         Key   : in     Keys.Key_Type;
+         Value : in     Values.Value_Type;
+         State :    out State_Type);
+
+      procedure Replace
+        (Tree      : in out Tree_Type;
+         Key       : in     Keys.Key_Type;
+         Value     : in     Values.Value_Type;
+         Existed   :    out Boolean;
+         Old_Value :    out Values.Value_Type;
+         State     :    out State_Type);
+
+      procedure Append
+        (Tree  : in out Tree_Type;
+         Key   : in     Keys.Key_Type;
+         Value : in     Values.Value_Type;
+         State :    out State_Type);
+   end Insertions;
+
+
    package Cursors is
       function Positive_Infinity_Bound
          return Bound_Type;
@@ -364,19 +401,44 @@ package body DB.DSA.Gen_BTrees is
      (Tree  : in out Tree_Type;
       Key   : in     Keys.Key_Type;
       Value : in     Values.Value_Type;
-      State :    out State_Type) is
-   begin
-      Insert (Tree, Key, Value, Default_Allow_Duplicates, State);
-   end Insert;
+      State :    out State_Type)
+   renames Insertions.Insert;
 
 
    procedure Insert
-     (Tree             : in out Tree_Type;
-      Key              : in     Keys.Key_Type;
-      Value            : in     Values.Value_Type;
-      Allow_Duplicates : in     Boolean;
-      State            :    out State_Type)
-   is separate;
+     (Tree      : in out Tree_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
+      Existed   :    out Boolean;
+      Old_Value :    out Values.Value_Type;
+      State     :    out State_Type)
+   renames Insertions.Insert;
+
+
+   procedure Replace
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
+      State :    out State_Type)
+   renames Insertions.Replace;
+
+
+   procedure Replace
+     (Tree      : in out Tree_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
+      Existed   :    out Boolean;
+      Old_Value :    out Values.Value_Type;
+      State     :    out State_Type)
+   renames Insertions.Replace;
+
+
+   procedure Append
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
+      State :    out State_Type)
+   renames Insertions.Append;
 
 
    procedure Delete
@@ -459,6 +521,7 @@ package body DB.DSA.Gen_BTrees is
    package body Stacks is separate;
    package body Initialization is separate;
    package body Searches is separate;
+   package body Insertions is separate;
    package body Cursors is separate;
    package body Misc is separate;
 

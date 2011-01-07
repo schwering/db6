@@ -36,6 +36,60 @@ package body Tree.Gen_Simple_Jobs is
    end Insert;
 
 
+   procedure Replace
+   is
+      KV    : constant Key_Value_Type := Next_Entry;
+      State : DB.Maps.State_Type := DB.Maps.Success;
+   begin
+      Map.Replace(Types.Key(KV), Types.Value(KV), State);
+      if State /= DB.Maps.Success then
+         Put_Line("Replacement failed "& State'Img);
+         raise Stop_Now;
+      end if;
+      declare
+         Val   : DB.Maps.Value_Type'Class := Null_Value;
+         State : DB.Maps.State_Type := DB.Maps.Failure;
+      begin
+         Map.Search(Types.Key(KV), Val, State);
+         if State /= DB.Maps.Success or else
+            not Types.Value(KV).Equals(Val) then
+            Put_Line("Look up failed "& State'Img);
+            Put_Line("Key   = """& To_String(Types.Key(KV)) &"""");
+            Put_Line("Value = """& To_String(Types.Value(KV)) &"""");
+            Put_Line("Value = """& To_String(Val) &"""");
+            raise Stop_Now;
+         end if;
+      end;
+   end Replace;
+
+
+   procedure Append
+   is
+      KV    : constant Key_Value_Type := Next_Entry;
+      State : DB.Maps.State_Type := DB.Maps.Success;
+   begin
+      Map.Append(Types.Key(KV), Types.Value(KV), State);
+      if State /= DB.Maps.Success then
+         Put_Line("Append failed "& State'Img);
+         raise Stop_Now;
+      end if;
+      declare
+         Val   : DB.Maps.Value_Type'Class := Null_Value;
+         State : DB.Maps.State_Type := DB.Maps.Failure;
+      begin
+         Map.Search(Types.Key(KV), Val, State);
+         if State /= DB.Maps.Success or else
+            not Types.Value(KV).Equals(Val) then
+            Put_Line("Look up failed "& State'Img);
+            Put_Line("Key   = """& To_String(Types.Key(KV)) &"""");
+            Put_Line("Value = """& To_String(Types.Value(KV)) &"""");
+            Put_Line("Value = """& To_String(Val) &"""");
+            raise Stop_Now;
+         end if;
+      end;
+   end Append;
+
+
    procedure Delete
    is
       use type DB.Blocks.Size_Type;
