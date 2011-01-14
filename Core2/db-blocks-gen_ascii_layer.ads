@@ -2,8 +2,6 @@
 --
 -- Puts a sequential ASCII layer ontop of block file IO.
 --
--- TODO XXX Note still implement this one?
---
 -- Copyright 2008--2011 Christoph Schwering
 
 with DB.Blocks.Gen_IO_Signature;
