@@ -103,11 +103,6 @@ package DB.Maps is
    -- Value_Type subclass.
    -- It is required for the Ada.Tags.Generic_Dispatching_Constructor.
 
-   --procedure Finalize
-     --(Value : in out Value_Type)
-   --is abstract;
-   -- The Finalize is called whenever a value's life-cycle ends in the map.
-
    package Value_Wrappers is new Utils.Gen_Auto_Pointers
      (Value_Type'Class, Value_Ref_Type);
 
@@ -331,18 +326,31 @@ package DB.Maps is
    -- must satisfy: Key > Min, where Key is the tuple (Row, Col, Time).
 
    function New_Cursor
-     (Map         : Map_Type;
-      Thread_Safe : Boolean;
-      Lower_Bound : Bound_Type;
-      Upper_Bound : Bound_Type)
+     (Map           : Map_Type;
+      Thread_Safe   : Boolean;
+      Lower_Bound   : Bound_Type;
+      Upper_Bound   : Bound_Type;
+      Column_Regexp : String := "")
       return Cursor_Type'Class
    is abstract;
+   -- Creates a new cursor that iterates over the elements between Lower_Bound
+   -- and Upper_Bound.
+   -- If Thread_Safe is true, one can use the cursor from multiple tasks.
+   -- Column_Regexp can be used to give a hint which attributes are interesting;
+   -- the implementation does not have to iterate over elements whose key's
+   -- column doesn't match Column_Regexp; i.e. to ensure that some columns are
+   -- not sent to the user, you have to check the columns yourself. The
+   -- implementation may ignore Column_Regexp. An empty string means is a
+   -- shorthand for the regexp that accepts everything; i.e. all columns are
+   -- visited. For regular expression syntax and implementation, check out
+   -- DB.Utils.Regular_Expressions.
 
    function New_Cursor_Ref
-     (Map         : Map_Type;
-      Thread_Safe : Boolean;
-      Lower_Bound : Bound_Type;
-      Upper_Bound : Bound_Type)
+     (Map           : Map_Type;
+      Thread_Safe   : Boolean;
+      Lower_Bound   : Bound_Type;
+      Upper_Bound   : Bound_Type;
+      Column_Regexp : String := "")
       return Cursor_Ref_Type;
 
    procedure Set_Thread_Safety

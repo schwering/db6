@@ -69,24 +69,27 @@ package body DB.Maps is
 
 
    function New_Cursor_Ref
-     (Map         : Map_Type;
-      Thread_Safe : Boolean;
-      Lower_Bound : Bound_Type;
-      Upper_Bound : Bound_Type)
+     (Map           : Map_Type;
+      Thread_Safe   : Boolean;
+      Lower_Bound   : Bound_Type;
+      Upper_Bound   : Bound_Type;
+      Column_Regexp : String := "")
       return Cursor_Ref_Type
    is
       function New_Cursor_Ref_Fix
-        (Map         : Map_Type'Class;
-         Thread_Safe : Boolean;
-         Lower_Bound : Bound_Type;
-         Upper_Bound : Bound_Type)
+        (Map           : Map_Type'Class;
+         Thread_Safe   : Boolean;
+         Lower_Bound   : Bound_Type;
+         Upper_Bound   : Bound_Type;
+         Column_Regexp : String)
          return Cursor_Ref_Type is
       begin
          return new Cursor_Type'Class'(New_Cursor
-           (Map, Thread_Safe, Lower_Bound, Upper_Bound));
+           (Map, Thread_Safe, Lower_Bound, Upper_Bound, Column_Regexp));
       end New_Cursor_Ref_Fix;
    begin
-      return New_Cursor_Ref_Fix (Map, Thread_Safe, Lower_Bound, Upper_Bound);
+      return New_Cursor_Ref_Fix
+        (Map, Thread_Safe, Lower_Bound, Upper_Bound, Column_Regexp);
    end New_Cursor_Ref;
 
 

@@ -505,19 +505,7 @@ package body DB.Maps.Covering is
      (Col   : String;
       Guard : RE.Regexp_Type)
       return Boolean
-   is
-      pragma Inline (Matches);
-   begin
-      return RE.Match (Col, Guard);
-   end Matches;
-
-
-   function Col_Image (Key : Key_Type) return String
-   is
-      pragma Inline (Col_Image);
-   begin
-      return String (Types.Keys.Columns.To_Buffer (Key.Column));
-   end Col_Image;
+   renames RE.Match;
 
 
    overriding
@@ -526,7 +514,7 @@ package body DB.Maps.Covering is
       Key : Key_Type)
       return Boolean
    is
-      C : constant String := Col_Image (Key);
+      C : constant String := Column_To_String (Key.Column);
    begin
       for I in Map.Slices'Range loop
          if Matches (C, Map.Slices (I).Guard) then
@@ -543,7 +531,7 @@ package body DB.Maps.Covering is
       Value :    out Value_Wrapper_Type;
       State :    out State_Type)
    is
-      C : constant String := Col_Image (Key);
+      C : constant String := Column_To_String (Key.Column);
    begin
       for I in Map.Slices'Range loop
          if Matches (C, Map.Slices (I).Guard) then
@@ -593,7 +581,7 @@ package body DB.Maps.Covering is
       Value : in     Value_Type'Class;
       State :    out State_Type)
    is
-      C       : constant String := Col_Image (Key);
+      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -618,7 +606,7 @@ package body DB.Maps.Covering is
       Old_Value :    out Value_Wrapper_Type;
       State     :    out State_Type)
    is
-      C       : constant String := Col_Image (Key);
+      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -641,7 +629,7 @@ package body DB.Maps.Covering is
       Value : in     Value_Type'Class;
       State :    out State_Type)
    is
-      C       : constant String := Col_Image (Key);
+      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -666,7 +654,7 @@ package body DB.Maps.Covering is
       Old_Value :    out Value_Wrapper_Type;
       State     :    out State_Type)
    is
-      C       : constant String := Col_Image (Key);
+      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -689,7 +677,7 @@ package body DB.Maps.Covering is
       Value : in     Value_Type'Class;
       State :    out State_Type)
    is
-      C       : constant String := Col_Image (Key);
+      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -712,7 +700,7 @@ package body DB.Maps.Covering is
       Value :    out Value_Wrapper_Type;
       State :    out State_Type)
    is
-      C       : constant String := Col_Image (Key);
+      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -754,10 +742,12 @@ package body DB.Maps.Covering is
 
 
    function New_Cursor
-     (Map         : Map_Type;
-      Thread_Safe : Boolean;
-      Lower_Bound : Bound_Type;
-      Upper_Bound : Bound_Type)
+     (Map           : Map_Type;
+      Cover         : Cover_Type;
+      Thread_Safe   : Boolean;
+      Lower_Bound   : Bound_Type;
+      Upper_Bound   : Bound_Type;
+      Column_Regexp : String)
       return Maps.Cursor_Type'Class
    is
       pragma Precondition (Map.Initialized);
@@ -768,13 +758,14 @@ package body DB.Maps.Covering is
       Cursors : Base_Cursor_Ref_Array_Ref_Type := null;
       Heap    : Heap_Ref_Type                  := null;
    begin
-      Cursors := new Base_Cursor_Ref_Array_Type (1 .. Map.Cover'Length);
-      Heap    := new Heaps.Heap_Type'(Heaps.New_Heap (Map.Cover'Length));
-      for I in Map.Cover'Range loop
-         Cursors (Map.Cover (I)) := new Base_Cursor_Type'
-           (Map.Slices (Map.Cover (I)).Map.New_Cursor (Thread_Safe,
-                                                       Lower_Bound,
-                                                       Upper_Bound));
+      Cursors := new Base_Cursor_Ref_Array_Type (1 .. Cover'Length);
+      Heap    := new Heaps.Heap_Type'(Heaps.New_Heap (Cover'Length));
+      for I in Cover'Range loop
+         Cursors (Cover (I)) := new Base_Cursor_Type'
+           (Map.Slices (Cover (I)).Map.New_Cursor (Thread_Safe,
+                                                   Lower_Bound,
+                                                   Upper_Bound,
+                                                   Column_Regexp));
       end loop;
       return Cursor_Type'(Maps.Cursor_Type with
                           Initialized => True,
@@ -791,6 +782,30 @@ package body DB.Maps.Covering is
             Free_Heap (Heap);
          end if;
          raise;
+   end New_Cursor;
+
+
+   function New_Cursor
+     (Map           : Map_Type;
+      Thread_Safe   : Boolean;
+      Lower_Bound   : Bound_Type;
+      Upper_Bound   : Bound_Type;
+      Column_Regexp : String := "")
+      return Maps.Cursor_Type'Class is
+   begin
+      if Column_Regexp = "" then
+         return New_Cursor
+           (Map, Map.Cover.all, Thread_Safe, Lower_Bound, Upper_Bound,
+            Column_Regexp);
+      else
+         declare
+            C : constant Cover_Type :=
+              Cover (RE.Compile (Column_Regexp), Map.Slices.all);
+         begin
+            return New_Cursor
+              (Map, C, Thread_Safe, Lower_Bound, Upper_Bound, Column_Regexp);
+         end;
+      end if;
    end New_Cursor;
 
 

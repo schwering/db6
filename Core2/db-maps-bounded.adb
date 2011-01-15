@@ -220,13 +220,15 @@ package body DB.Maps.Bounded is
 
 
    function New_Cursor
-     (Map         : Map_Type;
-      Thread_Safe : Boolean;
-      Lower_Bound : Bound_Type;
-      Upper_Bound : Bound_Type)
+     (Map           : Map_Type;
+      Thread_Safe   : Boolean;
+      Lower_Bound   : Bound_Type;
+      Upper_Bound   : Bound_Type;
+      Column_Regexp : String := "")
       return Maps.Cursor_Type'Class
    is
       pragma Precondition (Map.Initialized);
+      pragma Unreferenced (Column_Regexp);
 
       function New_Bound
         (Comparison : Comparison_Type;
@@ -405,7 +407,6 @@ package body DB.Maps.Bounded is
    begin
       Stats.Make_Stats (Map.Tree, My_Emit'Access);
    end Stats;
-
 
 end DB.Maps.Bounded;
 

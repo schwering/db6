@@ -3,6 +3,8 @@
 -- Maps implementation using normal Gen_BTrees with Types.Keys and
 -- Maps.Values.
 --
+-- This implementation ignores Column_Regexp parameters.
+--
 -- Copyright 2008--2011 Christoph Schwering
 
 with DB.Blocks;
@@ -156,10 +158,11 @@ package DB.Maps.Bounded is
 
    overriding
    function New_Cursor
-     (Map         : Map_Type;
-      Thread_Safe : Boolean;
-      Lower_Bound : Bound_Type;
-      Upper_Bound : Bound_Type)
+     (Map           : Map_Type;
+      Thread_Safe   : Boolean;
+      Lower_Bound   : Bound_Type;
+      Upper_Bound   : Bound_Type;
+      Column_Regexp : String := "")
       return Maps.Cursor_Type'Class;
 
    overriding
