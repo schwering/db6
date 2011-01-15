@@ -25,16 +25,6 @@ is
        Success  : out Boolean)
    is separate;
 
-   procedure Range_Query
-     (Request  : in  AWS.Status.Data;
-      Response : out AWS.Response.Data;
-      Success  : out Boolean);
-   procedure Range_Query
-      (Request  : in  AWS.Status.Data;
-       Response : out AWS.Response.Data;
-       Success  : out Boolean)
-   is separate;
-
    procedure Debug
      (Request  : in  AWS.Status.Data;
       Response : out AWS.Response.Data;
@@ -52,7 +42,6 @@ is
 
    Handlers : constant array (Positive range <>) of Handler_Type :=
      (Query'Access,
-      Range_Query'Access,
       Debug'Access);
 begin
    for I in Handlers'Range loop

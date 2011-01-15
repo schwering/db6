@@ -15,16 +15,6 @@ with REST.Log;
 
 function REST.Method.Post (Request : AWS.Status.Data) return AWS.Response.Data
 is
-   procedure Insert
-     (Request  : in  AWS.Status.Data;
-      Response : out AWS.Response.Data;
-      Success  : out Boolean);
-   procedure Insert
-      (Request  : in  AWS.Status.Data;
-       Response : out AWS.Response.Data;
-       Success  : out Boolean)
-   is separate;
-
    procedure Debug
      (Request  : in  AWS.Status.Data;
       Response : out AWS.Response.Data;
@@ -41,8 +31,7 @@ is
        Success  : out Boolean);
 
    Handlers : constant array (Positive range <>) of Handler_Type :=
-     (Insert'Access,
-      Debug'Access);
+     (1 => Debug'Access);
 begin
    for I in Handlers'Range loop
       declare
