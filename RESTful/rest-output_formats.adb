@@ -160,13 +160,10 @@ package body REST.Output_Formats is
       Queues.Mark_Final (Resource.Queue);
       if Resource.Free_On_Close then
          declare
-            --procedure Free is new Ada.Unchecked_Deallocation
-              --(Stream_Type'Class, Stream_Ref_Type);
             procedure Free is new Ada.Unchecked_Deallocation
               (DB.Maps.Cursor_Type'Class, DB.Maps.Cursor_Ref_Type);
          begin
             Free (Resource.Cursor);
-            --Free (Resource.Self);
          end;
       end if;
    end Close;

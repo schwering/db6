@@ -21,9 +21,9 @@ procedure Query
     Response : out AWS.Response.Data;
     Success  : out Boolean)
 is
-   URL   : constant AWS.URL.Object := AWS.Status.URI (Request);
-   Path  : constant String := AWS.URL.Pathname (URL);
-   Iter  : Path_Parsers.Iterator_Type;
+   URL  : constant AWS.URL.Object := AWS.Status.URI (Request);
+   Path : constant String := AWS.URL.Pathname (URL);
+   Iter : Path_Parsers.Iterator_Type;
 
    function Get_Count (S : String) return Positive is
    begin

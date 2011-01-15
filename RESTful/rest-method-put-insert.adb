@@ -17,6 +17,8 @@ with DB.Maps.Values.Long_Integers;
 with DB.Maps.Values.Nothings;
 with DB.Maps.Values.Strings;
 
+with REST.Input_Formats;
+with REST.Input_Formats.JSON;
 with REST.Maps;
 with REST.Path_Parsers;
 
@@ -26,6 +28,27 @@ procedure Insert
     Response : out AWS.Response.Data;
     Success  : out Boolean)
 is
+   URL  : constant AWS.URL.Object := AWS.Status.URI (Request);
+   Path : constant String := AWS.URL.Pathname (URL);
+   Iter : Path_Parsers.Iterator_Type;
+
+--   function Param (S : String) return String is
+--   begin
+--      return AWS.URL.Parameter (URL, S);
+--   end Param;
+
+   function Next_Path_Element return String is
+   begin
+      if Path_Parsers.Is_Final (Iter) then
+         return "";
+      end if;
+      Path_Parsers.Next (Path, Iter);
+      if Path_Parsers.Is_Final (Iter) then
+         return "";
+      end if;
+      return Path_Parsers.Value (Path, Iter);
+   end Next_Path_Element;
+
    procedure To_Boolean
      (Value   : in  String;
       Bool    : out DB.Maps.Values.Booleans.Value_Type;
@@ -140,22 +163,20 @@ is
       raise Invalid_Parameter_Error;
    end To_Value;
 
-   URL      : constant AWS.URL.Object := AWS.Status.URI (Request);
    Map_Name : constant String := Path_Parsers.Element (URL, 1);
-   Row      : constant String := AWS.URL.Parameter (URL, Row_Param);
-   Col      : constant String := AWS.URL.Parameter (URL, Column_Param);
-   Value    : constant String := AWS.URL.Parameter (URL, Value_Param);
+   Row      : constant String := Next_Path_Element;
 begin
-   if Map_Name = "" or Row = "" or Col = "" or Value = "" then
+   if Map_Name = "" then
       Success := False;
       return;
    end if;
 
    declare
       use type DB.Maps.State_Type;
-      Map : constant Maps.Map_Ref_Type := Maps.Map_By_Name (Map_Name);
-      Key : constant DB.Maps.Keys.Key_Type := DB.Maps.Strings_To_Key (Row, Col);
-      Val : constant DB.Maps.Value_Type'Class := To_Value (Value);
+      Map    : constant Maps.Map_Ref_Type := Maps.Map_By_Name (Map_Name);
+      Stream : Input_Formats.JSON.Stream_Type;
+      Key : constant DB.Maps.Keys.Key_Type := DB.Maps.Strings_To_Key (Row, "Col");
+      Val : constant DB.Maps.Value_Type'Class := To_Value ("Value");
       St  : DB.Maps.State_Type;
    begin
       Map.Insert (Key, Val, St);

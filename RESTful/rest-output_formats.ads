@@ -72,7 +72,6 @@ package REST.Output_Formats is
    -- Populates the stream with at most Max_Objects from the Cursor where Object
    -- is meant in the JSON-sense and not key/value-pairs returned from Cursor.
 
-
    ----------
    -- Information about the stream.
 
