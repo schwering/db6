@@ -13,15 +13,29 @@ with DB.Maps.Values.Long_Integers;
 with DB.Maps.Values.Nothings;
 with DB.Maps.Values.Strings;
 
+with REST.Input_Formats.JSON;
+
 package body REST.Input_Formats is
 
-   procedure Read
-     (Request : in     AWS.Status.Data;
-      Buffer  :    out AWS.Status.Stream_Element_Array;
-      Last    :    out AWS.Status.Stream_Element_Offset) is
+   function New_Parser (Content_Type : String) return Parser_Type'Class is
    begin
-      AWS.Status.Read_Body (Request, Buffer, Last);
-   end Read;
+      if Content_Type = "application/json" or else
+         Content_Type = "application/json" or else
+         Content_Type = "application/x-javascript" or else
+         Content_Type = "text/javascript" or else
+         Content_Type = "text/x-javascript" or else
+         Content_Type = "text/x-json"
+      then
+         return JSON.New_Parser;
+--      elsif Content_Type = "application/bson" or else
+--            Content_Type = "application/bson" or else
+--            Content_Type = "text/x-bson"
+--      then
+--         return BSON.Parser_Type'(Parser_Type with null record);
+      else
+         raise Malformed_Input_Data_Error;
+      end if;
+   end New_Parser;
 
 
    procedure Parse
@@ -35,25 +49,27 @@ package body REST.Input_Formats is
          begin
             Parser.Next_Token (Request, Token);
             case Token is
-               when Anonymous_Object_Start => Handler.Start_Anonymous_Object;
-               when Object_Start => Handler.Start_Object (Parser.Key);
-               when Object_End   => Handler.End_Object;
-               when Anonymous_Array_Start  => Handler.Start_Anonymous_Array;
-               when Array_Start  => Handler.Start_Array (Parser.Key);
-               when Array_End    => Handler.End_Array;
-               when Value        => Handler.Value (Parser.Key, Parser.Value);
-               when EOF          => exit;
+               when Object_Start =>
+                  if Parser.Has_Key then
+                     Handler.Start_Object (Parser.Key);
+                  else
+                     Handler.Start_Anonymous_Object;
+                  end if;
+               when Array_Start  =>
+                  if Parser.Has_Value then
+                     Handler.Start_Array (Parser.Key);
+                  else
+                     Handler.Start_Anonymous_Array;
+                  end if;
+               when Object_End => Handler.End_Object;
+               when Array_End  => Handler.End_Array;
+               when Value      => Handler.Value (Parser.Key, Parser.Value);
+               when EOF        => exit;
+               when Error      => Handler.Error;
             end case;
          end;
       end loop;
    end Parse;
-
-
-   procedure Initialize (Parser : in out Parser_Type) is
-   begin
-      Parser.The_Key   := null;
-      Parser.The_Value := null;
-   end Initialize;
 
 
    procedure Finalize (Parser : in out Parser_Type)
@@ -196,12 +212,26 @@ package body REST.Input_Formats is
             end if;
          end;
          
-         raise Invalid_Parameter_Error;
+         raise Malformed_Input_Data_Error;
       end To_Value;
 
    begin
       Parser.The_Value := new DB.Maps.Value_Type'Class'(To_Value (Value));
    end Set_Value;
+
+
+   function Has_Key (Parser : Parser_Type) return Boolean is
+   begin
+      return Parser.The_Key /= null;
+   end Has_Key;
+
+
+   function Has_Value (Parser : Parser_Type) return Boolean
+   is
+      use type DB.Maps.Value_Ref_Type;
+   begin
+      return Parser.The_Value /= null;
+   end Has_Value;
 
 
    function Key (Parser : Parser_Type) return String is
@@ -214,6 +244,134 @@ package body REST.Input_Formats is
    begin
       return Parser.The_Value.all;
    end Value;
+
+
+   procedure Unset_Key (Parser : in out Parser_Type)
+   is
+      procedure Free is new Ada.Unchecked_Deallocation
+        (String, String_Ref_Type);
+   begin
+      if Parser.The_Key /= null then
+         Free (Parser.The_Key);
+      end if;
+      Parser.The_Key := null;
+   end Unset_Key;
+
+
+   procedure Unset_Value (Parser : in out Parser_Type)
+   is
+      use type DB.Maps.Value_Ref_Type;
+      procedure Free is new Ada.Unchecked_Deallocation
+        (DB.Maps.Value_Type'Class, DB.Maps.Value_Ref_Type);
+   begin
+      if Parser.The_Value /= null then
+         Free (Parser.The_Value);
+      end if;
+      Parser.The_Value := null;
+   end Unset_Value;
+
+
+   procedure Fill_Buffer
+     (Parser  : in out Parser_Type'Class;
+      Request : in     AWS.Status.Data;
+      EOF     :    out Boolean) is
+   begin
+      if Parser.Current not in Parser.Buffer'Range then
+         AWS.Status.Read_Body (Request, Parser.Buffer, Parser.Last);
+         if Parser.Last not in Parser.Buffer'Range then
+            EOF := True;
+            return;
+         end if;
+      end if;
+   end Fill_Buffer;
+
+   pragma Inline (Fill_Buffer);
+
+
+   procedure Next
+     (Parser  : in out Parser_Type'Class;
+      Request : in     AWS.Status.Data;
+      Byte    :    out Ada.Streams.Stream_Element;
+      EOF     :    out Boolean) is
+   begin
+      Fill_Buffer (Parser, Request, EOF);
+      if not EOF then
+         Parser.Current := Parser.Current + 1;
+         Byte := Parser.Buffer (Parser.Current);
+      end if;
+   end Next;
+
+
+   procedure Next
+     (Parser  : in out Parser_Type'Class;
+      Request : in     AWS.Status.Data;
+      Char    :    out Character;
+      EOF     :    out Boolean)
+   is
+      Byte : Ada.Streams.Stream_Element;
+   begin
+      Next (Parser, Request, Byte, EOF);
+      if not EOF then
+         Char := Character'Val (Ada.Streams.Stream_Element'Pos (Byte));
+      end if;
+   end Next;
+
+
+   function String_To_Bytes (S : String) return AWS.Status.Stream_Element_Array
+   is
+      use AWS.Status;
+      B : Stream_Element_Array (Stream_Element_Offset (S'First) ..
+                                Stream_Element_Offset (S'Last));
+   begin
+      for I in S'Range loop
+         B (Stream_Element_Offset (I)) :=
+           Ada.Streams.Stream_Element'Val (Character'Pos (S (I)));
+      end loop;
+      return B;
+   end String_To_Bytes;
+
+
+   procedure Skip
+     (Parser    : in out Parser_Type'Class;
+      Request   : in     AWS.Status.Data;
+      Byte_List : in     AWS.Status.Stream_Element_Array)
+   is
+      function Skippable (Byte : Ada.Streams.Stream_Element) return Boolean
+      is
+         use type Ada.Streams.Stream_Element;
+      begin
+         for I in Byte_List'Range loop
+            if Byte = Byte_List (I) then
+               return True;
+            end if;
+         end loop;
+         return False;
+      end Skippable;
+      pragma Inline (Skippable);
+   begin
+      loop
+         declare
+            use type Ada.Streams.Stream_Element;
+            EOF : Boolean;
+         begin
+            Fill_Buffer (Parser, Request, EOF);
+            exit when EOF;
+            while Parser.Current < Parser.Last loop
+               exit when not Skippable (Parser.Buffer (Parser.Current + 1));
+               Parser.Current := Parser.Current + 1;
+            end loop;
+         end;
+      end loop;
+   end Skip;
+
+
+   procedure Skip
+     (Parser    : in out Parser_Type'Class;
+      Request   : in     AWS.Status.Data;
+      Char_List : in     String) is
+   begin
+      Skip (Parser, Request, String_To_Bytes (Char_List));
+   end Skip;
 
 end REST.Input_Formats;
 

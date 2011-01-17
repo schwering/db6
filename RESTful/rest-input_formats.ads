@@ -7,6 +7,7 @@
 -- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Finalization;
+with Ada.Streams;
 
 with AWS.Status;
 
@@ -26,23 +27,30 @@ package REST.Input_Formats is
       Handler : in out Handler_Type'Class);
 
    ----------
-   -- Returns the next token.
+   -- Parser operations.
+
+   function New_Parser (Content_Type : String) return Parser_Type'Class;
+
+   function New_Parser return Parser_Type
+   is abstract;
 
    type Token_Type is
-      (Anonymous_Object_Start, 
-       Object_Start,
+      (Object_Start,
        Object_End,
-       Anonymous_Array_Start,
        Array_Start,
        Array_End,
        Value,
-       EOF);
+       EOF,
+       Error);
 
    procedure Next_Token
      (Parser  : in out Parser_Type;
       Request : in     AWS.Status.Data;
       Token   :    out Token_Type)
    is abstract;
+
+   function Has_Key (Parser : Parser_Type) return Boolean;
+   function Has_Value (Parser : Parser_Type) return Boolean;
 
    function Key (Parser : Parser_Type) return String;
    function Value (Parser : Parser_Type) return DB.Maps.Value_Type'Class;
@@ -78,17 +86,24 @@ package REST.Input_Formats is
       Value   : in     DB.Maps.Value_Type'Class)
    is abstract;
 
+   procedure Error (Handler : in out Handler_Type)
+   is abstract;
+
 private
    type String_Ref_Type is access String;
 
+   subtype Buffer_Type is AWS.Status.Stream_Element_Array (1 .. 128);
+
+   use type AWS.Status.Stream_Element_Offset;
+
    type Parser_Type is abstract new AF.Limited_Controlled with
       record
-         The_Key   : String_Ref_Type;
-         The_Value : DB.Maps.Value_Ref_Type;
+         Buffer    : Buffer_Type;
+         Last      : AWS.Status.Stream_Element_Offset := Buffer_Type'First - 1;
+         Current   : AWS.Status.Stream_Element_Offset := Buffer_Type'First - 1;
+         The_Key   : String_Ref_Type                  := null;
+         The_Value : DB.Maps.Value_Ref_Type           := null;
       end record;
-
-   overriding
-   procedure Initialize (Parser : in out Parser_Type);
 
    overriding
    procedure Finalize (Parser : in out Parser_Type);
@@ -101,10 +116,36 @@ private
      (Parser : in out Parser_Type;
       Value  : in     String);
 
-   procedure Read
-     (Request : in     AWS.Status.Data;
-      Buffer  :    out AWS.Status.Stream_Element_Array;
-      Last    :    out AWS.Status.Stream_Element_Offset);
+   procedure Unset_Key (Parser : in out Parser_Type);
+
+   procedure Unset_Value (Parser : in out Parser_Type);
+
+   procedure Next
+     (Parser  : in out Parser_Type'Class;
+      Request : in     AWS.Status.Data;
+      Byte    :    out Ada.Streams.Stream_Element;
+      EOF     :    out Boolean);
+
+   procedure Next
+     (Parser  : in out Parser_Type'Class;
+      Request : in     AWS.Status.Data;
+      Char    :    out Character;
+      EOF     :    out Boolean);
+
+   function String_To_Bytes (S : String) return AWS.Status.Stream_Element_Array;
+
+   procedure Skip
+     (Parser    : in out Parser_Type'Class;
+      Request   : in     AWS.Status.Data;
+      Byte_List : in     AWS.Status.Stream_Element_Array);
+
+   procedure Skip
+     (Parser    : in out Parser_Type'Class;
+      Request   : in     AWS.Status.Data;
+      Char_List : in     String);
+
+   pragma Inline (Next);
+   pragma Inline (String_To_Bytes);
 
 end REST.Input_Formats;
 
