@@ -1,15 +1,17 @@
 -- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
 
-with "../Core2/libdb";
+with "libdbrest";
 with "../attributes";
 with "../lib/link_to_aws";
 
 project Server is
 
+   Server_Dir := "bin/";
+
    for Main use ("rest-main");
-   for Source_Dirs use (".");
-   for Object_Dir use "bin/"& Attributes.Build;
-   for Exec_Dir   use "bin/"& Attributes.Build;
+   for Source_Dirs use ("Main");
+   for Object_Dir use Server_Dir &"/"& Attributes.Build;
+   for Exec_Dir   use Server_Dir &"/"& Attributes.Build;
 
    package Compiler renames Attributes.Compiler;
    package Binder renames Attributes.Binder;

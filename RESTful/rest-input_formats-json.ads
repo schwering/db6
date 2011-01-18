@@ -2,6 +2,12 @@
 --
 -- Deserialization of database entries from JSON format.
 --
+-- The parser is kind of tolerant in that it ignores commas :-). It simply
+-- treats them like spaces.
+--
+-- XXX The parser doesn't handle floats like .123 correctly because Ada's
+-- 'Value-attribute doesn't accept such values.
+--
 -- A natural format of the output is JSON. The format of a cursor in JSON would
 -- look like this:
 -- [
@@ -36,7 +42,17 @@ package REST.Input_Formats.JSON is
       Token   :    out Token_Type);
 
 private
-   type Parser_Type is new Input_Formats.Parser_Type with null record;
+   Max_Indentation : constant := 64;
+
+   type Boolean_Array_Type is array (Positive range <>) of Boolean;
+   pragma Pack (Boolean_Array_Type);
+
+   type Parser_Type is new Input_Formats.Parser_Type with
+      record
+         Is_Array : Boolean_Array_Type (1 .. Max_Indentation)
+           := (others => False);
+         Level : Natural := 0;
+      end record;
 
 end REST.Input_Formats.JSON;
 

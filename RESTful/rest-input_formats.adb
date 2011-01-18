@@ -5,6 +5,7 @@
 -- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Unchecked_Deallocation;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with DB.Maps.Values;
 with DB.Maps.Values.Booleans;
@@ -55,8 +56,8 @@ package body REST.Input_Formats is
                   else
                      Handler.Start_Anonymous_Object;
                   end if;
-               when Array_Start  =>
-                  if Parser.Has_Value then
+               when Array_Start =>
+                  if Parser.Has_Key then
                      Handler.Start_Array (Parser.Key);
                   else
                      Handler.Start_Anonymous_Array;
@@ -145,7 +146,7 @@ package body REST.Input_Formats is
          Str     : out DB.Maps.Values.Strings.Value_Type;
          Success : out Boolean) is
       begin
-         if Value'Length = 0 or else
+         if Value'Length <= 1 or else
             (Value (Value'First) /= '"' or Value (Value'Last) /= '"')
          then
             Success := False;
@@ -177,20 +178,20 @@ package body REST.Input_Formats is
          end;
 
          declare
-            F : DB.Maps.Values.Long_Floats.Value_Type;
-         begin
-            To_Float (Value, F, Success);
-            if Success then
-               return F;
-            end if;
-         end;
-
-         declare
             I : DB.Maps.Values.Long_Integers.Value_Type;
          begin
             To_Int (Value, I, Success);
             if Success then
                return I;
+            end if;
+         end;
+
+         declare
+            F : DB.Maps.Values.Long_Floats.Value_Type;
+         begin
+            To_Float (Value, F, Success);
+            if Success then
+               return F;
             end if;
          end;
 
@@ -211,7 +212,7 @@ package body REST.Input_Formats is
                return N;
             end if;
          end;
-         
+
          raise Malformed_Input_Data_Error;
       end To_Value;
 
@@ -276,8 +277,10 @@ package body REST.Input_Formats is
       Request : in     AWS.Status.Data;
       EOF     :    out Boolean) is
    begin
-      if Parser.Current not in Parser.Buffer'Range then
+      EOF := False;
+      if Parser.Current >= Parser.Last then
          AWS.Status.Read_Body (Request, Parser.Buffer, Parser.Last);
+         Parser.Current := Parser.Buffer'First - 1;
          if Parser.Last not in Parser.Buffer'Range then
             EOF := True;
             return;
@@ -285,16 +288,14 @@ package body REST.Input_Formats is
       end if;
    end Fill_Buffer;
 
-   pragma Inline (Fill_Buffer);
-
 
    procedure Next
-     (Parser  : in out Parser_Type'Class;
+     (Parser  : in out Parser_Type;
       Request : in     AWS.Status.Data;
       Byte    :    out Ada.Streams.Stream_Element;
       EOF     :    out Boolean) is
    begin
-      Fill_Buffer (Parser, Request, EOF);
+      Parser.Fill_Buffer (Request, EOF);
       if not EOF then
          Parser.Current := Parser.Current + 1;
          Byte := Parser.Buffer (Parser.Current);
@@ -303,7 +304,7 @@ package body REST.Input_Formats is
 
 
    procedure Next
-     (Parser  : in out Parser_Type'Class;
+     (Parser  : in out Parser_Type;
       Request : in     AWS.Status.Data;
       Char    :    out Character;
       EOF     :    out Boolean)
@@ -331,8 +332,20 @@ package body REST.Input_Formats is
    end String_To_Bytes;
 
 
+   function Bytes_To_String (B : AWS.Status.Stream_Element_Array) return String
+   is
+      S : String (Positive (B'First) .. Natural (B'Last));
+   begin
+      for I in B'Range loop
+         S (Positive (I)) :=
+           Character'Val (Ada.Streams.Stream_Element'Pos (B (I)));
+      end loop;
+      return S;
+   end Bytes_To_String;
+
+
    procedure Skip
-     (Parser    : in out Parser_Type'Class;
+     (Parser    : in out Parser_Type;
       Request   : in     AWS.Status.Data;
       Byte_List : in     AWS.Status.Stream_Element_Array)
    is
@@ -349,24 +362,26 @@ package body REST.Input_Formats is
       end Skippable;
       pragma Inline (Skippable);
    begin
+      Whitespace_Loop:
       loop
          declare
             use type Ada.Streams.Stream_Element;
             EOF : Boolean;
          begin
-            Fill_Buffer (Parser, Request, EOF);
+            Parser.Fill_Buffer (Request, EOF);
             exit when EOF;
             while Parser.Current < Parser.Last loop
-               exit when not Skippable (Parser.Buffer (Parser.Current + 1));
+               exit Whitespace_Loop
+                  when not Skippable (Parser.Buffer (Parser.Current + 1));
                Parser.Current := Parser.Current + 1;
             end loop;
          end;
-      end loop;
+      end loop Whitespace_Loop;
    end Skip;
 
 
    procedure Skip
-     (Parser    : in out Parser_Type'Class;
+     (Parser    : in out Parser_Type;
       Request   : in     AWS.Status.Data;
       Char_List : in     String) is
    begin

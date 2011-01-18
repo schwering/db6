@@ -98,11 +98,12 @@ private
 
    type Parser_Type is abstract new AF.Limited_Controlled with
       record
-         Buffer    : Buffer_Type;
-         Last      : AWS.Status.Stream_Element_Offset := Buffer_Type'First - 1;
-         Current   : AWS.Status.Stream_Element_Offset := Buffer_Type'First - 1;
-         The_Key   : String_Ref_Type                  := null;
-         The_Value : DB.Maps.Value_Ref_Type           := null;
+         Buffer     : Buffer_Type;
+         Last       : AWS.Status.Stream_Element_Offset := Buffer_Type'First - 1;
+         Current    : AWS.Status.Stream_Element_Offset := Buffer_Type'First - 1;
+         The_Key    : String_Ref_Type                  := null;
+         The_Value  : DB.Maps.Value_Ref_Type           := null;
+         Expect_Key : Boolean                          := True;
       end record;
 
    overriding
@@ -120,27 +121,33 @@ private
 
    procedure Unset_Value (Parser : in out Parser_Type);
 
-   procedure Next
+   procedure Fill_Buffer
      (Parser  : in out Parser_Type'Class;
+      Request : in     AWS.Status.Data;
+      EOF     :    out Boolean);
+
+   procedure Next
+     (Parser  : in out Parser_Type;
       Request : in     AWS.Status.Data;
       Byte    :    out Ada.Streams.Stream_Element;
       EOF     :    out Boolean);
 
    procedure Next
-     (Parser  : in out Parser_Type'Class;
+     (Parser  : in out Parser_Type;
       Request : in     AWS.Status.Data;
       Char    :    out Character;
       EOF     :    out Boolean);
 
    function String_To_Bytes (S : String) return AWS.Status.Stream_Element_Array;
+   function Bytes_To_String (B : AWS.Status.Stream_Element_Array) return String;
 
    procedure Skip
-     (Parser    : in out Parser_Type'Class;
+     (Parser    : in out Parser_Type;
       Request   : in     AWS.Status.Data;
       Byte_List : in     AWS.Status.Stream_Element_Array);
 
    procedure Skip
-     (Parser    : in out Parser_Type'Class;
+     (Parser    : in out Parser_Type;
       Request   : in     AWS.Status.Data;
       Char_List : in     String);
 

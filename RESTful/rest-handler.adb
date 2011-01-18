@@ -1,11 +1,11 @@
-with Ada.Text_IO;
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009, 2010, 2011 Christoph Schwering
 
 with AWS.Messages;
-with AWS.Server;
 with AWS.Status;
-with AWS.Response;
-
-with DB.Maps;
 
 with REST.Method.Delete;
 with REST.Method.Get;
@@ -16,16 +16,9 @@ with REST.Method.Put;
 
 with REST.Log;
 
-procedure REST.Main is
+package body REST.Handler is
 
-   function Starts_With (S, T : String) return Boolean is
-   begin
-      return S'Length >= T'Length and then
-             S (S'First .. S'First + T'Length - 1) = T;
-   end Starts_With;
-
-
-   function Handler (Request : AWS.Status.Data) return AWS.Response.Data is
+   function Handle (Request : AWS.Status.Data) return AWS.Response.Data is
       use AWS.Status;
    begin
       case AWS.Status.Method (Request) is
@@ -40,22 +33,7 @@ procedure REST.Main is
             return AWS.Response.Acknowledge (AWS.Messages.S501,
                                              "Unsupported operation");
       end case;
-   end Handler;
+   end Handle;
 
-   WS : AWS.Server.HTTP;
-begin
-   Ada.Text_IO.Put_Line ("Hello");
-
-   AWS.Server.Start
-     (Web_Server     => WS,
-      Name           => "dingsbums-restful",
-      Callback       => Handler'Unrestricted_Access,
-      Port           => 8080);
-
-   declare
-      C : Character;
-   begin
-      Ada.Text_IO.Get (C);
-   end;
-end REST.Main;
+end REST.Handler;
 

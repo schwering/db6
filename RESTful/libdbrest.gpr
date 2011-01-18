@@ -1,0 +1,47 @@
+-- vim:tabstop=3:softtabstop=3:shiftwidth=3:expandtab
+
+with "../Core2/libdb";
+with "../attributes";
+with "../lib/link_to_aws";
+
+--library
+project LibDBRest is
+
+   for Object_Dir  use "lib/"& Attributes.Build &"/"& Attributes.Kind &"/"&
+                                                      Attributes.Object_Dir;
+   for Library_Dir use "lib/"& Attributes.Build &"/"& Attributes.Kind;
+   for Library_Name use "dbrest";
+   for Library_Kind use Attributes.Kind;
+   --for Library_Kind use "relocatable";
+   --for Library_Kind use "static";
+
+   for Languages use ("Ada");
+   for Source_Dirs use (".");
+
+   package Compiler is
+      C_Sw := ();
+      case Attributes.Operating_System is
+         when "GNU/Linux" | "Windows_NT" => C_Sw := C_Sw & "-DHAVE_OFF64_T";
+         when "Unix"                     => null;
+      end case;
+      case Attributes.Operating_System is
+         when "GNU/Linux" | "Unix" => C_Sw := C_Sw & "-DHAVE_PREAD" &
+                                                     "-DHAVE_PWRITE";
+         when "Windows_NT"         => null;
+      end case;
+      case Attributes.Operating_System is
+         when "GNU/Linux" | "Unix" => C_Sw := C_Sw & "-DHAVE_POSIX_MEMALIGN";
+         when "Windows_NT"         => null;
+      end case;
+
+
+      for Default_Switches ("Ada") use
+         Attributes.Compiler'Default_Switches("Ada");
+      for Default_Switches ("C") use
+         Attributes.Compiler'Default_Switches("C") & C_Sw;
+   end Compiler;
+
+   package Binder renames Attributes.Binder;
+
+end LibDBRest;
+
