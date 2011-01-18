@@ -1,0 +1,36 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008, 2009, 2010 Christoph Schwering
+
+with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Text_IO; use Ada.Text_IO;
+
+with AUnit.Assertions; use AUnit.Assertions;
+
+package body <PKG>.Test is
+
+   overriding
+   procedure Set_Up (T : in out Test_Type) is
+   begin
+      null;
+   end Set_Up;
+
+
+   overriding
+   procedure Tear_Down (T : in out Test_Type) is
+   begin
+      null;
+   end Tear_Down;
+
+
+   procedure Test_XYZ (T : in out Test_Type)
+   is
+      pragma Unreferenced (T);
+   begin
+      null;
+   end Test_XYZ;
+
+end <PKG>.Test;
+
