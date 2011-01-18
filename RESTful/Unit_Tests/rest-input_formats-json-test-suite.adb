@@ -18,6 +18,7 @@ package body REST.Input_Formats.JSON.Test.Suite is
       Ret.Add_Test (Caller.Create (Name &": Flat", Test_Flat'Access));
       Ret.Add_Test (Caller.Create (Name &": Nested", Test_Nested'Access));
       Ret.Add_Test (Caller.Create (Name &": Array", Test_Array'Access));
+      Ret.Add_Test (Caller.Create (Name &": Escape", Test_Escape'Access));
       return Ret;
    end Suite;
 

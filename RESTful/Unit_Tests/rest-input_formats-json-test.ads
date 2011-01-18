@@ -20,6 +20,7 @@ package REST.Input_Formats.JSON.Test is
    procedure Test_Flat (T : in out Test_Type);
    procedure Test_Nested (T : in out Test_Type);
    procedure Test_Array (T : in out Test_Type);
+   procedure Test_Escape (T : in out Test_Type);
 
 private
    use Ada.Strings.Unbounded;

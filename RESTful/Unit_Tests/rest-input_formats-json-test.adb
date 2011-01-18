@@ -336,5 +336,41 @@ package body REST.Input_Formats.JSON.Test is
          raise;
    end Test_Array;
 
+
+   procedure Test_Escape (T : in out Test_Type)
+   is
+      use DB.Maps.Values;
+      Expected : constant Item_Array_Type :=
+        ((Event => Anonymous_Object_Start),
+         (Value, TUS ("key1"), TKW (Strings.New_Value ("""string1"""))),
+         (Value, TUS ("key2"), TKW (Strings.New_Value ("""string2"""))),
+         (Value, TUS ("key3"), TKW (Strings.New_Value ("'string3'"))),
+         (Value, TUS ("key4"), TKW (Strings.New_Value ("'string4'"))),
+         (Value, TUS ("key5"), TKW (Strings.New_Value ("string5\"))),
+         (Value, TUS ("key6"), TKW (Strings.New_Value ("string6\"""))),
+         (Event => Object_End));
+      Request : AWS.Status.Data;
+      Handler : Handler_Type := (Expected'Length, Expected, others => <>);
+   begin
+      Init_Body
+        (Request,
+         "{"&
+         "   ""key1"" : '""string1""',"& ASCII.LF &
+         "   ""key2"" : ""\""string2\"""","& ASCII.LF &
+         "   ""key3"" : '\'string3\'',"& ASCII.LF &
+         "   'key4'   : ""'string4'"","& ASCII.LF &
+         "   'key5'   :'string5\\',"& ASCII.LF &
+         "   'key6'   :""string6\\\"""","& ASCII.LF &
+         "}   " & ASCII.LF & ASCII.HT);
+      Parse (Request, T.P.all, Handler);
+      Assert (Handler.I = Handler.Expected'Length,
+              "parsing not correct"& Handler.I'Img &" /"&
+              Handler.Expected'Length'Img);
+   exception
+      when E : others =>
+         Put_Line (Exception_Information (E));
+         raise;
+   end Test_Escape;
+
 end REST.Input_Formats.JSON.Test;
 

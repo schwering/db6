@@ -38,6 +38,7 @@ package body REST.Input_Formats.JSON is
       function Parse_String (Quotes : Boolean := True) return String
       is
          use Ada.Strings.Unbounded;
+         Quote   : constant Character := Char;
          T       : Unbounded_String;
          Escaped : Boolean := False;
       begin
@@ -46,9 +47,11 @@ package body REST.Input_Formats.JSON is
          end if;
          loop
             Next (Parser, Request, Char, EOF);
-            exit when (not Escaped and (Char = ''' or Char = '"')) or EOF;
+            exit when (not Escaped and Char = Quote) or EOF;
             Escaped := not Escaped and Char = '\';
-            Append (T, Char);
+            if not Escaped then
+               Append (T, Char);
+            end if;
          end loop;
          if Quotes then
             Append (T, '"');
