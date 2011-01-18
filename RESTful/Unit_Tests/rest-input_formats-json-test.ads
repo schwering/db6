@@ -32,16 +32,18 @@ private
        Array_Start,
        Array_End,
        Value,
+       Anonymous_Value,
        EOF,
        Error);
 
    type Item_Type (Event : Event_Type := Error) is
       record
          case Event is
-            when Object_Start | Array_Start | Value =>
+            when Object_Start | Array_Start | Anonymous_Value | Value =>
                Key : Unbounded_String;
                case Event is
-                  when Value  => Value : DB.Maps.Value_Wrapper_Type;
+                  when Anonymous_Value | Value =>
+                     Value : DB.Maps.Value_Wrapper_Type;
                   when others => null;
                end case;
             when others => null;

@@ -133,7 +133,7 @@ package body REST.Input_Formats.JSON is
             else
                Token := Array_Start;
                if Parser.Is_Array (Parser.Level) then
-                  Parser.Set_Key ("<ArrayIndex>");
+                  Parser.Unset_Key;
                end if;
                Parser.Level := Parser.Level + 1;
                Parser.Is_Array (Parser.Level) := True;
@@ -167,7 +167,7 @@ package body REST.Input_Formats.JSON is
             else
                Token := Value;
                if Parser.Is_Array (Parser.Level) then
-                  Parser.Set_Key ("<ArrayIndex>");
+                  Parser.Unset_Key;
                end if;
                Parser.Expect_Key := True;
                Parser.Set_Value (Parse_String);

@@ -68,6 +68,11 @@ package body REST.Input_Formats.JSON.Test is
    procedure End_Array (Handler : in out Handler_Type);
 
    overriding
+   procedure Anonymous_Value
+     (Handler : in out Handler_Type;
+      Val     : in     DB.Maps.Value_Type'Class);
+
+   overriding
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
@@ -139,6 +144,24 @@ package body REST.Input_Formats.JSON.Test is
               "expected "& Handler.Expected (Handler.I).Event'Img &", "&
               "got array end");
    end End_Array;
+
+
+   procedure Anonymous_Value
+     (Handler : in out Handler_Type;
+      Val     : in     DB.Maps.Value_Type'Class)
+   is
+      use type Ada.Tags.Tag;
+      use type DB.Maps.Value_Type;
+   begin
+      Handler.I := Handler.I + 1;
+      Assert (Handler.Expected (Handler.I).Event = Anonymous_Value,
+              "expected "& Handler.Expected (Handler.I).Event'Img &", "&
+              "got value");
+      Assert (Handler.Expected (Handler.I).Value.Ref.Image = Val.Image and
+              Handler.Expected (Handler.I).Value.Ref.all'Tag = Val'Tag,
+              "expected '"& Handler.Expected (Handler.I).Value.Ref.Image &"', "&
+              "got '"& Val.Image &"'");
+   end Anonymous_Value;
 
 
    procedure Value
@@ -278,11 +301,11 @@ package body REST.Input_Formats.JSON.Test is
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Array_Start, TUS ("outer")),
-         (Value, TUS ("<ArrayIndex>"), TKW (Strings.New_Value ("string1"))),
-         (Value, TUS ("<ArrayIndex>"), TKW (Strings.New_Value ("string2"))),
-         (Array_Start, TUS ("<ArrayIndex>")),
-         (Value, TUS ("<ArrayIndex>"), TKW (Strings.New_Value ("string3"))),
-         (Value, TUS ("<ArrayIndex>"), TKW (Strings.New_Value ("string4"))),
+         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string1"))),
+         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string2"))),
+         (Event => Anonymous_Array_Start),
+         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string3"))),
+         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string4"))),
          (Event => Array_End),
          (Event => Array_End),
          (Value, TUS ("huhu"), TKW (Strings.New_Value ("string5"))),

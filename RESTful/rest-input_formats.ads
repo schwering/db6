@@ -80,6 +80,11 @@ package REST.Input_Formats is
    procedure End_Array (Handler : in out Handler_Type)
    is abstract;
 
+   procedure Anonymous_Value
+     (Handler : in out Handler_Type;
+      Value   : in     DB.Maps.Value_Type'Class)
+   is abstract;
+
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;

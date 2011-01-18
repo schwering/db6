@@ -62,9 +62,14 @@ package body REST.Input_Formats is
                   else
                      Handler.Start_Anonymous_Array;
                   end if;
+               when Value =>
+                  if Parser.Has_Key then
+                     Handler.Value (Parser.Key, Parser.Value);
+                  else
+                     Handler.Anonymous_Value (Parser.Value);
+                  end if;
                when Object_End => Handler.End_Object;
                when Array_End  => Handler.End_Array;
-               when Value      => Handler.Value (Parser.Key, Parser.Value);
                when EOF        => exit;
                when Error      => Handler.Error;
             end case;
