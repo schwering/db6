@@ -28,6 +28,7 @@ package DB.Utils.Gen_Binary_Heaps is
    function Is_Empty (Heap : Heap_Type) return Boolean;
    function Size (Heap : Heap_Type) return Natural;
    function Get (Heap : Heap_Type; I : Positive) return Item_Type;
+   function Min (Heap : Heap_Type) return Item_Type;
    function Capacity (Heap : Heap_Type) return Natural;
 
 private
@@ -42,6 +43,8 @@ private
    pragma Inline (New_Heap);
    pragma Inline (Is_Empty);
    pragma Inline (Size);
+   pragma Inline (Get);
+   pragma Inline (Min);
    pragma Inline (Capacity);
 
 end DB.Utils.Gen_Binary_Heaps;
