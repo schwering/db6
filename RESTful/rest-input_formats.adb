@@ -18,6 +18,12 @@ with REST.Input_Formats.JSON;
 
 package body REST.Input_Formats is
 
+   function New_Parser (Request : AWS.Status.Data) return Parser_Type'Class is
+   begin
+      return New_Parser (AWS.Status.Content_Type (Request));
+   end New_Parser;
+
+
    function New_Parser (Content_Type : String) return Parser_Type'Class is
    begin
       if Content_Type = "application/json" or else
@@ -95,17 +101,13 @@ package body REST.Input_Formats is
    end Finalize;
 
 
-   procedure Set_Key
-     (Parser : in out Parser_Type;
-      Key    : in     String) is
+   procedure Set_Key (Parser : in out Parser_Type; Key : in String) is
    begin
       Parser.The_Key := new String'(Key);
    end Set_Key;
 
 
-   procedure Set_Value
-     (Parser : in out Parser_Type;
-      Value  : in     String)
+   procedure Set_Value (Parser : in out Parser_Type; Value : in String)
    is
       procedure To_Boolean
         (Value   : in  String;
@@ -226,6 +228,31 @@ package body REST.Input_Formats is
    end Set_Value;
 
 
+   procedure Unset_Key (Parser : in out Parser_Type)
+   is
+      procedure Free is new Ada.Unchecked_Deallocation
+        (String, String_Ref_Type);
+   begin
+      if Parser.The_Key /= null then
+         Free (Parser.The_Key);
+      end if;
+      Parser.The_Key := null;
+   end Unset_Key;
+
+
+   procedure Unset_Value (Parser : in out Parser_Type)
+   is
+      use type DB.Maps.Value_Ref_Type;
+      procedure Free is new Ada.Unchecked_Deallocation
+        (DB.Maps.Value_Type'Class, DB.Maps.Value_Ref_Type);
+   begin
+      if Parser.The_Value /= null then
+         Free (Parser.The_Value);
+      end if;
+      Parser.The_Value := null;
+   end Unset_Value;
+
+
    function Has_Key (Parser : Parser_Type) return Boolean is
    begin
       return Parser.The_Key /= null;
@@ -250,31 +277,6 @@ package body REST.Input_Formats is
    begin
       return Parser.The_Value.all;
    end Value;
-
-
-   procedure Unset_Key (Parser : in out Parser_Type)
-   is
-      procedure Free is new Ada.Unchecked_Deallocation
-        (String, String_Ref_Type);
-   begin
-      if Parser.The_Key /= null then
-         Free (Parser.The_Key);
-      end if;
-      Parser.The_Key := null;
-   end Unset_Key;
-
-
-   procedure Unset_Value (Parser : in out Parser_Type)
-   is
-      use type DB.Maps.Value_Ref_Type;
-      procedure Free is new Ada.Unchecked_Deallocation
-        (DB.Maps.Value_Type'Class, DB.Maps.Value_Ref_Type);
-   begin
-      if Parser.The_Value /= null then
-         Free (Parser.The_Value);
-      end if;
-      Parser.The_Value := null;
-   end Unset_Value;
 
 
    procedure Fill_Buffer

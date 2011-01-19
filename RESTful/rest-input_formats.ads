@@ -29,6 +29,7 @@ package REST.Input_Formats is
    ----------
    -- Parser operations.
 
+   function New_Parser (Request : AWS.Status.Data) return Parser_Type'Class;
    function New_Parser (Content_Type : String) return Parser_Type'Class;
 
    function New_Parser return Parser_Type
@@ -48,12 +49,6 @@ package REST.Input_Formats is
       Request : in     AWS.Status.Data;
       Token   :    out Token_Type)
    is abstract;
-
-   function Has_Key (Parser : Parser_Type) return Boolean;
-   function Has_Value (Parser : Parser_Type) return Boolean;
-
-   function Key (Parser : Parser_Type) return String;
-   function Value (Parser : Parser_Type) return DB.Maps.Value_Type'Class;
 
    ----------
    -- Callbacks to process data from the parser.
@@ -114,17 +109,17 @@ private
    overriding
    procedure Finalize (Parser : in out Parser_Type);
 
-   procedure Set_Key
-     (Parser : in out Parser_Type;
-      Key    : in     String);
-
-   procedure Set_Value
-     (Parser : in out Parser_Type;
-      Value  : in     String);
+   procedure Set_Key (Parser : in out Parser_Type; Key : in String);
+   procedure Set_Value (Parser : in out Parser_Type; Value : in String);
 
    procedure Unset_Key (Parser : in out Parser_Type);
-
    procedure Unset_Value (Parser : in out Parser_Type);
+
+   function Has_Key (Parser : Parser_Type) return Boolean;
+   function Has_Value (Parser : Parser_Type) return Boolean;
+
+   function Key (Parser : Parser_Type) return String;
+   function Value (Parser : Parser_Type) return DB.Maps.Value_Type'Class;
 
    procedure Fill_Buffer
      (Parser  : in out Parser_Type'Class;

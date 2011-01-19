@@ -4,7 +4,9 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
+with Ada.Finalization;
 with Ada.Strings.Unbounded;
+with Ada.Unchecked_Deallocation;
 
 with AWS.Messages;
 with AWS.Status;
@@ -12,7 +14,7 @@ with AWS.Response;
 with AWS.URL;
 
 with REST.Input_Formats;
-with REST.Input_Formats.JSON;
+with REST.Log;
 with REST.Maps;
 with REST.Path_Parsers;
 
@@ -26,11 +28,6 @@ is
    Path : constant String := AWS.URL.Pathname (URL);
    Iter : Path_Parsers.Iterator_Type;
 
---   function Param (S : String) return String is
---   begin
---      return AWS.URL.Parameter (URL, S);
---   end Param;
-
    function Next_Path_Element return String is
    begin
       if Path_Parsers.Is_Final (Iter) then
@@ -43,8 +40,10 @@ is
       return Path_Parsers.Value (Path, Iter);
    end Next_Path_Element;
 
-   Map_Name : constant String := Path_Parsers.Element (URL, 1);
-   Row      : constant String := Next_Path_Element;
+   type String_Ref_Type is access all String;
+
+   Map_Name   : constant String := Path_Parsers.Element (URL, 1);
+   Global_Row : aliased String := Next_Path_Element;
 begin
    if Map_Name = "" then
       Success := False;
@@ -53,25 +52,201 @@ begin
 
    declare
       use type DB.Maps.State_Type;
-      Map : constant Maps.Map_Ref_Type := Maps.Map_By_Name (Map_Name);
-      --Key : constant DB.Maps.Keys.Key_Type := DB.Maps.Strings_To_Key (Row, "Col");
-      --Val : constant DB.Maps.Value_Type'Class := To_Value ("Value");
-      St  : DB.Maps.State_Type;
+
+      Map   : constant Maps.Map_Ref_Type := Maps.Map_By_Name (Map_Name);
+      State : DB.Maps.State_Type;
+
+      type Handler_Type is new Ada.Finalization.Limited_Controlled and
+         Input_Formats.Handler_Type with
+         record
+            Level  : Natural := 0;
+            Row    : String_Ref_Type := Global_Row'Access;
+            Column : String_Ref_Type := null;
+         end record;
+
+      overriding
+      procedure Finalize (Handler : in out Handler_Type);
+
+      overriding
+      procedure Start_Anonymous_Object (Handler : in out Handler_Type);
+
+      overriding
+      procedure Start_Object
+        (Handler : in out Handler_Type;
+         Key     : in     String);
+
+      overriding
+      procedure End_Object (Handler : in out Handler_Type);
+
+      overriding
+      procedure Start_Anonymous_Array (Handler : in out Handler_Type);
+
+      overriding
+      procedure Start_Array
+        (Handler : in out Handler_Type;
+         Key     : in     String);
+
+      overriding
+      procedure End_Array (Handler : in out Handler_Type);
+
+      overriding
+      procedure Anonymous_Value
+        (Handler : in out Handler_Type;
+         Val     : in     DB.Maps.Value_Type'Class);
+
+      overriding
+      procedure Value
+        (Handler : in out Handler_Type;
+         Key     : in     String;
+         Val     : in     DB.Maps.Value_Type'Class);
+
+      overriding
+      procedure Error (Handler : in out Handler_Type);
+
+
+      procedure Free_Row (Handler : in out Handler_Type'Class)
+      is
+         procedure Free is new Ada.Unchecked_Deallocation
+           (String, String_Ref_Type);
+      begin
+         if Handler.Row /= null and Handler.Row /= Global_Row'Access then
+            Free (Handler.Row);
+         end if;
+      end Free_Row;
+
+
+      procedure Free_Column (Handler : in out Handler_Type'Class)
+      is
+         procedure Free is new Ada.Unchecked_Deallocation
+           (String, String_Ref_Type);
+      begin
+         if Handler.Column /= null then
+            Free (Handler.Column);
+         end if;
+      end Free_Column;
+
+
+      procedure Finalize (Handler : in out Handler_Type) is
+      begin
+         Free_Row (Handler);
+         Free_Column (Handler);
+      end Finalize;
+
+
+      procedure Start_Anonymous_Object (Handler : in out Handler_Type) is
+      begin
+         Handler.Level := Handler.Level + 1;
+      end Start_Anonymous_Object;
+
+
+      procedure Start_Object
+        (Handler : in out Handler_Type;
+         Key     : in     String) is
+      begin
+         if Handler.Level /= 0 then
+            raise Malformed_Input_Data_Error;
+         end if;
+         Handler.Free_Row;
+         Handler.Row   := new String'(Key);
+         Handler.Level := Handler.Level + 1;
+      end Start_Object;
+
+
+      procedure End_Object (Handler : in out Handler_Type) is
+      begin
+         Handler.Level := Handler.Level - 1;
+      end End_Object;
+
+
+      procedure Start_Anonymous_Array (Handler : in out Handler_Type) is
+      begin
+         Handler.Level := Handler.Level + 1;
+      end Start_Anonymous_Array;
+
+
+      procedure Start_Array
+        (Handler : in out Handler_Type;
+         Key     : in     String) is
+      begin
+         Handler.Free_Column;
+         Handler.Column := new String'(Key);
+         Handler.Level  := Handler.Level + 1;
+      end Start_Array;
+
+
+      procedure End_Array (Handler : in out Handler_Type) is
+      begin
+         Handler.Level := Handler.Level - 1;
+      end End_Array;
+
+
+      procedure Anonymous_Value
+        (Handler : in out Handler_Type;
+         Val     : in     DB.Maps.Value_Type'Class) is
+      begin
+         -- Anonymous_Value only appears in arrays whereas Value appears only in
+         -- objects.
+         if Handler.Row = null then
+            raise Malformed_Input_Data_Error;
+         end if;
+         if Handler.Column = null then
+            raise Malformed_Input_Data_Error;
+         end if;
+         declare
+            Key : constant DB.Maps.Key_Type :=
+              DB.Maps.Strings_To_Key (Handler.Row.all, Handler.Column.all);
+         begin
+            Map.Append (Key, Val, State);
+            if State /= DB.Maps.Success then
+               raise Insertion_Error;
+            end if;
+         end;
+      end Anonymous_Value;
+
+
+      procedure Value
+        (Handler : in out Handler_Type;
+         Key     : in     String;
+         Val     : in     DB.Maps.Value_Type'Class) is
+      begin
+         if Handler.Row = null then
+            raise Malformed_Input_Data_Error;
+         end if;
+         declare
+            Col : String renames Key;
+            Key : constant DB.Maps.Key_Type :=
+              DB.Maps.Strings_To_Key (Handler.Row.all, Col);
+         begin
+            Map.Replace (Key, Val, State);
+            if State /= DB.Maps.Success then
+               raise Insertion_Error;
+            end if;
+         end;
+      end Value;
+
+
+      procedure Error (Handler : in out Handler_Type) is
+      begin
+         raise Malformed_Input_Data_Error;
+      end Error;
+
+      Parser  : Input_Formats.Parser_Type'Class :=
+         Input_Formats.New_Parser (Request);
+      Handler : Handler_Type;
    begin
-      --Map.Insert (Key, Val, St);
-      --case St is
-         --when DB.Maps.Success =>
-            --Response := AWS.Response.Build
-              --(Status_Code  => AWS.Messages.S200,
-               --Content_Type => "text/plain",
-               --Message_Body => "ok");
-         --when DB.Maps.Failure =>
-            --Response := AWS.Response.Build
-              --(Status_Code  => AWS.Messages.S500,
-               --Content_Type => "text/plain",
-               --Message_Body => "error");
-      --end case;
+      Input_Formats.Parse (Request, Parser, Handler);
+      Response := AWS.Response.Build
+        (Status_Code  => AWS.Messages.S200,
+         Content_Type => "text/plain",
+         Message_Body => "ok");
       Success := True;
+   exception
+      when others =>
+         Response := AWS.Response.Build
+           (Status_Code  => AWS.Messages.S500,
+            Content_Type => "text/plain",
+            Message_Body => "error");
+         raise;
    end;
 end Insert;
 
