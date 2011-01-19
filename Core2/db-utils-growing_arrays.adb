@@ -20,11 +20,11 @@ package body DB.Utils.Growing_Arrays is
    function Gen_New_From_Index (I : Index_Type) return Index_Type is
    begin
       if I < 0 then
-         return I - 1;
-         --return I * 3 / 2 - 10;
+         --return I - 1;
+         return I * 3 / 2 - 10;
       else
-         return I - 1;
-         --return I * 2 / 3 - 10;
+         --return I - 1;
+         return I * 2 / 3 - 10;
       end if;
    end Gen_New_From_Index;
 
@@ -32,11 +32,11 @@ package body DB.Utils.Growing_Arrays is
    function Gen_New_To_Index (I : Index_Type) return Index_Type is
    begin
       if I < 0 then
-         return I + 1;
-         --return I * 2 / 3 + 10;
+         --return I + 1;
+         return I * 2 / 3 + 10;
       else
-         return I + 1;
-         --return I * 3 / 2 + 10;
+         --return I + 1;
+         return I * 3 / 2 + 10;
       end if;
    end Gen_New_To_Index;
 
