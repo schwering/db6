@@ -263,30 +263,5 @@ package body DB.Maps is
       Next_Fix (Cursor, Key, Value, State);
    end Next;
 
-
-   procedure Delete
-     (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
-      State  :    out State_Type)
-   is
-      procedure Delete_Fix
-        (Cursor : in out Cursor_Type'Class;
-         Key    :    out Key_Type;
-         Value  :    out Value_Type'Class;
-         State  :    out State_Type)
-      is
-         Value_Wrapper : Value_Wrapper_Type;
-      begin
-         Delete (Cursor, Key, Value_Wrapper, State);
-         if State = Success then
-            Value := Value_Wrapper.Ref.all;
-         end if;
-      end Delete_Fix;
-      pragma Inline (Delete_Fix);
-   begin
-      Delete_Fix (Cursor, Key, Value, State);
-   end Delete;
-
 end DB.Maps;
 

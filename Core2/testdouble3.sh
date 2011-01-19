@@ -17,9 +17,9 @@ C1=10k
 #    three blocks of insertions)
 C="$BIN $IO $FILE $IMPL $GEN 0\
         \
-	Insert,$C1,Reset Check,1,Cont Stats,1,Cont\
-	Insert,$C1,Reset Check,1,Cont Stats,1,Cont\
-	Insert,$C1,Reset Check,1,Cont Stats,1,Cont\
+	Append,$C1,Reset Check,1,Cont Stats,1,Cont\
+	Append,$C1,Reset Check,1,Cont Stats,1,Cont\
+	Append,$C1,Reset Check,1,Cont Stats,1,Cont\
 	"
 echo $C
 $C

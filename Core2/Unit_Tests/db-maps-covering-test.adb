@@ -318,7 +318,7 @@ package body DB.Maps.Covering.Test is
          end loop;
          Assert (N = Loop_Count, "Met "& N'Img &" items where "&
                                  Loop_Count'Img &" were expected");
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
       end;
 
@@ -333,20 +333,20 @@ package body DB.Maps.Covering.Test is
          N : Natural := 0;
          pragma Warnings (Off, P);
       begin
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&
                               "fail");
          loop
             C.Next (K, V, S);
             exit when S /= Success;
-            C.Delete (K, V, S);
+            C.Delete (S);
             Assert (S = Success, "Deletion was not successful");
             if N = 0 or else P /= K then
                N := N + 1;
             end if;
             P := K;
          end loop;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
          Assert (N = Loop_Count, "Met "& N'Img &" items where "&
                                  Loop_Count'Img &" were expected");
@@ -363,21 +363,21 @@ package body DB.Maps.Covering.Test is
          N : Natural := 0;
          pragma Warnings (Off, P);
       begin
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&
                               "fail");
          loop
             C.Next (K, V, S);
             exit when S /= Success;
             C.Pause;
-            C.Delete (K, V, S);
+            C.Delete (S);
             Assert (S = Success, "Deletion was not successful");
             if N = 0 or else P /= K then
                N := N + 1;
             end if;
             P := K;
          end loop;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
          Assert (N = Loop_Count, "Met "& N'Img &" items where "&
                                  Loop_Count'Img &" were expected");
@@ -399,20 +399,20 @@ package body DB.Maps.Covering.Test is
          else
             Modulo_Result := 1;
          end if;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&
                               "fail");
          loop
             C.Next (K, V, S);
             exit when S /= Success;
             if N mod 2 = Modulo_Result then
-               C.Delete (K, V, S);
+               C.Delete (S);
                Assert (S = Success, "Deletion was not successful");
                M := M + 1;
             end if;
             N := N + 1;
          end loop;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
          Assert (N = Loop_Count, "Met "& N'Img &" items where "&
                                  Loop_Count'Img &" were expected");
@@ -436,7 +436,7 @@ package body DB.Maps.Covering.Test is
          end loop;
          Assert (N = 2 * Loop_Count, "Met "& N'Img &" items where "&
                                      Loop_Count'Img &" were expected");
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
       end;
 
@@ -454,7 +454,7 @@ package body DB.Maps.Covering.Test is
             exit when S /= Success;
             N := N + 1;
          end loop;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
          Assert (N = 0, "Met "& N'Img &" items where 0 were expected");
       end;

@@ -12,6 +12,11 @@
 -- doesn't, it has no high key. Otherwise, the high key is the (temporally) last
 -- key contained in the node.
 --
+-- Usually, nodes are "ok", indicated by Is_Ok being True. Invalid_Node is not
+-- ok. After applying operations, a node might loose its ok-being-status when
+-- operations such as writing a key or value fail. Furthermore, binary operators
+-- usually yield non-ok values when one of the operands is not ok.
+--
 -- Copyright 2008--2011 Christoph Schwering
 
 with DB.DSA.Utils.Binary_Search;
@@ -922,19 +927,19 @@ package body Nodes is
    -- General and accessor subprograms.
 
    function New_RW_Node
-        (Is_Ok   : Boolean;
-         Level   : Level_Type;
-         Degree  : Degree_Type;
-         Link    : Address_Type)
-         return RW_Node_Type
+     (Is_Ok   : Boolean;
+      Level   : Level_Type;
+      Degree  : Degree_Type;
+      Link    : Address_Type)
+      return RW_Node_Type
    is
       Node : RW_Node_Type;
    begin
       Phys.Init_Block (Block   => Blocks.Base_Block_Type (Node),
-                      Is_Ok   => Is_Ok,
-                      Level   => Level,
-                      Degree  => Degree,
-                      Link    => Link);
+                       Is_Ok   => Is_Ok,
+                       Level   => Level,
+                       Degree  => Degree,
+                       Link    => Link);
       return Node;
    end New_RW_Node;
 
@@ -958,6 +963,14 @@ package body Nodes is
                           Degree => 0,
                           Link   => Invalid_Address);
    end Root_Node;
+
+
+   function To_RO_Node
+     (Node : Node_Type)
+      return RO_Node_Type is
+   begin
+      return Node (RO_Node_Type'Range);
+   end To_RO_Node;
 
 
    function Is_Ok
@@ -1334,7 +1347,7 @@ package body Nodes is
 
 
    function Split_Position
-     (Node : RW_Node_Type)
+     (Node : Node_Type)
       return Valid_Index_Type
    is
       pragma Precondition (Is_Ok (Node));
@@ -1364,7 +1377,7 @@ package body Nodes is
 
    procedure Copy_Entry
      (Node              : in out RW_Node_Type;
-      Source            : in     RW_Node_Type;
+      Source            : in     Node_Type;
       Index             : in     Valid_Index_Type;
       Key_Read_Context  : in out Keys.Read_Context_Type;
       Key_Write_Context : in out Keys.Write_Context_Type;
@@ -1392,7 +1405,7 @@ package body Nodes is
 
    procedure Copy_Entry
      (Node                : in out RW_Node_Type;
-      Source              : in     RW_Node_Type;
+      Source              : in     Node_Type;
       Index               : in     Valid_Index_Type;
       Key_Read_Context    : in out Keys.Read_Context_Type;
       Key_Write_Context   : in out Keys.Write_Context_Type;
@@ -1421,7 +1434,7 @@ package body Nodes is
 
 
    function Insertion
-     (Node  : RW_Node_Type;
+     (Node  : Node_Type;
       Index : Valid_Index_Type;
       Key   : Keys.Key_Type;
       Child : Valid_Address_Type)
@@ -1461,7 +1474,7 @@ package body Nodes is
 
 
    function Insertion
-     (Node  : RW_Node_Type;
+     (Node  : Node_Type;
       Index : Valid_Index_Type;
       Key   : Keys.Key_Type;
       Value : Values.Value_Type)
@@ -1506,7 +1519,7 @@ package body Nodes is
 
 
    function Substitution
-     (Node  : RW_Node_Type;
+     (Node  : Node_Type;
       Index : Valid_Index_Type;
       Key   : Keys.Key_Type;
       Child : Valid_Address_Type)
@@ -1547,7 +1560,7 @@ package body Nodes is
 
 
    function Substitution
-     (Node  : RW_Node_Type;
+     (Node  : Node_Type;
       Index : Valid_Index_Type;
       Key   : Keys.Key_Type;
       Value : Values.Value_Type)
@@ -1592,7 +1605,7 @@ package body Nodes is
 
 
    function Deletion
-     (Node  : RW_Node_Type;
+     (Node  : Node_Type;
       Index : Valid_Index_Type)
       return RW_Node_Type
    is
@@ -1605,7 +1618,8 @@ package body Nodes is
    begin
       if Is_Inner (Node) then
          declare
-            Key_Read_Context  : Keys.Read_Context_Type := Keys.New_Read_Context;
+            Key_Read_Context  : Keys.Read_Context_Type :=
+               Keys.New_Read_Context;
             Key_Write_Context : Keys.Write_Context_Type :=
                Keys.New_Write_Context;
          begin
@@ -1658,7 +1672,7 @@ package body Nodes is
 
 
    function Copy
-     (Node : RW_Node_Type;
+     (Node : Node_Type;
       From : Valid_Index_Type;
       To   : Index_Type)
       return RW_Node_Type is
@@ -1716,8 +1730,8 @@ package body Nodes is
 
 
    function Combination
-     (Left_Node  : RW_Node_Type;
-      Right_Node : RW_Node_Type)
+     (Left_Node  : Node_Type;
+      Right_Node : Node_Type)
       return RW_Node_Type is
    begin
       if not Is_Ok (Left_Node) or not Is_Ok (Right_Node) then

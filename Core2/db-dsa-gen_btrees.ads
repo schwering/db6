@@ -270,15 +270,11 @@ package DB.DSA.Gen_BTrees is
    procedure Delete
      (Tree   : in out Tree_Type;
       Cursor : in out Cursor_Type;
-      Key    :    out Keys.Key_Type;
-      Value  :    out Values.Value_Type;
       State  :    out State_Type);
-   -- Deletes the Key/Value-pair which was last hit by Cursor and sets State
+   -- Deletes the key/value-pair which was last hit by Cursor and sets State
    -- to the outcome of the deletion. If there was no previous Next call or it
    -- was not successful, the deletion is not successful, either, and State is
    -- set to Failure.
-   -- The next Next operation will need to recalibrate, i.e. find the
-   -- key/value-pair that should be visited next.
 
 private
    package Key_Comparisons is new Utils.Gen_Comparisons
@@ -355,6 +351,12 @@ private
         (Level : Level_Type)
          return RW_Node_Type;
       -- Returns a simple root node of degree 0.
+
+      function To_RO_Node
+        (Node : Node_Type)
+         return RO_Node_Type;
+      -- Returns read-only node part of Node. This might cut parts of the node
+      -- if it is not safe, so use this function with caution!
 
       function Is_Leaf
         (Node : Node_Type)
@@ -480,14 +482,14 @@ private
       -- Sets the address of the right neighbor of the node.
 
       function Split_Position
-        (Node : RW_Node_Type)
+        (Node : Node_Type)
          return Valid_Index_Type;
       -- Returns the position for a split. This position is the index of the
       -- first entry which should be (the first) member of the right node after
       -- the split.
 
       function Insertion
-        (Node  : RW_Node_Type;
+        (Node  : Node_Type;
          Index : Valid_Index_Type;
          Key   : Keys.Key_Type;
          Child : Valid_Address_Type)
@@ -496,7 +498,7 @@ private
       -- Count) at position Index. This function is defined for inner nodes.
 
       function Insertion
-        (Node  : RW_Node_Type;
+        (Node  : Node_Type;
          Index : Valid_Index_Type;
          Key   : Keys.Key_Type;
          Value : Values.Value_Type)
@@ -505,7 +507,7 @@ private
       -- position Index. This function is defined for leaves.
 
       function Substitution
-        (Node  : RW_Node_Type;
+        (Node  : Node_Type;
          Index : Valid_Index_Type;
          Key   : Keys.Key_Type;
          Child : Valid_Address_Type)
@@ -514,7 +516,7 @@ private
       -- Count) at position Index. This function is defined for inner nodes.
 
       function Substitution
-        (Node  : RW_Node_Type;
+        (Node  : Node_Type;
          Index : Valid_Index_Type;
          Key   : Keys.Key_Type;
          Value : Values.Value_Type)
@@ -523,14 +525,14 @@ private
       -- position Index. This function is defined for leaves.
 
       function Deletion
-        (Node  : RW_Node_Type;
+        (Node  : Node_Type;
          Index : Valid_Index_Type)
          return RW_Node_Type;
       -- Returns the node that results from the deletion of the Index-th child.
       -- This function works for both, leaves and inner nodes.
 
       function Copy
-        (Node : RW_Node_Type;
+        (Node : Node_Type;
          From : Valid_Index_Type;
          To   : Index_Type)
          return RW_Node_Type;
@@ -538,8 +540,8 @@ private
       -- This function works for both, leaves and inner nodes.
 
       function Combination
-        (Left_Node  : RW_Node_Type;
-         Right_Node : RW_Node_Type)
+        (Left_Node  : Node_Type;
+         Right_Node : Node_Type)
          return RW_Node_Type;
       -- Returns a combination of Left_Node and Right_Node. The degree is the
       -- sum of both, the left neighbor is Left_Node's and the right neighbor is
@@ -659,10 +661,10 @@ private
          Lower_Bound        : Bound_Type;
          Upper_Bound        : Bound_Type;
          Has_Node           : Boolean := False;
-         Node               : Nodes.RO_Node_Type;
+         Node               : Nodes.RW_Node_Type;
          Key_Context        : Keys.Read_Context_Type;
          Value_Context      : Values.Read_Context_Type;
-         Index              : Nodes.Valid_Index_Type;
+         Index              : Nodes.Index_Type;
          Key                : Keys.Key_Type;
          Force_Recalibrate  : Boolean := False;
          Owning_Tree        : Tree_Ref_Type;

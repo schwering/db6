@@ -388,7 +388,8 @@ package body Stacks is
                   raise;
             end;
             if not Nodes.Has_High_Key (N_Old) or else
-               Nodes.High_Key (N_Old) /= Nodes.High_Key (N) then
+               Nodes.High_Key (N_Old) /= Nodes.High_Key (N)
+            then
                Update_High_Key (Nodes.High_Key (N), N_A);
             else
                Unlock (Tree, N_A);

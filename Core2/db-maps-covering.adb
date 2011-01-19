@@ -922,13 +922,9 @@ package body DB.Maps.Covering is
 
    procedure Delete
      (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type)
    is
       pragma Unreferenced (Cursor);
-      pragma Unreferenced (Key);
-      pragma Unreferenced (Value);
       pragma Unreferenced (State);
    begin
       -- TODO implement

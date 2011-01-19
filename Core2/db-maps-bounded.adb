@@ -308,13 +308,11 @@ package body DB.Maps.Bounded is
 
    procedure Delete
      (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type)
    is
       S : BTrees.State_Type;
    begin
-      BTrees.Delete (Cursor.Map.Tree, Cursor.Cursor, Key, Value, S);
+      BTrees.Delete (Cursor.Map.Tree, Cursor.Cursor, S);
       State := To_State (S);
    end Delete;
 

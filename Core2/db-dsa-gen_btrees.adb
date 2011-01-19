@@ -164,6 +164,15 @@ package body DB.DSA.Gen_BTrees is
    end Insertions;
 
 
+   package Deletions is
+      procedure Delete
+        (Tree  : in out Tree_Type;
+         Key   : in     Keys.Key_Type;
+         Value :    out Values.Value_Type;
+         State :    out State_Type);
+   end Deletions;
+
+
    package Cursors is
       function Positive_Infinity_Bound
          return Bound_Type;
@@ -201,8 +210,6 @@ package body DB.DSA.Gen_BTrees is
       procedure Delete
         (Tree   : in out Tree_Type;
          Cursor : in out Cursor_Type;
-         Key    :    out Keys.Key_Type;
-         Value  :    out Values.Value_Type;
          State  :    out State_Type);
    end Cursors;
 
@@ -446,7 +453,7 @@ package body DB.DSA.Gen_BTrees is
       Key   : in     Keys.Key_Type;
       Value :    out Values.Value_Type;
       State :    out State_Type)
-   is separate;
+   renames Deletions.Delete;
 
 
    function Positive_Infinity_Bound
@@ -499,8 +506,6 @@ package body DB.DSA.Gen_BTrees is
    procedure Delete
      (Tree   : in out Tree_Type;
       Cursor : in out Cursor_Type;
-      Key    :    out Keys.Key_Type;
-      Value  :    out Values.Value_Type;
       State  :    out State_Type)
    renames Cursors.Delete;
 
@@ -522,6 +527,7 @@ package body DB.DSA.Gen_BTrees is
    package body Initialization is separate;
    package body Searches is separate;
    package body Insertions is separate;
+   package body Deletions is separate;
    package body Cursors is separate;
    package body Misc is separate;
 

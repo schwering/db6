@@ -5,6 +5,8 @@
 -- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Strings.Bounded;
+with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
@@ -234,7 +236,7 @@ package body DB.Maps.Bounded.Test is
          end loop;
          Assert (N = Loop_Count, "Met "& N'Img &" items where "&
                                  Loop_Count'Img &" were expected");
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
       end;
 
@@ -247,23 +249,23 @@ package body DB.Maps.Bounded.Test is
          S : State_Type;
          N : Natural := 0;
       begin
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&
                               "fail");
          loop
             C.Next (K, V, S);
             exit when S /= Success;
-            C.Delete (K, V, S);
+            C.Delete (S);
             Assert (S = Success, "Deletion was not successful");
             N := N + 1;
          end loop;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
          Assert (N = Loop_Count, "Met "& N'Img &" items where "&
                                  Loop_Count'Img &" were expected");
       end;
 
-      procedure Single_Cursor_Pause_Delete
+      procedure Single_Cursor_Pause_Delete (Expected : in Natural)
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
@@ -272,24 +274,24 @@ package body DB.Maps.Bounded.Test is
          S : State_Type;
          N : Natural := 0;
       begin
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&
                               "fail");
          loop
             C.Next (K, V, S);
             exit when S /= Success;
             C.Pause;
-            C.Delete (K, V, S);
+            C.Delete (S);
             Assert (S = Success, "Deletion was not successful");
             N := N + 1;
          end loop;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
-         Assert (N = Loop_Count, "Met "& N'Img &" items where "&
-                                 Loop_Count'Img &" were expected");
+         Assert (N = Expected, "Met "& N'Img &" items where "&
+                               Expected'Img &" were expected");
       end;
 
-      procedure Half_Cursor_Delete (Even : in Boolean)
+      procedure Half_Cursor_Delete (Expected : in Natural; Even : in Boolean)
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
@@ -305,25 +307,25 @@ package body DB.Maps.Bounded.Test is
          else
             Modulo_Result := 1;
          end if;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&
                               "fail");
          loop
             C.Next (K, V, S);
             exit when S /= Success;
             if N mod 2 = Modulo_Result then
-               C.Delete (K, V, S);
+               C.Delete (S);
                Assert (S = Success, "Deletion was not successful");
                M := M + 1;
             end if;
             N := N + 1;
          end loop;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
-         Assert (N = Loop_Count, "Met "& N'Img &" items where "&
-                                 Loop_Count'Img &" were expected");
-         Assert (M = Loop_Count/2, "Deleted "& N'Img &" items where "&
-                                   Loop_Count'Img &" were expected");
+         Assert (N = Expected, "Met "& N'Img &" items where "&
+                               Expected'Img &" were expected");
+         Assert (M = Expected/2, "Deleted "& N'Img &" items where "&
+                                 Expected'Img &" were expected");
       end;
 
       procedure Double_Cursor
@@ -342,7 +344,7 @@ package body DB.Maps.Bounded.Test is
          end loop;
          Assert (N = 2 * Loop_Count, "Met "& N'Img &" items where "&
                                      Loop_Count'Img &" were expected");
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
       end;
 
@@ -360,7 +362,7 @@ package body DB.Maps.Bounded.Test is
             exit when S /= Success;
             N := N + 1;
          end loop;
-         C.Delete (K, V, S);
+         C.Delete (S);
          Assert (S = Failure, "Cursor had finished but Delete didn't fail");
          Assert (N = 0, "Met "& N'Img &" items where 0 were expected");
       end;
@@ -374,16 +376,17 @@ package body DB.Maps.Bounded.Test is
       Appends (Map);
       Appends (Map);
       Double_Cursor;
-      Half_Cursor_Delete (Even => True);
-      Half_Cursor_Delete (Even => False);
-      Single_Cursor_Pause_Delete;
+      -- not 2*Loop_Count, because the recalibration will skip the duplicate
+      Half_Cursor_Delete (Expected => Loop_Count, Even => True);
+      Half_Cursor_Delete (Expected => Loop_Count, Even => False);
+      Single_Cursor_Pause_Delete (Expected => Loop_Count);
       Empty;
       Finalize (Map);
       Test_Utils.Unlink (File_Name);
    exception
-      when others =>
+      when E: others =>
          Test_Utils.Unlink (File_Name);
-         Assert (False, "3");
+         Put_Line (Exception_Information (E));
          raise;
    end;
 

@@ -377,16 +377,8 @@ package DB.Maps is
 
    procedure Delete
      (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type)
    is abstract;
-
-   procedure Delete
-     (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
-      State  :    out State_Type);
 
 private
    type Map_Type is abstract new AF.Limited_Controlled with null record;

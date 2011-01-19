@@ -4,7 +4,6 @@
 -- to find the key.
 -- During all this time, nothing is locked.
 --
---
 -- Design Notes:
 --
 -- The semantics of the Search_Node procedure are a little bit tricky because it

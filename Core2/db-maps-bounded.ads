@@ -184,8 +184,6 @@ package DB.Maps.Bounded is
    overriding
    procedure Delete
      (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Wrapper_Type;
       State  :    out State_Type);
 
 private
