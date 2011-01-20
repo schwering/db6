@@ -212,8 +212,8 @@ package body Cursors is
       begin
          Cursor.Key_Context   := Keys.New_Read_Context;
          Cursor.Value_Context := Values.New_Read_Context;
-         Nodes.Get_Key (Cursor.Node, Cursor.Index, Cursor.Key,
-                        Cursor.Key_Context);
+         Nodes.Get_Key
+           (Cursor.Node, Cursor.Index, Cursor.Key, Cursor.Key_Context);
       end Init_Contexts_And_Key;
 
 
@@ -239,8 +239,8 @@ package body Cursors is
             end loop;
          else
             Cursor.Index := Cursor.Index + 1;
-            Nodes.Get_Key (Cursor.Node, Cursor.Index, Cursor.Key,
-                           Cursor.Key_Context);
+            Nodes.Get_Key
+              (Cursor.Node, Cursor.Index, Cursor.Key, Cursor.Key_Context);
             State := Success;
          end if;
       exception
@@ -409,8 +409,9 @@ package body Cursors is
       then
          State := Success;
          Key   := Cursor.Key;
-         Nodes.Get_Value (Cursor.Node, Cursor.Index, Value,
-                          Cursor.Key_Context, Cursor.Value_Context);
+         Nodes.Get_Value
+           (Cursor.Node, Cursor.Index, Value, Cursor.Key_Context,
+            Cursor.Value_Context);
       elsif State = Success then
          State := Failure;
       end if;
