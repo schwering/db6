@@ -10,74 +10,33 @@ with DB.Utils.Global_Pool;
 package body DB.DSA.Gen_BTrees is
 
    package Stacks is
-      type Stack_Type is limited private;
+      generic
+         with function Exit_Cond
+           (N : Nodes.Node_Type)
+            return Boolean;
 
-      procedure Initialize
-        (Stack : out Stack_Type;
-         Key   : in  Keys.Key_Type);
-
-      procedure Finalize
-        (Stack : in out Stack_Type);
-
-      function Is_Empty
-        (Stack : Stack_Type)
-         return Boolean;
-
-      procedure Pop
-        (Stack : in out Stack_Type;
-         N_A   :    out Nodes.Valid_Address_Type);
-
-      procedure Pop
-        (Stack : in out Stack_Type;
-         N_A   :    out Nodes.Valid_Address_Type;
-         Level :    out Nodes.Level_Type);
-
-      procedure Build_Stack
+         with procedure Modify_Node
+           (N_Old : in  Nodes.Node_Type;
+            N     : out Nodes.RW_Node_Type;
+            State : out State_Type);
+      procedure Gen_Modify
         (Tree  : in out Tree_Type;
-         Stack : in out Stack_Type;
-         Level : in     Nodes.Level_Type);
-      -- Builds the stack from the root to the outermost-left leaf that might
-      -- contain the Key associated with the stack.
-
-      procedure Move_Right
-        (Tree      : in out          Tree_Type;
-         Stack     : in out          Stack_Type;
-         Level     : in              Nodes.Level_Type;
-         Exit_Cond : not null access function (N : Nodes.Node_Type)
-                                        return Boolean;
-         N_A       : in out          Nodes.Valid_Address_Type;
-         N         :    out          Nodes.Node_Type);
-      -- Moves to the right using Gen_BTrees.Move_Right but handles potential
-      -- splits of the tree correctly. If the nodes read starting from N_A are
-      -- not from the expected Level, the Stack is re-built.
-
-      procedure Write_And_Ascend
-        (Tree  : in out Tree_Type;
-         Stack : in out Stack_Type;
-         N_A   : in     Nodes.Valid_Address_Type;
-         N_Old : in     Nodes.RW_Node_Type;
-         N     : in     Nodes.RW_Node_Type);
-      -- Writes back the node(s) visited of the current level.
-      -- The address N_A must be locked when this procedure is called.
-      -- N_A is unlocked by this procedure.
-
-   private
-      type Item_Type is
-         record
-            Address : Nodes.Valid_Address_Type;
-            Level   : Nodes.Level_Type;
-         end record;
-
-      package Stacks is new Utils.Gen_Stacks
-        (Item_Type    => Item_Type,
-         Initial_Size => 7,
-         Storage_Pool => DB.Utils.Global_Pool.Global_Storage_Pool);
-
-      type Stack_Type is
-         record
-            S   : Stacks.Stack_Type;
-            Key : Keys.Key_Type;
-         end record;
+         Key   : in     Keys.Key_Type;
+         State :    out State_Type);
+      -- The generic operation which can be used to modify leaf nodes.
+      -- Internally it looks for the leaf that contains Key. This is done using
+      -- (eventually) Gen_Move_Right which is instantiated with Exit_Cond.
+      -- Exit_Cond is a crucial component, because it controls which leaf is
+      -- actually modified.
+      -- Then Modify_Node is called and the old leaf, N_Old, is replaced with
+      -- the new leaf, N. Subsequently, the node is written back and, if
+      -- necessary, the stack is unwound, i.e. backtracking is done. This is
+      -- required to keep the high-keys of the nodes consistent.
+      --
+      -- This procedure cares about race conditions and so on. Since the stack
+      -- of nodes which represents the path from the root node to the leaf plays
+      -- an important role, the package is named Stacks.
+      -- Also see the documentation of Stacks, Insertions and Deletions.
    end Stacks;
 
 
@@ -320,17 +279,23 @@ package body DB.DSA.Gen_BTrees is
    end Scan_Node;
 
 
+   generic
+      with function Exit_Cond (N : Nodes.Node_Type) return Boolean;
+   procedure Gen_Move_Right
+     (Tree : in out Tree_Type;
+      N_A  : in out Nodes.Valid_Address_Type;
+      N    :    out Nodes.Node_Type);
    -- Moves to the right starting from the node at address N_A until a node
    -- which satisfies the Exit_Cond is reached.
    -- During all this time, it cares about the lock by locking the current node
    -- and unlocking it right after the right neighbor is locked.
    -- Hence on return, the node N at address N_A is locked!
    -- The maximum count of concurrently held locks is 2.
-   procedure Move_Right
-     (Tree      : in out          Tree_Type;
-      Exit_Cond : not null access function (N : Nodes.Node_Type) return Boolean;
-      N_A       : in out          Nodes.Valid_Address_Type;
-      N         :    out          Nodes.Node_Type) is
+
+   procedure Gen_Move_Right
+     (Tree : in out Tree_Type;
+      N_A  : in out Nodes.Valid_Address_Type;
+      N    :    out Nodes.Node_Type) is
    begin
       Lock (Tree, N_A);
       loop
@@ -355,7 +320,7 @@ package body DB.DSA.Gen_BTrees is
             N_A := R_A;
          end;
       end loop;
-   end Move_Right;
+   end Gen_Move_Right;
 
 
    procedure Create

@@ -93,6 +93,76 @@
 separate (DB.DSA.Gen_BTrees)
 package body Stacks is
 
+   type Item_Type is
+      record
+         Address : Nodes.Valid_Address_Type;
+         Level   : Nodes.Level_Type;
+      end record;
+
+   package Stacks is new Utils.Gen_Stacks
+     (Item_Type    => Item_Type,
+      Initial_Size => 7,
+      Storage_Pool => DB.Utils.Global_Pool.Global_Storage_Pool);
+
+   type Stack_Type is
+      record
+         S   : Stacks.Stack_Type;
+         Key : Keys.Key_Type;
+      end record;
+
+
+   procedure Initialize
+     (Stack : out Stack_Type;
+      Key   : in  Keys.Key_Type);
+
+   procedure Finalize
+     (Stack : in out Stack_Type);
+
+   function Is_Empty
+     (Stack : Stack_Type)
+      return Boolean;
+
+   procedure Pop
+     (Stack : in out Stack_Type;
+      N_A   :    out Nodes.Valid_Address_Type);
+
+   procedure Pop
+     (Stack : in out Stack_Type;
+      N_A   :    out Nodes.Valid_Address_Type;
+      Level :    out Nodes.Level_Type);
+
+   procedure Build_Stack
+     (Tree  : in out Tree_Type;
+      Stack : in out Stack_Type;
+      Level : in     Nodes.Level_Type);
+   -- Builds the stack from the root to the outermost-left leaf that might
+   -- contain the Key associated with the stack.
+
+   generic
+      with function Exit_Cond
+        (N : Nodes.Node_Type)
+         return Boolean;
+   procedure Gen_Rebuilding_Move_Right
+     (Tree  : in out Tree_Type;
+      Stack : in out Stack_Type;
+      Level : in     Nodes.Level_Type;
+      N_A   : in out Nodes.Valid_Address_Type;
+      N     :    out Nodes.Node_Type);
+   -- Moves to the right using Gen_BTrees.Move_Right but handles potential
+   -- splits of the tree correctly. If the nodes read starting from N_A are
+   -- not from the expected Level, the Stack is re-built.
+
+   procedure Write_And_Ascend
+     (Tree  : in out Tree_Type;
+      Stack : in out Stack_Type;
+      N_A   : in     Nodes.Valid_Address_Type;
+      N_Old : in     Nodes.RW_Node_Type;
+      N     : in     Nodes.RW_Node_Type);
+   -- Writes back the node(s) visited of the current level.
+   -- The address N_A must be locked when this procedure is called.
+   -- N_A is unlocked by this procedure.
+
+
    procedure Initialize
      (Stack : out Stack_Type;
       Key   : in  Keys.Key_Type) is
@@ -204,16 +274,18 @@ package body Stacks is
    end Build_Stack;
 
 
-   procedure Move_Right
-     (Tree      : in out          Tree_Type;
-      Stack     : in out          Stack_Type;
-      Level     : in              Nodes.Level_Type;
-      Exit_Cond : not null access function (N : Nodes.Node_Type) return Boolean;
-      N_A       : in out          Nodes.Valid_Address_Type;
-      N         :    out          Nodes.Node_Type)
+   procedure Gen_Rebuilding_Move_Right
+     (Tree  : in out          Tree_Type;
+      Stack : in out          Stack_Type;
+      Level : in              Nodes.Level_Type;
+      N_A   : in out          Nodes.Valid_Address_Type;
+      N     :    out          Nodes.Node_Type)
    is
       use type Nodes.Level_Type;
       use type Nodes.Valid_Address_Type;
+
+      function Precise_Exit_Cond (N : Nodes.Node_Type) return Boolean;
+      pragma Inline (Precise_Exit_Cond);
 
       function Precise_Exit_Cond (N : Nodes.Node_Type) return Boolean is
       begin
@@ -223,18 +295,20 @@ package body Stacks is
          end if;
          return Exit_Cond (N);
       end Precise_Exit_Cond;
+
+      procedure Move_Right is new Gen_Move_Right (Precise_Exit_Cond);
    begin
-      Move_Right (Tree, Precise_Exit_Cond'Access, N_A, N);
+      Move_Right (Tree, N_A, N);
       if Nodes.Level (N) /= Level then
          pragma Assert (N_A = Root_Address);
          Unlock (Tree, N_A);
          Build_Stack (Tree, Stack, Level);
          Pop (Stack, N_A);
          pragma Assert (N_A /= Root_Address);
-         Move_Right (Tree, Precise_Exit_Cond'Access, N_A, N);
+         Move_Right (Tree, N_A, N);
          pragma Assert (Nodes.Level (N) = Level);
       end if;
-   end Move_Right;
+   end Gen_Rebuilding_Move_Right;
 
 
    procedure Write_And_Ascend
@@ -244,6 +318,37 @@ package body Stacks is
       N_Old : in     Nodes.RW_Node_Type;
       N     : in     Nodes.RW_Node_Type)
    is
+      procedure Pop_Inner
+        (C_A : in  Nodes.Valid_Address_Type;
+         N_A : out Nodes.Valid_Address_Type;
+         N   : out Nodes.RW_Node_Type);
+
+      procedure Update_High_Key
+        (C_Key : in Keys.Key_Type;
+         C_A   : in Nodes.Valid_Address_Type);
+      -- Handles the case that the high-key of a node C changed. Then C_A is the
+      -- address of C and C_Key is the high-key of C.
+
+      procedure Insert_Key_And_Update_High_Key
+        (L_Key : in Keys.Key_Type;
+         L_A   : in Nodes.Valid_Address_Type;
+         R_Key : in Keys.Key_Type;
+         R_A   : in Nodes.Valid_Address_Type);
+      -- Handles the split of a node into nodes L and R, where L is written back
+      -- to the position of the original node, L_A, and R is written to a new
+      -- address, R_A.
+      -- If there is no parent into which the subtree induced by R can be
+      -- inserted, i.e. the stack is empty, then we've arrived at the root and
+      -- create a new one.
+      -- Otherwise, in the parent N of L, the key of the pointer to L is set to
+      -- the possibly changed high-key of L and the pointer to R and its
+      -- high-key are inserted.
+
+      procedure Write_And_Ascend
+        (N_A   : in Nodes.Valid_Address_Type;
+         N_Old : in Nodes.RW_Node_Type;
+         N     : in Nodes.RW_Node_Type);
+
 
       procedure Pop_Inner
         (C_A : in  Nodes.Valid_Address_Type;
@@ -255,12 +360,14 @@ package body Stacks is
             return Nodes.Is_Valid (Nodes.Child_Position (N, C_A));
          end Exit_Cond;
 
+         procedure Move_Right is new Gen_Rebuilding_Move_Right (Exit_Cond);
+
          Level : Nodes.Level_Type;
       begin
          declare
          begin
             Pop (Stack, N_A, Level);
-            Move_Right (Tree, Stack, Level, Exit_Cond'Access, N_A, N);
+            Move_Right (Tree, Stack, Level, N_A, N);
          exception
             when others =>
                Unlock (Tree, C_A);
@@ -270,14 +377,6 @@ package body Stacks is
       end Pop_Inner;
 
 
-      procedure Write_And_Ascend
-        (N_A   : in Nodes.Valid_Address_Type;
-         N_Old : in Nodes.RW_Node_Type;
-         N     : in Nodes.RW_Node_Type);
-
-
-      -- Handles the case that the high-key of a node C changed. Then C_A is the
-      -- address of C and C_Key is the high-key of C.
       procedure Update_High_Key
         (C_Key : in Keys.Key_Type;
          C_A   : in Nodes.Valid_Address_Type) is
@@ -300,15 +399,6 @@ package body Stacks is
       end Update_High_Key;
 
 
-      -- Handles the split of a node into nodes L and R, where L is written back
-      -- to the position of the original node, L_A, and R is written to a new
-      -- address, R_A.
-      -- If there is no parent into which the subtree induced by R can be
-      -- inserted, i.e. the stack is empty, then we've arrived at the root and
-      -- create a new one.
-      -- Otherwise, in the parent N of L, the key of the pointer to L is set to
-      -- the possibly changed high-key of L and the pointer to R and its
-      -- high-key are inserted.
       procedure Insert_Key_And_Update_High_Key
         (L_Key : in Keys.Key_Type;
          L_A   : in Nodes.Valid_Address_Type;
@@ -396,10 +486,9 @@ package body Stacks is
             end if;
          else
             declare
-               I   : constant Nodes.Valid_Index_Type :=
-                 Nodes.Split_Position (N);
-               L   : Nodes.RW_Node_Type := Nodes.Copy (N, 1, I - 1);
-               R   : Nodes.RW_Node_Type := Nodes.Copy (N, I, Nodes.Degree (N));
+               I : constant Nodes.Valid_Index_Type := Nodes.Split_Position (N);
+               L : Nodes.RW_Node_Type := Nodes.Copy (N, 1, I - 1);
+               R : Nodes.RW_Node_Type := Nodes.Copy (N, I, Nodes.Degree (N));
                L_A : Nodes.Valid_Address_Type renames N_A;
                R_A : Nodes.Valid_Address_Type;
             begin
@@ -424,6 +513,53 @@ package body Stacks is
    begin
       Write_And_Ascend (N_A, N_Old, N);
    end Write_And_Ascend;
+
+
+   procedure Gen_Modify
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      State :    out State_Type)
+   is
+      pragma Precondition (Tree.Initialized);
+
+      use type Nodes.Valid_Index_Type;
+      use type Blocks.Size_Type;
+
+      procedure Move_Right is new Gen_Rebuilding_Move_Right (Exit_Cond);
+
+      Stack : Stack_Type;
+      N_A   : Nodes.Valid_Address_Type;
+      N_Old : Nodes.RW_Node_Type;
+   begin
+      Initialize (Stack, Key);
+
+      Build_Stack (Tree, Stack, Nodes.Leaf_Level);
+      Pop (Stack, N_A);
+      Move_Right (Tree, Stack, Nodes.Leaf_Level, N_A, N_Old);
+
+      declare
+         N : Nodes.RW_Node_Type;
+      begin
+         Modify_Node (N_Old, N, State);
+         case State is
+            when Success =>
+               Write_And_Ascend (Tree, Stack, N_A, N_Old, N);
+            when Failure =>
+               Unlock (Tree, N_A);
+         end case;
+      exception
+         when others =>
+            Unlock (Tree, N_A);
+            raise;
+      end;
+
+      Finalize (Stack);
+
+   exception
+      when others =>
+         Finalize (Stack);
+         raise;
+   end Gen_Modify;
 
 end Stacks;
 

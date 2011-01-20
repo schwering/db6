@@ -1,16 +1,16 @@
 -- Abstract:
 --
--- Multiple variants that all delete a new Key/Value pair as follows.
--- (1) Descend to a leaf using the Stacks package.
+-- Delete a new Key/Value pair as follows.
+-- (1) Descend to a leaf.
 -- (2) Move to the right as until a node is reached that either contains the
 --     searched key or guarantees that there is no node that contains the key.
 --     Remove the entry from the found leaf.
--- (3) Now start the ascent according to the Stacks package.
+-- (3) Now start the ascent.
 --
 -- Design Nodes:
 --
--- Since the deletion heavily relies on the nested Stacks package, check its
--- documentation for information about locking etc.
+-- The deletion obviously agrees to the Stacks.Gen_Modify contract. Check the
+-- documentation of Stacks for more information about locking and so on.
 --
 -- Why don't we just remove the entry from the leaf and then stop?
 -- The ascent is necessary to ensure that the keys of the pointers in the
@@ -48,78 +48,55 @@ separate (DB.DSA.Gen_BTrees)
 package body Deletions is
 
    procedure Delete
-     (Tree     : in out Tree_Type;
-      Key      : in     Keys.Key_Type;
-      Value    :    out Values.Value_Type;
-      State    :    out State_Type)
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type)
    is
-      pragma Precondition (Tree.Initialized);
-
-      Stack : Stacks.Stack_Type;
-      N_A   : Nodes.Valid_Address_Type;
-      N_Old : Nodes.RW_Node_Type;
-   begin
-      Stacks.Initialize (Stack, Key);
-
-      declare
-         function Exit_Cond
-           (N : Nodes.Node_Type)
-            return Boolean
-         is
-            use type Nodes.Degree_Type;
-            High_Key     : Keys.Key_Type;
-            Has_High_Key : Boolean;
-         begin
-            if not Nodes.Is_Valid (Nodes.Link (N)) then
-               return True;
-            end if;
-            Nodes.Get_High_Key (N, High_Key, Has_High_Key);
-            if not Has_High_Key then
-               return False;
-            end if;
-            if Nodes.Degree (N) = 0 then
-               return Key < High_Key;
-            else
-               return Key <= High_Key;
-            end if;
-         end Exit_Cond;
+      function Exit_Cond
+        (N : Nodes.Node_Type)
+         return Boolean
+      is
+         use type Nodes.Degree_Type;
+         High_Key     : Keys.Key_Type;
+         Has_High_Key : Boolean;
       begin
-         Stacks.Build_Stack (Tree, Stack, Nodes.Leaf_Level);
-         Stacks.Pop (Stack, N_A);
-         Stacks.Move_Right (Tree, Stack, Nodes.Leaf_Level, Exit_Cond'Access,
-                            N_A, N_Old);
-      end;
+         if not Nodes.Is_Valid (Nodes.Link (N)) then
+            return True;
+         end if;
+         Nodes.Get_High_Key (N, High_Key, Has_High_Key);
+         if not Has_High_Key then
+            return False;
+         end if;
+         if Nodes.Degree (N) = 0 then
+            return Key < High_Key;
+         else
+            return Key <= High_Key;
+         end if;
+      end Exit_Cond;
 
-      declare
+
+      procedure Modify_Node
+        (N_Old : in  Nodes.Node_Type;
+         N     : out Nodes.RW_Node_Type;
+         State : out State_Type)
+      is
+         use type Nodes.Degree_Type;
          I : Nodes.Index_Type;
       begin
          I := Nodes.Key_Position (N_Old, Key);
          if Nodes.Is_Valid (I) and then Key = Nodes.Key (N_Old, I) then
-            declare
-               N : constant Nodes.RW_Node_Type := Nodes.Deletion (N_Old, I);
-            begin
-               Stacks.Write_And_Ascend (Tree, Stack, N_A, N_Old, N);
-               Value := Nodes.Value (N_Old, I);
-               State := Success;
-            end;
+            N     := Nodes.Deletion (N_Old, I);
+            Value := Nodes.Value (N_Old, I);
+            State := Success;
          else
-            Unlock (Tree, N_A);
-            Stacks.Finalize (Stack);
             State := Failure;
-            return;
          end if;
-      exception
-         when others =>
-            Unlock (Tree, N_A);
-            raise;
-      end;
+      end Modify_Node;
 
-      Stacks.Finalize (Stack);
-
-   exception
-      when others =>
-         Stacks.Finalize (Stack);
-         raise;
+      procedure Delete is new Stacks.Gen_Modify (Exit_Cond, Modify_Node);
+   begin
+      Delete (Tree, Key, State);
    end Delete;
 
 end Deletions;
