@@ -21,6 +21,8 @@ package body DB.Maps.Bounded.Test.Suite is
                                    Test_Open'Access));
       Ret.Add_Test (Caller.Create (Name & ": Cursor",
                                    Test_Cursor'Access));
+      Ret.Add_Test (Caller.Create (Name & ": Delete_Range",
+                                   Test_Range'Access));
       return Ret;
    end Suite;
 

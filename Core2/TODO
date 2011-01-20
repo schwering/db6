@@ -1,4 +1,20 @@
 * Gen_BTrees
+      * Cursor Delete verbessern:
+        (Vielleicht reicht das aktuelle Delete_Range aber auch einfach aus.)
+        Elemente koennen zum Loeschen vorgemerkt werden. Das eigentlich
+        Loeschen findet erst statt, wenn der aktuelle Knoten verlassen
+        wird. Dann wird ein Gen_Modify aufgerufen, das zum aktuellen
+        Knoten laeuft (durch Exit_Cond gesteuert) und dann alle in dem
+        gelesenen Knoten vorhandenen und zum Loeschen vorgemerkten
+        Elemente loescht. Die Elemente, die nicht im Knoten gefunden
+        werden, sind entweder schon geloescht worden oder durch ein Split
+        in einen rechten Nachbarn gewandert. Diejenigen, die kleiner als
+        der High-Key des betrachteten Knoten sind, koennen geloescht werden,
+        die anderen werden aufgehoben und aus dem naechsten Knoten
+        geloescht. Die Frage ist, ob Cursor.Node auch durch den neu
+        gelesenen Knoten ersetzt wird. Die Nachbar-Adresse von Cursor.Node
+        stimmt naemlich im Falle eines Splits nicht mehr, andererseits
+        werden bei einem Split dann Elemente doppelt betrachtet.
       * Reorganize implementieren:
         Ein Task, der immer wieder ueber den B-Baum laeuft,
         unterlaufene Blaetter merget, hintere Bloecke in vordere

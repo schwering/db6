@@ -129,6 +129,12 @@ package body DB.DSA.Gen_BTrees is
          Key   : in     Keys.Key_Type;
          Value :    out Values.Value_Type;
          State :    out State_Type);
+
+      procedure Delete_Range
+        (Tree  : in out Tree_Type;
+         First : in     Keys.Key_Type;
+         Last  : in     Keys.Key_Type;
+         State :    out State_Type);
    end Deletions;
 
 
@@ -419,6 +425,14 @@ package body DB.DSA.Gen_BTrees is
       Value :    out Values.Value_Type;
       State :    out State_Type)
    renames Deletions.Delete;
+
+
+   procedure Delete_Range
+     (Tree  : in out Tree_Type;
+      First : in     Keys.Key_Type;
+      Last  : in     Keys.Key_Type;
+      State :    out State_Type)
+   renames Deletions.Delete_Range;
 
 
    function Positive_Infinity_Bound

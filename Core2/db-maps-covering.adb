@@ -717,6 +717,21 @@ package body DB.Maps.Covering is
    end Delete;
 
 
+   procedure Delete_Range
+     (Map   : in out Map_Type;
+      First : in     Key_Type;
+      Last  : in     Key_Type;
+      State :    out State_Type)
+   is
+   begin
+      State := Success;
+      for I in Map.Slices'Range loop
+         Map.Slices (I).Map.Delete_Range (First, Last, State);
+         exit when State /= Success;
+      end loop;
+   end Delete_Range;
+
+
    procedure Free_Heap_Item (Item : in out Heap_Item_Type)
    is
       procedure Free is new Ada.Unchecked_Deallocation

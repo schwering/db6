@@ -219,6 +219,19 @@ package body DB.Maps.Bounded is
    end Delete;
 
 
+   procedure Delete_Range
+     (Map   : in out Map_Type;
+      First : in     Key_Type;
+      Last  : in     Key_Type;
+      State :    out State_Type)
+   is
+      S : BTrees.State_Type;
+   begin
+      BTrees.Delete_Range (Map.Tree, First, Last, S);
+      State := To_State (S);
+   end Delete_Range;
+
+
    function New_Cursor
      (Map           : Map_Type;
       Thread_Safe   : Boolean;

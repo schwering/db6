@@ -121,7 +121,7 @@ package DB.DSA.Gen_BTrees is
       Key   :    out Keys.Key_Type;
       Value :    out Values.Value_Type;
       State :    out State_Type);
-   -- Searches the minimum Key / Value pair or sets State = Failure if no
+   -- Searches the minimum Key/Value pair or sets State = Failure if no
    -- such key exists.
    -- This procedure never blocks because it uses no locks (as long as
    -- Block_IO.Read and Block_IO.Write do not block).
@@ -131,7 +131,7 @@ package DB.DSA.Gen_BTrees is
       Key   : in     Keys.Key_Type;
       Value : in     Values.Value_Type;
       State :    out State_Type);
-   -- Inserts a new Key / Value pair into the Tree. If there already is Key
+   -- Inserts a new Key/Value pair into the Tree. If there already is Key
    -- contained in Tree, it does not modify Tree and sets State = Failure.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
    -- available.
@@ -143,7 +143,7 @@ package DB.DSA.Gen_BTrees is
       Existed   :    out Boolean;
       Old_Value :    out Values.Value_Type;
       State     :    out State_Type);
-   -- Inserts a new Key / Value pair into the Tree. If there already is Key
+   -- Inserts a new Key/Value pair into the Tree. If there already is Key
    -- contained in Tree, it does not modify Tree, sets Old_Value to the
    -- respective value and sets State = Failure.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
@@ -154,7 +154,7 @@ package DB.DSA.Gen_BTrees is
       Key   : in     Keys.Key_Type;
       Value : in     Values.Value_Type;
       State :    out State_Type);
-   -- Inserts a new Key / Value pair into the Tree. If Key is already contained
+   -- Inserts a new Key/Value pair into the Tree. If Key is already contained
    -- in Tree, its associated value is replaced with Value.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
    -- available.
@@ -166,7 +166,7 @@ package DB.DSA.Gen_BTrees is
       Existed   :    out Boolean;
       Old_Value :    out Values.Value_Type;
       State     :    out State_Type);
-   -- Inserts a new Key / Value pair into the Tree. If Key is already contained
+   -- Inserts a new Key/Value pair into the Tree. If Key is already contained
    -- in Tree, its associated value is replaced with Value.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
    -- available.
@@ -176,8 +176,8 @@ package DB.DSA.Gen_BTrees is
       Key   : in     Keys.Key_Type;
       Value : in     Values.Value_Type;
       State :    out State_Type);
-   -- Inserts a new Key / Value pair into the Tree. If Key is already contained
-   -- in Tree, these old Key / value pairs will coexist with the new Key / Value
+   -- Inserts a new Key/Value pair into the Tree. If Key is already contained
+   -- in Tree, these old Key/value pairs will coexist with the new Key/Value
    -- pair.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
    -- available.
@@ -187,8 +187,20 @@ package DB.DSA.Gen_BTrees is
       Key   : in     Keys.Key_Type;
       Value :    out Values.Value_Type;
       State :    out State_Type);
-   -- Deletes the Key / Value pair or sets State = Failure if no such key
+   -- Deletes the Key/Value pair or sets State = Failure if no such key
    -- exists.
+   -- This procedure might block because of Block_IO.Lock until the lock becomes
+   -- available.
+
+   procedure Delete_Range
+     (Tree  : in out Tree_Type;
+      First : in     Keys.Key_Type;
+      Last  : in     Keys.Key_Type;
+      State :    out State_Type);
+   -- Deletes all key/value pairs starting at First and ending at Last (both
+   -- inclusive).
+   -- If one of the deletions fails, State is set to Failure and the procedure
+   -- aborts.
    -- This procedure might block because of Block_IO.Lock until the lock becomes
    -- available.
 
@@ -351,12 +363,6 @@ private
         (Level : Level_Type)
          return RW_Node_Type;
       -- Returns a simple root node of degree 0.
-
-      function To_RO_Node
-        (Node : Node_Type)
-         return RO_Node_Type;
-      -- Returns read-only node part of Node. This might cut parts of the node
-      -- if it is not safe, so use this function with caution!
 
       function Is_Leaf
         (Node : Node_Type)

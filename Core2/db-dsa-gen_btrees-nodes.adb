@@ -965,14 +965,6 @@ package body Nodes is
    end Root_Node;
 
 
-   function To_RO_Node
-     (Node : Node_Type)
-      return RO_Node_Type is
-   begin
-      return Node (RO_Node_Type'Range);
-   end To_RO_Node;
-
-
    function Is_Ok
      (Node : Node_Type)
       return Boolean is

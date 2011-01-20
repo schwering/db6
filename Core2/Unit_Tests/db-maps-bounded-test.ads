@@ -20,6 +20,7 @@ package DB.Maps.Bounded.Test is
    procedure Test_Create (T : in out Test_Type);
    procedure Test_Open (T : in out Test_Type);
    procedure Test_Cursor (T : in out Test_Type);
+   procedure Test_Range (T : in out Test_Type);
 
 private
    type Map_Ref_Type is access Map_Type;

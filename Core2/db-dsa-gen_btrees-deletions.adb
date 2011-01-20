@@ -98,5 +98,91 @@ package body Deletions is
       Delete (Tree, Key, State);
    end Delete;
 
+
+   procedure Delete_Range
+     (Tree  : in out Tree_Type;
+      First : in     Keys.Key_Type;
+      Last  : in     Keys.Key_Type;
+      State :    out State_Type)
+   is
+      Key : Keys.Key_Type := First;
+
+      function Exit_Cond
+        (N : Nodes.Node_Type)
+         return Boolean
+      is
+         use type Nodes.Degree_Type;
+         High_Key     : Keys.Key_Type;
+         Has_High_Key : Boolean;
+      begin
+         if not Nodes.Is_Valid (Nodes.Link (N)) then
+            return True;
+         end if;
+         Nodes.Get_High_Key (N, High_Key, Has_High_Key);
+         if not Has_High_Key then
+            return False;
+         end if;
+         if Nodes.Degree (N) = 0 then
+            return Last < High_Key;
+         else
+            return Key <= High_Key;
+         end if;
+      end Exit_Cond;
+
+
+      Last_Leaf : Boolean := False;
+
+      procedure Modify_Node
+        (N_Old : in  Nodes.Node_Type;
+         N     : out Nodes.RW_Node_Type;
+         State : out State_Type)
+      is
+         use type Nodes.Degree_Type;
+         I : Nodes.Index_Type := Nodes.Key_Position (N_Old, Key);
+      begin
+         Last_Leaf := not Nodes.Is_Valid (Nodes.Link (N_Old));
+
+         if not Nodes.Is_Valid (I) then
+            State := Failure;
+            return;
+         end if;
+
+         declare
+            High_Key     : Keys.Key_Type;
+            Has_High_Key : Boolean;
+         begin
+            if Nodes.Degree (N_Old) = 0 then
+               Nodes.Get_High_Key (N_Old, High_Key, Has_High_Key);
+               if Has_High_Key and then Key < High_Key then
+                  Key := High_Key;
+               end if;
+               State := Failure;
+               return;
+            end if;
+         end;
+
+         N (N_Old'Range) := N_Old;
+         State           := Failure;
+         loop
+            exit when I > Nodes.Degree (N);
+            Key := Nodes.Key (N, I);
+            exit when Key > Last;
+            if Key >= First then
+               N     := Nodes.Deletion (N, I);
+               State := Success;
+            else
+               I := I + 1;
+            end if;
+         end loop;
+      end Modify_Node;
+
+      procedure Delete is new Stacks.Gen_Modify (Exit_Cond, Modify_Node);
+   begin
+      while not Last_Leaf and Key <= Last loop
+         Delete (Tree, Key, State);
+      end loop;
+      State := Success;
+   end Delete_Range;
+
 end Deletions;
 

@@ -257,6 +257,15 @@ package DB.Maps is
       Value :    out Value_Type'Class;
       State :    out State_Type);
 
+   procedure Delete_Range
+     (Map   : in out Map_Type;
+      First : in     Key_Type;
+      Last  : in     Key_Type;
+      State :    out State_Type)
+   is abstract;
+   -- Deletes all key/value pairs starting at First and ending at Last, both
+   -- inclusive.
+
 
    ----------
    -- Miscellaneous procedures.

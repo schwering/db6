@@ -36,26 +36,41 @@ package body DB.Maps.Bounded.Test is
 
       type Pool_Type is array (Natural range <>) of Bounded_String;
 
-     Pool : constant Pool_Type :=
-       (To_Bounded_String ("Halleluja"),
-        To_Bounded_String ("BMW"),
-        To_Bounded_String ("Der neue X3"),
-        To_Bounded_String ("Sportwagen"),
-        To_Bounded_String ("Automotive Software"),
-        To_Bounded_String ("Artificial Intelligence: A Modern Approach"),
-        To_Bounded_String ("Stuart Russel"),
-        To_Bounded_String ("Peter Norvig"),
-        To_Bounded_String ("Hannelore Kraft"),
-        To_Bounded_String ("Edmund Stoiber"),
-        To_Bounded_String ("Oberst Wilhelm Klink"),
-        To_Bounded_String ("Corporal Newkirk"),
-        To_Bounded_String ("Feldwebel Georg Schultz"),
-        To_Bounded_String ("Schultzi ist ein Genie"),
-        To_Bounded_String ("Hogan"));
+      Pool : constant Pool_Type :=
+        (To_Bounded_String ("Halleluja"),
+         To_Bounded_String ("BMW"),
+         To_Bounded_String ("Der neue X3"),
+         To_Bounded_String ("Sportwagen"),
+         To_Bounded_String ("Automotive Software"),
+         To_Bounded_String ("Artificial Intelligence: A Modern Approach"),
+         To_Bounded_String ("Stuart Russel"),
+         To_Bounded_String ("Peter Norvig"),
+         To_Bounded_String ("Hannelore Kraft"),
+         To_Bounded_String ("Edmund Stoiber"),
+         To_Bounded_String ("Oberst Wilhelm Klink"),
+         To_Bounded_String ("Corporal Newkirk"),
+         To_Bounded_String ("Feldwebel Georg Schultz"),
+         To_Bounded_String ("Schultzi ist ein Genie"),
+         To_Bounded_String ("Hogan"));
 
+     function To_String (I : Integer; Len : Integer) return String
+     is
+        T : constant String := I'Img;
+        S : String (1 .. Integer'Max (Len, T'Length)) := (others => ' ');
+     begin
+        S (S'Last - T'Length + 1 .. S'Last) := T;
+        for I in S'Range loop
+           if S (I) = ' ' then
+             S (I) := '0';
+           end if;
+        end loop;
+        return S;
+     end To_String;
+
+     Int    : constant String := To_String (I, Loop_Count'Img'Length);
      Suffix : constant String := To_String (Pool ((I * I) mod Pool'Length));
    begin
-      return New_Key (Integer'Image (I) & Suffix, Suffix, I * I);
+      return New_Key (Int & Suffix, Suffix, I * I);
    end New_Key;
 
 
@@ -176,6 +191,81 @@ package body DB.Maps.Bounded.Test is
                                  " be deleted from the map with value "&
                                  New_Value (I).Image);
          end if;
+      end loop;
+   end;
+
+
+   procedure Delete_Range (Map   : in out Maps.Map_Type'Class;
+                           First : in     Integer;
+                           Last  : in     Integer)
+   is
+      V : Values.Integers.Value_Type;
+      S : State_Type;
+   begin
+      for I in Integer'Max (First, 1) .. Integer'Min (Last, Loop_Count) loop
+         Map.Search (New_Key (I), V, S);
+         Assert (S = Success, "Item in range doesn't exist "&
+                              Types.Keys.Image (New_Key (I)));
+      end loop;
+
+      Map.Delete_Range (New_Key (First), New_Key (Last), S);
+      Assert (S = Success, "Delete range failed "&
+                           Types.Keys.Image (New_Key (First)) &" to "&
+                           Types.Keys.Image (New_Key (Last)));
+
+      for I in Integer'Max (First, 1) .. Integer'Min (Last, Loop_Count) loop
+         Map.Search (New_Key (I), V, S);
+         Assert (S = Failure, "Item in range still exists "& I'Img &" "&
+                              Types.Keys.Image (New_Key (I)));
+      end loop;
+   end;
+
+
+   procedure Concurrent_Delete_Range (Map   : in out Maps.Map_Type'Class;
+                                      First : in     Integer;
+                                      Last  : in     Integer)
+   is
+      V : Values.Integers.Value_Type;
+      S : State_Type;
+   begin
+      for I in Integer'Max (First, 1) .. Integer'Min (Last, Loop_Count) loop
+         Map.Search (New_Key (I), V, S);
+         Assert (S = Success, "Item in range doesn't exist "&
+                              Types.Keys.Image (New_Key (I)));
+      end loop;
+
+      declare
+         task type Worker_Type is
+            entry Start;
+            entry Finish (State : out State_Type);
+         end Worker_Type;
+
+         task body Worker_Type is
+         begin
+            accept Start;
+            Map.Delete_Range (New_Key (First), New_Key (Last), S);
+            accept Finish (State : out State_Type) do
+               State := S;
+            end Finish;
+         end Worker_Type;
+
+         Tasks : array (Positive range 1 .. 5) of Worker_Type;
+      begin
+         for I in Tasks'Range loop
+            Tasks (I).Start;
+         end loop;
+         for I in Tasks'Range loop
+            Tasks (I).Finish (S);
+            Assert (S = Success, "Delete range failed "&
+                                 Types.Keys.Image (New_Key (First)) &" to "&
+                                 Types.Keys.Image (New_Key (Last)));
+         end loop;
+      end;
+
+      for I in Integer'Max (First, 1) .. Integer'Min (Last, Loop_Count) loop
+         Map.Search (New_Key (I), V, S);
+         Assert (S = Failure, "Item in range still exists "&
+                              Types.Keys.Image (New_Key (I)));
       end loop;
    end;
 
@@ -389,6 +479,68 @@ package body DB.Maps.Bounded.Test is
          Put_Line (Exception_Information (E));
          raise;
    end;
+
+
+   procedure Test_Range (T : in out Test_Type)
+   is
+      pragma Unreferenced (T);
+
+      Map : Map_Type := New_Map;
+
+      procedure Contains (M : Natural)
+      is
+         C : Maps.Cursor_Type'Class := Map.New_Cursor
+           (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
+         K : Key_Type;
+         V : Values.Integers.Value_Type;
+         S : State_Type;
+         N : Natural := 0;
+      begin
+         loop
+            C.Next (K, V, S);
+            exit when S /= Success;
+            N := N + 1;
+         end loop;
+         C.Delete (S);
+         Assert (S = Failure, "Cursor had finished but Delete didn't fail");
+         Assert (N = M, "Met "& N'Img &" items where"& M'Img &" were expected");
+      end;
+
+   begin
+      Create (Map, File_Name);
+
+      Appends (Map);
+      Delete_Range (Map, 1, Loop_Count / 2);
+      Contains (Loop_Count / 2);
+      Delete_Range (Map, Loop_Count / 2 + 1, Loop_Count);
+      Contains (0);
+
+      Appends (Map);
+      Delete_Range (Map, -100, Loop_Count / 2);
+      Contains (Loop_Count / 2);
+      Delete_Range (Map, Loop_Count / 2 + 1, Loop_Count + 100);
+      Contains (0);
+
+      Appends (Map);
+      Delete_Range (Map, 1, Loop_Count - 1);
+      Contains (1);
+      Delete_Range (Map, Loop_Count, Loop_Count + 100);
+      Contains (0);
+
+      Appends (Map);
+      Appends (Map);
+      Concurrent_Delete_Range (Map, 1, Loop_Count);
+      Contains (0);
+
+      Finalize (Map);
+      Test_Utils.Unlink (File_Name);
+   exception
+      when E: others =>
+         Test_Utils.Unlink (File_Name);
+         Put_Line (Exception_Information (E));
+         raise;
+   end;
+
 
 end DB.Maps.Bounded.Test;
 

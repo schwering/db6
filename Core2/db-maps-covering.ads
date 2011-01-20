@@ -123,6 +123,13 @@ package DB.Maps.Covering is
       Value :    out Value_Wrapper_Type;
       State :    out State_Type);
 
+   overriding
+   procedure Delete_Range
+     (Map   : in out Map_Type;
+      First : in     Key_Type;
+      Last  : in     Key_Type;
+      State :    out State_Type);
+
 
    ----------
    -- Miscellaneous procedures.
