@@ -18,7 +18,7 @@ C1=1m
 C="$BIN $IO $FILE $IMPL $GEN 0\
         \
 	Insert,$C1,Cont\
-	Insert,$C1,Reset\
+	Append,$C1,Reset\
 	Search,$C1,Reset\
         \
 	Insert,$C1,Cont\
@@ -45,7 +45,7 @@ $C
 #C="$BIN $IO $FILE $GEN 0 Check,1,Reset"
 #echo $C
 #$C
-C="$BIN $IO $FILE $GEN 0 Stats,1,Reset"
+C="$BIN $IO $FILE $IMPL $GEN 0 Stats,1,Reset"
 echo $C
 $C
 ls -ahl $FILE
