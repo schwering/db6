@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- Administrates the opened maps.
+--
+-- Copyright 2010--2011 Christoph Schwering
+
 with Ada.Containers.Ordered_Maps;
 with Ada.Strings;
 with Ada.Strings.Bounded;

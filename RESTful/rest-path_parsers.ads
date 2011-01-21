@@ -16,7 +16,7 @@
 --
 -- The visited elements for /foo/bar/bla are foo, bar and then bla.
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with AWS.URL;
 

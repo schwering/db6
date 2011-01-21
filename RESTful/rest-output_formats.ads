@@ -43,7 +43,7 @@
 -- the consumer has read (or closed) the stream. (Unless the answer is so small
 -- that it fits in the queue's buffer at once, of course.)
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with Ada.Streams;
 

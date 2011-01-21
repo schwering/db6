@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2010--2011 Christoph Schwering
+
 with Ada.Calendar;
 with Ada.Calendar.Formatting;
 with Ada.Text_IO;

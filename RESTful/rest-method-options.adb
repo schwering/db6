@@ -1,3 +1,9 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2010--2011 Christoph Schwering
+
 with AWS.Status;
 with AWS.Response;
 

@@ -1,11 +1,8 @@
 -- Abstract:
 --
--- The PUT handler dispatches to some internal handlers which are implemented
--- as separate procedures. The first handler which succeeds determines the
--- response. If no handler wants to handle the request, an error is logged and a
--- short error response is performed.
+-- see spec
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with AWS.Messages;
 with AWS.Status;

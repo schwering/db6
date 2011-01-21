@@ -2,7 +2,7 @@
 --
 -- The design of the logger is broken.
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with Ada.Exceptions;
 

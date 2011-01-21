@@ -27,7 +27,7 @@
 -- XXX There's place for optimization by adding Skip-like Read-procedures
 -- instead of calling Next so often.
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 package REST.Input_Formats.JSON is
 

@@ -4,7 +4,7 @@
 -- The input is intended to represent the content of a map or, typically, of
 -- a list of keys and values.
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with Ada.Finalization;
 with Ada.Streams;

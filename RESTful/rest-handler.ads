@@ -3,7 +3,7 @@
 -- The AWS handler for HTTP requests. It dispatches to the respective
 -- REST.Method children.
 --
--- Copyright 2008, 2009, 2010, 2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with AWS.Response;
 with AWS.Status;

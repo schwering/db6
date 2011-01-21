@@ -2,7 +2,7 @@
 --
 -- Inserts a key/value pair into the map.
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with Ada.Finalization;
 with Ada.Strings.Unbounded;

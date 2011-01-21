@@ -2,7 +2,7 @@
 --
 -- see spec
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 package body REST.Path_Parsers is
 

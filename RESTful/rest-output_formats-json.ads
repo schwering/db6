@@ -2,7 +2,7 @@
 --
 -- Serialization of database entries to JSON format.
 --
--- Copyright 2008--2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with Ada.Streams;
 

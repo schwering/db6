@@ -2,7 +2,7 @@
 --
 -- see spec
 --
--- Copyright 2008, 2009, 2010, 2011 Christoph Schwering
+-- Copyright 2010--2011 Christoph Schwering
 
 with AWS.Messages;
 with AWS.Status;
