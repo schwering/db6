@@ -18,6 +18,9 @@ with AWS.Net;
 with AWS.Response;
 with AWS.Server;
 
+with DB.Maps;
+
+with REST.Method;
 with REST.Handler;
 with REST.Maps.Test_Utils;
 
@@ -210,6 +213,26 @@ package body REST.Put.Test is
                TS (S) &" not successful");
          end;
       end if;
+
+      declare
+         Map : REST.Maps.Map_Ref_Type := REST.Maps.Map_By_Name (Table);
+      begin
+         for I in Key_Values'Range loop
+            declare
+               use type DB.Maps.State_Type;
+               Key : constant DB.Maps.Key_Type :=
+                  DB.Maps.Strings_To_Key (TS (Key_Values (I).Row),
+                                          TS (Key_Values (I).Column));
+               Value : DB.Maps.Value_Wrapper_Type;
+               State : DB.Maps.State_Type;
+            begin
+               Map.Search (Key, Value, State);
+               Assert (State = DB.Maps.Success, "No element with key "&
+                       TS (Key_Values (I).Row) &" / "&
+                       TS (Key_Values (I).Column));
+            end;
+         end loop;
+      end;
    end Put;
 
 

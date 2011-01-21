@@ -42,7 +42,7 @@ is
 
    type String_Ref_Type is access all String;
 
-   Map_Name   : constant String := Path_Parsers.Element (URL, 1);
+   Map_Name   : constant String := Next_Path_Element;
    Global_Row : aliased String := Next_Path_Element;
 begin
    if Map_Name = "" then
