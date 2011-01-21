@@ -57,15 +57,15 @@ package REST.Output_Formats is
    package AS renames Ada.Streams;
    package ARS renames AWS.Resources.Streams;
 
-   type Stream_Type is abstract new ARS.Stream_Type with private;
+   type Writer_Type is abstract new ARS.Stream_Type with private;
 
-   type Stream_Ref_Type is access Stream_Type'Class;
+   type Writer_Ref_Type is access Writer_Type'Class;
 
    ----------
    -- Populates a stream with objects from the cursor.
 
-   procedure Initialize_Stream
-     (Stream        : in Stream_Ref_Type;
+   procedure Initialize_Writer
+     (Writer        : in Writer_Ref_Type;
       Cursor        : in DB.Maps.Cursor_Ref_Type;
       Free_On_Close : in Boolean;
       Max_Objects   : in Natural);
@@ -75,42 +75,42 @@ package REST.Output_Formats is
    ----------
    -- Information about the stream.
 
-   function Content_Type (Stream : Stream_Type) return String
+   function Content_Type (Writer : Writer_Type) return String
    is abstract;
 
    ----------
    -- Operations to manipulate the content of the stream.
 
-   procedure Start_Anonymous_Object (Resource : in out Stream_Type)
+   procedure Start_Anonymous_Object (Resource : in out Writer_Type)
    is abstract;
 
    procedure Start_Object
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String)
    is abstract;
 
-   procedure End_Object (Resource : in out Stream_Type)
+   procedure End_Object (Resource : in out Writer_Type)
    is abstract;
 
-   procedure Start_Anonymous_Array (Resource : in out Stream_Type)
+   procedure Start_Anonymous_Array (Resource : in out Writer_Type)
    is abstract;
 
    procedure Start_Array
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String)
    is abstract;
 
-   procedure End_Array (Resource : in out Stream_Type)
+   procedure End_Array (Resource : in out Writer_Type)
    is abstract;
 
    procedure Put_Value
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String;
       Value    : in     DB.Maps.Value_Type'Class)
    is abstract;
 
    procedure Put_Anonymous_Value
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Value    : in     DB.Maps.Value_Type'Class)
    is abstract;
 
@@ -118,18 +118,18 @@ package REST.Output_Formats is
    -- Operations to read the stream.
 
    procedure Read
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Buffer   :    out AS.Stream_Element_Array;
       Last     :    out AS.Stream_Element_Offset);
 
-   procedure Close (Resource : in out Stream_Type);
+   procedure Close (Resource : in out Writer_Type);
 
-   function End_Of_File (Resource : Stream_Type) return Boolean;
+   function End_Of_File (Resource : Writer_Type) return Boolean;
 
-   procedure Reset (Resource : in out Stream_Type) is null;
+   procedure Reset (Resource : in out Writer_Type) is null;
 
    procedure Set_Index
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       To       : in     AS.Stream_Element_Offset) is null;
 
 private
@@ -139,17 +139,17 @@ private
 
    task type Populator_Type is
       entry Initialize
-        (Stream_Ref : in Stream_Ref_Type;
+        (Writer_Ref : in Writer_Ref_Type;
          Max_Objs   : in Natural);
       entry Stop;
    end Populator_Type;
 
-   type Stream_Type is abstract new ARS.Stream_Type with
+   type Writer_Type is abstract new ARS.Stream_Type with
       record
          Queue         : Queues.Queue_Type;
          Cursor        : DB.Maps.Cursor_Ref_Type;
          Populator     : Populator_Type;
-         Self          : Stream_Ref_Type := null;
+         Self          : Writer_Ref_Type := null;
          Initialized   : Boolean := False;
          Free_On_Close : Boolean := False;
       end record;

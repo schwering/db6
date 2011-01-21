@@ -11,16 +11,16 @@ with DB.Maps.Values.Strings;
 
 package body REST.Output_Formats.JSON is
 
-   function Content_Type (Stream : Stream_Type) return String
+   function Content_Type (Writer : Writer_Type) return String
    is
-      pragma Unreferenced (Stream);
+      pragma Unreferenced (Writer);
    begin
       return "application/json";
    end Content_Type;
 
 
    procedure Emit
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Str      : in     String)
    is
       pragma Assert (String'Component_Size =
@@ -37,7 +37,7 @@ package body REST.Output_Formats.JSON is
    end Emit;
 
 
-   procedure Indent (Resource : in out Stream_Type) is
+   procedure Indent (Resource : in out Writer_Type) is
       Whitespace : constant String (1 .. Resource.Indent * 3 + 1) :=
         (1 => ASCII.LF, others => ' ');
    begin
@@ -73,7 +73,7 @@ package body REST.Output_Formats.JSON is
    end Escape;
 
 
-   procedure Start_Anonymous_Object (Resource : in out Stream_Type) is
+   procedure Start_Anonymous_Object (Resource : in out Writer_Type) is
    begin
       if Resource.Comma then
          Emit (Resource, ",");
@@ -86,7 +86,7 @@ package body REST.Output_Formats.JSON is
 
 
    procedure Start_Object
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String) is
    begin
       if Resource.Comma then
@@ -102,7 +102,7 @@ package body REST.Output_Formats.JSON is
    end Start_Object;
 
 
-   procedure End_Object (Resource : in out Stream_Type) is
+   procedure End_Object (Resource : in out Writer_Type) is
    begin
       Resource.Indent := Resource.Indent - 1;
       Indent (Resource);
@@ -111,7 +111,7 @@ package body REST.Output_Formats.JSON is
    end End_Object;
 
 
-   procedure Start_Anonymous_Array (Resource : in out Stream_Type) is
+   procedure Start_Anonymous_Array (Resource : in out Writer_Type) is
    begin
       if Resource.Comma then
          Emit (Resource, ",");
@@ -124,7 +124,7 @@ package body REST.Output_Formats.JSON is
 
 
    procedure Start_Array
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String) is
    begin
       if Resource.Comma then
@@ -140,7 +140,7 @@ package body REST.Output_Formats.JSON is
    end Start_Array;
 
 
-   procedure End_Array (Resource : in out Stream_Type) is
+   procedure End_Array (Resource : in out Writer_Type) is
    begin
    Resource.Indent := Resource.Indent - 1;
    Indent (Resource);
@@ -150,7 +150,7 @@ package body REST.Output_Formats.JSON is
 
 
    procedure Put_Value
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String;
       Value    : in     DB.Maps.Value_Type'Class) is
    begin
@@ -175,7 +175,7 @@ package body REST.Output_Formats.JSON is
 
 
    procedure Put_Anonymous_Value
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Value    : in     DB.Maps.Value_Type'Class) is
    begin
       if Resource.Comma then

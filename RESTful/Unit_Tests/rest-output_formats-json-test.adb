@@ -40,7 +40,7 @@ package body REST.Output_Formats.JSON.Test is
 
    procedure Init_Body
      (Request : in out AWS.Status.Data;
-      Writer  : in out Stream_Type)
+      Writer  : in out Writer_Type)
    is
       package AS renames Ada.Streams;
 
@@ -180,20 +180,20 @@ package body REST.Output_Formats.JSON.Test is
    renames DB.Maps.New_Value_Wrapper;
 
 
-   type Stream_Ref_Type is access all Stream_Type'Class;
+   type Writer_Ref_Type is access all Writer_Type'Class;
 
    task type Writer_Task_Type is
       entry Start (Doc_Ptr    : in Item_Array_Ref_Type;
-                   Writer_Ptr : in Stream_Ref_Type);
+                   Writer_Ptr : in Writer_Ref_Type);
    end Writer_Task_Type;
 
    task body Writer_Task_Type
    is
       Doc    : Item_Array_Ref_Type;
-      Writer : Stream_Ref_Type;
+      Writer : Writer_Ref_Type;
    begin
       accept Start (Doc_Ptr    : in Item_Array_Ref_Type;
-                    Writer_Ptr : in Stream_Ref_Type) do
+                    Writer_Ptr : in Writer_Ref_Type) do
          Doc    := Doc_Ptr;
          Writer := Writer_Ptr;
       end Start;
@@ -242,7 +242,7 @@ package body REST.Output_Formats.JSON.Test is
          (Value, TUS ("key10"), TKW (Nothings.New_Value)),
          (Event => Object_End));
 
-      Writer      : aliased JSON.Stream_Type;
+      Writer      : aliased JSON.Writer_Type;
       Writer_Task : Writer_Task_Type;
       Request     : AWS.Status.Data;
       Parser      : Input_Formats.JSON.Parser_Type :=
@@ -274,7 +274,7 @@ package body REST.Output_Formats.JSON.Test is
          (Value, TUS ("key5"), TKW (Strings.New_Value ("string5"))),
          (Event => Object_End));
 
-      Writer      : aliased JSON.Stream_Type;
+      Writer      : aliased JSON.Writer_Type;
       Writer_Task : Writer_Task_Type;
       Request     : AWS.Status.Data;
       Parser      : Input_Formats.JSON.Parser_Type :=
@@ -306,7 +306,7 @@ package body REST.Output_Formats.JSON.Test is
          (Value, TUS ("huhu"), TKW (Strings.New_Value ("string5"))),
          (Event => Object_End));
 
-      Writer      : aliased JSON.Stream_Type;
+      Writer      : aliased JSON.Writer_Type;
       Writer_Task : Writer_Task_Type;
       Request     : AWS.Status.Data;
       Parser      : Input_Formats.JSON.Parser_Type :=
@@ -335,7 +335,7 @@ package body REST.Output_Formats.JSON.Test is
          (Value, TUS ("key6"), TKW (Strings.New_Value ("string6\"""))),
          (Event => Object_End));
 
-      Writer      : aliased JSON.Stream_Type;
+      Writer      : aliased JSON.Writer_Type;
       Writer_Task : Writer_Task_Type;
       Request     : AWS.Status.Data;
       Parser      : Input_Formats.JSON.Parser_Type :=

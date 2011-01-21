@@ -130,14 +130,14 @@ begin
          Lower_Bound   => Bound (Row_1, Inclusive_1, Lower => True),
          Upper_Bound   => Bound (Row_2, Inclusive_2, Lower => False),
          Column_Regexp => Col_Regexp);
-      Stream : constant Output_Formats.Stream_Ref_Type :=
-        new Output_Formats.JSON.Stream_Type;
+      Writer : constant Output_Formats.Writer_Ref_Type :=
+        new Output_Formats.JSON.Writer_Type;
    begin
-      Output_Formats.Initialize_Stream
-        (Stream, Cursor, Free_On_Close => True, Max_Objects => Count);
+      Output_Formats.Initialize_Writer
+        (Writer, Cursor, Free_On_Close => True, Max_Objects => Count);
       Response := AWS.Response.Stream
-        (Content_Type => Stream.Content_Type,
-         Handle       => Stream,
+        (Content_Type => Writer.Content_Type,
+         Handle       => Writer,
          Server_Close => True);
       Success := True;
    end;

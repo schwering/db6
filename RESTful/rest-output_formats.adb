@@ -14,7 +14,7 @@ package body REST.Output_Formats is
 
    task body Populator_Type
    is
-      Stream           : Stream_Ref_Type := null;
+      Writer           : Writer_Ref_Type := null;
       Max_Objects      : Positive;
       N_Objects        : Natural := 0;
       Last_Key         : DB.Maps.Key_Type := DB.Maps.Keys.Null_Key;
@@ -23,10 +23,10 @@ package body REST.Output_Formats is
    begin
       select
          accept Initialize
-           (Stream_Ref : in Stream_Ref_Type;
+           (Writer_Ref : in Writer_Ref_Type;
             Max_Objs   : in Natural)
          do
-            Stream      := Stream_Ref;
+            Writer      := Writer_Ref;
             Max_Objects := Max_Objs;
          end Initialize;
       or
@@ -39,7 +39,7 @@ package body REST.Output_Formats is
          goto Ending;
       end if;
 
-      Stream.Start_Anonymous_Object;
+      Writer.Start_Anonymous_Object;
 
       loop
          <<Next_Iteration>>
@@ -62,9 +62,9 @@ package body REST.Output_Formats is
             end select;
             exit when Cancelled;
             exit when N_Objects >= Max_Objects;
-            exit when Queues.Is_Final (Stream.Queue);
+            exit when Queues.Is_Final (Writer.Queue);
 
-            Stream.Cursor.Next (Key, Value, State);
+            Writer.Cursor.Next (Key, Value, State);
             exit when State /= DB.Maps.Success;
 
             if Last_Initialized and then
@@ -76,15 +76,15 @@ package body REST.Output_Formats is
             end if;
 
             if not Last_Initialized then
-               Stream.Start_Object (DB.Maps.Row_To_String (Key.Row));
+               Writer.Start_Object (DB.Maps.Row_To_String (Key.Row));
             elsif Last_Key.Row /= Key.Row then
-               Stream.End_Object;
+               Writer.End_Object;
                N_Objects := N_Objects + 1;
                exit when N_Objects >= Max_Objects;
-               Stream.Start_Object (DB.Maps.Row_To_String (Key.Row));
+               Writer.Start_Object (DB.Maps.Row_To_String (Key.Row));
             end if;
 
-            Stream.Put_Value
+            Writer.Put_Value
               (DB.Maps.Column_To_String (Key.Column), Value.Ref.all);
 
             Last_Key         := Key;
@@ -94,11 +94,11 @@ package body REST.Output_Formats is
 
       if Last_Initialized then
          -- Finish last object.
-         Stream.End_Object;
+         Writer.End_Object;
       end if;
 
-      Stream.End_Object;
-      Queues.Mark_Final (Stream.Queue);
+      Writer.End_Object;
+      Queues.Mark_Final (Writer.Queue);
 
       accept Stop;
       <<Ending>> null;
@@ -106,29 +106,29 @@ package body REST.Output_Formats is
    exception
       when E : others =>
          Log.Error (E);
-         Queues.Mark_Final (Stream.Queue);
+         Queues.Mark_Final (Writer.Queue);
    end Populator_Type;
 
 
-   procedure Initialize_Stream
-     (Stream        : in Stream_Ref_Type;
+   procedure Initialize_Writer
+     (Writer        : in Writer_Ref_Type;
       Cursor        : in DB.Maps.Cursor_Ref_Type;
       Free_On_Close : in Boolean;
       Max_Objects   : in Natural) is
    begin
-      if Stream.Initialized then
+      if Writer.Initialized then
          raise Stream_Error;
       end if;
-      Stream.Initialized   := True;
-      Stream.Cursor        := Cursor;
-      Stream.Self          := Stream;
-      Stream.Free_On_Close := Free_On_Close;
-      Stream.Populator.Initialize (Stream, Max_Objects);
-   end Initialize_Stream;
+      Writer.Initialized   := True;
+      Writer.Cursor        := Cursor;
+      Writer.Self          := Writer;
+      Writer.Free_On_Close := Free_On_Close;
+      Writer.Populator.Initialize (Writer, Max_Objects);
+   end Initialize_Writer;
 
 
    procedure Read
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Buffer   :    out AS.Stream_Element_Array;
       Last     :    out AS.Stream_Element_Offset)
    is
@@ -158,7 +158,7 @@ package body REST.Output_Formats is
    end Read;
 
 
-   procedure Close (Resource : in out Stream_Type) is
+   procedure Close (Resource : in out Writer_Type) is
    begin
       Log.Info ("Closing stream (queue final = "&
         Queues.Is_Final (Resource.Queue)'Img &")");
@@ -180,7 +180,7 @@ package body REST.Output_Formats is
    end Close;
 
 
-   function End_Of_File (Resource : Stream_Type) return Boolean is
+   function End_Of_File (Resource : Writer_Type) return Boolean is
    begin
       return Queues.Is_Final (Resource.Queue);
    end End_Of_File;

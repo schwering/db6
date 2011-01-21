@@ -84,14 +84,16 @@ package body REST.Output_Formats.BSON is
    -- http://bsonspec.org/#/specification
 
 
-   function Content_Type (Stream : Stream_Type) return String is
+   function Content_Type (Writer : Writer_Type) return String
+   is
+      pragma Unreferenced (Writer);
    begin
       return "application/content";
    end Content_Type;
 
 
    procedure Emit
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Str      : in     String)
    is
       pragma Assert (String'Component_Size =
@@ -108,14 +110,14 @@ package body REST.Output_Formats.BSON is
    end Emit;
 
 
-   procedure Start_Anonymous_Object (Resource : in out Stream_Type) is
+   procedure Start_Anonymous_Object (Resource : in out Writer_Type) is
    begin
       Emit (Resource, "{");
    end Start_Anonymous_Object;
 
 
    procedure Start_Object
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String) is
    begin
       Emit (Resource, """");
@@ -125,20 +127,20 @@ package body REST.Output_Formats.BSON is
    end Start_Object;
 
 
-   procedure End_Object (Resource : in out Stream_Type) is
+   procedure End_Object (Resource : in out Writer_Type) is
    begin
       Emit (Resource, "},");
    end End_Object;
 
 
-   procedure Start_Anonymous_Array (Resource : in out Stream_Type) is
+   procedure Start_Anonymous_Array (Resource : in out Writer_Type) is
    begin
       Emit (Resource, "[");
    end Start_Anonymous_Array;
 
 
    procedure Start_Array
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String) is
    begin
       Emit (Resource, """");
@@ -148,14 +150,14 @@ package body REST.Output_Formats.BSON is
    end Start_Array;
 
 
-   procedure End_Array (Resource : in out Stream_Type) is
+   procedure End_Array (Resource : in out Writer_Type) is
    begin
       Emit (Resource, "],");
    end End_Array;
 
 
    procedure Put_Value
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String;
       Value    : in     DB.Maps.Value_Type'Class) is
    begin
@@ -174,7 +176,7 @@ package body REST.Output_Formats.BSON is
 
 
    procedure Put_Anonymous_Value
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Value    : in     DB.Maps.Value_Type'Class) is
    begin
       if Value in DB.Maps.Values.Strings.Value_Type'Class then

@@ -16,46 +16,46 @@ package REST.Output_Formats.JSON is
    package AS renames Ada.Streams;
    package ARS renames AWS.Resources.Streams;
 
-   type Stream_Type is new Output_Formats.Stream_Type with private;
+   type Writer_Type is new Output_Formats.Writer_Type with private;
 
    overriding
-   function Content_Type (Stream : Stream_Type) return String;
+   function Content_Type (Writer : Writer_Type) return String;
 
    overriding
-   procedure Start_Anonymous_Object (Resource : in out Stream_Type);
+   procedure Start_Anonymous_Object (Resource : in out Writer_Type);
 
    overriding
    procedure Start_Object
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String);
 
    overriding
-   procedure End_Object (Resource : in out Stream_Type);
+   procedure End_Object (Resource : in out Writer_Type);
 
    overriding
-   procedure Start_Anonymous_Array (Resource : in out Stream_Type);
+   procedure Start_Anonymous_Array (Resource : in out Writer_Type);
 
    overriding
    procedure Start_Array
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String);
 
    overriding
-   procedure End_Array (Resource : in out Stream_Type);
+   procedure End_Array (Resource : in out Writer_Type);
 
    overriding
    procedure Put_Value
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Key      : in     String;
       Value    : in     DB.Maps.Value_Type'Class);
 
    overriding
    procedure Put_Anonymous_Value
-     (Resource : in out Stream_Type;
+     (Resource : in out Writer_Type;
       Value    : in     DB.Maps.Value_Type'Class);
 
 private
-   type Stream_Type is new Output_Formats.Stream_Type with
+   type Writer_Type is new Output_Formats.Writer_Type with
       record
          Indent : Natural := 0;
          Comma  : Boolean := False;
