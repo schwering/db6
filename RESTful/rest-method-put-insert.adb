@@ -143,7 +143,7 @@ begin
         (Handler : in out Handler_Type;
          Key     : in     String) is
       begin
-         if Handler.Level /= 0 then
+         if Handler.Level = 0 then
             raise Malformed_Input_Data_Error;
          end if;
          Handler.Free_Row;
@@ -168,6 +168,9 @@ begin
         (Handler : in out Handler_Type;
          Key     : in     String) is
       begin
+         if Handler.Level = 0 then
+            raise Malformed_Input_Data_Error;
+         end if;
          Handler.Free_Column;
          Handler.Column := new String'(Key);
          Handler.Level  := Handler.Level + 1;

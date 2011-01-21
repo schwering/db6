@@ -5,7 +5,6 @@
 -- Copyright 2010--2011 Christoph Schwering
 
 with Ada.Unchecked_Deallocation;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with DB.Maps.Values;
 with DB.Maps.Values.Booleans;

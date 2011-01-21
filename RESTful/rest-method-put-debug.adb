@@ -33,7 +33,8 @@ begin
    end loop;
 
    Response := AWS.Response.Build
-     (Content_Type => "text/plain",
+     (Status_Code  => AWS.Messages.S500,
+      Content_Type => "text/plain",
       Message_Body => AWS.URL.Path (AWS.Status.URI (Request)) & ASCII.LF &
                       AWS.URL.Pathname (AWS.Status.URI (Request)) & ASCII.LF &
                       To_String (S));

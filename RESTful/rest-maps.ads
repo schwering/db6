@@ -50,7 +50,10 @@ private
    package Map_Maps is new Ada.Containers.Ordered_Maps
      (Map_Name_Type, Map_Ref_Type, Map_Names."<", DB.Maps."=");
 
-    Maps : Map_Maps.Map := Map_Maps.Empty_Map;
+    Initialized : Boolean := False;
+    Maps        : Map_Maps.Map := Map_Maps.Empty_Map;
+
+    pragma Volatile (Initialized);
 
 end REST.Maps;
 

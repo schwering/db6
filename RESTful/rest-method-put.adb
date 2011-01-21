@@ -50,6 +50,9 @@ begin
          if Success then
             return Response;
          end if;
+      exception
+         when E : others =>
+            REST.Log.Error (E);
       end;
    end loop;
 
