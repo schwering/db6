@@ -11,7 +11,9 @@ with DB.Maps.Values.Strings;
 
 package body REST.Output_Formats.JSON is
 
-   function Content_Type (Stream : Stream_Type) return String is
+   function Content_Type (Stream : Stream_Type) return String
+   is
+      pragma Unreferenced (Stream);
    begin
       return "application/json";
    end Content_Type;
@@ -43,6 +45,34 @@ package body REST.Output_Formats.JSON is
    end Indent;
 
 
+   function Escape (S : String) return String
+   is
+      N : Natural := 0;
+   begin
+      for I in S'Range loop
+         if S (I) = '\' or S (I) = '"' then
+            N := N + 1;
+         end if;
+      end loop;
+      if N = 0 then
+         return S;
+      else
+         declare
+            T : String (S'First .. S'Last + N);
+         begin
+            for I in reverse S'Range loop
+               T (I + N) := S (I);
+               if S (I) = '\' or S (I) = '"' then
+                  N := N - 1;
+                  T (I + N) := '\';
+               end if;
+            end loop;
+            return T;
+         end;
+      end if;
+   end Escape;
+
+
    procedure Start_Anonymous_Object (Resource : in out Stream_Type) is
    begin
       if Resource.Comma then
@@ -64,7 +94,7 @@ package body REST.Output_Formats.JSON is
       end if;
       Indent (Resource);
       Emit (Resource, """");
-      Emit (Resource, Key);
+      Emit (Resource, Escape (Key));
       Emit (Resource, """ : ");
       Emit (Resource, "{");
       Resource.Indent := Resource.Indent + 1;
@@ -102,7 +132,7 @@ package body REST.Output_Formats.JSON is
       end if;
       Indent (Resource);
       Emit (Resource, """");
-      Emit (Resource, Key);
+      Emit (Resource, Escape (Key));
       Emit (Resource, """ : ");
       Emit (Resource, "[");
       Resource.Indent := Resource.Indent + 1;
@@ -112,8 +142,8 @@ package body REST.Output_Formats.JSON is
 
    procedure End_Array (Resource : in out Stream_Type) is
    begin
-      Resource.Indent := Resource.Indent - 1;
-      Indent (Resource);
+   Resource.Indent := Resource.Indent - 1;
+   Indent (Resource);
    Emit (Resource, "]");
    Resource.Comma := True;
    end End_Array;
@@ -129,11 +159,11 @@ package body REST.Output_Formats.JSON is
       end if;
       Indent (Resource);
       Emit (Resource, """");
-      Emit (Resource, Key);
+      Emit (Resource, Escape (Key));
       Emit (Resource, """ : ");
       if Value in DB.Maps.Values.Strings.Value_Type'Class then
          Emit (Resource, """");
-         Emit (Resource, Value.Image);
+         Emit (Resource, Escape (Value.Image));
          Emit (Resource, """");
       elsif Value in DB.Maps.Values.Booleans.Value_Type'Class then
          Emit (Resource, Ada.Characters.Handling.To_Lower (Value.Image));
@@ -142,6 +172,27 @@ package body REST.Output_Formats.JSON is
       end if;
       Resource.Comma := True;
    end Put_Value;
+
+
+   procedure Put_Anonymous_Value
+     (Resource : in out Stream_Type;
+      Value    : in     DB.Maps.Value_Type'Class) is
+   begin
+      if Resource.Comma then
+         Emit (Resource, ",");
+      end if;
+      Indent (Resource);
+      if Value in DB.Maps.Values.Strings.Value_Type'Class then
+         Emit (Resource, """");
+         Emit (Resource, Escape (Value.Image));
+         Emit (Resource, """");
+      elsif Value in DB.Maps.Values.Booleans.Value_Type'Class then
+         Emit (Resource, Ada.Characters.Handling.To_Lower (Value.Image));
+      else
+         Emit (Resource, Value.Image);
+      end if;
+      Resource.Comma := True;
+   end Put_Anonymous_Value;
 
 end REST.Output_Formats.JSON;
 

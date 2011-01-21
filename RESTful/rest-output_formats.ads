@@ -109,6 +109,11 @@ package REST.Output_Formats is
       Value    : in     DB.Maps.Value_Type'Class)
    is abstract;
 
+   procedure Put_Anonymous_Value
+     (Resource : in out Stream_Type;
+      Value    : in     DB.Maps.Value_Type'Class)
+   is abstract;
+
    ----------
    -- Operations to read the stream.
 

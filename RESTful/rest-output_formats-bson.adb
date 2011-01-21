@@ -172,5 +172,20 @@ package body REST.Output_Formats.BSON is
       Emit (Resource, ",");
    end Put_Value;
 
+
+   procedure Put_Anonymous_Value
+     (Resource : in out Stream_Type;
+      Value    : in     DB.Maps.Value_Type'Class) is
+   begin
+      if Value in DB.Maps.Values.Strings.Value_Type'Class then
+         Emit (Resource, """");
+         Emit (Resource, Value.Image);
+         Emit (Resource, """");
+      else
+         Emit (Resource, Value.Image);
+      end if;
+      Emit (Resource, ",");
+   end Put_Anonymous_Value;
+
 end REST.Output_Formats.BSON;
 

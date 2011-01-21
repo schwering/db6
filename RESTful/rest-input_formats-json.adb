@@ -69,8 +69,11 @@ package body REST.Input_Formats.JSON is
          T : Unbounded_String;
       begin
          loop
-            exit when (Char /= '-' and
+            exit when (Char /= '+' and
+                       Char /= '-' and
                        Char /= '.' and
+                       Char /= 'e' and
+                       Char /= 'E' and
                        Char not in '0' .. '9') or
                       EOF;
             Append (T, Char);
@@ -175,7 +178,7 @@ package body REST.Input_Formats.JSON is
                Parser.Expect_Key := True;
                Parser.Set_Value (Parse_String);
             end if;
-         when '-' | '.' | '0' .. '9' =>
+         when '+' | '-' | '.' | '0' .. '9' =>
             if Parser.Level not in Parser.Is_Array'Range then
                Token := Error;
                REST.Log.Info ("JSON: indentation level out of range");

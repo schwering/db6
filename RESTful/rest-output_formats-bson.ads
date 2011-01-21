@@ -47,6 +47,11 @@ package REST.Output_Formats.BSON is
       Key      : in     String;
       Value    : in     DB.Maps.Value_Type'Class);
 
+   overriding
+   procedure Put_Anonymous_Value
+     (Resource : in out Stream_Type;
+      Value    : in     DB.Maps.Value_Type'Class);
+
 private
    subtype Byte_Type is AS.Stream_Element;
    subtype Byte_Array_Type is AS.Stream_Element_Array;

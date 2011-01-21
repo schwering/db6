@@ -14,20 +14,30 @@ package body REST.Output_Formats is
 
    task body Populator_Type
    is
-      Stream           : Stream_Ref_Type;
+      Stream           : Stream_Ref_Type := null;
       Max_Objects      : Positive;
       N_Objects        : Natural := 0;
       Last_Key         : DB.Maps.Key_Type := DB.Maps.Keys.Null_Key;
       Last_Initialized : Boolean := False;
       Cancelled        : Boolean := False;
    begin
-      accept Initialize
-        (Stream_Ref : in Stream_Ref_Type;
-         Max_Objs   : in Natural)
-      do
-         Stream      := Stream_Ref;
-         Max_Objects := Max_Objs;
-      end Initialize;
+      select
+         accept Initialize
+           (Stream_Ref : in Stream_Ref_Type;
+            Max_Objs   : in Natural)
+         do
+            Stream      := Stream_Ref;
+            Max_Objects := Max_Objs;
+         end Initialize;
+      or
+         accept Stop do
+            Cancelled := True;
+         end Stop;
+      end select;
+
+      if Cancelled then
+         goto Ending;
+      end if;
 
       Stream.Start_Anonymous_Object;
 
@@ -91,6 +101,7 @@ package body REST.Output_Formats is
       Queues.Mark_Final (Stream.Queue);
 
       accept Stop;
+      <<Ending>> null;
 
    exception
       when E : others =>

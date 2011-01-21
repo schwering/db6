@@ -49,6 +49,11 @@ package REST.Output_Formats.JSON is
       Key      : in     String;
       Value    : in     DB.Maps.Value_Type'Class);
 
+   overriding
+   procedure Put_Anonymous_Value
+     (Resource : in out Stream_Type;
+      Value    : in     DB.Maps.Value_Type'Class);
+
 private
    type Stream_Type is new Output_Formats.Stream_Type with
       record
