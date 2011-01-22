@@ -14,9 +14,9 @@ with DB.Blocks;
 with DB.Blob_Trees;
 
 with DB.Types.Times;
-with DB.Types.Values;
-with DB.Types.Values.Bounded;
-with DB.Types.Values.Unbounded;
+with DB.Types.Byte_Arrays;
+with DB.Types.Byte_Arrays.Bounded;
+with DB.Types.Byte_Arrays.Unbounded;
 
 procedure Tree.Gen_Blob_Trees is
    package Keys     renames DB.Blob_Trees.Keys;
@@ -28,17 +28,17 @@ procedure Tree.Gen_Blob_Trees is
 
    function To_Bounded
      (V : Test_Data.Values.String_Type)
-      return DB.Types.Values.Bounded.String_Type is
+      return DB.Types.Byte_Arrays.Bounded.String_Type is
    begin
-      --return DB.Types.Values.Bounded.New_String(Test_Data.Values.To_Buffer(V));
+      --return DB.Types.Byte_Arrays.Bounded.New_String(Test_Data.Values.To_Buffer(V));
       return V;
    end To_Bounded;
 
    function To_Unbounded
      (V : Test_Data.Values.String_Type)
-      return DB.Types.Values.Unbounded.String_Type is
+      return DB.Types.Byte_Arrays.Unbounded.String_Type is
    begin
-      return DB.Types.Values.Unbounded.New_String(Test_Data.Values.To_Buffer(V));
+      return DB.Types.Byte_Arrays.Unbounded.New_String(Test_Data.Values.To_Buffer(V));
       --return V;
    end To_Unbounded;
 

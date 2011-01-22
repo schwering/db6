@@ -62,6 +62,8 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
 
    function To_Buffer (S : String_Type) return Indefinite_Buffer_Type;
 
+   function Image (S : String_Type) return String;
+
 
    package Uncompressed is
       type Context_Type is null record;

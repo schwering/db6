@@ -4,6 +4,7 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
+with Ada.Strings.Unbounded;
 with Ada.Unchecked_Deallocation;
 
 package body DB.Types.Gen_Strings.Gen_Unbounded is
@@ -209,6 +210,20 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
          return S.S.Buffer (1 .. S.Length);
       end if;
    end To_Buffer;
+
+
+   function Image (S : String_Type) return String is
+      use Ada.Strings.Unbounded;
+      T : Unbounded_String;
+   begin
+      if S.S = null then
+         return "";
+      end if;
+      for I in 1 .. S.Length loop
+         Append (T, Item_Type'Image (S.S.Buffer (I)));
+      end loop;
+      return To_String (T);
+   end Image;
 
 
    package body Uncompressed is separate;

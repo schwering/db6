@@ -11,7 +11,7 @@ with DB.Utils;
 generic
    Max_Length : in Positive := 1024;
 package DB.Types.Gen_Strings.Gen_Bounded is
-   pragma Pure;
+   pragma Preelaborate;
 
    subtype Indefinite_Buffer_Type is Gen_Strings.Indefinite_Buffer_Type;
    subtype Length_Type is Gen_Strings.Length_Type range 0 .. Max_Length;
@@ -65,6 +65,8 @@ package DB.Types.Gen_Strings.Gen_Bounded is
       return String_Type;
 
    function To_Buffer (S : String_Type) return Indefinite_Buffer_Type;
+
+   function Image (S : String_Type) return String;
 
 
    package Uncompressed is

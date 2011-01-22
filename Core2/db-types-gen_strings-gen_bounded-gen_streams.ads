@@ -10,7 +10,7 @@ with Ada.Streams;
 
 generic
 package DB.Types.Gen_Strings.Gen_Bounded.Gen_Streams is
-   pragma Pure;
+   pragma Preelaborate;
 
    type String_Ref_Type is access all String_Type;
    for String_Ref_Type'Storage_Size use 0;

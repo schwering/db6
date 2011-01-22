@@ -4,7 +4,7 @@ with DB.Types.Times;
 
 with DB.Types.Gen_Strings;
 with DB.Types.Strings;
-with DB.Types.Values;
+with DB.Types.Byte_Arrays;
 
 pragma Warnings (Off);
 with DB.Types.Gen_Strings.Gen_Bounded;
@@ -206,15 +206,15 @@ package body Tree.Test_Data.URLs is
    is
       type Uint32 is mod 2**32;
       type Definite_Buffer_Type is
-         new DB.Types.Values.Indefinite_Buffer_Type(1 .. 4);
+         new DB.Types.Byte_Arrays.Indefinite_Buffer_Type(1 .. 4);
       function Convert is new Ada.Unchecked_Conversion
         (Uint32, Definite_Buffer_Type);
 
       use type Types.Count_Type;
       I   : constant Uint32 
           := Uint32(Count mod Uint32'Modulus);
-      Buf : constant DB.Types.Values.Indefinite_Buffer_Type
-          := DB.Types.Values.Indefinite_Buffer_Type(Convert(I));
+      Buf : constant DB.Types.Byte_Arrays.Indefinite_Buffer_Type
+          := DB.Types.Byte_Arrays.Indefinite_Buffer_Type(Convert(I));
    begin
       return Types.New_Value(Buf);
    end Make_Value1;
@@ -230,12 +230,12 @@ package body Tree.Test_Data.URLs is
       subtype R is Positive range From .. Img'Last;
       type Definite_String_Type is new String(R);
       type Definite_Buffer_Type is
-         new DB.Types.Values.Indefinite_Buffer_Type(R);
+         new DB.Types.Byte_Arrays.Indefinite_Buffer_Type(R);
       function Convert is new Ada.Unchecked_Conversion
         (Definite_String_Type, Definite_Buffer_Type);
 
-      Buf : constant DB.Types.Values.Indefinite_Buffer_Type
-          := DB.Types.Values.Indefinite_Buffer_Type
+      Buf : constant DB.Types.Byte_Arrays.Indefinite_Buffer_Type
+          := DB.Types.Byte_Arrays.Indefinite_Buffer_Type
                 (Convert(Definite_String_Type(Sub)));
    begin
       return Types.New_Value(Buf);

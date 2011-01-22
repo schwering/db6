@@ -1,5 +1,5 @@
 with DB.Maps.Tag_Map;
-with DB.Types.Values.Bounded.Streams;
+with DB.Types.Byte_Arrays.Bounded.Streams;
 
 package body Tree.Types is
 
@@ -23,7 +23,7 @@ package body Tree.Types is
 
 
    function New_Value
-     (S : DB.Types.Values.Indefinite_Buffer_Type)
+     (S : DB.Types.Byte_Arrays.Indefinite_Buffer_Type)
       return Value_Type is
    begin
       return New_Value (String (S));
@@ -31,42 +31,42 @@ package body Tree.Types is
 
 
    function From_Bounded
-     (S : DB.Types.Values.Bounded.String_Type)
+     (S : DB.Types.Byte_Arrays.Bounded.String_Type)
       return Value_Type is
    begin
-      return New_Value (DB.Types.Values.Bounded.To_Buffer (S));
+      return New_Value (DB.Types.Byte_Arrays.Bounded.To_Buffer (S));
    end From_Bounded;
 
 
    function From_Unbounded
-     (S : DB.Types.Values.Unbounded.String_Type)
+     (S : DB.Types.Byte_Arrays.Unbounded.String_Type)
       return Value_Type is
    begin
-      return New_Value (DB.Types.Values.Unbounded.To_Buffer (S));
+      return New_Value (DB.Types.Byte_Arrays.Unbounded.To_Buffer (S));
    end From_Unbounded;
 
 
    function To_Bounded
      (V : Value_Type)
-      return DB.Types.Values.Bounded.String_Type is
+      return DB.Types.Byte_Arrays.Bounded.String_Type is
    begin
-      return DB.Types.Values.Bounded.New_String
-              (DB.Types.Values.Bounded.Indefinite_Buffer_Type (V.Image));
+      return DB.Types.Byte_Arrays.Bounded.New_String
+              (DB.Types.Byte_Arrays.Bounded.Indefinite_Buffer_Type (V.Image));
    end To_Bounded;
 
 
    function To_Unbounded
      (V : Value_Type)
-      return DB.Types.Values.Unbounded.String_Type is
+      return DB.Types.Byte_Arrays.Unbounded.String_Type is
    begin
-      return DB.Types.Values.Unbounded.New_String
-              (DB.Types.Values.Unbounded.Indefinite_Buffer_Type (V.Image));
+      return DB.Types.Byte_Arrays.Unbounded.New_String
+              (DB.Types.Byte_Arrays.Unbounded.Indefinite_Buffer_Type (V.Image));
    end To_Unbounded;
 
 
    function Null_Value return Value_Type is
    begin
-      return From_Bounded (DB.Types.Values.Bounded.Empty_String);
+      return From_Bounded (DB.Types.Byte_Arrays.Bounded.Empty_String);
    end Null_Value;
 
 

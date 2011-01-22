@@ -41,7 +41,11 @@ package DB.Types.Keys is
          Time_Context   : Times.Write_Context_Type;
       end record;
 
-   Is_Context_Free_Serialization : constant Boolean;
+   Is_Context_Free_Serialization : constant Boolean :=
+      Row_Serialization.Is_Context_Free_Serialization and
+      Column_Serialization.Is_Context_Free_Serialization and
+      Times.Is_Context_Free_Serialization;
+
 
    function Null_Key return Key_Type;
 
@@ -83,11 +87,6 @@ package DB.Types.Keys is
       Write_Context_Type => Write_Context_Type);
 
 private
-   Is_Context_Free_Serialization : constant Boolean :=
-      Row_Serialization.Is_Context_Free_Serialization and
-      Column_Serialization.Is_Context_Free_Serialization and
-      Times.Is_Context_Free_Serialization;
-
    pragma Inline (Null_Key);
    pragma Inline (New_Read_Context);
    pragma Inline (New_Write_Context);
