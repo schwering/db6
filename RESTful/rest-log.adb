@@ -36,35 +36,62 @@ package body REST.Log is
    end Now;
 
 
-   procedure Log_To_Stdout (Msg : in String) is
+   function Img (N : Integer) return String
+   is
+      S : constant String := Integer'Image (N);
    begin
-      Ada.Text_IO.Put_Line (Kind &" ("& Now &"):");
-      Ada.Text_IO.Put_Line (Msg);
+      if S (S'First) = ' ' then
+         return S (S'First + 1 .. S'Last);
+      else
+         return S;
+      end if;
+   end Img;
+
+
+   procedure Log_To_Stdout
+     (Msg    : in String;
+      Source : in String := GNAT.Source_Info.File;
+      Line   : in Natural := GNAT.Source_Info.Line) is
+   begin
+      Ada.Text_IO.Put (Source &":"& Img (Line) &": ");
+      Ada.Text_IO.Put (Kind &" ("& Now &"):");
+      --Ada.Text_IO.New_Line;
+      Ada.Text_IO.Put (Msg);
+      Ada.Text_IO.New_Line;
       Ada.Text_IO.New_Line;
    end Log_To_Stdout;
 
 
-   procedure Info (Msg : in String)
+   procedure Info
+     (Msg    : in String;
+      Source : in String := GNAT.Source_Info.File;
+      Line   : in Natural := GNAT.Source_Info.Line)
    is
       procedure Log is new Log_To_Stdout ("Info");
    begin
-      Log (Msg);
+      Log (Msg, Source, Line);
    end Info;
 
 
-   procedure Error (Msg : in String)
+   procedure Error
+     (Msg    : in String;
+      Source : in String := GNAT.Source_Info.File;
+      Line   : in Natural := GNAT.Source_Info.Line)
    is
       procedure Log is new Log_To_Stdout ("Error");
    begin
-      Log (Msg);
+      Log (Msg, Source, Line);
    end Error;
 
 
-   procedure Error (Exc : in Ada.Exceptions.Exception_Occurrence)
+   procedure Error
+     (Exc    : in Ada.Exceptions.Exception_Occurrence;
+      Source : in String := GNAT.Source_Info.File;
+      Line   : in Natural := GNAT.Source_Info.Line)
    is
       procedure Log is new Log_To_Stdout ("Exception");
    begin
-      Log (Ada.Exceptions.Exception_Information (Exc));
+      Log (Ada.Exceptions.Exception_Information (Exc), Source, Line);
    end Error;
 
 end REST.Log;
