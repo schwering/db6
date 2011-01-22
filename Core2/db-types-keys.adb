@@ -86,55 +86,6 @@ package body DB.Types.Keys is
    end Compare;
 
 
-   function Short_Bound
-     (Left : Key_Type)
-      return Key_Type is
-   begin
-      return Key_Type'(Row    => Rows.Short_Bound (Left.Row),
-                       Column => Columns.Short_Bound (Left.Column),
-                       Time   => Times.Short_Bound (Left.Time));
-   end Short_Bound;
-
-
-   function Short_Delimiter (Left, Right : Key_Type) return Key_Type
-   is
-      function "<" (L, R : Key_Type) return Boolean is
-      begin
-         return L <= R and L /= R;
-      end "<";
-
-      pragma Assert (Left <= Right);
-      Key       : Key_Type;
-      Row_Delim : constant Rows.String_Type :=
-         Rows.Short_Delimiter (Left.Row, Right.Row);
-   begin
-      if Left.Row < Row_Delim then
-         Key :=  Key_Type'(Row    => Row_Delim,
-                           Column => Columns.Empty_String,
-                           Time   => Times.Number_Type'Last);
-      else
-         declare
-            Column_Delim : constant Columns.String_Type :=
-               Columns.Short_Delimiter (Left.Column, Right.Column);
-         begin
-            if Left.Column < Column_Delim then
-               return Key_Type'(Row    => Row_Delim,
-                                Column => Column_Delim,
-                                Time   => Times.Number_Type'Last);
-            else
-               Key :=  Key_Type'(Row    => Row_Delim,
-                                 Column => Column_Delim,
-                                 Time   => Times.Short_Delimiter (Left.Time,
-                                                                  Right.Time));
-            end if;
-         end;
-      end if;
-      pragma Assert (Left /= Right or else (Left = Key and Key = Right));
-      pragma Assert (Left = Right or else (Left <= Key and Key < Right));
-      return Key;
-   end Short_Delimiter;
-
-
    function New_Read_Context return Read_Context_Type is
    begin
       return Read_Context_Type'(Row_Serialization.New_Read_Context,

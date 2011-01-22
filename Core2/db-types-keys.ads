@@ -75,10 +75,6 @@ package DB.Types.Keys is
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type);
 
-   function Short_Bound (Left : Key_Type) return Key_Type;
-
-   function Short_Delimiter (Left, Right : Key_Type) return Key_Type;
-
    function Image (Key : Key_Type) return String;
 
    package Keys_Signature is new Blocks.Gen_Keys_Signature
