@@ -35,83 +35,26 @@
 -- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Finalization;
-with Ada.Streams;
 
 with DB.Blocks;
 with DB.Types.Keys;
-with DB.Utils.Gen_Auto_Pointers;
+with DB.Types.Values;
 
 package DB.Maps is
 
    package AF renames Ada.Finalization;
 
-   type Serializable_Type is interface;
-
-   procedure Write
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Object : in              Serializable_Type)
-   is abstract;
-
-   procedure Read
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Object : out             Serializable_Type)
-   is abstract;
-
-   function Size_Bound
-     (Object : Serializable_Type)
-      return Ada.Streams.Stream_Element_Offset
-   is abstract;
-
-
-   type Comparable_Type is interface;
-
-   function Equals (A, B : Comparable_Type) return Boolean
-   is abstract;
-
-   function Equals (Left, Right : Comparable_Type'Class) return Boolean;
-
-
-   type Printable_Type is interface;
-
-   function Image (Printable : Printable_Type) return String
-   is abstract;
-
-
    package Keys renames Types.Keys;
    subtype Key_Type is Keys.Key_Type;
+
+   package Values renames Types.Values;
+   subtype Value_Type is Values.Value_Type;
 
    function Row_To_String (Row : Keys.Rows.String_Type) return String;
    function Column_To_String (Column : Keys.Columns.String_Type) return String;
    function String_To_Row (S : String) return Keys.Rows.String_Type;
    function String_To_Column (S : String) return Keys.Columns.String_Type;
    function Strings_To_Key (Row : String; Column : String) return Keys.Key_Type;
-
-   type Value_Type is abstract new AF.Controlled and
-                                   Serializable_Type and
-                                   Comparable_Type and
-                                   Printable_Type with null record;
-
-   type Value_Ref_Type is access Value_Type'Class;
-
-   type Value_Parameters_Type is null record;
-
-   function New_Value
-     (Params : not null access Value_Parameters_Type)
-      return Value_Type
-   is abstract;
-   -- The purpose of this constructor is to initialize a default instance of a
-   -- Value_Type subclass.
-   -- It is required for the Ada.Tags.Generic_Dispatching_Constructor.
-
-   package Value_Wrappers is new Utils.Gen_Auto_Pointers
-     (Value_Type'Class, Value_Ref_Type);
-
-   subtype Value_Wrapper_Type is Value_Wrappers.Auto_Pointer_Type;
-
-   function New_Value_Wrapper
-     (Value : Value_Type'Class)
-      return Value_Wrapper_Type
-   renames Value_Wrappers.New_Auto_Pointer;
 
 
    ----------
@@ -182,80 +125,62 @@ package DB.Maps is
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Wrapper_Type;
-      State :    out State_Type)
-   is abstract;
-
-   procedure Search
-     (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type);
-
-   procedure Search_Minimum
-     (Map   : in out Map_Type;
-      Key   :    out Key_Type;
-      Value :    out Value_Wrapper_Type;
+      Value :    out Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type);
+      Value :    out Value_Type;
+      State :    out State_Type)
+   is abstract;
 
    procedure Insert
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Insert
      (Map       : in out Map_Type;
       Key       : in     Key_Type;
-      Value     : in     Value_Type'Class;
+      Value     : in     Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Wrapper_Type;
+      Old_Value :    out Value_Type;
       State     :    out State_Type)
    is abstract;
 
    procedure Replace
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Replace
      (Map       : in out Map_Type;
       Key       : in     Key_Type;
-      Value     : in     Value_Type'Class;
+      Value     : in     Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Wrapper_Type;
+      Old_Value :    out Value_Type;
       State     :    out State_Type)
    is abstract;
 
    procedure Append
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Wrapper_Type;
+      Value :    out Value_Type;
       State :    out State_Type)
    is abstract;
-
-   procedure Delete
-     (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type);
 
    procedure Delete_Range
      (Map   : in out Map_Type;
@@ -374,15 +299,9 @@ package DB.Maps is
    procedure Next
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
-      Value  :    out Value_Wrapper_Type;
+      Value  :    out Value_Type;
       State  :    out State_Type)
    is abstract;
-
-   procedure Next
-     (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
-      State  :    out State_Type);
 
    procedure Delete
      (Cursor : in out Cursor_Type;

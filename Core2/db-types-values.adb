@@ -43,6 +43,19 @@ package body DB.Types.Values is
    end New_Value;
 
 
+   function New_Value (S : String) return Value_Type is
+      use Strings;
+   begin
+      if S'Length in Bounded.Length_Type'Range then
+         return (Bounded_String_Value,
+                 Bounded.New_String (Indefinite_Buffer_Type (S)));
+      else
+         return (Unbounded_String_Value,
+                 Unbounded.New_String (Indefinite_Buffer_Type (S)));
+      end if;
+   end New_Value;
+
+
    function New_Value (Bounded_String : Strings.Bounded.String_Type)
       return Value_Type is
    begin
@@ -252,7 +265,7 @@ package body DB.Types.Values is
       Tag : Tag_Type;
    begin
       Tags.Read (Context.Tag, Block, Cursor, Tag);
-      case Value.Tag is
+      case Tag is
          when Nothing_Value =>
             Value := Value_Type'(Tag => Nothing_Value, others => <>);
             Nothings.Read
@@ -297,6 +310,8 @@ package body DB.Types.Values is
               (Context.Unbounded_Byte_Array, Block, Cursor,
                Value.Unbounded_Byte_Array);
          when Key_Value =>
+            Value := Value_Type'(Tag => Key_Value,
+                                 others => <>);
             Keys.Read
               (Context.Key, Block, Cursor, Value.Key);
       end case;

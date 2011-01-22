@@ -11,13 +11,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 with AUnit.Assertions; use AUnit.Assertions;
 
 with DB.Maps;
-with DB.Maps.Tag_Map;
 with DB.Maps.Test_Utils;
-with DB.Maps.Values.Integers;
-with DB.Maps.Values.Strings;
-with DB.Types.Keys; use DB.Types.Keys;
+with DB.Types.Keys;
+with DB.Types.Values;
 
 package body DB.Maps.Covering.Test is
+   use DB.Types;
+   use type DB.Types.Values.Value_Type;
 
    package Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (256);
 
@@ -40,15 +40,15 @@ package body DB.Maps.Covering.Test is
    end Unlink_Files;
 
 
-   function New_Key (Row, Col : String; Time : Natural) return Key_Type is
+   function New_Key (Row, Col : String; Time : Natural) return Keys.Key_Type is
    begin
-      return Key_Type'(Rows.New_String (Rows.Indefinite_Buffer_Type (Row)),
-                       Columns.New_String (Rows.Indefinite_Buffer_Type (Col)),
-                       Times.Number_Type (Time));
+      return (Keys.Rows.New_String (Keys.Rows.Indefinite_Buffer_Type (Row)),
+              Keys.Columns.New_String (Keys.Rows.Indefinite_Buffer_Type (Col)),
+              Keys.Times.Number_Type (Time));
    end New_Key;
 
 
-   function New_Key (I : Integer) return Key_Type
+   function New_Key (I : Integer) return Keys.Key_Type
    is
       use Strings;
       type Pool_Type is array (Natural range <>) of Bounded_String;
@@ -72,33 +72,29 @@ package body DB.Maps.Covering.Test is
    end New_Key;
 
 
-   function New_Value (I : Integer) return Maps.Value_Type'Class is
+   function New_Value (I : Integer) return Maps.Value_Type is
    begin
-      return Values.Integers.New_Value (I);
+      return Values.New_Value (I);
    end New_Value;
 
 
    --function New_Value (S : String) return Maps.Value_Type'Class is
    --begin
-      --return Values.Strings.New_Value (S);
+      --return Values.New_Value (S);
    --end New_Value;
 
 
    overriding
    procedure Set_Up (T : in out Test_Type) is
    begin
-      Tag_Map.Utils.Store (T.State);
-      Tag_Map.Clear;
-      Tag_Map.Register (Values.Integers.Value_Type'Tag);
-      Tag_Map.Register (Values.Strings.Value_Type'Tag);
-      Tag_Map.Seal;
+      null;
    end Set_Up;
 
 
    overriding
    procedure Tear_Down (T : in out Test_Type) is
    begin
-      Tag_Map.Utils.Restore (T.State);
+      null;
    end Tear_Down;
 
 
@@ -139,13 +135,13 @@ package body DB.Maps.Covering.Test is
       for I in 1 .. Loop_Count loop
          Map.Insert (New_Key (I), New_Value (I), S);
          Assert (S = Success, "Insertion failed: "&
-                              Types.Keys.Image (New_Key (I)) &"  /  "&
-                              New_Value (I).Image);
+                              Keys.Image (New_Key (I)) &"  /  "&
+                              Values.Image (New_Value (I)));
          declare
-            V : Values.Integers.Value_Type;
+            V : Values.Value_Type;
          begin
             Map.Search (New_Key (I), V, S);
-            Assert (S = Success, Types.Keys.Image (New_Key (I)) &" is not in "&
+            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
          end;
       end loop;
@@ -159,13 +155,13 @@ package body DB.Maps.Covering.Test is
       for I in 1 .. Loop_Count loop
          Map.Append (New_Key (I), New_Value (I), S);
          Assert (S = Success, "Append failed: "&
-                              Types.Keys.Image (New_Key (I)) &"  /  "&
-                              New_Value (I).Image);
+                              Keys.Image (New_Key (I)) &"  /  "&
+                              Values.Image (New_Value (I)));
          declare
-            V : Values.Integers.Value_Type;
+            V : Values.Value_Type;
          begin
             Map.Search (New_Key (I), V, S);
-            Assert (S = Success, Types.Keys.Image (New_Key (I)) &" is not in "&
+            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
          end;
       end loop;
@@ -179,21 +175,21 @@ package body DB.Maps.Covering.Test is
       for I in 1 .. Loop_Count loop
          Map.Insert (New_Key (I), New_Value (I), S);
          Assert (S = Failure, "Duplicate insertion successful: "&
-                              Types.Keys.Image (New_Key (I)) &"  /  "&
-                              New_Value (I).Image);
+                              Keys.Image (New_Key (I)) &"  /  "&
+                              Values.Image (New_Value (I)));
       end loop;
    end;
 
 
    procedure Searches (Map : in out Maps.Map_Type'Class)
    is
-      V : Values.Integers.Value_Type;
+      V : Values.Value_Type;
       S : State_Type;
    begin
       for I in 1 .. Loop_Count loop
          Map.Search (New_Key (I), V, S);
          Assert (S = Success, "Search failed: "&
-                              Types.Keys.Image (New_Key (I)));
+                              Keys.Image (New_Key (I)));
       end loop;
    end;
 
@@ -201,23 +197,25 @@ package body DB.Maps.Covering.Test is
    procedure Deletes (Map         : in out Maps.Map_Type'Class;
                       Anti_Search : in     Boolean)
    is
-      V : Values.Integers.Value_Type;
+      V : Values.Value_Type;
       S : State_Type;
    begin
       for I in 1 .. Loop_Count loop
          Map.Delete (New_Key (I), V, S);
          Assert (S = Success, "Delete failed: "&
-                              Types.Keys.Image (New_Key (I)));
-         Assert (V.Equals(New_Value (I)),
-                 "Unexpected value "& V.Image &" vs "& New_Value (I).Image);
+                              Keys.Image (New_Key (I)));
+         Assert (V = Values.New_Value (I),
+                 "Unexpected value "& Values.Image (V) &" vs "&
+                 Values.Image (New_Value (I)));
          if Anti_Search then
             Map.Search (New_Key (I), V, S);
-            Assert (S = Failure, Types.Keys.Image (New_Key (I)) &" is still in"&
-                                 " the map with value "& New_Value (I).Image);
+            Assert (S = Failure, Keys.Image (New_Key (I)) &" is still in"&
+                                 " the map with value "&
+                                 Values.Image (New_Value (I)));
             Map.Delete (New_Key (I), V, S);
-            Assert (S = Failure, Types.Keys.Image (New_Key (I)) &" could still"&
+            Assert (S = Failure, Keys.Image (New_Key (I)) &" could still"&
                                  " be deleted from the map with value "&
-                                 New_Value (I).Image);
+                                 Values.Image (New_Value (I)));
          end if;
       end loop;
    end;
@@ -295,11 +293,12 @@ package body DB.Maps.Covering.Test is
 
       procedure Single_Cursor_Pause
       is
+         use type Keys.Key_Type;
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         P : Key_Type := Null_Key;
-         K : Key_Type := Null_Key;
-         V : Values.Integers.Value_Type;
+         P : Keys.Key_Type := Keys.Null_Key;
+         K : Keys.Key_Type := Keys.Null_Key;
+         V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin
@@ -307,8 +306,8 @@ package body DB.Maps.Covering.Test is
             C.Next (K, V, S);
             exit when S /= Success;
             Assert (N = 0 or else P <= K,
-                    "Previous key "& Types.Keys.Image (P) &" is not "&
-                    "less than or equal to "& Types.Keys.Image (K));
+                    "Previous key "& Keys.Image (P) &" is not "&
+                    "less than or equal to "& Keys.Image (K));
             C.Pause;
             if N = 0 or else P /= K then
                N := N + 1;
@@ -323,11 +322,12 @@ package body DB.Maps.Covering.Test is
 
       procedure Single_Cursor_Delete
       is
+         use type Keys.Key_Type;
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         P : Key_Type := Null_Key;
-         K : Key_Type;
-         V : Values.Integers.Value_Type;
+         P : Keys.Key_Type := Keys.Null_Key;
+         K : Keys.Key_Type;
+         V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin
@@ -352,11 +352,12 @@ package body DB.Maps.Covering.Test is
 
       procedure Single_Cursor_Pause_Delete
       is
+         use type Keys.Key_Type;
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
-         P : Key_Type := Null_Key;
-         V : Values.Integers.Value_Type;
+         K : Keys.Key_Type;
+         P : Keys.Key_Type := Keys.Null_Key;
+         V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin
@@ -384,8 +385,8 @@ package body DB.Maps.Covering.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
-         V : Values.Integers.Value_Type;
+         K : Keys.Key_Type;
+         V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
          M : Natural := 0;
@@ -421,8 +422,8 @@ package body DB.Maps.Covering.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
-         V : Values.Integers.Value_Type;
+         K : Keys.Key_Type;
+         V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin
@@ -441,8 +442,8 @@ package body DB.Maps.Covering.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
-         V : Values.Integers.Value_Type;
+         K : Keys.Key_Type;
+         V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
       begin

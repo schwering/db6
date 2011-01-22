@@ -2,12 +2,10 @@ with Ada.Streams;
 
 with Tree.To_Strings;
 
-with DB.Maps;
-with DB.Maps.Values.Strings;
-
-with DB.Types.Keys;
 with DB.Types.Byte_Arrays.Bounded;
 with DB.Types.Byte_Arrays.Unbounded;
+with DB.Types.Keys;
+with DB.Types.Values;
 
 private
 package Tree.Types is
@@ -33,17 +31,9 @@ package Tree.Types is
    ----------
    -- Value_Type
 
-   type Value_Type is new DB.Maps.Values.Strings.Value_Type with
-      null record;
+   subtype Value_Type is DB.Types.Values.Value_Type;
 
-   overriding
-   function New_Value
-     (Params : not null access DB.Maps.Value_Parameters_Type)
-      return Value_Type;
-
-   function New_Value
-     (S : String)
-      return Value_Type;
+   function New_Value (S : String) return Value_Type;
 
    function New_Value
      (S : DB.Types.Byte_Arrays.Indefinite_Buffer_Type)
@@ -61,7 +51,7 @@ package Tree.Types is
 
    function Null_Value return Value_Type;
 
-   function To_String (V : DB.Maps.Value_Type'Class) return String;
+   function To_String (V : DB.Types.Values.Value_Type) return String;
 
    ----------
    -- Pair or key and value.

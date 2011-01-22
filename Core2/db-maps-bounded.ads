@@ -10,7 +10,6 @@
 with DB.Blocks;
 private with DB.DSA.Gen_BTrees;
 private with DB.Blocks.Local_IO;
-private with DB.Maps.Abstract_Value_Serialization;
 
 package DB.Maps.Bounded is
    pragma Elaborate_Body;
@@ -69,60 +68,60 @@ package DB.Maps.Bounded is
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Wrapper_Type;
+      Value :    out Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
-      Value :    out Value_Wrapper_Type;
+      Value :    out Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Insert
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Insert
      (Map       : in out Map_Type;
       Key       : in     Key_Type;
-      Value     : in     Value_Type'Class;
+      Value     : in     Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Wrapper_Type;
+      Old_Value :    out Value_Type;
       State     :    out State_Type);
 
    overriding
    procedure Replace
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Replace
      (Map       : in out Map_Type;
       Key       : in     Key_Type;
-      Value     : in     Value_Type'Class;
+      Value     : in     Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Wrapper_Type;
+      Old_Value :    out Value_Type;
       State     :    out State_Type);
 
    overriding
    procedure Append
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Wrapper_Type;
+      Value :    out Value_Type;
       State :    out State_Type);
 
    overriding
@@ -185,7 +184,7 @@ package DB.Maps.Bounded is
    procedure Next
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
-      Value  :    out Value_Wrapper_Type;
+      Value  :    out Value_Type;
       State  :    out State_Type);
 
    overriding
@@ -198,8 +197,8 @@ private
    package Block_IO      renames Block_IO_Impl.IO_Signature;
 
    package BTrees is new DSA.Gen_BTrees
-     (Keys     => Types.Keys.Keys_Signature,
-      Values   => Abstract_Value_Serialization.Values_Signature,
+     (Keys     => Keys.Keys_Signature,
+      Values   => Values.Values_Signature,
       Block_IO => Block_IO);
 
    type Map_Ref_Type is access all Map_Type;

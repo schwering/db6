@@ -528,7 +528,7 @@ package body DB.Maps.Covering is
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Wrapper_Type;
+      Value :    out Value_Type;
       State :    out State_Type)
    is
       C : constant String := Column_To_String (Key.Column);
@@ -546,7 +546,7 @@ package body DB.Maps.Covering is
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Key_Type;
-      Value :    out Value_Wrapper_Type;
+      Value :    out Value_Type;
       State :    out State_Type) is
    begin
       if Map.Cover'Length = 0 then
@@ -558,7 +558,7 @@ package body DB.Maps.Covering is
          declare
             use type Utils.Comparison_Result_Type;
             This_Key   : Key_Type;
-            This_Value : Value_Wrapper_Type;
+            This_Value : Value_Type;
             This_State : State_Type;
          begin
             Map.Slices (Map.Cover (I)).Map.Search_Minimum
@@ -578,7 +578,7 @@ package body DB.Maps.Covering is
    procedure Insert
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -601,9 +601,9 @@ package body DB.Maps.Covering is
    procedure Insert
      (Map       : in out Map_Type;
       Key       : in     Key_Type;
-      Value     : in     Value_Type'Class;
+      Value     : in     Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Wrapper_Type;
+      Old_Value :    out Value_Type;
       State     :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -626,7 +626,7 @@ package body DB.Maps.Covering is
    procedure Replace
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -649,9 +649,9 @@ package body DB.Maps.Covering is
    procedure Replace
      (Map       : in out Map_Type;
       Key       : in     Key_Type;
-      Value     : in     Value_Type'Class;
+      Value     : in     Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Wrapper_Type;
+      Old_Value :    out Value_Type;
       State     :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -674,7 +674,7 @@ package body DB.Maps.Covering is
    procedure Append
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value : in     Value_Type'Class;
+      Value : in     Value_Type;
       State :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -697,7 +697,7 @@ package body DB.Maps.Covering is
    procedure Delete
      (Map   : in out Map_Type;
       Key   : in     Key_Type;
-      Value :    out Value_Wrapper_Type;
+      Value :    out Value_Type;
       State :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -735,7 +735,7 @@ package body DB.Maps.Covering is
    procedure Free_Heap_Item (Item : in out Heap_Item_Type)
    is
       procedure Free is new Ada.Unchecked_Deallocation
-        (Value_Type'Class, Value_Ref_Type);
+        (Value_Type, Value_Ref_Type);
    begin
       if Item.Value /= null then
          Free (Item.Value);
@@ -878,7 +878,7 @@ package body DB.Maps.Covering is
    procedure Next
      (Cursor : in out Cursor_Type;
       Key    :    out Key_Type;
-      Value  :    out Value_Wrapper_Type;
+      Value  :    out Value_Type;
       State  :    out State_Type)
    is
       pragma Precondition (Cursor.Initialized);
@@ -894,14 +894,13 @@ package body DB.Maps.Covering is
       procedure Insert_From_Sub_Cursor (Sub_Cursor : in Base_Cursor_Ref_Type)
       is
          K : Key_Type;
-         V : Value_Wrapper_Type := Value;
+         V : Value_Type := Value;
          S : State_Type;
       begin
          Sub_Cursor.Next (K, V, S);
          if S = Success then
             declare
-               V_Ref : constant Value_Ref_Type :=
-                 new Value_Type'Class'(V.Ref.all);
+               V_Ref : constant Value_Ref_Type := new Value_Type'(V);
                Item  : constant Heap_Item_Type :=
                  Heap_Item_Type'(K, V_Ref, Sub_Cursor);
             begin
@@ -928,7 +927,7 @@ package body DB.Maps.Covering is
       begin
          Heaps.Extract_Min (Cursor.Heap.all, Item);
          Key   := Item.Key;
-         Value := New_Value_Wrapper (Item.Value.all);
+         Value := Item.Value.all;
          State := Success;
          Insert_From_Sub_Cursor (Item.Cursor);
       end;

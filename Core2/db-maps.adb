@@ -4,24 +4,12 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
-with Ada.Tags;
 with Interfaces.C;
 
 with DB.Maps.Bounded;
 with DB.Maps.Covering;
 
 package body DB.Maps is
-
-   function Equals (Left, Right : Comparable_Type'Class) return Boolean
-   is
-      use type Ada.Tags.Tag;
-   begin
-      return Left'Tag = Right'Tag and then Left.Equals (Right);
-   end Equals;
-
-
-   ----------
-   -- Constructors for maps, bounds and converts for keys.
 
    function New_Map
      (Implementation   : in Implementation_Type;
@@ -155,113 +143,6 @@ package body DB.Maps is
               String_To_Column (Column),
               Keys.Times.Number_Type (Seconds));
    end Strings_To_Key;
-
-
-   ----------
-   -- Dispatching implementations for the Value_Type'Class-operations.
-   -- The *_Fix versions only exist due to a bug of GNAT:
-   --   call to abstract procedure must be dispatching
-   -- So we create the *_Fix versions which take a 'Class object and hence
-   -- aren't class members.
-
-   procedure Search
-     (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type)
-   is
-      procedure Search_Fix
-        (Map   : in out Map_Type'Class;
-         Key   : in     Key_Type;
-         Value :    out Value_Type'Class;
-         State :    out State_Type)
-      is
-         Value_Wrapper : Value_Wrapper_Type;
-      begin
-         Search (Map, Key, Value_Wrapper, State);
-         if State = Success then
-            Value := Value_Wrapper.Ref.all;
-         end if;
-      end Search_Fix;
-      pragma Inline (Search_Fix);
-   begin
-      Search_Fix (Map, Key, Value, State);
-   end Search;
-
-
-   procedure Search_Minimum
-     (Map   : in out Map_Type;
-      Key   :    out Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type)
-   is
-      procedure Search_Minimum_Fix
-        (Map   : in out Map_Type'Class;
-         Key   :    out Key_Type;
-         Value :    out Value_Type'Class;
-         State :    out State_Type)
-      is
-         Value_Wrapper : Value_Wrapper_Type;
-      begin
-         Map.Search_Minimum (Key, Value_Wrapper, State);
-         if State = Success then
-            Value := Value_Wrapper.Ref.all;
-         end if;
-      end Search_Minimum_Fix;
-      pragma Inline (Search_Minimum_Fix);
-   begin
-      Search_Minimum_Fix (Map, Key, Value, State);
-   end Search_Minimum;
-
-
-   procedure Delete
-     (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type'Class;
-      State :    out State_Type)
-   is
-      procedure Delete_Fix
-        (Map   : in out Map_Type'Class;
-         Key   : in     Key_Type;
-         Value :    out Value_Type'Class;
-         State :    out State_Type)
-      is
-         Value_Wrapper : Value_Wrapper_Type;
-      begin
-         Delete (Map, Key, Value_Wrapper, State);
-         if State = Success then
-            Value := Value_Wrapper.Ref.all;
-         end if;
-      end Delete_Fix;
-      pragma Inline (Delete_Fix);
-   begin
-      Delete_Fix (Map, Key, Value, State);
-   end Delete;
-
-
-   procedure Next
-     (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type'Class;
-      State  :    out State_Type)
-   is
-      procedure Next_Fix
-        (Cursor : in out Cursor_Type'Class;
-         Key    :    out Key_Type;
-         Value  :    out Value_Type'Class;
-         State  :    out State_Type)
-      is
-         Value_Wrapper : Value_Wrapper_Type;
-      begin
-         Next (Cursor, Key, Value_Wrapper, State);
-         if State = Success then
-            Value := Value_Wrapper.Ref.all;
-         end if;
-      end Next_Fix;
-      pragma Inline (Next_Fix);
-   begin
-      Next_Fix (Cursor, Key, Value, State);
-   end Next;
 
 end DB.Maps;
 

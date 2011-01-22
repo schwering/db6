@@ -1,24 +1,10 @@
-with DB.Maps.Tag_Map;
-with DB.Types.Byte_Arrays.Bounded.Streams;
+with DB.Types.Values;
 
 package body Tree.Types is
 
-   overriding
-   function New_Value
-     (Params : not null access DB.Maps.Value_Parameters_Type)
-      return Value_Type is
+   function New_Value (S : String) return Value_Type is
    begin
-      return (DB.Maps.Values.Strings.New_Value (Params) with
-              null record);
-   end New_Value;
-
-
-   function New_Value
-     (S : String)
-      return Value_Type is
-   begin
-      return (DB.Maps.Values.Strings.New_Value (S) with
-              null record);
+      return DB.Types.Values.New_Value (S);
    end New_Value;
 
 
@@ -51,7 +37,8 @@ package body Tree.Types is
       return DB.Types.Byte_Arrays.Bounded.String_Type is
    begin
       return DB.Types.Byte_Arrays.Bounded.New_String
-              (DB.Types.Byte_Arrays.Bounded.Indefinite_Buffer_Type (V.Image));
+              (DB.Types.Byte_Arrays.Bounded.Indefinite_Buffer_Type
+                  (DB.Types.Values.Image (V)));
    end To_Bounded;
 
 
@@ -60,7 +47,8 @@ package body Tree.Types is
       return DB.Types.Byte_Arrays.Unbounded.String_Type is
    begin
       return DB.Types.Byte_Arrays.Unbounded.New_String
-              (DB.Types.Byte_Arrays.Unbounded.Indefinite_Buffer_Type (V.Image));
+              (DB.Types.Byte_Arrays.Unbounded.Indefinite_Buffer_Type
+               (DB.Types.Values.Image (V)));
    end To_Unbounded;
 
 
@@ -70,9 +58,9 @@ package body Tree.Types is
    end Null_Value;
 
 
-   function To_String (V : DB.Maps.Value_Type'Class) return String is
+   function To_String (V : DB.Types.Values.Value_Type) return String is
    begin
-      return V.Image;
+      return DB.Types.Values.Image (V);
    end To_String;
 
 
@@ -88,8 +76,5 @@ package body Tree.Types is
       return KV.Value;
    end;
 
-begin
-   DB.Maps.Tag_Map.Register (Value_Type'Tag);
-   DB.Maps.Tag_Map.Seal;
 end Tree.Types;
 

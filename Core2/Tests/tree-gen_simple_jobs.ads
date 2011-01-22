@@ -8,9 +8,7 @@ with DB.Maps;
 private
 generic
    with function Next_Entry return Key_Value_Type;
-
-   Map        : in out DB.Maps.Map_Type'Class;
-   Null_value : in out Types.Value_Type'Class;
+   Map : in out DB.Maps.Map_Type'Class;
 package Tree.Gen_Simple_Jobs is
 
    Stop_Now : exception;

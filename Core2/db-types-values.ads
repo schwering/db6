@@ -137,6 +137,7 @@ package DB.Types.Values is
       return Value_Type;
    function New_Value (Real : Reals.Real_Type) return Value_Type;
    function New_Value (Long_Real : Long_Reals.Real_Type) return Value_Type;
+   function New_Value (S : String) return Value_Type;
    function New_Value (Bounded_String : Strings.Bounded.String_Type)
       return Value_Type;
    function New_Value (Unbounded_String : Strings.Unbounded.String_Type)
