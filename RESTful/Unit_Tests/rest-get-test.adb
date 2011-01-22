@@ -16,12 +16,7 @@ with AWS.Response;
 with AWS.Server;
 
 with DB.Maps;
-with DB.Maps.Values;
-with DB.Maps.Values.Booleans;
-with DB.Maps.Values.Long_Floats;
-with DB.Maps.Values.Long_Integers;
-with DB.Maps.Values.Nothings;
-with DB.Maps.Values.Strings;
+with DB.Types.Values;
 
 with REST.Method;
 with REST.Maps.Test_Utils; use REST.Maps.Test_Utils;
@@ -48,7 +43,7 @@ package body REST.Get.Test is
    begin
       for I in KVs'Range loop
          declare
-            use DB.Maps.Values;
+            use DB.Types.Values;
             use type DB.Maps.State_Type;
             Key   : constant DB.Maps.Key_Type := 
                DB.Maps.Strings_To_Key (TS (KVs (I).Row), TS (KVs (I).Column));
@@ -59,28 +54,28 @@ package body REST.Get.Test is
                when ''' =>
                   Map.Insert
                     (Key,
-                     Strings.New_Value (Val (Val'First+1 ..  Val'Last-1)),
+                     New_Value (Val (Val'First+1 ..  Val'Last-1)),
                      State);
                when '0' .. '9' =>
                   Map.Insert
                     (Key,
-                     Long_Integers.New_Value
-                       (Long_Integers.Integer_Type'Value (Val)),
+                     New_Value
+                       (Long_Integers.Discrete_Type'Value (Val)),
                      State);
                when '-' =>
                   Map.Insert
                     (Key,
-                     Long_Floats.New_Value
-                       (Long_Floats.Float_Type'Value (Val)),
+                     New_Value
+                       (Long_Reals.Real_Type'Value (Val)),
                      State);
                when 't' | 'f' =>
                   Map.Insert
                     (Key,
-                     Booleans.New_Value
-                       (Booleans.Integer_Type'Value (Val)),
+                     New_Value
+                       (Booleans.Discrete_Type'Value (Val)),
                      State);
                when 'n' =>
-                  Map.Insert (Key, Nothings.New_Value, State);
+                  Map.Insert (Key, Nothing_Value, State);
                when others =>
                   Assert (False, "Value '"& Val &"' invalid");
             end case;

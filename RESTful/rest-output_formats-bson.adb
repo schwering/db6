@@ -6,11 +6,6 @@
 
 with Ada.Unchecked_Conversion;
 
-with DB.Maps.Values.Long_Integers;
-with DB.Maps.Values.Long_Floats;
-with DB.Maps.Values.Nothings;
-with DB.Maps.Values.Strings;
-
 package body REST.Output_Formats.BSON is
 
    type BSON_Int32_Type is mod 2**32;
@@ -159,34 +154,17 @@ package body REST.Output_Formats.BSON is
    procedure Put_Value
      (Resource : in out Writer_Type;
       Key      : in     String;
-      Value    : in     DB.Maps.Value_Type'Class) is
+      Value    : in     DB.Maps.Value_Type) is
    begin
-      Emit (Resource, """");
-      Emit (Resource, Key);
-      Emit (Resource, """ : ");
-      if Value in DB.Maps.Values.Strings.Value_Type'Class then
-         Emit (Resource, """");
-         Emit (Resource, Value.Image);
-         Emit (Resource, """");
-      else
-         Emit (Resource, Value.Image);
-      end if;
-      Emit (Resource, ",");
+      null;
    end Put_Value;
 
 
    procedure Put_Anonymous_Value
      (Resource : in out Writer_Type;
-      Value    : in     DB.Maps.Value_Type'Class) is
+      Value    : in     DB.Maps.Value_Type) is
    begin
-      if Value in DB.Maps.Values.Strings.Value_Type'Class then
-         Emit (Resource, """");
-         Emit (Resource, Value.Image);
-         Emit (Resource, """");
-      else
-         Emit (Resource, Value.Image);
-      end if;
-      Emit (Resource, ",");
+      null;
    end Put_Anonymous_Value;
 
 end REST.Output_Formats.BSON;

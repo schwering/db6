@@ -47,12 +47,12 @@ package REST.Output_Formats.JSON is
    procedure Put_Value
      (Resource : in out Writer_Type;
       Key      : in     String;
-      Value    : in     DB.Maps.Value_Type'Class);
+      Value    : in     DB.Maps.Value_Type);
 
    overriding
    procedure Put_Anonymous_Value
      (Resource : in out Writer_Type;
-      Value    : in     DB.Maps.Value_Type'Class);
+      Value    : in     DB.Maps.Value_Type);
 
 private
    type Writer_Type is new Output_Formats.Writer_Type with

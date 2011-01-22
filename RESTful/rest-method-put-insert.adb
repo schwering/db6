@@ -92,13 +92,13 @@ begin
       overriding
       procedure Anonymous_Value
         (Handler : in out Handler_Type;
-         Val     : in     DB.Maps.Value_Type'Class);
+         Val     : in     DB.Maps.Value_Type);
 
       overriding
       procedure Value
         (Handler : in out Handler_Type;
          Key     : in     String;
-         Val     : in     DB.Maps.Value_Type'Class);
+         Val     : in     DB.Maps.Value_Type);
 
       overriding
       procedure Error (Handler : in out Handler_Type);
@@ -185,7 +185,7 @@ begin
 
       procedure Anonymous_Value
         (Handler : in out Handler_Type;
-         Val     : in     DB.Maps.Value_Type'Class) is
+         Val     : in     DB.Maps.Value_Type) is
       begin
          -- Anonymous_Value only appears in arrays whereas Value appears only in
          -- objects.
@@ -210,7 +210,7 @@ begin
       procedure Value
         (Handler : in out Handler_Type;
          Key     : in     String;
-         Val     : in     DB.Maps.Value_Type'Class) is
+         Val     : in     DB.Maps.Value_Type) is
       begin
          if Handler.Row = null then
             raise Malformed_Input_Data_Error;

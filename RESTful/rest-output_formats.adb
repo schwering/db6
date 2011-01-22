@@ -48,7 +48,7 @@ package body REST.Output_Formats is
             use type DB.Maps.Keys.Columns.String_Type;
             use type DB.Maps.State_Type;
             Key   : DB.Maps.Key_Type;
-            Value : DB.Maps.Value_Wrapper_Type;
+            Value : DB.Maps.Value_Type;
             State : DB.Maps.State_Type;
          begin
             select
@@ -85,7 +85,7 @@ package body REST.Output_Formats is
             end if;
 
             Writer.Put_Value
-              (DB.Maps.Column_To_String (Key.Column), Value.Ref.all);
+              (DB.Maps.Column_To_String (Key.Column), Value);
 
             Last_Key         := Key;
             Last_Initialized := True;

@@ -77,13 +77,13 @@ package REST.Input_Formats is
 
    procedure Anonymous_Value
      (Handler : in out Handler_Type;
-      Value   : in     DB.Maps.Value_Type'Class)
+      Value   : in     DB.Maps.Value_Type)
    is abstract;
 
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
-      Value   : in     DB.Maps.Value_Type'Class)
+      Value   : in     DB.Maps.Value_Type)
    is abstract;
 
    procedure Error (Handler : in out Handler_Type)
@@ -102,7 +102,7 @@ private
          Last       : AWS.Status.Stream_Element_Offset := Buffer_Type'First - 1;
          Current    : AWS.Status.Stream_Element_Offset := Buffer_Type'First - 1;
          The_Key    : String_Ref_Type                  := null;
-         The_Value  : DB.Maps.Value_Ref_Type           := null;
+         The_Value  : DB.Maps.Value_Type;
          Expect_Key : Boolean                          := True;
       end record;
 
@@ -113,13 +113,11 @@ private
    procedure Set_Value (Parser : in out Parser_Type; Value : in String);
 
    procedure Unset_Key (Parser : in out Parser_Type);
-   procedure Unset_Value (Parser : in out Parser_Type);
 
    function Has_Key (Parser : Parser_Type) return Boolean;
-   function Has_Value (Parser : Parser_Type) return Boolean;
 
    function Key (Parser : Parser_Type) return String;
-   function Value (Parser : Parser_Type) return DB.Maps.Value_Type'Class;
+   function Value (Parser : Parser_Type) return DB.Maps.Value_Type;
 
    procedure Fill_Buffer
      (Parser  : in out Parser_Type'Class;

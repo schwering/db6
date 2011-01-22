@@ -106,12 +106,12 @@ package REST.Output_Formats is
    procedure Put_Value
      (Resource : in out Writer_Type;
       Key      : in     String;
-      Value    : in     DB.Maps.Value_Type'Class)
+      Value    : in     DB.Maps.Value_Type)
    is abstract;
 
    procedure Put_Anonymous_Value
      (Resource : in out Writer_Type;
-      Value    : in     DB.Maps.Value_Type'Class)
+      Value    : in     DB.Maps.Value_Type)
    is abstract;
 
    ----------

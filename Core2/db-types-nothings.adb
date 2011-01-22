@@ -36,7 +36,7 @@ package body DB.Types.Nothings is
    is
       pragma Unreferenced (Nothing);
    begin
-      return "(null)";
+      return "null";
    end Image;
 
 end DB.Types.Nothings;

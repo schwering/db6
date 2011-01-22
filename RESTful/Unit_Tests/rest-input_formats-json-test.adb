@@ -13,12 +13,7 @@ with AWS.Status.Set;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
-with DB.Maps.Values;
-with DB.Maps.Values.Booleans;
-with DB.Maps.Values.Long_Floats;
-with DB.Maps.Values.Long_Integers;
-with DB.Maps.Values.Nothings;
-with DB.Maps.Values.Strings;
+with DB.Types.Values;
 
 package body REST.Input_Formats.JSON.Test is
 
@@ -70,13 +65,13 @@ package body REST.Input_Formats.JSON.Test is
    overriding
    procedure Anonymous_Value
      (Handler : in out Handler_Type;
-      Val     : in     DB.Maps.Value_Type'Class);
+      Val     : in     DB.Maps.Value_Type);
 
    overriding
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
-      Val     : in     DB.Maps.Value_Type'Class);
+      Val     : in     DB.Maps.Value_Type);
 
    overriding
    procedure Error (Handler : in out Handler_Type);
@@ -148,7 +143,7 @@ package body REST.Input_Formats.JSON.Test is
 
    procedure Anonymous_Value
      (Handler : in out Handler_Type;
-      Val     : in     DB.Maps.Value_Type'Class)
+      Val     : in     DB.Maps.Value_Type)
    is
       use type Ada.Tags.Tag;
       use type DB.Maps.Value_Type;
@@ -157,17 +152,16 @@ package body REST.Input_Formats.JSON.Test is
       Assert (Handler.Expected (Handler.I).Event = Anonymous_Value,
               "expected "& Handler.Expected (Handler.I).Event'Img &", "&
               "got value");
-      Assert (Handler.Expected (Handler.I).Value.Ref.Image = Val.Image and
-              Handler.Expected (Handler.I).Value.Ref.all'Tag = Val'Tag,
-              "expected '"& Handler.Expected (Handler.I).Value.Ref.Image &"', "&
-              "got '"& Val.Image &"'");
+      Assert (Handler.Expected (Handler.I).Value = Val,
+              "expected '"& DB.Types.Values.Image (Handler.Expected (Handler.I).Value)
+              &"', "& "got '"& DB.Types.Values.Image (Val) &"'");
    end Anonymous_Value;
 
 
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
-      Val     : in     DB.Maps.Value_Type'Class)
+      Val     : in     DB.Maps.Value_Type)
    is
       use type Ada.Tags.Tag;
       use type DB.Maps.Value_Type;
@@ -179,10 +173,9 @@ package body REST.Input_Formats.JSON.Test is
       Assert (To_String (Handler.Expected (Handler.I).Key) = Key,
               "expected '"& To_String (Handler.Expected (Handler.I).Key) &"', "&
               "got '"& Key &"'");
-      Assert (Handler.Expected (Handler.I).Value.Ref.Image = Val.Image and
-              Handler.Expected (Handler.I).Value.Ref.all'Tag = Val'Tag,
-              "expected '"& Handler.Expected (Handler.I).Value.Ref.Image &"', "&
-              "got '"& Val.Image &"'");
+      Assert (Handler.Expected (Handler.I).Value = Val,
+              "expected '"& DB.Types.Values.Image (Handler.Expected (Handler.I).Value)
+              &"', "& "got '"& DB.Types.Values.Image (Val) &"'");
    end Value;
 
 
@@ -199,10 +192,6 @@ package body REST.Input_Formats.JSON.Test is
    renames To_Unbounded_String;
 
 
-   function TKW (V : DB.Maps.Value_Type'Class) return DB.Maps.Value_Wrapper_Type
-   renames DB.Maps.New_Value_Wrapper;
-
-
    procedure Init_Body (Request : in out AWS.Status.Data; S : in String) is
    begin
       AWS.Status.Set.Append_Body (Request, String_To_Bytes (S));
@@ -214,16 +203,16 @@ package body REST.Input_Formats.JSON.Test is
       use DB.Maps.Values;
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
-         (Value, TUS ("key1"), TKW (Strings.New_Value ("string1"))),
-         (Value, TUS ("key2"), TKW (Strings.New_Value ("string2"))),
-         (Value, TUS ("key3"), TKW (Strings.New_Value ("string3"))),
-         (Value, TUS ("key4"), TKW (Long_Integers.New_Value (123))),
-         (Value, TUS ("key5"), TKW (Long_Integers.New_Value (-123))),
-         (Value, TUS ("key6"), TKW (Long_Floats.New_Value (123.901239))),
-         (Value, TUS ("key7"), TKW (Long_Floats.New_Value (-123.0))),
-         (Value, TUS ("key8"), TKW (Booleans.New_Value (False))),
-         (Value, TUS ("key9"), TKW (Booleans.New_Value (True))),
-         (Value, TUS ("key10"), TKW (Nothings.New_Value)),
+         (Value, TUS ("key1"), New_Value ("string1")),
+         (Value, TUS ("key2"), New_Value ("string2")),
+         (Value, TUS ("key3"), New_Value ("string3")),
+         (Value, TUS ("key4"), New_Value (DB.Types.Values.Long_Integers.Discrete_Type (123))),
+         (Value, TUS ("key5"), New_Value (DB.Types.Values.Long_Integers.Discrete_Type (-123))),
+         (Value, TUS ("key6"), New_Value (DB.Types.Values.Long_Reals.Real_Type (123.901239))),
+         (Value, TUS ("key7"), New_Value (DB.Types.Values.Long_Reals.Real_Type (-123.0))),
+         (Value, TUS ("key8"), New_Value (False)),
+         (Value, TUS ("key9"), New_Value (True)),
+         (Value, TUS ("key10"), Nothing_Value),
          (Event => Object_End));
       Request : AWS.Status.Data;
       Handler : Handler_Type := (Expected'Length, Expected, others => <>);
@@ -259,14 +248,14 @@ package body REST.Input_Formats.JSON.Test is
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Object_Start, TUS ("outer")),
-         (Value, TUS ("key1"), TKW (Strings.New_Value ("string1"))),
-         (Value, TUS ("key2"), TKW (Strings.New_Value ("string2"))),
+         (Value, TUS ("key1"), New_Value ("string1")),
+         (Value, TUS ("key2"), New_Value ("string2")),
          (Object_Start, TUS ("inner")),
-         (Value, TUS ("key3"), TKW (Strings.New_Value ("string3"))),
-         (Value, TUS ("key4"), TKW (Strings.New_Value ("string4"))),
+         (Value, TUS ("key3"), New_Value ("string3")),
+         (Value, TUS ("key4"), New_Value ("string4")),
          (Event => Object_End),
          (Event => Object_End),
-         (Value, TUS ("key5"), TKW (Strings.New_Value ("string5"))),
+         (Value, TUS ("key5"), New_Value ("string5")),
          (Event => Object_End));
       Request : AWS.Status.Data;
       Handler : Handler_Type := (Expected'Length, Expected, others => <>);
@@ -301,14 +290,14 @@ package body REST.Input_Formats.JSON.Test is
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Array_Start, TUS ("outer")),
-         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string1"))),
-         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string2"))),
+         (Anonymous_Value, TUS(""), New_Value ("string1")),
+         (Anonymous_Value, TUS(""), New_Value ("string2")),
          (Event => Anonymous_Array_Start),
-         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string3"))),
-         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string4"))),
+         (Anonymous_Value, TUS(""), New_Value ("string3")),
+         (Anonymous_Value, TUS(""), New_Value ("string4")),
          (Event => Array_End),
          (Event => Array_End),
-         (Value, TUS ("huhu"), TKW (Strings.New_Value ("string5"))),
+         (Value, TUS ("huhu"), New_Value ("string5")),
          (Event => Object_End));
       Request : AWS.Status.Data;
       Handler : Handler_Type := (Expected'Length, Expected, others => <>);
@@ -342,12 +331,12 @@ package body REST.Input_Formats.JSON.Test is
       use DB.Maps.Values;
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
-         (Value, TUS ("key1"), TKW (Strings.New_Value ("""string1"""))),
-         (Value, TUS ("key2"), TKW (Strings.New_Value ("""string2"""))),
-         (Value, TUS ("key3"), TKW (Strings.New_Value ("'string3'"))),
-         (Value, TUS ("key4"), TKW (Strings.New_Value ("'string4'"))),
-         (Value, TUS ("key5"), TKW (Strings.New_Value ("string5\"))),
-         (Value, TUS ("key6"), TKW (Strings.New_Value ("string6\"""))),
+         (Value, TUS ("key1"), New_Value ("""string1""")),
+         (Value, TUS ("key2"), New_Value ("""string2""")),
+         (Value, TUS ("key3"), New_Value ("'string3'")),
+         (Value, TUS ("key4"), New_Value ("'string4'")),
+         (Value, TUS ("key5"), New_Value ("string5\")),
+         (Value, TUS ("key6"), New_Value ("string6\""")),
          (Event => Object_End));
       Request : AWS.Status.Data;
       Handler : Handler_Type := (Expected'Length, Expected, others => <>);

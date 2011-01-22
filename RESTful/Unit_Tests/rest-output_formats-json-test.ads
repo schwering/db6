@@ -50,7 +50,7 @@ private
                Key : Unbounded_String;
                case Event is
                   when Anonymous_Value | Value =>
-                     Value : DB.Maps.Value_Wrapper_Type;
+                     Value : DB.Maps.Value_Type;
                   when others => null;
                end case;
             when others => null;
@@ -92,13 +92,13 @@ private
    overriding
    procedure Anonymous_Value
      (Handler : in out Handler_Type;
-      Val     : in     DB.Maps.Value_Type'Class);
+      Val     : in     DB.Maps.Value_Type);
 
    overriding
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
-      Val     : in     DB.Maps.Value_Type'Class);
+      Val     : in     DB.Maps.Value_Type);
 
    overriding
    procedure Error (Handler : in out Handler_Type);

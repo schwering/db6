@@ -11,15 +11,6 @@ with Interfaces.C;
 
 with AWS.Net;
 
-with DB.Maps.Tag_Map;
-with DB.Maps.Values.Booleans;
-with DB.Maps.Values.Floats;
-with DB.Maps.Values.Integers;
-with DB.Maps.Values.Long_Floats;
-with DB.Maps.Values.Long_Integers;
-with DB.Maps.Values.Nothings;
-with DB.Maps.Values.Strings;
-
 with REST.Method;
 with REST.Handler;
 with REST.Log;
@@ -140,17 +131,6 @@ package body REST.Maps.Test_Utils is
 
    procedure Delete_And_Create_Maps is
    begin
-      if not Initialized then
-         DB.Maps.Tag_Map.Register (DB.Maps.Values.Booleans.Value_Type'Tag);
-         DB.Maps.Tag_Map.Register (DB.Maps.Values.Floats.Value_Type'Tag);
-         DB.Maps.Tag_Map.Register (DB.Maps.Values.Integers.Value_Type'Tag);
-         DB.Maps.Tag_Map.Register (DB.Maps.Values.Long_Floats.Value_Type'Tag);
-         DB.Maps.Tag_Map.Register (DB.Maps.Values.Long_Integers.Value_Type'Tag);
-         DB.Maps.Tag_Map.Register (DB.Maps.Values.Nothings.Value_Type'Tag);
-         DB.Maps.Tag_Map.Register (DB.Maps.Values.Strings.Value_Type'Tag);
-         DB.Maps.Tag_Map.Seal;
-      end if;
-
       Initialized := True;
 
       for I in Infos'Range loop

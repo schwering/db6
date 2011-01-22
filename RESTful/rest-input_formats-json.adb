@@ -168,7 +168,6 @@ package body REST.Input_Formats.JSON is
                   REST.Log.Info ("JSON: key/value delimiter missing");
                   goto EOF_Handling;
                end if;
-               Parser.Unset_Value;
                Parser.Next_Token (Request, Token);
             else
                Token := Value;

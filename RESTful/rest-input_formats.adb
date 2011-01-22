@@ -6,13 +6,6 @@
 
 with Ada.Unchecked_Deallocation;
 
-with DB.Maps.Values;
-with DB.Maps.Values.Booleans;
-with DB.Maps.Values.Long_Floats;
-with DB.Maps.Values.Long_Integers;
-with DB.Maps.Values.Nothings;
-with DB.Maps.Values.Strings;
-
 with REST.Input_Formats.JSON;
 
 package body REST.Input_Formats is
@@ -85,17 +78,11 @@ package body REST.Input_Formats is
 
    procedure Finalize (Parser : in out Parser_Type)
    is
-      use type DB.Maps.Value_Ref_Type;
       procedure Free is new Ada.Unchecked_Deallocation
         (String, String_Ref_Type);
-      procedure Free is new Ada.Unchecked_Deallocation
-        (DB.Maps.Value_Type'Class, DB.Maps.Value_Ref_Type);
    begin
       if Parser.The_Key /= null then
          Free (Parser.The_Key);
-      end if;
-      if Parser.The_Value /= null then
-         Free (Parser.The_Value);
       end if;
    end Finalize;
 
@@ -110,11 +97,11 @@ package body REST.Input_Formats is
    is
       procedure To_Boolean
         (Value   : in  String;
-         Bool    : out DB.Maps.Values.Booleans.Value_Type;
+         Bool    : out DB.Maps.Value_Type;
          Success : out Boolean) is
       begin
-         Bool := DB.Maps.Values.Booleans.New_Value
-           (DB.Maps.Values.Booleans.Integer_Type'Value (Value));
+         Bool := DB.Maps.Values.New_Value
+           (DB.Maps.Values.Booleans.Discrete_Type'Value (Value));
          Success := True;
       exception
          when Constraint_Error =>
@@ -123,33 +110,33 @@ package body REST.Input_Formats is
 
       procedure To_Int
         (Value   : in  String;
-         Int     : out DB.Maps.Values.Long_Integers.Value_Type;
+         Int     : out DB.Maps.Value_Type;
          Success : out Boolean) is
       begin
-         Int := DB.Maps.Values.Long_Integers.New_Value
-           (DB.Maps.Values.Long_Integers.Integer_Type'Value (Value));
+         Int := DB.Maps.Values.New_Value
+           (DB.Maps.Values.Long_Integers.Discrete_Type'Value (Value));
          Success := True;
       exception
          when Constraint_Error =>
             Success := False;
       end To_Int;
 
-      procedure To_Float
+      procedure To_Real
         (Value   : in  String;
-         Flt     : out DB.Maps.Values.Long_Floats.Value_Type;
+         Flt     : out DB.Maps.Value_Type;
          Success : out Boolean) is
       begin
-         Flt := DB.Maps.Values.Long_Floats.New_Value
-           (DB.Maps.Values.Long_Floats.Float_Type'Value (Value));
+         Flt := DB.Maps.Values.New_Value
+           (DB.Maps.Values.Long_Reals.Real_Type'Value (Value));
          Success := True;
       exception
          when Constraint_Error =>
             Success := False;
-      end To_Float;
+      end To_Real;
 
       procedure To_String
         (Value   : in  String;
-         Str     : out DB.Maps.Values.Strings.Value_Type;
+         Str     : out DB.Maps.Value_Type;
          Success : out Boolean) is
       begin
          if Value'Length <= 1 or else
@@ -157,7 +144,7 @@ package body REST.Input_Formats is
          then
             Success := False;
          else
-            Str := DB.Maps.Values.Strings.New_Value
+            Str := DB.Maps.Values.New_Value
               (Value (Value'First + 1 .. Value'Last - 1));
             Success := True;
          end if;
@@ -165,17 +152,19 @@ package body REST.Input_Formats is
 
       procedure To_Nothing
         (Value   : in  String;
+         Nothing : out DB.Maps.Value_Type;
          Success : out Boolean) is
       begin
          Success := Value = "null";
+         Nothing := DB.Maps.Values.Nothing_Value;
       end To_Nothing;
 
-      function To_Value (Value : String) return DB.Maps.Value_Type'Class
+      function To_Value (Value : String) return DB.Maps.Value_Type
       is
          Success : Boolean;
       begin
          declare
-            S : DB.Maps.Values.Strings.Value_Type;
+            S : DB.Maps.Value_Type;
          begin
             To_String (Value, S, Success);
             if Success then
@@ -184,7 +173,7 @@ package body REST.Input_Formats is
          end;
 
          declare
-            I : DB.Maps.Values.Long_Integers.Value_Type;
+            I : DB.Maps.Value_Type;
          begin
             To_Int (Value, I, Success);
             if Success then
@@ -193,16 +182,16 @@ package body REST.Input_Formats is
          end;
 
          declare
-            F : DB.Maps.Values.Long_Floats.Value_Type;
+            F : DB.Maps.Value_Type;
          begin
-            To_Float (Value, F, Success);
+            To_Real (Value, F, Success);
             if Success then
                return F;
             end if;
          end;
 
          declare
-            B : DB.Maps.Values.Booleans.Value_Type;
+            B : DB.Maps.Value_Type;
          begin
             To_Boolean (Value, B, Success);
             if Success then
@@ -211,9 +200,9 @@ package body REST.Input_Formats is
          end;
 
          declare
-            N : DB.Maps.Values.Nothings.Value_Type;
+            N : DB.Maps.Value_Type;
          begin
-            To_Nothing (Value, Success);
+            To_Nothing (Value, N, Success);
             if Success then
                return N;
             end if;
@@ -223,7 +212,7 @@ package body REST.Input_Formats is
       end To_Value;
 
    begin
-      Parser.The_Value := new DB.Maps.Value_Type'Class'(To_Value (Value));
+      Parser.The_Value := To_Value (Value);
    end Set_Value;
 
 
@@ -239,31 +228,10 @@ package body REST.Input_Formats is
    end Unset_Key;
 
 
-   procedure Unset_Value (Parser : in out Parser_Type)
-   is
-      use type DB.Maps.Value_Ref_Type;
-      procedure Free is new Ada.Unchecked_Deallocation
-        (DB.Maps.Value_Type'Class, DB.Maps.Value_Ref_Type);
-   begin
-      if Parser.The_Value /= null then
-         Free (Parser.The_Value);
-      end if;
-      Parser.The_Value := null;
-   end Unset_Value;
-
-
    function Has_Key (Parser : Parser_Type) return Boolean is
    begin
       return Parser.The_Key /= null;
    end Has_Key;
-
-
-   function Has_Value (Parser : Parser_Type) return Boolean
-   is
-      use type DB.Maps.Value_Ref_Type;
-   begin
-      return Parser.The_Value /= null;
-   end Has_Value;
 
 
    function Key (Parser : Parser_Type) return String is
@@ -272,9 +240,9 @@ package body REST.Input_Formats is
    end Key;
 
 
-   function Value (Parser : Parser_Type) return DB.Maps.Value_Type'Class is
+   function Value (Parser : Parser_Type) return DB.Maps.Value_Type is
    begin
-      return Parser.The_Value.all;
+      return Parser.The_Value;
    end Value;
 
 

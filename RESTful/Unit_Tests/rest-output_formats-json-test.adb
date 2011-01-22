@@ -13,12 +13,7 @@ with AWS.Status.Set;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
-with DB.Maps.Values;
-with DB.Maps.Values.Booleans;
-with DB.Maps.Values.Long_Floats;
-with DB.Maps.Values.Long_Integers;
-with DB.Maps.Values.Nothings;
-with DB.Maps.Values.Strings;
+with DB.Types.Values;
 
 with REST.Input_Formats.JSON;
 
@@ -121,29 +116,28 @@ package body REST.Output_Formats.JSON.Test is
 
    procedure Anonymous_Value
      (Handler : in out Handler_Type;
-      Val     : in     DB.Maps.Value_Type'Class)
+      Val     : in     DB.Maps.Value_Type)
    is
       use type Ada.Tags.Tag;
-      use type DB.Maps.Value_Type;
+      use DB.Types.Values;
    begin
       Handler.I := Handler.I + 1;
       Assert (Handler.Expected (Handler.I).Event = Anonymous_Value,
               "expected "& Handler.Expected (Handler.I).Event'Img &", "&
               "got value");
-      Assert (Handler.Expected (Handler.I).Value.Ref.Image = Val.Image and
-              Handler.Expected (Handler.I).Value.Ref.all'Tag = Val'Tag,
-              "expected '"& Handler.Expected (Handler.I).Value.Ref.Image &"', "&
-              "got '"& Val.Image &"'");
+      Assert (Image (Handler.Expected (Handler.I).Value) = Image (Val),
+              "expected '"& Image (Handler.Expected (Handler.I).Value) &"', "&
+              "got '"& Image (Val) &"'");
    end Anonymous_Value;
 
 
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
-      Val     : in     DB.Maps.Value_Type'Class)
+      Val     : in     DB.Maps.Value_Type)
    is
       use type Ada.Tags.Tag;
-      use type DB.Maps.Value_Type;
+      use DB.Types.Values;
    begin
       Handler.I := Handler.I + 1;
       Assert (Handler.Expected (Handler.I).Event = Value,
@@ -152,10 +146,9 @@ package body REST.Output_Formats.JSON.Test is
       Assert (To_String (Handler.Expected (Handler.I).Key) = Key,
               "expected '"& To_String (Handler.Expected (Handler.I).Key) &"', "&
               "got '"& Key &"'");
-      Assert (Handler.Expected (Handler.I).Value.Ref.Image = Val.Image and
-              Handler.Expected (Handler.I).Value.Ref.all'Tag = Val'Tag,
-              "expected '"& Handler.Expected (Handler.I).Value.Ref.Image &"', "&
-              "got '"& Val.Image &"'");
+      Assert (Image (Handler.Expected (Handler.I).Value) = Image (Val),
+              "expected '"& Image (Handler.Expected (Handler.I).Value) &"', "&
+              "got '"& Image (Val) &"'");
    end Value;
 
 
@@ -174,10 +167,6 @@ package body REST.Output_Formats.JSON.Test is
 
    function TS (U : Unbounded_String) return String
    renames To_String;
-
-
-   function TKW (V : DB.Maps.Value_Type'Class) return DB.Maps.Value_Wrapper_Type
-   renames DB.Maps.New_Value_Wrapper;
 
 
    type Writer_Ref_Type is access all Writer_Type'Class;
@@ -212,9 +201,9 @@ package body REST.Output_Formats.JSON.Test is
             when Array_End =>
                Writer.End_Array;
             when Value =>
-               Writer.Put_Value (TS (Doc (I).Key), Doc (I).Value.Ref.all);
+               Writer.Put_Value (TS (Doc (I).Key), Doc (I).Value);
             when Anonymous_Value =>
-               Writer.Put_Anonymous_Value (Doc (I).Value.Ref.all);
+               Writer.Put_Anonymous_Value (Doc (I).Value);
             when Error =>
                Assert (False, "There's an ERROR in Doc, stupid test");
          end case;
@@ -230,16 +219,16 @@ package body REST.Output_Formats.JSON.Test is
 
       Doc : aliased Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
-         (Value, TUS ("key1"), TKW (Strings.New_Value ("string1"))),
-         (Value, TUS ("key2"), TKW (Strings.New_Value ("string2"))),
-         (Value, TUS ("key3"), TKW (Strings.New_Value ("string3"))),
-         (Value, TUS ("key4"), TKW (Long_Integers.New_Value (123))),
-         (Value, TUS ("key5"), TKW (Long_Integers.New_Value (-123))),
-         (Value, TUS ("key6"), TKW (Long_Floats.New_Value (123.901239))),
-         (Value, TUS ("key7"), TKW (Long_Floats.New_Value (-123.0))),
-         (Value, TUS ("key8"), TKW (Booleans.New_Value (False))),
-         (Value, TUS ("key9"), TKW (Booleans.New_Value (True))),
-         (Value, TUS ("key10"), TKW (Nothings.New_Value)),
+         (Value, TUS ("key1"), New_Value ("string1")),
+         (Value, TUS ("key2"), New_Value ("string2")),
+         (Value, TUS ("key3"), New_Value ("string3")),
+         (Value, TUS ("key4"), New_Value (Long_Integers.Discrete_Type (123))),
+         (Value, TUS ("key5"), New_Value (Long_Integers.Discrete_Type (-123))),
+         (Value, TUS ("key6"), New_Value (Long_reals.Real_Type (123.901239))),
+         (Value, TUS ("key7"), New_Value (Long_reals.Real_Type (-123.0))),
+         (Value, TUS ("key8"), New_Value (False)),
+         (Value, TUS ("key9"), New_Value (True)),
+         (Value, TUS ("key10"), Nothing_Value),
          (Event => Object_End));
 
       Writer      : aliased JSON.Writer_Type;
@@ -264,14 +253,14 @@ package body REST.Output_Formats.JSON.Test is
       Doc : aliased Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Object_Start, TUS ("outer")),
-         (Value, TUS ("key1"), TKW (Strings.New_Value ("string1"))),
-         (Value, TUS ("key2"), TKW (Strings.New_Value ("string2"))),
+         (Value, TUS ("key1"), New_Value ("string1")),
+         (Value, TUS ("key2"), New_Value ("string2")),
          (Object_Start, TUS ("inner")),
-         (Value, TUS ("key3"), TKW (Strings.New_Value ("string3"))),
-         (Value, TUS ("key4"), TKW (Strings.New_Value ("string4"))),
+         (Value, TUS ("key3"), New_Value ("string3")),
+         (Value, TUS ("key4"), New_Value ("string4")),
          (Event => Object_End),
          (Event => Object_End),
-         (Value, TUS ("key5"), TKW (Strings.New_Value ("string5"))),
+         (Value, TUS ("key5"), New_Value ("string5")),
          (Event => Object_End));
 
       Writer      : aliased JSON.Writer_Type;
@@ -296,14 +285,14 @@ package body REST.Output_Formats.JSON.Test is
       Doc : aliased Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Array_Start, TUS ("outer")),
-         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string1"))),
-         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string2"))),
+         (Anonymous_Value, TUS(""), New_Value ("string1")),
+         (Anonymous_Value, TUS(""), New_Value ("string2")),
          (Event => Anonymous_Array_Start),
-         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string3"))),
-         (Anonymous_Value, TUS(""), TKW (Strings.New_Value ("string4"))),
+         (Anonymous_Value, TUS(""), New_Value ("string3")),
+         (Anonymous_Value, TUS(""), New_Value ("string4")),
          (Event => Array_End),
          (Event => Array_End),
-         (Value, TUS ("huhu"), TKW (Strings.New_Value ("string5"))),
+         (Value, TUS ("huhu"), New_Value ("string5")),
          (Event => Object_End));
 
       Writer      : aliased JSON.Writer_Type;
@@ -327,12 +316,12 @@ package body REST.Output_Formats.JSON.Test is
 
       Doc : aliased Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
-         (Value, TUS ("key1"), TKW (Strings.New_Value ("""string1"""))),
-         (Value, TUS ("key2"), TKW (Strings.New_Value ("""string2"""))),
-         (Value, TUS ("key3"), TKW (Strings.New_Value ("'string3'"))),
-         (Value, TUS ("key4"), TKW (Strings.New_Value ("'string4'"))),
-         (Value, TUS ("key5"), TKW (Strings.New_Value ("string5\"))),
-         (Value, TUS ("key6"), TKW (Strings.New_Value ("string6\"""))),
+         (Value, TUS ("key1"), New_Value ("""string1""")),
+         (Value, TUS ("key2"), New_Value ("""string2""")),
+         (Value, TUS ("key3"), New_Value ("'string3'")),
+         (Value, TUS ("key4"), New_Value ("'string4'")),
+         (Value, TUS ("key5"), New_Value ("string5\")),
+         (Value, TUS ("key6"), New_Value ("string6\""")),
          (Event => Object_End));
 
       Writer      : aliased JSON.Writer_Type;
@@ -347,7 +336,6 @@ package body REST.Output_Formats.JSON.Test is
       Init_Body (Request, Writer);
       Input_Formats.Parse (Request, Parser, Handler);
    end Test_Escaped;
-
 
 end REST.Output_Formats.JSON.Test;
 

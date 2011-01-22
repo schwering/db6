@@ -6,6 +6,7 @@
 
 with Ada.Strings.Unbounded;
 with Ada.Unchecked_Deallocation;
+with Ada.Unchecked_Conversion;
 
 package body DB.Types.Gen_Strings.Gen_Unbounded is
 
@@ -213,6 +214,7 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
 
 
    function Image (S : String_Type) return String is
+      function Convert is new Ada.Unchecked_Conversion (Item_Type, Character);
       use Ada.Strings.Unbounded;
       T : Unbounded_String;
    begin
@@ -220,7 +222,7 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
          return "";
       end if;
       for I in 1 .. S.Length loop
-         Append (T, Item_Type'Image (S.S.Buffer (I)));
+         Append (T, Convert (S.S.Buffer (I)));
       end loop;
       return To_String (T);
    end Image;

@@ -6,8 +6,7 @@
 
 with Ada.Characters.Handling;
 
-with DB.Maps.Values.Booleans;
-with DB.Maps.Values.Strings;
+with DB.Types.Values;
 
 package body REST.Output_Formats.JSON is
 
@@ -152,7 +151,9 @@ package body REST.Output_Formats.JSON is
    procedure Put_Value
      (Resource : in out Writer_Type;
       Key      : in     String;
-      Value    : in     DB.Maps.Value_Type'Class) is
+      Value    : in     DB.Maps.Value_Type)
+   is
+      use type DB.Types.Values.Tag_Type;
    begin
       if Resource.Comma then
          Emit (Resource, ",");
@@ -161,14 +162,17 @@ package body REST.Output_Formats.JSON is
       Emit (Resource, """");
       Emit (Resource, Escape (Key));
       Emit (Resource, """ : ");
-      if Value in DB.Maps.Values.Strings.Value_Type'Class then
+      if Value.Tag = DB.Types.Values.Bounded_String_Value or
+         Value.Tag = DB.Types.Values.Unbounded_String_Value
+      then
          Emit (Resource, """");
-         Emit (Resource, Escape (Value.Image));
+         Emit (Resource, Escape (DB.Types.Values.Image (Value)));
          Emit (Resource, """");
-      elsif Value in DB.Maps.Values.Booleans.Value_Type'Class then
-         Emit (Resource, Ada.Characters.Handling.To_Lower (Value.Image));
+      elsif Value.Tag = DB.Types.Values.Boolean_Value then
+         Emit (Resource, Ada.Characters.Handling.To_Lower (DB.Types.Values.Image
+           (Value)));
       else
-         Emit (Resource, Value.Image);
+         Emit (Resource, DB.Types.Values.Image (Value));
       end if;
       Resource.Comma := True;
    end Put_Value;
@@ -176,20 +180,25 @@ package body REST.Output_Formats.JSON is
 
    procedure Put_Anonymous_Value
      (Resource : in out Writer_Type;
-      Value    : in     DB.Maps.Value_Type'Class) is
+      Value    : in     DB.Maps.Value_Type)
+   is
+      use type DB.Types.Values.Tag_Type;
    begin
       if Resource.Comma then
          Emit (Resource, ",");
       end if;
       Indent (Resource);
-      if Value in DB.Maps.Values.Strings.Value_Type'Class then
+      if Value.Tag = DB.Types.Values.Bounded_String_Value or
+         Value.Tag = DB.Types.Values.Unbounded_String_Value
+      then
          Emit (Resource, """");
-         Emit (Resource, Escape (Value.Image));
+         Emit (Resource, Escape (DB.Types.Values.Image (Value)));
          Emit (Resource, """");
-      elsif Value in DB.Maps.Values.Booleans.Value_Type'Class then
-         Emit (Resource, Ada.Characters.Handling.To_Lower (Value.Image));
+      elsif Value.Tag =  DB.Types.Values.Boolean_Value then
+         Emit (Resource, Ada.Characters.Handling.To_Lower (DB.Types.Values.Image
+           (Value)));
       else
-         Emit (Resource, Value.Image);
+         Emit (Resource, DB.Types.Values.Image (Value));
       end if;
       Resource.Comma := True;
    end Put_Anonymous_Value;

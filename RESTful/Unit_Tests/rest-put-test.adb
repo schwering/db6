@@ -143,7 +143,7 @@ package body REST.Put.Test is
                Key : constant DB.Maps.Key_Type :=
                   DB.Maps.Strings_To_Key (TS (Key_Values (I).Row),
                                           TS (Key_Values (I).Column));
-               Value : DB.Maps.Value_Wrapper_Type;
+               Value : DB.Maps.Value_Type;
                State : DB.Maps.State_Type;
             begin
                Map.Search (Key, Value, State);

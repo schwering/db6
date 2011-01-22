@@ -5,6 +5,7 @@
 -- Copyright 2008--2011 Christoph Schwering
 
 with Ada.Strings.Unbounded;
+with Ada.Unchecked_Conversion;
 
 package body DB.Types.Gen_Strings.Gen_Bounded is
 
@@ -179,11 +180,12 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
 
 
    function Image (S : String_Type) return String is
+      function Convert is new Ada.Unchecked_Conversion (Item_Type, Character);
       use Ada.Strings.Unbounded;
       T : Unbounded_String;
    begin
       for I in 1 .. S.Length loop
-         Append (T, Item_Type'Image (S.Buffer (I)));
+         Append (T, Convert (S.Buffer (I)));
       end loop;
       return To_String (T);
    end Image;
