@@ -14,7 +14,7 @@ package REST.Method is
    From_Excl_Param : constant String := "excl1";
    To_Excl_Param   : constant String := "excl2";
    Yes_Value       : constant String := "y";
-   Infinity_Row    : constant String := "_inf:";
+   Infinity_Row    : constant String := "_inf";
 
    function Make_Key
      (Key : String;

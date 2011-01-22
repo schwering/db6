@@ -103,8 +103,14 @@ is
       if Row = Infinity_Row then
          return Infinity;
       else
+         -- How do we determine Max? Have a look at this truth table:
+         -- Lower Inclusive => Max
+         -- true  true      => false
+         -- true  false     => true
+         -- false true      => true
+         -- false false     => false
          return DB.Maps.New_Bound (Comparison,
-                                   Make_Key (Row, Max => not Lower));
+                                   Make_Key (Row, Max => Lower /= Inclusive));
       end if;
    end Bound;
 

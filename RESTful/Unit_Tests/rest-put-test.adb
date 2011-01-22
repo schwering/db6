@@ -14,67 +14,14 @@ with AWS.Client;
 with AWS.Headers;
 with AWS.Headers.Set;
 with AWS.Messages;
-with AWS.Net;
 with AWS.Response;
 with AWS.Server;
 
 with DB.Maps;
 
-with REST.Method;
-with REST.Handler;
-with REST.Maps.Test_Utils;
+with REST.Maps.Test_Utils; use REST.Maps.Test_Utils;
 
 package body REST.Put.Test is
-
-   Base_Port : constant := 8080;
-   Port      : Natural := 0;
-
-   type Key_Value_Type is
-      record
-         Row    : Unbounded_String;
-         Column : Unbounded_String;
-         Value  : Unbounded_String;
-      end record;
-
-   type Key_Value_Array_Type is array (Positive range <>) of Key_Value_Type;
-
-
-   function TS (S : Unbounded_String) return String
-   renames To_String;
-
-
-   function TUS (S : String) return Unbounded_String
-   renames To_Unbounded_String;
-
-
-   function KV (Row, Column, Value : String) return Key_Value_Type is
-   begin
-      return (TUS (Row), TUS (Column), TUS (Value));
-   end KV;
-
-
-   function URL (Table : String; Row : String := "") return String
-   is
-      function Img (N : Integer) return String
-      is
-         S : constant String := Integer'Image (N);
-      begin
-         if S (S'First) = ' ' then
-            return S (S'First + 1 .. S'Last);
-         else
-            return S;
-         end if;
-      end Img;
-   begin
-      return "http://localhost:"& Img (Port) &"/"& Table &"/"& Row;
-   end URL;
-
-
-   function URL (Table : String; Row : Unbounded_String) return String is
-   begin
-      return URL (Table, TS (Row));
-   end URL;
-
 
    overriding
    procedure Set_Up (T : in out Test_Type) is
@@ -88,33 +35,6 @@ package body REST.Put.Test is
    begin
       null;
    end Tear_Down;
-
-
-   procedure Start_Server (WS : in out AWS.Server.HTTP)
-   is
-      subtype Port_Range is Natural range 1 .. 10;
-   begin
-      Maps.Test_Utils.Delete_And_Create_Maps;
-      for I in Port_Range loop
-         declare
-         begin
-            Port := Base_Port + I;
-            AWS.Server.Start
-              (Web_Server => WS,
-               Name       => "dingsbums-restful",
-               Callback   => REST.Handler.Handler,
-               Port       => Port);
-            Put_Line ("Starting server at port "& Port'Img);
-            exit;
-         exception
-            when AWS.Net.Socket_Error =>
-               Put_Line ("Starting server at port "& Port'Img &" FAILED");
-               if I = Port_Range'Last then
-                  raise;
-               end if;
-         end;
-      end loop;
-   end Start_Server;
 
 
    function Put
@@ -215,7 +135,7 @@ package body REST.Put.Test is
       end if;
 
       declare
-         Map : REST.Maps.Map_Ref_Type := REST.Maps.Map_By_Name (Table);
+         Map : constant REST.Maps.Map_Ref_Type := REST.Maps.Map_By_Name (Table);
       begin
          for I in Key_Values'Range loop
             declare
@@ -257,7 +177,11 @@ package body REST.Put.Test is
             KV ("mensch4", "alter", "26"),
             KV ("mensch5", "vorname", "'Rudi'"),
             KV ("mensch5", "nachname", "'Fichtenwald'"),
-            KV ("mensch5", "alter", "24")),
+            KV ("mensch5", "alter", "24"),
+            KV ("person6", "gehalt", "1.234"),
+            KV ("person6", "doof", "true"),
+            KV ("person6", "klug", "false"),
+            KV ("person6", "auto", "null")),
            Nested => False);
    exception
       when E : others =>
@@ -287,7 +211,11 @@ package body REST.Put.Test is
             KV ("person4", "alter", "26"),
             KV ("person5", "vorname", "'Rudi'"),
             KV ("person5", "nachname", "'Fichtenwald'"),
-            KV ("person5", "alter", "24")),
+            KV ("person5", "alter", "24"),
+            KV ("person6", "gehalt", "1.234"),
+            KV ("person6", "doof", "true"),
+            KV ("person6", "klug", "false"),
+            KV ("person6", "auto", "null")),
            Nested => True);
    exception
       when E : others =>

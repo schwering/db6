@@ -78,9 +78,9 @@ package body REST.Output_Formats is
             if not Last_Initialized then
                Writer.Start_Object (DB.Maps.Row_To_String (Key.Row));
             elsif Last_Key.Row /= Key.Row then
-               Writer.End_Object;
                N_Objects := N_Objects + 1;
                exit when N_Objects >= Max_Objects;
+               Writer.End_Object;
                Writer.Start_Object (DB.Maps.Row_To_String (Key.Row));
             end if;
 
