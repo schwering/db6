@@ -1,4 +1,14 @@
 * Gen_BTrees
+      * Referenz-Werte / HTTP GET:
+        Werte, deren Typ Key_Type ist. In der REST-Schnittstelle kann dann
+        bei einer Punktsuche (oder auch beim Cursor?) die Referenz ueber ein
+        Maps.Search verfolgt werden. Die Rekursionstiefe kann per GET-Parameter
+        angegeben werden.
+        REST GET muss dahin umgestellt werden, dass ein Cache URL -> Fetcher
+        besteht, wobei URL die um Laenge und Offset bereinigte URL ist und
+        Fetcher ein Objekt (Task?) ist, das einen Cursor besitzt und das man
+        per Schnittstelle um das naechste Objekt (entweder direkt aus dem
+        Cursor oder wie jetzt aus der Queue) bitten kann.
       * Cursor Delete verbessern:
         (Vielleicht reicht das aktuelle Delete_Range aber auch einfach aus.)
         Elemente koennen zum Loeschen vorgemerkt werden. Das eigentlich
