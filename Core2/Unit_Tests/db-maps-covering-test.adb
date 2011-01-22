@@ -297,12 +297,11 @@ package body DB.Maps.Covering.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         P : Key_Type;
-         K : Key_Type;
+         P : Key_Type := Null_Key;
+         K : Key_Type := Null_Key;
          V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
-         pragma Warnings (Off, P);
       begin
          loop
             C.Next (K, V, S);
@@ -326,12 +325,11 @@ package body DB.Maps.Covering.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         P : Key_Type;
+         P : Key_Type := Null_Key;
          K : Key_Type;
          V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
-         pragma Warnings (Off, P);
       begin
          C.Delete (S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&
@@ -357,11 +355,10 @@ package body DB.Maps.Covering.Test is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
          K : Key_Type;
-         P : Key_Type;
+         P : Key_Type := Null_Key;
          V : Values.Integers.Value_Type;
          S : State_Type;
          N : Natural := 0;
-         pragma Warnings (Off, P);
       begin
          C.Delete (S);
          Assert (S = Failure, "Cursor had no hit no value but Delete didn't "&

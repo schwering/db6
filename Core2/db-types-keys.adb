@@ -181,7 +181,7 @@ package body DB.Types.Keys is
       Key     :    out Key_Type) is
    begin
       Row_Serialization.Read (Context.Row_Context, Block, Cursor, Key.Row);
-      Key.Column := Columns.Empty_String;
+      --Key.Column := Columns.Empty_String;
       Column_Serialization.Read (Context.Column_Context, Block, Cursor,
                                  Key.Column);
       Times.Read (Context.Time_Context, Block, Cursor, Key.Time);
@@ -195,10 +195,10 @@ package body DB.Types.Keys is
    is
       Key : Key_Type;
    begin
-      --Read (Context, Block, Cursor, Key);
-      Row_Serialization.Skip (Context.Row_Context, Block, Cursor);
-      Column_Serialization.Skip (Context.Column_Context, Block, Cursor);
-      Times.Skip (Context.Time_Context, Block, Cursor);
+      Read (Context, Block, Cursor, Key);
+      --Row_Serialization.Skip (Context.Row_Context, Block, Cursor);
+      --Column_Serialization.Skip (Context.Column_Context, Block, Cursor);
+      --Times.Skip (Context.Time_Context, Block, Cursor);
    end Skip;
 
 
