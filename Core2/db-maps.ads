@@ -56,7 +56,7 @@ package DB.Maps is
    ----------
    -- Map initialization operations.
 
-   type Implementation_Type is (BTree, Multi);
+   type Implementation_Type is (BTree, Multi, Bloomed);
    type Map_Type is abstract new AF.Limited_Controlled with private;
    type Map_Ref_Type is access Map_Type'Class;
 

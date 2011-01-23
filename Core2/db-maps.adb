@@ -6,6 +6,7 @@
 
 with Interfaces.C;
 
+with DB.Maps.Bloom;
 with DB.Maps.Bounded;
 with DB.Maps.Covering;
 
@@ -21,6 +22,8 @@ package body DB.Maps is
             return Bounded.New_Map (Allow_Duplicates);
          when Multi =>
             return Covering.New_Map (Allow_Duplicates);
+         when Bloomed =>
+            return Bloom.New_Map (Allow_Duplicates);
       end case;
    end New_Map;
 
@@ -36,6 +39,8 @@ package body DB.Maps is
          when Multi =>
             return new Covering.Map_Type'
               (Covering.New_Map (Allow_Duplicates));
+         when Bloomed =>
+            return new Bloom.Map_Type'(Bloom.New_Map (Allow_Duplicates));
       end case;
    end New_Map_Ref;
 

@@ -5,6 +5,7 @@
 -- Copyright 2008--2011 Christoph Schwering
 
 with DB.Locks.Mutexes.Test.Suite;
+with DB.Maps.Bloom.Test.Suite;
 with DB.Maps.Bounded.Test.Suite;
 with DB.Maps.Covering.Test.Suite;
 with DB.Types.Strings_Bounded.Test.Suite;
@@ -25,6 +26,7 @@ package body Composite_Suite is
       Res.Add_Test (DB.Utils.Auto_Pointers.Test.Suite.Suite);
       Res.Add_Test (DB.Utils.Smart_Pointers.Test.Suite.Suite);
       Res.Add_Test (DB.Maps.Bounded.Test.Suite.Suite);
+      Res.Add_Test (DB.Maps.Bloom.Test.Suite.Suite);
       Res.Add_Test (DB.Maps.Covering.Test.Suite.Suite);
       Res.Add_Test (DB.Types.Strings_Bounded.Test.Suite.Suite);
       return Res;

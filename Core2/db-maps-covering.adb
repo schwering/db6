@@ -721,8 +721,7 @@ package body DB.Maps.Covering is
      (Map   : in out Map_Type;
       First : in     Keys.Key_Type;
       Last  : in     Keys.Key_Type;
-      State :    out State_Type)
-   is
+      State :    out State_Type) is
    begin
       State := Success;
       for I in Map.Slices'Range loop
