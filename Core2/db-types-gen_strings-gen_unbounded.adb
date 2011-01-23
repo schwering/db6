@@ -213,6 +213,38 @@ package body DB.Types.Gen_Strings.Gen_Unbounded is
    end To_Buffer;
 
 
+   function Hash_1 (S : String_Type) return Utils.Hash_Type is
+      function Hash is new Gen_Forward_Hash (31);
+      pragma Inline (Hash);
+   begin
+      return Hash (S.S.Buffer, S.Length);
+   end Hash_1;
+
+
+   function Hash_2 (S : String_Type) return Utils.Hash_Type is
+      function Hash is new Gen_Backward_Hash (31);
+      pragma Inline (Hash);
+   begin
+      return Hash (S.S.Buffer, S.Length);
+   end Hash_2;
+
+
+   function Hash_3 (S : String_Type) return Utils.Hash_Type is
+      function Hash is new Gen_Forward_Hash (29);
+      pragma Inline (Hash);
+   begin
+      return Hash (S.S.Buffer, S.Length);
+   end Hash_3;
+
+
+   function Hash_4 (S : String_Type) return Utils.Hash_Type is
+      function Hash is new Gen_Backward_Hash (29);
+      pragma Inline (Hash);
+   begin
+      return Hash (S.S.Buffer, S.Length);
+   end Hash_4;
+
+
    function Image (S : String_Type) return String is
       function Convert is new Ada.Unchecked_Conversion (Item_Type, Character);
       use Ada.Strings.Unbounded;

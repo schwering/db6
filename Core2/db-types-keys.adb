@@ -132,7 +132,6 @@ package body DB.Types.Keys is
       Key     :    out Key_Type) is
    begin
       Row_Serialization.Read (Context.Row_Context, Block, Cursor, Key.Row);
-      --Key.Column := Columns.Empty_String;
       Column_Serialization.Read (Context.Column_Context, Block, Cursor,
                                  Key.Column);
       Times.Read (Context.Time_Context, Block, Cursor, Key.Time);
@@ -151,6 +150,38 @@ package body DB.Types.Keys is
       --Column_Serialization.Skip (Context.Column_Context, Block, Cursor);
       --Times.Skip (Context.Time_Context, Block, Cursor);
    end Skip;
+
+
+   function Hash_1 (K : Key_Type) return Utils.Hash_Type
+   is
+      use type Utils.Hash_Type;
+   begin
+      return Rows.Hash_1 (K.Row) xor Columns.Hash_1 (K.Column);
+   end Hash_1;
+
+
+   function Hash_2 (K : Key_Type) return Utils.Hash_Type
+   is
+      use type Utils.Hash_Type;
+   begin
+      return Rows.Hash_2 (K.Row) xor Columns.Hash_2 (K.Column);
+   end Hash_2;
+
+
+   function Hash_3 (K : Key_Type) return Utils.Hash_Type
+   is
+      use type Utils.Hash_Type;
+   begin
+      return Rows.Hash_3 (K.Row) xor Columns.Hash_3 (K.Column);
+   end Hash_3;
+
+
+   function Hash_4 (K : Key_Type) return Utils.Hash_Type
+   is
+      use type Utils.Hash_Type;
+   begin
+      return Rows.Hash_4 (K.Row) xor Columns.Hash_4 (K.Column);
+   end Hash_4;
 
 
    function Image (Key : Key_Type) return String is

@@ -79,6 +79,11 @@ package DB.Types.Keys is
       Block   : in     Blocks.Base_Block_Type;
       Cursor  : in out Blocks.Cursor_Type);
 
+   function Hash_1 (K : Key_Type) return Utils.Hash_Type;
+   function Hash_2 (K : Key_Type) return Utils.Hash_Type;
+   function Hash_3 (K : Key_Type) return Utils.Hash_Type;
+   function Hash_4 (K : Key_Type) return Utils.Hash_Type;
+
    function Image (Key : Key_Type) return String;
 
    package Keys_Signature is new Blocks.Gen_Keys_Signature

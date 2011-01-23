@@ -40,9 +40,7 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
    function To_Index (L : Length_Type) return Index_Type;
 
    function New_String (Arr : Indefinite_Buffer_Type) return String_Type;
-
    function New_String (Length : Length_Type) return String_Type;
-
    function New_String
      (S        : String_Type;
       S_From   : Index_Type;
@@ -59,6 +57,11 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
       From   : Index_Type;
       Length : Length_Type)
       return String_Type;
+
+   function Hash_1 (S : String_Type) return Utils.Hash_Type;
+   function Hash_2 (S : String_Type) return Utils.Hash_Type;
+   function Hash_3 (S : String_Type) return Utils.Hash_Type;
+   function Hash_4 (S : String_Type) return Utils.Hash_Type;
 
    function To_Buffer (S : String_Type) return Indefinite_Buffer_Type;
 
