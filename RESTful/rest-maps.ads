@@ -14,6 +14,9 @@ package REST.Maps is
 
    subtype Map_Ref_Type is DB.Maps.Map_Ref_Type;
 
+   function Count return Natural;
+   function Map_Name (N : Positive) return String;
+
    function Map_By_Name (Name : String) return Map_Ref_Type;
 
 private

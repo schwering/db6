@@ -118,7 +118,7 @@ is
 
 begin
    if Map_Name = "" or Row_1 = "" or Col_Regexp = "" then
-      Success := True;
+      Success := False;
       return;
    end if;
 

@@ -43,6 +43,18 @@ package body REST.Maps is
    end Init;
 
 
+   function Count return Natural is
+   begin
+      return Infos'Length;
+   end Count;
+
+
+   function Map_Name (N : Positive) return String is
+   begin
+      return Map_Names.To_String (Infos (N).Name);
+   end Map_Name;
+
+
    function Map_By_Name (Name : String) return Map_Ref_Type is
    begin
       Init;
