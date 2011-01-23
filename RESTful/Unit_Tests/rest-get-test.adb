@@ -16,6 +16,7 @@ with AWS.Response;
 with AWS.Server;
 
 with DB.Maps;
+with DB.Types.Keys;
 with DB.Types.Values;
 
 with REST.Method;
@@ -45,7 +46,7 @@ package body REST.Get.Test is
          declare
             use DB.Types.Values;
             use type DB.Maps.State_Type;
-            Key   : constant DB.Maps.Key_Type := 
+            Key   : constant DB.Types.Keys.Key_Type := 
                DB.Maps.Strings_To_Key (TS (KVs (I).Row), TS (KVs (I).Column));
             Val   : constant String := TS (KVs (I).Value);
             State : DB.Maps.State_Type;

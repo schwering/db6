@@ -151,7 +151,7 @@ package body REST.Output_Formats.JSON is
    procedure Put_Value
      (Resource : in out Writer_Type;
       Key      : in     String;
-      Value    : in     DB.Maps.Value_Type)
+      Value    : in     DB.Types.Values.Value_Type)
    is
       use type DB.Types.Values.Tag_Type;
    begin
@@ -180,7 +180,7 @@ package body REST.Output_Formats.JSON is
 
    procedure Put_Anonymous_Value
      (Resource : in out Writer_Type;
-      Value    : in     DB.Maps.Value_Type)
+      Value    : in     DB.Types.Values.Value_Type)
    is
       use type DB.Types.Values.Tag_Type;
    begin

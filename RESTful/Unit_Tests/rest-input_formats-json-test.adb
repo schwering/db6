@@ -65,13 +65,13 @@ package body REST.Input_Formats.JSON.Test is
    overriding
    procedure Anonymous_Value
      (Handler : in out Handler_Type;
-      Val     : in     DB.Maps.Value_Type);
+      Val     : in     DB.Types.Values.Value_Type);
 
    overriding
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
-      Val     : in     DB.Maps.Value_Type);
+      Val     : in     DB.Types.Values.Value_Type);
 
    overriding
    procedure Error (Handler : in out Handler_Type);
@@ -143,10 +143,10 @@ package body REST.Input_Formats.JSON.Test is
 
    procedure Anonymous_Value
      (Handler : in out Handler_Type;
-      Val     : in     DB.Maps.Value_Type)
+      Val     : in     DB.Types.Values.Value_Type)
    is
       use type Ada.Tags.Tag;
-      use type DB.Maps.Value_Type;
+      use type DB.Types.Values.Value_Type;
    begin
       Handler.I := Handler.I + 1;
       Assert (Handler.Expected (Handler.I).Event = Anonymous_Value,
@@ -161,10 +161,10 @@ package body REST.Input_Formats.JSON.Test is
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
-      Val     : in     DB.Maps.Value_Type)
+      Val     : in     DB.Types.Values.Value_Type)
    is
       use type Ada.Tags.Tag;
-      use type DB.Maps.Value_Type;
+      use type DB.Types.Values.Value_Type;
    begin
       Handler.I := Handler.I + 1;
       Assert (Handler.Expected (Handler.I).Event = Value,
@@ -200,7 +200,7 @@ package body REST.Input_Formats.JSON.Test is
 
    procedure Test_Flat (T : in out Test_Type)
    is
-      use DB.Maps.Values;
+      use DB.Types.Values;
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Value, TUS ("key1"), New_Value ("string1")),
@@ -244,7 +244,7 @@ package body REST.Input_Formats.JSON.Test is
 
    procedure Test_Nested (T : in out Test_Type)
    is
-      use DB.Maps.Values;
+      use DB.Types.Values;
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Object_Start, TUS ("outer")),
@@ -286,7 +286,7 @@ package body REST.Input_Formats.JSON.Test is
 
    procedure Test_Array (T : in out Test_Type)
    is
-      use DB.Maps.Values;
+      use DB.Types.Values;
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Array_Start, TUS ("outer")),
@@ -328,7 +328,7 @@ package body REST.Input_Formats.JSON.Test is
 
    procedure Test_Escape (T : in out Test_Type)
    is
-      use DB.Maps.Values;
+      use DB.Types.Values;
       Expected : constant Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
          (Value, TUS ("key1"), New_Value ("""string1""")),

@@ -10,6 +10,8 @@ with AWS.Status;
 with AWS.Response;
 with AWS.URL;
 
+with DB.Maps;
+
 with REST.Output_Formats;
 with REST.Output_Formats.JSON;
 with REST.Maps;

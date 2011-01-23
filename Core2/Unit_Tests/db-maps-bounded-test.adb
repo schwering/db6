@@ -73,15 +73,15 @@ package body DB.Maps.Bounded.Test is
    end New_Key;
 
 
-   function New_Value (I : Integer) return Maps.Value_Type is
+   function New_Value (I : Integer) return Values.Value_Type is
    begin
       return Values.New_Value (I);
    end New_Value;
 
 
-   --function New_Value (S : String) return Maps.Value_Type'Class is
+   --function New_Value (S : String) return Values.Value_Type is
    --begin
-      --return Values.Strings.New_Value (S);
+      --return Values.New_Value (S);
    --end New_Value;
 
 
@@ -311,7 +311,7 @@ package body DB.Maps.Bounded.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
+         K : Keys.Key_Type;
          V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
@@ -332,7 +332,7 @@ package body DB.Maps.Bounded.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
+         K : Keys.Key_Type;
          V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
@@ -357,7 +357,7 @@ package body DB.Maps.Bounded.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
+         K : Keys.Key_Type;
          V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
@@ -383,7 +383,7 @@ package body DB.Maps.Bounded.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
+         K : Keys.Key_Type;
          V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
@@ -420,7 +420,7 @@ package body DB.Maps.Bounded.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
+         K : Keys.Key_Type;
          V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
@@ -440,7 +440,7 @@ package body DB.Maps.Bounded.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
+         K : Keys.Key_Type;
          V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;
@@ -489,7 +489,7 @@ package body DB.Maps.Bounded.Test is
       is
          C : Maps.Cursor_Type'Class := Map.New_Cursor
            (False, Negative_Infinity_Bound, Positive_Infinity_Bound);
-         K : Key_Type;
+         K : Keys.Key_Type;
          V : Values.Value_Type;
          S : State_Type;
          N : Natural := 0;

@@ -9,6 +9,7 @@ with Ada.Streams;
 with AWS.Resources.Streams;
 
 with DB.Maps;
+with DB.Types.Values;
 
 package REST.Output_Formats.JSON is
    pragma Elaborate_Body;
@@ -47,12 +48,12 @@ package REST.Output_Formats.JSON is
    procedure Put_Value
      (Resource : in out Writer_Type;
       Key      : in     String;
-      Value    : in     DB.Maps.Value_Type);
+      Value    : in     DB.Types.Values.Value_Type);
 
    overriding
    procedure Put_Anonymous_Value
      (Resource : in out Writer_Type;
-      Value    : in     DB.Maps.Value_Type);
+      Value    : in     DB.Types.Values.Value_Type);
 
 private
    type Writer_Type is new Output_Formats.Writer_Type with

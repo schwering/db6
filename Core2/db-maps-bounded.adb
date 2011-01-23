@@ -93,12 +93,12 @@ package body DB.Maps.Bounded is
    overriding
    function Contains
      (Map : Map_Type;
-      Key : Key_Type)
+      Key : Keys.Key_Type)
       return Boolean
    is
       use type BTrees.State_Type;
       State : BTrees.State_Type;
-      Value : Value_Type;
+      Value : Values.Value_Type;
    begin
       BTrees.Search (Map.Self.Tree, Key, Value, State);
       return State = BTrees.Success;
@@ -107,8 +107,8 @@ package body DB.Maps.Bounded is
 
    procedure Search
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -120,8 +120,8 @@ package body DB.Maps.Bounded is
 
    procedure Search_Minimum
      (Map   : in out Map_Type;
-      Key   :    out Key_Type;
-      Value :    out Value_Type;
+      Key   :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -133,8 +133,8 @@ package body DB.Maps.Bounded is
 
    procedure Insert
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -146,10 +146,10 @@ package body DB.Maps.Bounded is
 
    procedure Insert
      (Map       : in out Map_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Type;
+      Old_Value :    out Values.Value_Type;
       State     :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -161,8 +161,8 @@ package body DB.Maps.Bounded is
 
    procedure Replace
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -174,10 +174,10 @@ package body DB.Maps.Bounded is
 
    procedure Replace
      (Map       : in out Map_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Type;
+      Old_Value :    out Values.Value_Type;
       State     :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -189,8 +189,8 @@ package body DB.Maps.Bounded is
 
    procedure Append
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -203,8 +203,8 @@ package body DB.Maps.Bounded is
 
    procedure Delete
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -216,8 +216,8 @@ package body DB.Maps.Bounded is
 
    procedure Delete_Range
      (Map   : in out Map_Type;
-      First : in     Key_Type;
-      Last  : in     Key_Type;
+      First : in     Keys.Key_Type;
+      Last  : in     Keys.Key_Type;
       State :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -240,7 +240,7 @@ package body DB.Maps.Bounded is
 
       function New_Bound
         (Comparison : Comparison_Type;
-         Key        : Key_Type)
+         Key        : Keys.Key_Type)
          return BTrees.Bound_Type
       is
          C : BTrees.Comparison_Type;
@@ -303,8 +303,8 @@ package body DB.Maps.Bounded is
 
    procedure Next
      (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type)
    is
       S : BTrees.State_Type;
@@ -348,7 +348,7 @@ package body DB.Maps.Bounded is
    procedure Check
      (Map : in out Map_Type)
    is
-      function Key_To_String (Key : Key_Type) return String
+      function Key_To_String (Key : Keys.Key_Type) return String
       is
          function Row_Image (S : Keys.Rows.String_Type) return String is
          begin
@@ -367,7 +367,7 @@ package body DB.Maps.Bounded is
       end Key_To_String;
 
       function Value_To_String
-        (Value : Value_Type)
+        (Value : Values.Value_Type)
          return String is
       begin
          return Values.Image (Value);

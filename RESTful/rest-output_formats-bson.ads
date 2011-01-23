@@ -45,12 +45,12 @@ package REST.Output_Formats.BSON is
    procedure Put_Value
      (Resource : in out Writer_Type;
       Key      : in     String;
-      Value    : in     DB.Maps.Value_Type);
+      Value    : in     DB.Types.Values.Value_Type);
 
    overriding
    procedure Put_Anonymous_Value
      (Resource : in out Writer_Type;
-      Value    : in     DB.Maps.Value_Type);
+      Value    : in     DB.Types.Values.Value_Type);
 
 private
    subtype Byte_Type is AS.Stream_Element;

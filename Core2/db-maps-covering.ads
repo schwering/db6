@@ -1,7 +1,7 @@
 -- Abstract:
 --
 -- Maps implementation using normal Gen_BTrees with Types.Keys and
--- Types.Values.Covering.
+-- Types.Values.
 --
 -- Copyright 2008--2011 Christoph Schwering
 
@@ -60,74 +60,74 @@ package DB.Maps.Covering is
    overriding
    function Contains
      (Map : Map_Type;
-      Key : Key_Type)
+      Key : Keys.Key_Type)
       return Boolean;
 
    overriding
    procedure Search
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Search_Minimum
      (Map   : in out Map_Type;
-      Key   :    out Key_Type;
-      Value :    out Value_Type;
+      Key   :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Insert
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Insert
      (Map       : in out Map_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Type;
+      Old_Value :    out Values.Value_Type;
       State     :    out State_Type);
 
    overriding
    procedure Replace
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Replace
      (Map       : in out Map_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Type;
+      Old_Value :    out Values.Value_Type;
       State     :    out State_Type);
 
    overriding
    procedure Append
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Delete
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type);
 
    overriding
    procedure Delete_Range
      (Map   : in out Map_Type;
-      First : in     Key_Type;
-      Last  : in     Key_Type;
+      First : in     Keys.Key_Type;
+      Last  : in     Keys.Key_Type;
       State :    out State_Type);
 
 
@@ -186,8 +186,8 @@ package DB.Maps.Covering is
    overriding
    procedure Next
      (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type);
 
    overriding
@@ -255,11 +255,11 @@ private
       Base_Cursor_Ref_Type;
    type Base_Cursor_Ref_Array_Ref_Type is access Base_Cursor_Ref_Array_Type;
 
-   type Value_Ref_Type is access Value_Type;
+   type Value_Ref_Type is access Values.Value_Type;
 
    type Heap_Item_Type is
       record
-         Key    : Key_Type;
+         Key    : Keys.Key_Type;
          Value  : Value_Ref_Type;
          Cursor : Base_Cursor_Ref_Type;
       end record;

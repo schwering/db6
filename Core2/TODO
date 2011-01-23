@@ -9,6 +9,8 @@
         Fetcher ein Objekt (Task?) ist, das einen Cursor besitzt und das man
         per Schnittstelle um das naechste Objekt (entweder direkt aus dem
         Cursor oder wie jetzt aus der Queue) bitten kann.
+      * Bloomfilter:
+        Mit DB.Maps und XML davorschalten.
       * Cursor Delete verbessern:
         (Vielleicht reicht das aktuelle Delete_Range aber auch einfach aus.)
         Elemente koennen zum Loeschen vorgemerkt werden. Das eigentlich

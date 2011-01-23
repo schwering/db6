@@ -4,7 +4,7 @@
 --
 -- Copyright 2010--2011 Christoph Schwering
 
-with DB.Maps;
+with DB.Types.Keys;
 
 package REST.Method is
 
@@ -19,7 +19,7 @@ package REST.Method is
    function Make_Key
      (Key : String;
       Max : Boolean := False)
-      return DB.Maps.Key_Type;
+      return DB.Types.Keys.Key_Type;
 
 end REST.Method;
 

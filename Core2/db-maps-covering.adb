@@ -511,7 +511,7 @@ package body DB.Maps.Covering is
    overriding
    function Contains
      (Map : Map_Type;
-      Key : Key_Type)
+      Key : Keys.Key_Type)
       return Boolean
    is
       C : constant String := Column_To_String (Key.Column);
@@ -527,8 +527,8 @@ package body DB.Maps.Covering is
 
    procedure Search
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is
       C : constant String := Column_To_String (Key.Column);
@@ -545,8 +545,8 @@ package body DB.Maps.Covering is
 
    procedure Search_Minimum
      (Map   : in out Map_Type;
-      Key   :    out Key_Type;
-      Value :    out Value_Type;
+      Key   :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type) is
    begin
       if Map.Cover'Length = 0 then
@@ -557,8 +557,8 @@ package body DB.Maps.Covering is
       for I in Map.Cover'First + 1 .. Map.Cover'Last loop
          declare
             use type Utils.Comparison_Result_Type;
-            This_Key   : Key_Type;
-            This_Value : Value_Type;
+            This_Key   : Keys.Key_Type;
+            This_Value : Values.Value_Type;
             This_State : State_Type;
          begin
             Map.Slices (Map.Cover (I)).Map.Search_Minimum
@@ -577,8 +577,8 @@ package body DB.Maps.Covering is
 
    procedure Insert
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -600,10 +600,10 @@ package body DB.Maps.Covering is
 
    procedure Insert
      (Map       : in out Map_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Type;
+      Old_Value :    out Values.Value_Type;
       State     :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -625,8 +625,8 @@ package body DB.Maps.Covering is
 
    procedure Replace
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -648,10 +648,10 @@ package body DB.Maps.Covering is
 
    procedure Replace
      (Map       : in out Map_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Type;
+      Old_Value :    out Values.Value_Type;
       State     :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -673,8 +673,8 @@ package body DB.Maps.Covering is
 
    procedure Append
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -696,8 +696,8 @@ package body DB.Maps.Covering is
 
    procedure Delete
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is
       C       : constant String := Column_To_String (Key.Column);
@@ -719,8 +719,8 @@ package body DB.Maps.Covering is
 
    procedure Delete_Range
      (Map   : in out Map_Type;
-      First : in     Key_Type;
-      Last  : in     Key_Type;
+      First : in     Keys.Key_Type;
+      Last  : in     Keys.Key_Type;
       State :    out State_Type)
    is
    begin
@@ -735,7 +735,7 @@ package body DB.Maps.Covering is
    procedure Free_Heap_Item (Item : in out Heap_Item_Type)
    is
       procedure Free is new Ada.Unchecked_Deallocation
-        (Value_Type, Value_Ref_Type);
+        (Values.Value_Type, Value_Ref_Type);
    begin
       if Item.Value /= null then
          Free (Item.Value);
@@ -869,7 +869,7 @@ package body DB.Maps.Covering is
 
    function "<" (Left, Right : Heap_Item_Type) return Boolean
    is
-      use type Key_Type;
+      use type Keys.Key_Type;
    begin
       return Left.Key < Right.Key;
    end "<";
@@ -877,8 +877,8 @@ package body DB.Maps.Covering is
 
    procedure Next
      (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type)
    is
       pragma Precondition (Cursor.Initialized);
@@ -893,14 +893,14 @@ package body DB.Maps.Covering is
 
       procedure Insert_From_Sub_Cursor (Sub_Cursor : in Base_Cursor_Ref_Type)
       is
-         K : Key_Type;
-         V : Value_Type := Value;
+         K : Keys.Key_Type;
+         V : Values.Value_Type := Value;
          S : State_Type;
       begin
          Sub_Cursor.Next (K, V, S);
          if S = Success then
             declare
-               V_Ref : constant Value_Ref_Type := new Value_Type'(V);
+               V_Ref : constant Value_Ref_Type := new Values.Value_Type'(V);
                Item  : constant Heap_Item_Type :=
                  Heap_Item_Type'(K, V_Ref, Sub_Cursor);
             begin

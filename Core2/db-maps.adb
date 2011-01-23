@@ -95,7 +95,7 @@ package body DB.Maps is
 
    function New_Bound
      (Comparison : Comparison_Type;
-      Key        : Key_Type)
+      Key        : Keys.Key_Type)
       return Bound_Type is
    begin
       return Bound_Type'(Concrete   => True,

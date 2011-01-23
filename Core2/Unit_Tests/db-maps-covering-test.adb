@@ -72,13 +72,13 @@ package body DB.Maps.Covering.Test is
    end New_Key;
 
 
-   function New_Value (I : Integer) return Maps.Value_Type is
+   function New_Value (I : Integer) return DB.Types.Values.Value_Type is
    begin
       return Values.New_Value (I);
    end New_Value;
 
 
-   --function New_Value (S : String) return Maps.Value_Type'Class is
+   --function New_Value (S : String) return DB.Types.Values.Value_Type'Class is
    --begin
       --return Values.New_Value (S);
    --end New_Value;

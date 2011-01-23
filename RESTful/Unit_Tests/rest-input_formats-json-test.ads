@@ -44,7 +44,7 @@ private
                Key : Unbounded_String;
                case Event is
                   when Anonymous_Value | Value =>
-                     Value : DB.Maps.Value_Type;
+                     Value : DB.Types.Values.Value_Type;
                   when others => null;
                end case;
             when others => null;

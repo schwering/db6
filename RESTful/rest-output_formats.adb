@@ -17,7 +17,7 @@ package body REST.Output_Formats is
       Writer           : Writer_Ref_Type := null;
       Max_Objects      : Positive;
       N_Objects        : Natural := 0;
-      Last_Key         : DB.Maps.Key_Type := DB.Maps.Keys.Null_Key;
+      Last_Key         : DB.Types.Keys.Key_Type := DB.Types.Keys.Null_Key;
       Last_Initialized : Boolean := False;
       Cancelled        : Boolean := False;
    begin
@@ -44,11 +44,11 @@ package body REST.Output_Formats is
       loop
          <<Next_Iteration>>
          declare
-            use type DB.Maps.Keys.Rows.String_Type;
-            use type DB.Maps.Keys.Columns.String_Type;
+            use type DB.Types.Keys.Rows.String_Type;
+            use type DB.Types.Keys.Columns.String_Type;
             use type DB.Maps.State_Type;
-            Key   : DB.Maps.Key_Type;
-            Value : DB.Maps.Value_Type;
+            Key   : DB.Types.Keys.Key_Type;
+            Value : DB.Types.Values.Value_Type;
             State : DB.Maps.State_Type;
          begin
             select

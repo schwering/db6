@@ -9,9 +9,9 @@ package body REST.Method is
    function Make_Key
      (Key : String;
       Max : Boolean := False)
-      return DB.Maps.Key_Type
+      return DB.Types.Keys.Key_Type
    is
-      use DB.Maps.Keys;
+      use DB.Types.Keys;
    begin
       if Max then
          return (Row    => Rows.New_String (Rows.Indefinite_Buffer_Type (Key)),

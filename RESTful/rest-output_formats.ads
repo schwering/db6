@@ -50,6 +50,7 @@ with Ada.Streams;
 with AWS.Resources.Streams;
 
 with DB.Maps;
+with DB.Types.Values;
 private with DB.DSA.Utils.Gen_Queues;
 
 package REST.Output_Formats is
@@ -106,12 +107,12 @@ package REST.Output_Formats is
    procedure Put_Value
      (Resource : in out Writer_Type;
       Key      : in     String;
-      Value    : in     DB.Maps.Value_Type)
+      Value    : in     DB.Types.Values.Value_Type)
    is abstract;
 
    procedure Put_Anonymous_Value
      (Resource : in out Writer_Type;
-      Value    : in     DB.Maps.Value_Type)
+      Value    : in     DB.Types.Values.Value_Type)
    is abstract;
 
    ----------

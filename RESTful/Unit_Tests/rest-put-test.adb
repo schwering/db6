@@ -18,6 +18,8 @@ with AWS.Response;
 with AWS.Server;
 
 with DB.Maps;
+with DB.Types.Keys;
+with DB.Types.Values;
 
 with REST.Maps.Test_Utils; use REST.Maps.Test_Utils;
 
@@ -140,10 +142,10 @@ package body REST.Put.Test is
          for I in Key_Values'Range loop
             declare
                use type DB.Maps.State_Type;
-               Key : constant DB.Maps.Key_Type :=
+               Key : constant DB.Types.Keys.Key_Type :=
                   DB.Maps.Strings_To_Key (TS (Key_Values (I).Row),
                                           TS (Key_Values (I).Column));
-               Value : DB.Maps.Value_Type;
+               Value : DB.Types.Values.Value_Type;
                State : DB.Maps.State_Type;
             begin
                Map.Search (Key, Value, State);

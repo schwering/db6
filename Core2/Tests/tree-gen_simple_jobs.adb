@@ -4,6 +4,8 @@ with Ada.Strings.Fixed;
 with Ada.Tags;
 
 with DB.Blocks;
+with DB.Types.Keys;
+with DB.Types.Values;
 
 package body Tree.Gen_Simple_Jobs is
 
@@ -20,8 +22,8 @@ package body Tree.Gen_Simple_Jobs is
          raise Stop_Now;
       end if;
       declare
-         use type DB.Maps.Value_Type;
-         Val   : DB.Maps.Value_Type;
+         use type DB.Types.Values.Value_Type;
+         Val   : DB.Types.Values.Value_Type;
          State : DB.Maps.State_Type := DB.Maps.Failure;
       begin
          Map.Search(Types.Key(KV), Val, State);
@@ -49,8 +51,8 @@ package body Tree.Gen_Simple_Jobs is
          raise Stop_Now;
       end if;
       declare
-         use type DB.Maps.Value_Type;
-         Val   : DB.Maps.Value_Type;
+         use type DB.Types.Values.Value_Type;
+         Val   : DB.Types.Values.Value_Type;
          State : DB.Maps.State_Type := DB.Maps.Failure;
       begin
          Map.Search(Types.Key(KV), Val, State);
@@ -78,8 +80,8 @@ package body Tree.Gen_Simple_Jobs is
          raise Stop_Now;
       end if;
       declare
-         use type DB.Maps.Value_Type;
-         Val   : DB.Maps.Value_Type;
+         use type DB.Types.Values.Value_Type;
+         Val   : DB.Types.Values.Value_Type;
          State : DB.Maps.State_Type := DB.Maps.Failure;
       begin
          Map.Search(Types.Key(KV), Val, State);
@@ -99,9 +101,9 @@ package body Tree.Gen_Simple_Jobs is
    procedure Delete
    is
       use type DB.Blocks.Size_Type;
-      use type DB.Maps.Value_Type;
+      use type DB.Types.Values.Value_Type;
       KV    : constant Key_Value_Type := Next_Entry;
-      Val   : DB.Maps.Value_Type;
+      Val   : DB.Types.Values.Value_Type;
       State : DB.Maps.State_Type := DB.Maps.Success;
    begin
       Map.Delete(Types.Key(KV), Val, State);
@@ -120,9 +122,9 @@ package body Tree.Gen_Simple_Jobs is
    procedure Search
    is
       use type DB.Blocks.Size_Type;
-      use type DB.Maps.Value_Type;
+      use type DB.Types.Values.Value_Type;
       KV    : constant Key_Value_Type := Next_Entry;
-      Val   : DB.Maps.Value_Type;
+      Val   : DB.Types.Values.Value_Type;
       State : DB.Maps.State_Type := DB.Maps.Success;
    begin
       Map.Search(Types.Key(KV), Val, State);
@@ -143,7 +145,7 @@ package body Tree.Gen_Simple_Jobs is
    is
       use type DB.Blocks.Size_Type;
       KV    : constant Key_Value_Type := Next_Entry;
-      Val   : DB.Maps.Value_Type;
+      Val   : DB.Types.Values.Value_Type;
       State : DB.Maps.State_Type := DB.Maps.Failure;
    begin
       Map.Search(Types.Key(KV), Val, State);

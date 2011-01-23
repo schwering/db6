@@ -97,11 +97,11 @@ package body REST.Input_Formats is
    is
       procedure To_Boolean
         (Value   : in  String;
-         Bool    : out DB.Maps.Value_Type;
+         Bool    : out DB.Types.Values.Value_Type;
          Success : out Boolean) is
       begin
-         Bool := DB.Maps.Values.New_Value
-           (DB.Maps.Values.Booleans.Discrete_Type'Value (Value));
+         Bool := DB.Types.Values.New_Value
+           (DB.Types.Values.Booleans.Discrete_Type'Value (Value));
          Success := True;
       exception
          when Constraint_Error =>
@@ -110,11 +110,11 @@ package body REST.Input_Formats is
 
       procedure To_Int
         (Value   : in  String;
-         Int     : out DB.Maps.Value_Type;
+         Int     : out DB.Types.Values.Value_Type;
          Success : out Boolean) is
       begin
-         Int := DB.Maps.Values.New_Value
-           (DB.Maps.Values.Long_Integers.Discrete_Type'Value (Value));
+         Int := DB.Types.Values.New_Value
+           (DB.Types.Values.Long_Integers.Discrete_Type'Value (Value));
          Success := True;
       exception
          when Constraint_Error =>
@@ -123,11 +123,11 @@ package body REST.Input_Formats is
 
       procedure To_Real
         (Value   : in  String;
-         Flt     : out DB.Maps.Value_Type;
+         Flt     : out DB.Types.Values.Value_Type;
          Success : out Boolean) is
       begin
-         Flt := DB.Maps.Values.New_Value
-           (DB.Maps.Values.Long_Reals.Real_Type'Value (Value));
+         Flt := DB.Types.Values.New_Value
+           (DB.Types.Values.Long_Reals.Real_Type'Value (Value));
          Success := True;
       exception
          when Constraint_Error =>
@@ -136,7 +136,7 @@ package body REST.Input_Formats is
 
       procedure To_String
         (Value   : in  String;
-         Str     : out DB.Maps.Value_Type;
+         Str     : out DB.Types.Values.Value_Type;
          Success : out Boolean) is
       begin
          if Value'Length <= 1 or else
@@ -144,7 +144,7 @@ package body REST.Input_Formats is
          then
             Success := False;
          else
-            Str := DB.Maps.Values.New_Value
+            Str := DB.Types.Values.New_Value
               (Value (Value'First + 1 .. Value'Last - 1));
             Success := True;
          end if;
@@ -152,19 +152,19 @@ package body REST.Input_Formats is
 
       procedure To_Nothing
         (Value   : in  String;
-         Nothing : out DB.Maps.Value_Type;
+         Nothing : out DB.Types.Values.Value_Type;
          Success : out Boolean) is
       begin
          Success := Value = "null";
-         Nothing := DB.Maps.Values.Nothing_Value;
+         Nothing := DB.Types.Values.Nothing_Value;
       end To_Nothing;
 
-      function To_Value (Value : String) return DB.Maps.Value_Type
+      function To_Value (Value : String) return DB.Types.Values.Value_Type
       is
          Success : Boolean;
       begin
          declare
-            S : DB.Maps.Value_Type;
+            S : DB.Types.Values.Value_Type;
          begin
             To_String (Value, S, Success);
             if Success then
@@ -173,7 +173,7 @@ package body REST.Input_Formats is
          end;
 
          declare
-            I : DB.Maps.Value_Type;
+            I : DB.Types.Values.Value_Type;
          begin
             To_Int (Value, I, Success);
             if Success then
@@ -182,7 +182,7 @@ package body REST.Input_Formats is
          end;
 
          declare
-            F : DB.Maps.Value_Type;
+            F : DB.Types.Values.Value_Type;
          begin
             To_Real (Value, F, Success);
             if Success then
@@ -191,7 +191,7 @@ package body REST.Input_Formats is
          end;
 
          declare
-            B : DB.Maps.Value_Type;
+            B : DB.Types.Values.Value_Type;
          begin
             To_Boolean (Value, B, Success);
             if Success then
@@ -200,7 +200,7 @@ package body REST.Input_Formats is
          end;
 
          declare
-            N : DB.Maps.Value_Type;
+            N : DB.Types.Values.Value_Type;
          begin
             To_Nothing (Value, N, Success);
             if Success then
@@ -240,7 +240,7 @@ package body REST.Input_Formats is
    end Key;
 
 
-   function Value (Parser : Parser_Type) return DB.Maps.Value_Type is
+   function Value (Parser : Parser_Type) return DB.Types.Values.Value_Type is
    begin
       return Parser.The_Value;
    end Value;

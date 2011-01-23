@@ -116,7 +116,7 @@ package body REST.Output_Formats.JSON.Test is
 
    procedure Anonymous_Value
      (Handler : in out Handler_Type;
-      Val     : in     DB.Maps.Value_Type)
+      Val     : in     DB.Types.Values.Value_Type)
    is
       use type Ada.Tags.Tag;
       use DB.Types.Values;
@@ -134,7 +134,7 @@ package body REST.Output_Formats.JSON.Test is
    procedure Value
      (Handler : in out Handler_Type;
       Key     : in     String;
-      Val     : in     DB.Maps.Value_Type)
+      Val     : in     DB.Types.Values.Value_Type)
    is
       use type Ada.Tags.Tag;
       use DB.Types.Values;
@@ -215,7 +215,7 @@ package body REST.Output_Formats.JSON.Test is
    procedure Test_Flat (T : in out Test_Type)
    is
       pragma Unreferenced (T);
-      use DB.Maps.Values;
+      use DB.Types.Values;
 
       Doc : aliased Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
@@ -248,7 +248,7 @@ package body REST.Output_Formats.JSON.Test is
    procedure Test_Nested (T : in out Test_Type)
    is
       pragma Unreferenced (T);
-      use DB.Maps.Values;
+      use DB.Types.Values;
 
       Doc : aliased Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
@@ -280,7 +280,7 @@ package body REST.Output_Formats.JSON.Test is
    procedure Test_Array (T : in out Test_Type)
    is
       pragma Unreferenced (T);
-      use DB.Maps.Values;
+      use DB.Types.Values;
 
       Doc : aliased Item_Array_Type :=
         ((Event => Anonymous_Object_Start),
@@ -312,7 +312,7 @@ package body REST.Output_Formats.JSON.Test is
    procedure Test_Escaped (T : in out Test_Type)
    is
       pragma Unreferenced (T);
-      use DB.Maps.Values;
+      use DB.Types.Values;
 
       Doc : aliased Item_Array_Type :=
         ((Event => Anonymous_Object_Start),

@@ -13,6 +13,10 @@ with AWS.Status;
 with AWS.Response;
 with AWS.URL;
 
+with DB.Maps;
+with DB.Types.Keys;
+with DB.Types.Values;
+
 with REST.Input_Formats;
 with REST.Log;
 with REST.Maps;
@@ -92,13 +96,13 @@ begin
       overriding
       procedure Anonymous_Value
         (Handler : in out Handler_Type;
-         Val     : in     DB.Maps.Value_Type);
+         Val     : in     DB.Types.Values.Value_Type);
 
       overriding
       procedure Value
         (Handler : in out Handler_Type;
          Key     : in     String;
-         Val     : in     DB.Maps.Value_Type);
+         Val     : in     DB.Types.Values.Value_Type);
 
       overriding
       procedure Error (Handler : in out Handler_Type);
@@ -185,7 +189,7 @@ begin
 
       procedure Anonymous_Value
         (Handler : in out Handler_Type;
-         Val     : in     DB.Maps.Value_Type) is
+         Val     : in     DB.Types.Values.Value_Type) is
       begin
          -- Anonymous_Value only appears in arrays whereas Value appears only in
          -- objects.
@@ -196,7 +200,7 @@ begin
             raise Malformed_Input_Data_Error;
          end if;
          declare
-            Key : constant DB.Maps.Key_Type :=
+            Key : constant DB.Types.Keys.Key_Type :=
               DB.Maps.Strings_To_Key (Handler.Row.all, Handler.Column.all);
          begin
             Map.Append (Key, Val, State);
@@ -210,14 +214,14 @@ begin
       procedure Value
         (Handler : in out Handler_Type;
          Key     : in     String;
-         Val     : in     DB.Maps.Value_Type) is
+         Val     : in     DB.Types.Values.Value_Type) is
       begin
          if Handler.Row = null then
             raise Malformed_Input_Data_Error;
          end if;
          declare
             Col : String renames Key;
-            Key : constant DB.Maps.Key_Type :=
+            Key : constant DB.Types.Keys.Key_Type :=
               DB.Maps.Strings_To_Key (Handler.Row.all, Col);
          begin
             Map.Replace (Key, Val, State);

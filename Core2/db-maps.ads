@@ -2,17 +2,17 @@
 --
 -- A general, object-oriented map API whose keys are composite types consisting
 -- of a row ID, a column ID and a timestamp whereas the values must implement
--- the Value_Type interface.
+-- the Values.Value_Type interface.
 --
--- The API of Value_Type has a disadvantage:
+-- The API of Values.Value_Type has a disadvantage:
 -- The implented Read procedure usually wants to know how many bytes can be
 -- read, for example the length of the string. This information could be written
 -- in the corresponding Write procedure, but this would be redundant as the
 -- data is written as DB.Types.Values.Bounded.String_Type, i.e. with a length.
 -- The latter cannot be (easily) changed, because it is an integral part of the
--- Gen_BTrees instance and Value_Type's Read function is invoked later, way out
--- of control of Gen_BTrees. However, the length information must be present in
--- Gen_BTrees control flow.
+-- Gen_BTrees instance and Values.Value_Type's Read function is invoked later,
+-- way out of control of Gen_BTrees. However, the length information must be
+-- present in Gen_BTrees control flow.
 -- So there are multiple ways to handle this problem:
 -- 1. Choose DB.Types.Values.Bounded.Streams'Class instead of
 --    Ada.Streams.Root_Stream_Type'Class as Read/Write and make use of the
@@ -22,8 +22,8 @@
 --    This yields the question whether it is a broken design aspect that the
 --    length of values is always written. But I think it isn't:
 --
---    One might argue that we could leave the length -- or some other size
---    indicator -- out and determine the size -- or the actual Read procedure --
+--    One might argue that we could leave the length--or some other size
+--    indicator--out and determine the size--or the actual Read procedure--
 --    via the value object. A standard way how to do this would be object
 --    orientation. One could claim that the user searches for a certain key or
 --    so and knows the type of the corresponding value.
@@ -44,11 +44,7 @@ package DB.Maps is
 
    package AF renames Ada.Finalization;
 
-   package Keys renames Types.Keys;
-   subtype Key_Type is Keys.Key_Type;
-
-   package Values renames Types.Values;
-   subtype Value_Type is Values.Value_Type;
+   use Types;
 
    function Row_To_String (Row : Keys.Rows.String_Type) return String;
    function Column_To_String (Column : Keys.Columns.String_Type) return String;
@@ -118,74 +114,74 @@ package DB.Maps is
 
    function Contains
      (Map : Map_Type;
-      Key : Key_Type)
+      Key : Keys.Key_Type)
       return Boolean
    is abstract;
 
    procedure Search
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Search_Minimum
      (Map   : in out Map_Type;
-      Key   :    out Key_Type;
-      Value :    out Value_Type;
+      Key   :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Insert
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Insert
      (Map       : in out Map_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Type;
+      Old_Value :    out Values.Value_Type;
       State     :    out State_Type)
    is abstract;
 
    procedure Replace
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Replace
      (Map       : in out Map_Type;
-      Key       : in     Key_Type;
-      Value     : in     Value_Type;
+      Key       : in     Keys.Key_Type;
+      Value     : in     Values.Value_Type;
       Existed   :    out Boolean;
-      Old_Value :    out Value_Type;
+      Old_Value :    out Values.Value_Type;
       State     :    out State_Type)
    is abstract;
 
    procedure Append
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value : in     Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value : in     Values.Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Delete
      (Map   : in out Map_Type;
-      Key   : in     Key_Type;
-      Value :    out Value_Type;
+      Key   : in     Keys.Key_Type;
+      Value :    out Values.Value_Type;
       State :    out State_Type)
    is abstract;
 
    procedure Delete_Range
      (Map   : in out Map_Type;
-      First : in     Key_Type;
-      Last  : in     Key_Type;
+      First : in     Keys.Key_Type;
+      Last  : in     Keys.Key_Type;
       State :    out State_Type)
    is abstract;
    -- Deletes all key/value pairs starting at First and ending at Last, both
@@ -253,7 +249,7 @@ package DB.Maps is
 
    function New_Bound
      (Comparison : Comparison_Type;
-      Key        : Key_Type)
+      Key        : Keys.Key_Type)
       return Bound_Type;
    -- Creates a concrete bound. The bound New_Bound (Greater, Min) is a
    -- lower bound, because this means that all keys Key hit by the cursor
@@ -298,8 +294,8 @@ package DB.Maps is
 
    procedure Next
      (Cursor : in out Cursor_Type;
-      Key    :    out Key_Type;
-      Value  :    out Value_Type;
+      Key    :    out Keys.Key_Type;
+      Value  :    out Values.Value_Type;
       State  :    out State_Type)
    is abstract;
 
@@ -320,7 +316,7 @@ private
          case Concrete is
             when True =>
                Comparison : Comparison_Type;
-               Key        : Key_Type;
+               Key        : Keys.Key_Type;
             when False =>
                Infinity   : Infinity_Type;
          end case;
