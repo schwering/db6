@@ -4,7 +4,7 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
-package body DB.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite is
+package body DB.DSA.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite is
 
    function Suite return Access_Test_Suite
    is
@@ -14,5 +14,5 @@ package body DB.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite is
       return Ret;
    end Suite;
 
-end DB.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite;
+end DB.DSA.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite;
 

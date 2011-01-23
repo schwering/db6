@@ -4,7 +4,7 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
-package body DB.Utils.Gen_Binary_Heaps is
+package body DB.DSA.Utils.Gen_Binary_Heaps is
 
    function New_Heap (Capacity : Natural) return Heap_Type is
    begin
@@ -166,5 +166,5 @@ package body DB.Utils.Gen_Binary_Heaps is
       return Heap.Capacity;
    end Capacity;
 
-end DB.Utils.Gen_Binary_Heaps;
+end DB.DSA.Utils.Gen_Binary_Heaps;
 

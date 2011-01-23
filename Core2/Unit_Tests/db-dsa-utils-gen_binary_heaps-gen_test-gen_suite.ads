@@ -7,9 +7,9 @@
 with AUnit.Test_Suites; use AUnit.Test_Suites;
 
 generic
-package DB.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite is
+package DB.DSA.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite is
 
    function Suite return Access_Test_Suite;
 
-end DB.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite;
+end DB.DSA.Utils.Gen_Binary_Heaps.Gen_Test.Gen_Suite;
 

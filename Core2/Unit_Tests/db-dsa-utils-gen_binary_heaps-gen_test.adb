@@ -9,7 +9,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
-package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
+package body DB.DSA.Utils.Gen_Binary_Heaps.Gen_Test is
 
    Heap_Size : constant := 100;
 
@@ -139,5 +139,5 @@ package body DB.Utils.Gen_Binary_Heaps.Gen_Test is
       Is_Empty (T);
    end Tests;
 
-end DB.Utils.Gen_Binary_Heaps.Gen_Test;
+end DB.DSA.Utils.Gen_Binary_Heaps.Gen_Test;
 

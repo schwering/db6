@@ -11,7 +11,7 @@
 generic
    type Item_Type is private;
    with function "<" (Left, Right : Item_Type) return Boolean is <>;
-package DB.Utils.Gen_Binary_Heaps is
+package DB.DSA.Utils.Gen_Binary_Heaps is
    pragma Pure;
 
    type Heap_Type (<>) is limited private;
@@ -47,5 +47,5 @@ private
    pragma Inline (Min);
    pragma Inline (Capacity);
 
-end DB.Utils.Gen_Binary_Heaps;
+end DB.DSA.Utils.Gen_Binary_Heaps;
 

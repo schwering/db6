@@ -4,7 +4,7 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
-package body DB.Utils.Binary_Heaps_Test_Utils is
+package body DB.DSA.Utils.Binary_Heaps_Test_Utils is
 
    function Succ (I : Integer) return Integer is
    begin
@@ -27,5 +27,5 @@ package body DB.Utils.Binary_Heaps_Test_Utils is
       end if;
    end Image;
 
-end DB.Utils.Binary_Heaps_Test_Utils;
+end DB.DSA.Utils.Binary_Heaps_Test_Utils;
 

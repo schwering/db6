@@ -5,7 +5,7 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
-private with DB.Utils.Gen_Binary_Heaps;
+private with DB.DSA.Utils.Gen_Binary_Heaps;
 private with DB.Utils.Regular_Expressions;
 
 package DB.Maps.Covering is
@@ -265,7 +265,7 @@ private
       end record;
 
    function "<" (Left, Right : Heap_Item_Type) return Boolean;
-   package Heaps is new Utils.Gen_Binary_Heaps (Heap_Item_Type, "<");
+   package Heaps is new DSA.Utils.Gen_Binary_Heaps (Heap_Item_Type, "<");
    type Heap_Ref_Type is access Heaps.Heap_Type;
 
    type Cursor_Type is new Maps.Cursor_Type with

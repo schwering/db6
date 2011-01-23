@@ -1,9 +1,9 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with DB.Utils.Gen_Binary_Heaps;
+with DB.DSA.Utils.Gen_Binary_Heaps;
 
 procedure Heap_Test
 is
-   package Bin_Heaps is new DB.Utils.Gen_Binary_Heaps (Integer);
+   package Bin_Heaps is new DB.DSA.Utils.Gen_Binary_Heaps (Integer);
    use Bin_Heaps;
 
    Heap_Error : exception;

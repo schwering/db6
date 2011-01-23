@@ -11,7 +11,7 @@ generic
    Initial_Item : Item_Type;
    with function Succ (Item : Item_Type) return Item_Type;
    with function Img (Item : Item_Type) return String;
-package DB.Utils.Gen_Binary_Heaps.Gen_Test is
+package DB.DSA.Utils.Gen_Binary_Heaps.Gen_Test is
 
    type Heap_Ref_Type is access Heap_Type;
 
@@ -37,5 +37,5 @@ package DB.Utils.Gen_Binary_Heaps.Gen_Test is
 
    Tests_Ref : Caller.Test_Method := Tests'Access;
 
-end DB.Utils.Gen_Binary_Heaps.Gen_Test;
+end DB.DSA.Utils.Gen_Binary_Heaps.Gen_Test;
 
