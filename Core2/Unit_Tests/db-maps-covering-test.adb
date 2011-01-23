@@ -230,9 +230,9 @@ package body DB.Maps.Covering.Test is
       Map.Add_Slice ("AI.*", BTree, Strings.To_String (Map_File_Names (2)));
       Map.Add_Slice ("(Kraft.*)|(Stoiber.*)", BTree,
                      Strings.To_String (Map_File_Names (3)));
-      Map.Add_Slice ("(Hogan.*)|(Klink.*)", BTree,
+      Map.Add_Slice ("(Hogan.*)|(Klink.*)", Bloomed,
                      Strings.To_String (Map_File_Names (4)));
-      Map.Add_Slice (".*", BTree, Strings.To_String (Map_File_Names (5)));
+      Map.Add_Slice (".*", Bloomed, Strings.To_String (Map_File_Names (5)));
    end;
 
 

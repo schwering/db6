@@ -42,8 +42,8 @@ tags: *.ads *.adb
 apidoc: *.ads
 	for F in *.ads; do adabrowse -f $$F; done
 
-sstats:
-	ls *.ads *.adb | xargs wc | sort -n
+statsall:
+	find ../Core2 ../RESTful -name \*.ads -or -name \*.adb -or -name \*.h -or -name \*.c | grep -v bin | grep -v lib | xargs wc | sort -n
 
 stats:
 	ls *.ads *.adb *.[hc] | xargs wc | sort -n
