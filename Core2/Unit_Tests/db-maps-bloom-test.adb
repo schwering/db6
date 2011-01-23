@@ -66,10 +66,12 @@ package body DB.Maps.Bloom.Test is
         return S;
      end To_String;
 
-     Int    : constant String := To_String (I, Loop_Count'Img'Length);
+     -- take 1000000 * Loop_Count to have some buffer for anti-tests for collisions
+     Int    : constant String :=
+       To_String (I, Integer'Image (100000*Loop_Count)'Length);
      Suffix : constant String := To_String (Pool ((I * I) mod Pool'Length));
    begin
-      return New_Key (Int & Suffix, Suffix, I * I);
+      return New_Key (Int & Suffix, Suffix, abs I);
    end New_Key;
 
 
@@ -272,6 +274,44 @@ package body DB.Maps.Bloom.Test is
    end;
 
 
+   procedure Check_Collisions (Map : in out Map_Type)
+   is
+      Collision    : Natural := 0;
+      No_Collision : Natural := 0;
+   begin
+      for I in 1 .. Loop_Count loop
+         declare
+            K : constant Keys.Key_Type := New_Key (I);
+            S : constant String := Keys.Image (K);
+         begin
+            Assert (Map.Contains (K),
+                    "Why is key "& S &" not contained?");
+            Assert (Bloom_Filters.Contains (Map.Filter, K),
+                    "Why is key "& S &" not in Bloom filter?");
+         end;
+      end loop;
+      for I in Loop_Count + 1 .. 10000 * Loop_Count + Loop_Count loop
+         declare
+            K : constant Keys.Key_Type := New_Key (I);
+            S : constant String := Keys.Image (K);
+         begin
+            Assert (not Map.Contains (K),
+                    "Why is key "& S &" contained?");
+            if Bloom_Filters.Contains (Map.Filter, K) then
+               Collision := Collision + 1;
+            else
+               No_Collision := No_Collision + 1;
+            end if;
+         end;
+      end loop;
+      Put_Line ("kollision : No_Collision: "&
+                Collision'Img &" :"& No_Collision'Img);
+      Assert (Collision < No_Collision,
+              "There are more collisions ("& Collision'Img &") than "&
+              "no-collisions ("& No_Collision'Img &")");
+   end Check_Collisions;
+
+
    procedure Test_Create (T : in out Test_Type)
    is
       pragma Unreferenced (T);
@@ -304,6 +344,7 @@ package body DB.Maps.Bloom.Test is
       begin
          Open (Map, File_Name);
          Searches (Map);
+         Check_Collisions (Map);
          Anti_Inserts (Map);
          Deletes (Map, Anti_Search => True);
          Finalize (Map);

@@ -69,7 +69,7 @@ package body DB.Maps.Bounded.Test is
      Int    : constant String := To_String (I, Loop_Count'Img'Length);
      Suffix : constant String := To_String (Pool ((I * I) mod Pool'Length));
    begin
-      return New_Key (Int & Suffix, Suffix, I * I);
+      return New_Key (Int & Suffix, Suffix, abs (I * I));
    end New_Key;
 
 

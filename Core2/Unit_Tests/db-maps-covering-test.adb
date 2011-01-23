@@ -68,7 +68,7 @@ package body DB.Maps.Covering.Test is
 
      Suffix : constant String := To_String (Pool ((I * I) mod Pool'Length));
    begin
-      return New_Key (Integer'Image (I) & Suffix, Suffix, I * I);
+      return New_Key (Integer'Image (I) & Suffix, Suffix, abs (I * I));
    end New_Key;
 
 
