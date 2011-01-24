@@ -1,5 +1,5 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with DB.Utils.Regular_Expressions; use DB.Utils.Regular_Expressions;
+with DB.Utils.Regexps; use DB.Utils.Regexps;
 
 procedure Regexp_Test
 is

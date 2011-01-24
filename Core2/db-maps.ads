@@ -273,7 +273,7 @@ package DB.Maps is
    -- implementation may ignore Column_Regexp. An empty string means is a
    -- shorthand for the regexp that accepts everything; i.e. all columns are
    -- visited. For regular expression syntax and implementation, check out
-   -- DB.Utils.Regular_Expressions.
+   -- DB.Utils.Regexps.
 
    function New_Cursor_Ref
      (Map           : Map_Type;

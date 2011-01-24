@@ -6,7 +6,7 @@
 
 with AUnit.Test_Fixtures;
 
-package DB.Utils.Regular_Expressions.Test is
+package DB.Utils.Regexps.Test is
 
    type Test_Type is new AUnit.Test_Fixtures.Test_Fixture with private;
 
@@ -41,5 +41,5 @@ private
          Regexps : Regexp_Ref_Array_Type (1 .. 5);
       end record;
 
-end DB.Utils.Regular_Expressions.Test;
+end DB.Utils.Regexps.Test;
 

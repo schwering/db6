@@ -6,13 +6,13 @@
 
 with AUnit.Test_Caller;
 
-package body DB.Utils.Regular_Expressions.Test.Suite is
+package body DB.Utils.Regexps.Test.Suite is
 
    package Caller is new AUnit.Test_Caller (Test_Type);
 
    function Suite return Access_Test_Suite
    is
-      Name : constant String := "Regular_Expressions";
+      Name : constant String := "Regexps";
       Ret : constant Access_Test_Suite := new Test_Suite;
    begin
       Ret.Add_Test (Caller.Create (Name & ": Empty_Regexp", Test_Empty_Regexp'Access));
@@ -24,5 +24,5 @@ package body DB.Utils.Regular_Expressions.Test.Suite is
       return Ret;
    end Suite;
 
-end DB.Utils.Regular_Expressions.Test.Suite;
+end DB.Utils.Regexps.Test.Suite;
 

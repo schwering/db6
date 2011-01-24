@@ -71,7 +71,7 @@
 
 private with Ada.Finalization;
 
-package DB.Utils.Regular_Expressions is
+package DB.Utils.Regexps is
    pragma Preelaborate;
 
    --  The regular expression must first be compiled, using the Compile
@@ -203,4 +203,4 @@ private
    procedure Adjust (R : in out Regexp);
    --  Called after an assignment (do a copy of the Regexp_Access.all)
 
-end DB.Utils.Regular_Expressions;
+end DB.Utils.Regexps;

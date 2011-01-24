@@ -44,7 +44,7 @@ with Ada.Strings.Unbounded;
 
 with DB.Utils.Growing_Arrays;
 
-package body DB.Utils.Regular_Expressions is
+package body DB.Utils.Regexps is
 
    Open_Paren    : constant Character := '(';
    Close_Paren   : constant Character := ')';
@@ -1933,5 +1933,5 @@ package body DB.Utils.Regular_Expressions is
       return To_String (S);
    end Draw;
 
-end DB.Utils.Regular_Expressions;
+end DB.Utils.Regexps;
 

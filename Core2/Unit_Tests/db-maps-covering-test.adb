@@ -14,6 +14,7 @@ with DB.Maps;
 with DB.Maps.Test_Utils;
 with DB.Types.Keys;
 with DB.Types.Values;
+with DB.Utils.Regexps.Cache;
 
 package body DB.Maps.Covering.Test is
    use DB.Types;
@@ -101,17 +102,17 @@ package body DB.Maps.Covering.Test is
    procedure Test_Cover (T : in out Test_Type)
    is
       pragma Unreferenced (T);
-   begin
-      declare
-         use Utils.Regular_Expressions;
+      procedure Exec
+      is
+         use Utils.Regexps;
          Guard : constant Slice_Array_Type :=
-           ((Compile ("a*b"), null),
-            (Compile ("b"), null),
-            (Compile ("ab*"), null),
-            (Compile ("c"), null),
-            (Compile ("(aa)*(bb)*"), null),
-            (Compile ("(bb)*(aa)*"), null));
-         R : constant Regexp_Type := Compile ("a(a|b)b");
+           ((Cache.Compile ("a*b"), null),
+            (Cache.Compile ("b"), null),
+            (Cache.Compile ("ab*"), null),
+            (Cache.Compile ("c"), null),
+            (Cache.Compile ("(aa)*(bb)*"), null),
+            (Cache.Compile ("(bb)*(aa)*"), null));
+         R : constant Regexp_Type := Cache.Compile ("a(a|b)b");
          Cov : constant Cover_Type := Cover (R, Guard);
          U : Regexp_Type := Empty_Regexp;
       begin
@@ -125,6 +126,9 @@ package body DB.Maps.Covering.Test is
          Assert (Cov'Length = 2, "We have "& Cov'Length'Img &" elements "&
                                  "in the cover instead of 2.");
       end;
+   begin
+      Exec;
+      Exec; -- this tests the cache
    end;
 
 
@@ -224,7 +228,7 @@ package body DB.Maps.Covering.Test is
    procedure Configure_Map (Map : in out Map_Type'Class)
    is
       use type DB.Maps.Implementation_Type;
-      use Utils.Regular_Expressions;
+      use Utils.Regexps;
    begin
       Map.Add_Slice ("BMW.*", BTree, Strings.To_String (Map_File_Names (1)));
       Map.Add_Slice ("AI.*", BTree, Strings.To_String (Map_File_Names (2)));

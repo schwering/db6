@@ -6,7 +6,7 @@
 -- Copyright 2008--2011 Christoph Schwering
 
 private with DB.DSA.Utils.Gen_Binary_Heaps;
-private with DB.Utils.Regular_Expressions;
+private with DB.Utils.Regexps;
 
 package DB.Maps.Covering is
    pragma Elaborate_Body;
@@ -200,7 +200,7 @@ private
    pragma Controlled (Map_Ref_Type);
    for Map_Ref_Type'Storage_Size use 0;
 
-   package RE renames Utils.Regular_Expressions;
+   package RE renames Utils.Regexps;
 
    type Node_Type;
    type Node_Ref_Type is access Node_Type;

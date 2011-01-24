@@ -14,6 +14,7 @@ with Unicode.CES;
 
 with DB.Blocks.Gen_ASCII_Layer;
 with DB.Blocks.Local_IO;
+with DB.Utils.Regexps.Cache;
 
 package body DB.Maps.Covering is
 
@@ -70,7 +71,7 @@ package body DB.Maps.Covering is
 
    function Cover (Regexp : String; Map : Map_Type'Class) return Cover_Type
    is
-      R : constant RE.Regexp_Type := RE.Compile (Regexp);
+      R : constant RE.Regexp_Type := RE.Cache.Compile (Regexp);
    begin
       return Cover (R, Map.Slices.all);
    end Cover;
@@ -363,7 +364,7 @@ package body DB.Maps.Covering is
          Node : Node_Ref_Type := Map.Config;
       begin
          for I in Map.Slices'Range loop
-            Map.Slices (I).Guard := RE.Compile (Node.Guard);
+            Map.Slices (I).Guard := RE.Cache.Compile (Node.Guard);
             declare
                Impl    : constant Implementation_Type :=
                   Implementation_Type'Value (Node.Impl);
@@ -814,7 +815,7 @@ package body DB.Maps.Covering is
       else
          declare
             C : constant Cover_Type :=
-              Cover (RE.Compile (Column_Regexp), Map.Slices.all);
+              Cover (RE.Cache.Compile (Column_Regexp), Map.Slices.all);
          begin
             return New_Cursor
               (Map, C, Thread_Safe, Lower_Bound, Upper_Bound, Column_Regexp);

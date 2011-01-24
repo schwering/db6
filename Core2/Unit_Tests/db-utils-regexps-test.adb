@@ -10,7 +10,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with AUnit.Assertions; use AUnit.Assertions;
 
-package body DB.Utils.Regular_Expressions.Test is
+package body DB.Utils.Regexps.Test is
 
    procedure Set_Up (T : in out Test_Type) is
    begin
@@ -261,5 +261,5 @@ package body DB.Utils.Regular_Expressions.Test is
       end loop;
    end;
 
-end DB.Utils.Regular_Expressions.Test;
+end DB.Utils.Regexps.Test;
 
