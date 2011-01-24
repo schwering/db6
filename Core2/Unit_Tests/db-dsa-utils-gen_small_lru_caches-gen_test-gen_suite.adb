@@ -1,0 +1,18 @@
+-- Abstract:
+--
+-- see spec
+--
+-- Copyright 2008--2011 Christoph Schwering
+
+package body DB.DSA.Utils.Gen_Small_LRU_Caches.Gen_Test.Gen_Suite is
+
+   function Suite return Access_Test_Suite
+   is
+      Ret : constant Access_Test_Suite := new Test_Suite;
+   begin
+      Ret.Add_Test (Caller.Create ("Small_LRU_Caches", Tests_Ref));
+      return Ret;
+   end Suite;
+
+end DB.DSA.Utils.Gen_Small_LRU_Caches.Gen_Test.Gen_Suite;
+

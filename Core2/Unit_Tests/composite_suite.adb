@@ -10,6 +10,7 @@ with DB.Maps.Bounded.Test.Suite;
 with DB.Maps.Covering.Test.Suite;
 with DB.Types.Strings_Bounded.Test.Suite;
 with DB.DSA.Utils.Binary_Heaps.Test.Suite;
+with DB.DSA.Utils.Small_LRU_Caches.Test.Suite;
 with DB.Utils.Regular_Expressions.Test.Suite;
 with DB.Utils.Auto_Pointers.Test.Suite;
 with DB.Utils.Smart_Pointers.Test.Suite;
@@ -22,6 +23,7 @@ package body Composite_Suite is
    begin
       Res.Add_Test (DB.Locks.Mutexes.Test.Suite.Suite);
       Res.Add_Test (DB.DSA.Utils.Binary_Heaps.Test.Suite.Suite);
+      Res.Add_Test (DB.DSA.Utils.Small_LRU_Caches.Test.Suite.Suite);
       Res.Add_Test (DB.Utils.Regular_Expressions.Test.Suite.Suite);
       Res.Add_Test (DB.Utils.Auto_Pointers.Test.Suite.Suite);
       Res.Add_Test (DB.Utils.Smart_Pointers.Test.Suite.Suite);
