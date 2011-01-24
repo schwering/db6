@@ -160,10 +160,10 @@ package body REST.Get.Test is
          Row_Count            : Natural := 0;
       begin
          for I in KVs'Range loop
-            if (Row_1 = Method.Infinity_Row or else
+            if (Row_1 = Infinity_Row or else
                 (not Excl_1 and then Row_1 <= KVs (I).Row) or else
                 (    Excl_1 and then Row_1 <  KVs (I).Row)) and then
-               (Row_2 = Method.Infinity_Row or else
+               (Row_2 = Infinity_Row or else
                 (not Excl_2 and then KVs (I).Row <= Row_2) or else
                 (    Excl_2 and then KVs (I).Row <  Row_2))
             then
@@ -343,26 +343,26 @@ package body REST.Get.Test is
       Start_Server (WS);
       Get
         (Table     => "test",
-         Row_1     => Method.Infinity_Row, Excl_1 => False,
-         Row_2     => Method.Infinity_Row, Excl_2 => False,
+         Row_1     => Infinity_Row, Excl_1 => False,
+         Row_2     => Infinity_Row, Excl_2 => False,
          Count     => 100,
          Do_Insert => True);
       Get
         (Table     => "test",
-         Row_1     => Method.Infinity_Row, Excl_1 => False,
-         Row_2     => Method.Infinity_Row, Excl_2 => True,
+         Row_1     => Infinity_Row, Excl_1 => False,
+         Row_2     => Infinity_Row, Excl_2 => True,
          Count     => 100,
          Do_Insert => False);
       Get
         (Table     => "test",
-         Row_1     => Method.Infinity_Row, Excl_1 => True,
-         Row_2     => Method.Infinity_Row, Excl_2 => False,
+         Row_1     => Infinity_Row, Excl_1 => True,
+         Row_2     => Infinity_Row, Excl_2 => False,
          Count     => 100,
          Do_Insert => False);
       Get
         (Table     => "test",
-         Row_1     => Method.Infinity_Row, Excl_1 => True,
-         Row_2     => Method.Infinity_Row, Excl_2 => True,
+         Row_1     => Infinity_Row, Excl_1 => True,
+         Row_2     => Infinity_Row, Excl_2 => True,
          Count     => 100,
          Do_Insert => False);
    exception
@@ -410,8 +410,8 @@ package body REST.Get.Test is
             Do_Insert => False);
          Get
            (Table     => "test",
-            Row_1     => Method.Infinity_Row, Excl_1 => False,
-            Row_2     => Method.Infinity_Row, Excl_2 => False,
+            Row_1     => Infinity_Row, Excl_1 => False,
+            Row_2     => Infinity_Row, Excl_2 => False,
             Count     => I,
             Do_Insert => False);
       end loop;

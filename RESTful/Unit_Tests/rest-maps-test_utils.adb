@@ -68,7 +68,7 @@ package body REST.Maps.Test_Utils is
       function Excl_String (Param : String; Excl : Boolean) return String is
       begin
         if Excl then
-          return Param &"="& REST.Method.Yes_Value &"&";
+          return Param &"="& Yes_Value &"&";
         else
            return "";
         end if;
@@ -77,9 +77,9 @@ package body REST.Maps.Test_Utils is
    begin
       return "http://localhost:"& Img (Port) &"/"& Table &"/"& Col_Regexp &
              "/"& Row_1 &"/"& Row_2 &"/?"&
-             Excl_String (REST.Method.From_Excl_Param, Excl_1) &
-             Excl_String (REST.Method.To_Excl_Param, Excl_2) &
-             REST.Method.Count_Param &"="& Img (Count);
+             Excl_String (From_Excl_Param, Excl_1) &
+             Excl_String (To_Excl_Param, Excl_2) &
+             Count_Param &"="& Img (Count);
    end URL;
 
 

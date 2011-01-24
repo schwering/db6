@@ -15,6 +15,7 @@ with DB.Maps;
 with REST.Output_Formats;
 with REST.Output_Formats.JSON;
 with REST.Maps;
+with REST.Maps.Cursors;
 with REST.Path_Parsers;
 
 separate (REST.Method.Get)
@@ -27,23 +28,23 @@ is
    Path : constant String := AWS.URL.Pathname (URL);
    Iter : Path_Parsers.Iterator_Type;
 
-   function Get_Count (S : String) return Positive is
+   function Param (S : String; Def : String := "") return String
+   is
+      T : constant String := AWS.URL.Parameter (URL, S);
    begin
-      if S = "" then
-         return 1;
-      elsif S = "inf" then
-         return Positive'Last;
+      if T = "" then
+         return T;
       else
-         return Positive'Value (S);
+         return Def;
       end if;
-   exception
-      when others =>
-         return 1;
-   end Get_Count;
+   end Param;
 
-   function Param (S : String) return String is
+   function Param (S : String; Def : Integer) return Integer is
    begin
-      return AWS.URL.Parameter (URL, S);
+      return Integer'Value (Param (S, "no-int"));
+   exception
+      when Constraint_Error =>
+         return Def;
    end Param;
 
    function Next_Path_Element return String is
@@ -64,58 +65,8 @@ is
    Row_2       : constant String := Next_Path_Element;
    Inclusive_1 : constant Boolean := Param (From_Excl_Param) /= Yes_Value;
    Inclusive_2 : constant Boolean := Param (To_Excl_Param) /= Yes_Value;
-   Count       : constant Positive := Get_Count (Param (Count_Param));
-
-   function Bound
-     (Row       : String;
-      Inclusive : Boolean;
-      Lower     : Boolean)
-      return DB.Maps.Bound_Type
-   is
-      function Infinity return DB.Maps.Bound_Type is
-      begin
-         if Lower then
-            return DB.Maps.Negative_Infinity_Bound;
-         else
-            return DB.Maps.Positive_Infinity_Bound;
-         end if;
-      end Infinity;
-
-      function Comparison return DB.Maps.Comparison_Type is
-      begin
-         case Lower is
-            when True =>
-               case Inclusive is
-                  when True =>
-                     return DB.Maps.Greater;
-                  when False =>
-                     return DB.Maps.Greater_Or_Equal;
-               end case;
-            when False =>
-               case Inclusive is
-                  when True =>
-                     return DB.Maps.Less;
-                  when False =>
-                     return DB.Maps.Less_Or_Equal;
-               end case;
-         end case;
-      end Comparison;
-
-   begin
-      if Row = Infinity_Row then
-         return Infinity;
-      else
-         -- How do we determine Max? Have a look at this truth table:
-         -- Lower Inclusive => Max
-         -- true  true      => false
-         -- true  false     => true
-         -- false true      => true
-         -- false false     => false
-         return DB.Maps.New_Bound (Comparison,
-                                   Make_Key (Row, Max => Lower /= Inclusive));
-      end if;
-   end Bound;
-
+   Offset      : constant Natural := Param (Offset_Param, 0);
+   Count       : constant Natural := Param (Count_Param, Natural'Last);
 begin
    if Map_Name = "" or Row_1 = "" or Col_Regexp = "" then
       Success := False;
@@ -131,6 +82,8 @@ begin
             return Query.Row_2;
          end if;
       end Row_2;
+
+      use REST.Maps.Cursors;
 
       Map    : constant Maps.Map_Ref_Type := Maps.Map_By_Name (Map_Name);
       Cursor : constant DB.Maps.Cursor_Ref_Type := Map.New_Cursor_Ref
