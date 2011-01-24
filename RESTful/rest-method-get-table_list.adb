@@ -5,8 +5,6 @@
 -- Copyright 2010--2011 Christoph Schwering
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
-use Ada.Text_IO;
 
 with AWS.Status;
 with AWS.Response;
@@ -25,7 +23,6 @@ is
    P   : constant String := AWS.URL.Pathname (URL);
    S   : Unbounded_String;
 begin
-   Put_Line ("Huhu");
    if P /= "" and P /= "/" then
       Success := False;
    end if;
