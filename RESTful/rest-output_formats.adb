@@ -154,7 +154,6 @@ package body REST.Output_Formats is
       end loop;
 
       Last := AS.Stream_Element_Offset (Q_Last);
-      Log.Info ("Read "& Last'Img);
    end Read;
 
 

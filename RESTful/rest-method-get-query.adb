@@ -6,6 +6,7 @@
 
 with Ada.Strings.Unbounded;
 
+with AWS;
 with AWS.Status;
 with AWS.Response;
 with AWS.URL;
@@ -99,6 +100,7 @@ begin
       Response := AWS.Response.Stream
         (Content_Type => Writer.Content_Type,
          Handle       => Writer,
+         Encoding     => AWS.Status.Preferred_Coding (Request),
          Server_Close => True);
       Success := True;
    end;

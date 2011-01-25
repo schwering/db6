@@ -54,7 +54,7 @@ package body REST.Log is
       Line   : in Natural := GNAT.Source_Info.Line) is
    begin
       Ada.Text_IO.Put (Source &":"& Img (Line) &": ");
-      Ada.Text_IO.Put (Kind &" ("& Now &"):");
+      Ada.Text_IO.Put (Kind &" ("& Now &"): ");
       --Ada.Text_IO.New_Line;
       Ada.Text_IO.Put (Msg);
       Ada.Text_IO.New_Line;
