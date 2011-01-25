@@ -13,8 +13,11 @@ generic
 package DB.Types.Gen_Strings is
    pragma Pure;
 
-   pragma Assert (Item_Type'Size =
-                  System.Storage_Elements.Storage_Element'Size);
+   pragma Compile_Time_Error
+      (Item_Type'Size /= System.Storage_Elements.Storage_Element'Size,
+       "Item_Type in Gen_Bloom_Filters must have size of byte");
+   pragma Assert
+      (Item_Type'Size = System.Storage_Elements.Storage_Element'Size);
 
    subtype Length_Type is Natural range 0 .. Natural'Last;
    subtype Index_Type is Length_Type range 1 .. Length_Type'Last;
