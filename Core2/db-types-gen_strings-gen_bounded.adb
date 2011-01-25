@@ -147,6 +147,18 @@ package body DB.Types.Gen_Strings.Gen_Bounded is
    end Length;
 
 
+   function First (S : String_Type) return Index_Type is
+   begin
+      return S.Buffer'First;
+   end First;
+
+
+   function Last (S : String_Type) return Length_Type is
+   begin
+      return S.Buffer'First + S.Length - 1;
+   end Last;
+
+
    function Element (S : String_Type; I : Index_Type) return Item_Type is
    begin
       return S.Buffer (I);

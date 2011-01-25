@@ -49,7 +49,8 @@ package DB.Types.Gen_Strings.Gen_Unbounded is
       return String_Type;
 
    function Length (S : String_Type) return Length_Type;
-
+   function First (S : String_Type) return Index_Type;
+   function Last (S : String_Type) return Length_Type;
    function Element (S : String_Type; I : Index_Type) return Item_Type;
 
    function Substring
@@ -147,6 +148,8 @@ private
    pragma Inline (New_String);
    pragma Inline (To_Index);
    pragma Inline (Length);
+   pragma Inline (First);
+   pragma Inline (Last);
    pragma Inline (Element);
    pragma Inline (Substring);
 

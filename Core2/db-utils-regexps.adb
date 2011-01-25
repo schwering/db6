@@ -1216,6 +1216,32 @@ package body DB.Utils.Regexps is
    -----------
 
    function Match (S : String; R : Regexp) return Boolean is
+      function First (S : String) return Positive is
+      begin
+         return S'First;
+      end First;
+
+      function Last (S : String) return Natural is
+      begin
+         return S'Last;
+      end Last;
+
+      function Element (S : String; I : Positive) return Character is
+      begin
+         return S (I);
+      end Element;
+
+      pragma Inline (First);
+      pragma Inline (Last);
+      pragma Inline (Element);
+
+      function Match is new Gen_Match (String, First, Last, Element);
+   begin
+      return Match (S, R);
+   end Match;
+
+
+   function Gen_Match (S : String_Type; R : Regexp) return Boolean is
       Current_State : State_Index := R.R.Start_State;
 
    begin
@@ -1223,18 +1249,14 @@ package body DB.Utils.Regexps is
          raise Constraint_Error;
       end if;
 
-      for Char in S'Range loop
-
-         Current_State := R.R.States (Current_State, R.R.Map (S (Char)));
-
+      for I in First (S) .. Last (S) loop
+         Current_State := R.R.States (Current_State, R.R.Map (Element (S, I)));
          if Current_State = 0 then
             return False;
          end if;
-
       end loop;
-
       return R.R.Is_Final (Current_State);
-   end Match;
+   end Gen_Match;
 
    ---------
    -- Set --

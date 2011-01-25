@@ -502,23 +502,21 @@ package body DB.Maps.Covering is
    end Max_Key_Size;
 
 
-   function Matches
-     (Col   : String;
-      Guard : RE.Regexp_Type)
-      return Boolean
-   renames RE.Match;
+   function Matches is new RE.Gen_Match
+      (String_Type => Keys.Columns.String_Type,
+       First       => Keys.Columns.First,
+       Last        => Keys.Columns.Last,
+       Element     => Keys.Columns.Element);
 
 
    overriding
    function Contains
      (Map : Map_Type;
       Key : Keys.Key_Type)
-      return Boolean
-   is
-      C : constant String := Column_To_String (Key.Column);
+      return Boolean is
    begin
       for I in Map.Slices'Range loop
-         if Matches (C, Map.Slices (I).Guard) then
+         if Matches (Key.Column, Map.Slices (I).Guard) then
             return Map.Slices (I).Map.Contains (Key);
          end if;
       end loop;
@@ -535,7 +533,7 @@ package body DB.Maps.Covering is
       C : constant String := Column_To_String (Key.Column);
    begin
       for I in Map.Slices'Range loop
-         if Matches (C, Map.Slices (I).Guard) then
+         if Matches (Key.Column, Map.Slices (I).Guard) then
             Map.Slices (I).Map.Search (Key, Value, State);
             return;
          end if;
@@ -587,7 +585,7 @@ package body DB.Maps.Covering is
    begin
       State := Failure;
       for I in Map.Slices'Range loop
-         if Matches (C, Map.Slices (I).Guard) then
+         if Matches (Key.Column, Map.Slices (I).Guard) then
             Matched := True;
             Map.Slices (I).Map.Insert (Key, Value, State);
             exit when State /= Success;
@@ -612,7 +610,7 @@ package body DB.Maps.Covering is
    begin
       State := Failure;
       for I in Map.Slices'Range loop
-         if Matches (C, Map.Slices (I).Guard) then
+         if Matches (Key.Column, Map.Slices (I).Guard) then
             Matched := True;
             Map.Slices (I).Map.Insert (Key, Value, Existed, Old_Value, State);
             exit when State /= Success;
@@ -635,7 +633,7 @@ package body DB.Maps.Covering is
    begin
       State := Failure;
       for I in Map.Slices'Range loop
-         if Matches (C, Map.Slices (I).Guard) then
+         if Matches (Key.Column, Map.Slices (I).Guard) then
             Matched := True;
             Map.Slices (I).Map.Replace (Key, Value, State);
             exit when State /= Success;
@@ -660,7 +658,7 @@ package body DB.Maps.Covering is
    begin
       State := Failure;
       for I in Map.Slices'Range loop
-         if Matches (C, Map.Slices (I).Guard) then
+         if Matches (Key.Column, Map.Slices (I).Guard) then
             Matched := True;
             Map.Slices (I).Map.Replace (Key, Value, Existed, Old_Value, State);
             exit when State /= Success;
@@ -683,7 +681,7 @@ package body DB.Maps.Covering is
    begin
       State := Failure;
       for I in Map.Slices'Range loop
-         if Matches (C, Map.Slices (I).Guard) then
+         if Matches (Key.Column, Map.Slices (I).Guard) then
             Matched := True;
             Map.Slices (I).Map.Append (Key, Value, State);
             exit when State /= Success;
@@ -706,7 +704,7 @@ package body DB.Maps.Covering is
    begin
       State := Failure;
       for I in Map.Slices'Range loop
-         if Matches (C, Map.Slices (I).Guard) then
+         if Matches (Key.Column, Map.Slices (I).Guard) then
             Matched := True;
             Map.Slices (I).Map.Delete (Key, Value, State);
             exit when State /= Success;

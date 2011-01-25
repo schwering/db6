@@ -148,6 +148,15 @@ package DB.Utils.Regexps is
    --  True if S matches R, otherwise False. Raises Constraint_Error if
    --  R is an uninitialized regular expression value.
 
+   generic
+      type String_Type (<>) is limited private;
+      with function First (S : String_Type) return Positive;
+      with function Last (S : String_Type) return Natural;
+      with function Element (S : String_Type; I : Positive) return Character;
+   function Gen_Match (S : String_Type; R : Regexp) return Boolean;
+   --  True if S matches R, otherwise False. Raises Constraint_Error if
+   --  R is an uninitialized regular expression value.
+
    function Empty_Regexp return Regexp;
    --  Regular regular expression that accepts nothing.
 
