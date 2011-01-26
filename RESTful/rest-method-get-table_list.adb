@@ -24,7 +24,7 @@ is
    URL_Prefix : constant String := AWS.URL.Protocol_Name (URL) &"://"&
                                    AWS.URL.Host (URL) &":"&
                                    AWS.URL.Port (URL) &"/";
-   URL_Suffix : constant String := "/*/"& Infinity_Row &
+   URL_Suffix : constant String := "/"& Everything_Regexp &"/"& Infinity_Row &
                                    "/"& Infinity_Row &
                                    "?"& Count_Param &"="& Img (Default_Count);
    S          : Unbounded_String;
