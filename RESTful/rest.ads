@@ -25,6 +25,9 @@ package REST is
 
    Default_Count   : constant Positive := 5;
 
+   SSL                  : constant Boolean := False;
+   Certificate_Filename : constant String := "SSL/aws.pem";
+
    function Make_Key
      (Key : String;
       Max : Boolean := False)
