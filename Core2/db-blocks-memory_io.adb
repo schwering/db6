@@ -112,7 +112,7 @@ package body DB.Blocks.Memory_IO is
       end if;
 
       for I in Files'Range loop
-         if Files (I).File /= File then
+         if Files (I).File = File then
             for J in Files (I).File.Buffer'Range loop
                Free (Files (I).File.Buffer (J));
             end loop;
