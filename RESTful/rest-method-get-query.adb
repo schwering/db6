@@ -7,9 +7,12 @@
 with Ada.Strings.Unbounded;
 
 with AWS;
+with AWS.Parameters;
+with AWS.Parameters.Set;
 with AWS.Status;
 with AWS.Response;
 with AWS.URL;
+with AWS.URL.Set;
 
 with DB.Maps;
 
@@ -25,6 +28,8 @@ procedure Query
     Response : out AWS.Response.Data;
     Success  : out Boolean)
 is
+   use Ada.Strings.Unbounded;
+
    function Format_Path (S : String) return String
    is
       Last : Natural := S'Last;
@@ -79,6 +84,29 @@ is
    Incl_2      : constant Boolean := Param (To_Excl_Param) /= Yes_Value;
    Offset      : constant Natural := Param (Offset_Param, 0);
    Count       : constant Natural := Param (Count_Param, Natural'Last);
+
+   function Next_URL return Unbounded_String is
+   begin
+      if Count = Natural'Last then
+         return To_Unbounded_String ("");
+      else
+         declare
+            Next_URL   : AWS.URL.Object := URL;
+            Parameters : AWS.Parameters.List := AWS.URL.Parameters (URL);
+            Offset_Str : constant String := Natural'Image (Offset + Count);
+            First      : Positive := Offset_Str'First;
+         begin
+            while Offset_Str (First) = ' ' loop
+               First := First + 1;
+            end loop;
+            AWS.Parameters.Set.Update
+              (Parameters, Offset_Param, Offset_Str (First .. Offset_Str'Last));
+            AWS.URL.Set.Parameters (Next_URL, Parameters);
+            return To_Unbounded_String (AWS.URL.URL (Next_URL));
+         end;
+      end if;
+   end Next_URL;
+
 begin
    if Map_Name = "" or Row_1 = "" or Col_Regexp = "" then
       Success := False;
@@ -108,13 +136,14 @@ begin
       Output_Formats.Initialize_Writer
         (Writer            => Writer,
          Map               => Map,
-         URL_Path          => Ada.Strings.Unbounded.To_Unbounded_String (Path),
+         URL_Path          => To_Unbounded_String (Path),
          Offset            => Offset,
          Lower_Bound       => Maps.Cursors.Bound (Row_1, Incl_1, Lower => True),
          Upper_Bound       => Maps.Cursors.Bound (Row_2, Incl_2, Lower => False),
          Has_Column_Regexp => Col_Regexp /= "*",
          Column_Regexp     => Col_Regexp,
-         Max_Objects       => Count);
+         Max_Objects       => Count,
+         Next_URL          => Next_URL);
       Response := AWS.Response.Stream
         (Content_Type => Writer.Content_Type,
          Handle       => Writer,

@@ -20,6 +20,7 @@ package REST is
    To_Excl_Param   : constant String := "excl2";
    Yes_Value       : constant String := "y";
    Infinity_Row    : constant String := "_inf";
+   Next_URL_Key    : constant String := "_next";
 
    function Make_Key
      (Key : String;

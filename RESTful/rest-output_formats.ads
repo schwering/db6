@@ -59,6 +59,7 @@ private with REST.Maps.Cursors;
 
 package REST.Output_Formats is
 
+   use Ada.Strings.Unbounded;
    package AS renames Ada.Streams;
    package ARS renames AWS.Resources.Streams;
 
@@ -72,13 +73,14 @@ package REST.Output_Formats is
    procedure Initialize_Writer
      (Writer            : in Writer_Ref_Type;
       Map               : in REST.Maps.Map_Ref_Type;
-      URL_Path          : in Ada.Strings.Unbounded.Unbounded_String;
+      URL_Path          : in Unbounded_String;
       Offset            : in Natural;
       Lower_Bound       : in DB.Maps.Bound_Type;
       Upper_Bound       : in DB.Maps.Bound_Type;
       Has_Column_Regexp : in Boolean;
       Column_Regexp     : in String;
-      Max_Objects       : in Natural);
+      Max_Objects       : in Natural;
+      Next_URL          : in Unbounded_String);
    -- Populates the stream with at most Max_Objects from the cursor created from
    -- the given Map with Lower_Bound and Upper_Bound and Column_Regexp.
    -- Object is meant in the JSON-sense and not key/value-pairs returned from
@@ -151,8 +153,9 @@ private
 
    task type Populator_Type is
       entry Initialize
-        (Writer_Ref : in Writer_Ref_Type;
-         Max_Objs   : in Natural);
+        (Writer      : in Writer_Ref_Type;
+         Max_Objects : in Natural;
+         Next_URL    : in Unbounded_String);
       entry Stop;
    end Populator_Type;
 

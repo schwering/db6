@@ -15,15 +15,18 @@ package body REST.Output_Formats is
       use type Maps.Cursors.Cursor_Ref_Type;
       Writer      : Writer_Ref_Type := null;
       Max_Objects : Positive;
+      Next_URL    : Unbounded_String;
       Cancelled   : Boolean := False;
    begin
       select
          accept Initialize
-           (Writer_Ref : in Writer_Ref_Type;
-            Max_Objs   : in Natural)
+           (Writer      : in Writer_Ref_Type;
+            Max_Objects : in Natural;
+            Next_URL    : in Unbounded_String)
          do
-            Writer      := Writer_Ref;
-            Max_Objects := Max_Objs;
+            Populator_Type.Writer      := Writer;
+            Populator_Type.Max_Objects := Max_Objects;
+            Populator_Type.Next_URL    := Next_URL;
          end Initialize;
       or
          accept Stop do
@@ -75,6 +78,13 @@ package body REST.Output_Formats is
          end;
       end loop;
 
+      if Writer.Cursor = null or Length (Next_URL) = 0 then
+         Writer.Put_Value (Next_URL_Key, DB.Types.Values.Nothing_Value);
+      else
+         Writer.Put_Value
+           (Next_URL_Key, DB.Types.Values.New_Value (To_String (Next_URL)));
+      end if;
+
       Writer.End_Object;
       Queues.Mark_Final (Writer.Queue);
 
@@ -91,13 +101,14 @@ package body REST.Output_Formats is
    procedure Initialize_Writer
      (Writer            : in Writer_Ref_Type;
       Map               : in REST.Maps.Map_Ref_Type;
-      URL_Path          : in Ada.Strings.Unbounded.Unbounded_String;
+      URL_Path          : in Unbounded_String;
       Offset            : in Natural;
       Lower_Bound       : in DB.Maps.Bound_Type;
       Upper_Bound       : in DB.Maps.Bound_Type;
       Has_Column_Regexp : in Boolean;
       Column_Regexp     : in String;
-      Max_Objects       : in Natural) is
+      Max_Objects       : in Natural;
+      Next_URL          : in Unbounded_String) is
    begin
       if Writer.Initialized then
          raise Stream_Error;
@@ -107,7 +118,7 @@ package body REST.Output_Formats is
       Writer.Cursor := Maps.Cursors.New_Cursor
          (Map, URL_Path, Offset, Lower_Bound, Upper_Bound,
           Has_Column_Regexp, Column_Regexp);
-      Writer.Populator.Initialize (Writer, Max_Objects);
+      Writer.Populator.Initialize (Writer, Max_Objects, Next_URL);
    end Initialize_Writer;
 
 
