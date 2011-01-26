@@ -236,6 +236,10 @@ package body REST.Maps.Cursors is
          end if;
       end Next_Pair;
 
+      function Match is new DB.Utils.Regexps.Gen_Match
+        (DB.Types.Keys.Columns.String_Type, DB.Types.Keys.Columns.First,
+         DB.Types.Keys.Columns.Last, DB.Types.Keys.Columns.Element);
+
       Key   : DB.Types.Keys.Key_Type;
       Value : DB.Types.Values.Value_Type;
    begin
@@ -260,15 +264,17 @@ package body REST.Maps.Cursors is
          exit when Cursor.Reuse_Last;
          -- Break after one object.
 
-         if Process /= null then
+         if Process /= null and then
+            (not Cursor.Has_Column_Regexp or else
+             Match (Key.Column, Cursor.Column_Regexp))
+         then
             Process (Key, Value);
          end if;
       end loop;
 
+      Cursor.Offset := Cursor.Offset + 1;
       if EOF then
          Finalize (Cursor);
-      else
-         Cursor.Offset := Cursor.Offset + 1;
       end if;
    end Next;
 
