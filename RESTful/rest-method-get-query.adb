@@ -87,7 +87,7 @@ is
 
    function Next_URL return Unbounded_String is
    begin
-      if Count >= Natural'Last then
+      if Count = Natural'Last then
          return To_Unbounded_String ("");
       else
          declare
@@ -135,7 +135,7 @@ begin
          Offset            => Offset,
          Lower_Bound       => Maps.Cursors.Bound (Row_1, Incl_1, Lower => True),
          Upper_Bound       => Maps.Cursors.Bound (Row_2, Incl_2, Lower => False),
-         Has_Column_Regexp => Col_Regexp /= "*",
+         Has_Column_Regexp => Col_Regexp /= Everything_Regexp,
          Column_Regexp     => Col_Regexp,
          Max_Objects       => Count,
          Next_URL          => Next_URL);

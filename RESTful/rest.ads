@@ -13,17 +13,19 @@ package REST is
    Malformed_Input_Data_Error : exception;
    Insertion_Error            : exception;
 
-   Count_Param     : constant String := "n";
-   Offset_Param    : constant String := "o";
-   Reverse_Param   : constant String := "rev";
-   From_Excl_Param : constant String := "excl1";
-   To_Excl_Param   : constant String := "excl2";
-   Yes_Value       : constant String := "y";
+   Count_Param          : constant String := "n";
+   Offset_Param         : constant String := "o";
+   Reverse_Param        : constant String := "rev";
+   From_Excl_Param      : constant String := "excl1";
+   To_Excl_Param        : constant String := "excl2";
+   Yes_Value            : constant String := "y";
 
-   Infinity_Row    : constant String := "_inf";
-   Next_URL_Key    : constant String := "_succ";
+   Everything_Regexp    : constant String := ".*";
 
-   Default_Count   : constant Positive := 5;
+   Infinity_Row         : constant String := "_inf";
+   Next_URL_Key         : constant String := "_succ";
+
+   Default_Count        : constant Positive := 5;
 
    SSL                  : constant Boolean := False;
    Certificate_Filename : constant String := "SSL/aws.pem";
