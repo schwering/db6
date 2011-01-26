@@ -2,15 +2,24 @@
 --
 -- Tasks that run over cursors.
 --
+-- URL_Path is intended to include in some standardized format the table, the
+-- column regular expression, the lower bound row and the upper bound row.
+--
+-- The user is required to call Release if he doesn't need the cursor anymore
+-- to put it back into the cache. Together with Next, this mechanism cares about
+-- finalization of cursors.
+--
+--
+-- XXX TODO Make somehow the Clean_Task a daemon-thread.
+--
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
-private with Ada.Containers.Ordered_Maps;
-private with Ada.Containers.Vectors;
+private with Ada.Calendar;
+private with Ada.Containers.Ordered_Multisets;
 with Ada.Strings.Unbounded;
 
 with DB.Types.Keys;
 with DB.Types.Values;
-private with DB.Locks.Mutexes;
 private with DB.Utils.Regexps;
 
 package REST.Maps.Cursors is
@@ -26,24 +35,40 @@ package REST.Maps.Cursors is
       return DB.Maps.Bound_Type;
 
    function New_Cursor
-     (Map           : not null DB.Maps.Map_Ref_Type;
-      URL_Path      : Unbounded_String;
-      Offset        : Natural;
-      Lower         : DB.Maps.Bound_Type;
-      Upper         : DB.Maps.Bound_Type;
-      Column_Regexp : String)
+     (Map               : not null DB.Maps.Map_Ref_Type;
+      URL_Path          : Unbounded_String;
+      Offset            : Natural;
+      Lower             : DB.Maps.Bound_Type;
+      Upper             : DB.Maps.Bound_Type;
+      Has_Column_Regexp : Boolean;
+      Column_Regexp     : String)
       return Cursor_Ref_Type;
 
-   procedure Release_Cursor (Cursor : in not null Cursor_Ref_Type);
+   procedure Release (Cursor : in not null Cursor_Ref_Type);
+   -- Releasing the cursor means that the cursor is managed by the package
+   -- again. Subsequent New_Cursor calls might return exactly the cursor. After
+   -- some time, the cursor will be finalized.
 
    procedure Next
      (Cursor  : in out Cursor_Ref_Type;
-      Key     :    out DB.Types.Keys.Key_Type;
-      Value   :    out DB.Types.Values.Value_Type;
-      Success :    out Boolean);
-   -- Returns the next Key/Value pair from the cursor and sets Success to True
-   -- if it succeeds, or finalizes Cursors, sets Cursor to null and Success to
-   -- False.
+      Process : access procedure
+                        (Key   : in DB.Types.Keys.Key_Type;
+                         Value : in DB.Types.Values.Value_Type);
+      EOF     :    out Boolean);
+   -- Iterates over the next elements which have the equivalent row value from
+   -- Cursor. For each Key/Value pair of these, Process is called; so for each
+   -- Process call, all arguments K and K' have K.Row = K'.Row. Iff Cursor
+   -- reaches its end during this procedure, EOF is set to True, which doesn't
+   -- indicate an error but only that subsequent Next procedures are not
+   -- necessary. Furthermore, in this case the resources held by Cursor are
+   -- freed and Cursor is set to null.
+
+   procedure Increment_Offset
+     (Cursor : in not null Cursor_Ref_Type);
+   -- Increments the offset by one.
+   -- The offset will remain together with Cursor will remain after Cursor
+   -- is released for some time, and subsequent New_Cursor queries might return
+   -- Cursor again if the offset (and URL_Path) match.
 
    procedure Push_Back
      (Cursor : in not null Cursor_Ref_Type;
@@ -52,40 +77,37 @@ package REST.Maps.Cursors is
    -- Pushes back the given Key/Value pair to the cursor.
    -- No second Push_Back may be issued directly after one; in between, there
    -- must be one or more Next calls.
-
-   procedure Finalize (Cursor : in out Cursor_Ref_Type);
-   -- Finalizes all resources acquired by the cursor.
+   -- This should be called after Next returned a Key/Value pair which denotes
+   -- the end of processing the cursor for now.
 
 private
-   Timeout : constant := 60;
+   Timeout : constant Duration := 60.0;
 
    type Cursor_Self_Ref_Type is access all Cursor_Type;
 
-   task type Killer_Task_Type is
-      entry Start (Cursor : in Cursor_Ref_Type);
-      entry Stop;
-   end Killer_Task_Type;
-
    type Cursor_Type is limited
       record
-         URL_Path      : Unbounded_String;
-         Cursor        : DB.Maps.Cursor_Ref_Type;
-         Offset        : Natural := 0;
-         Column_Regexp : DB.Utils.Regexps.Regexp_Type;
-         Has_Last      : Boolean := False;
-         Last_Key      : DB.Types.Keys.Key_Type;
-         Last_Value    : DB.Types.Values.Value_Type;
-         Released      : Boolean := False; -- for assertions / debugging
-         Killer        : Killer_Task_Type;
+         Search_Only       : Boolean;
+         URL_Path          : Unbounded_String;
+         Offset            : Natural := 0;
+         Cursor            : DB.Maps.Cursor_Ref_Type;
+         Has_Column_Regexp : Boolean;
+         Column_Regexp     : DB.Utils.Regexps.Regexp_Type;
+         Reuse_Last        : Boolean := False;
+         Has_Last          : Boolean := False;
+         Last_Key          : DB.Types.Keys.Key_Type;
+         Last_Value        : DB.Types.Values.Value_Type;
+         Last_Used         : Ada.Calendar.Time;
+         Released          : Boolean := False; -- for assertions / debugging
       end record;
    
+   function Less (A, B : Cursor_Ref_Type) return Boolean;
+   function Equal (A, B : Cursor_Ref_Type) return Boolean;
 
-   package Vectors is new Ada.Containers.Vectors
-     (Positive, Cursor_Ref_Type);
+   procedure Finalize (Cursor : in out Cursor_Ref_Type);
 
-   package Maps is new Ada.Containers.Ordered_Maps
-     (Unbounded_String, Vectors.Vector, "=" => Vectors."=");
-
+   package Multisets is new Ada.Containers.Ordered_Multisets
+     (Cursor_Ref_Type, Less, Equal);
 
    protected Cursors is
       procedure Put (Cursor : in not null Cursor_Ref_Type);
@@ -99,29 +121,11 @@ private
       -- The cursor must match URL_Path, i.e. the bounds must be correct, and
       -- the Offset must match.
 
-      procedure Kill (Cursor : in out Cursor_Ref_Type; Success : out Boolean);
-      -- Looks whether Cursor is currently in the cache and if so, finalizes it
-      -- and sets Success to True.
-
-      procedure Kill_All;
+      procedure Clean;
 
    private
-      Map : Maps.Map;
+      Map : Multisets.Set;
    end Cursors;
-
-
-   Trash_Size : constant := 10;
-
-   type Cursor_Ref_Array_Type is array (1 .. Trash_Size) of Cursor_Ref_Type;
-
-   protected Trash is
-      entry Throw_Away (Cursor : in not null Cursor_Ref_Type);
-      entry Empty;
-   private
-      Cursors : Cursor_Ref_Array_Type := (others => null);
-   end Trash;
-
-   task Cleaner_Task;
 
 end REST.Maps.Cursors;
 

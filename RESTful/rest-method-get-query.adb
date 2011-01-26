@@ -25,15 +25,26 @@ procedure Query
     Response : out AWS.Response.Data;
     Success  : out Boolean)
 is
+   function Format_Path (S : String) return String
+   is
+      Last : Natural := S'Last;
+   begin
+      for I in reverse S'Range loop
+         exit when S (I) /= '/' and S (I) /= '?';
+         Last := I - 1;
+      end loop;
+      return S (S'First .. Last);
+   end Format_Path;
+
    URL  : constant AWS.URL.Object := AWS.Status.URI (Request);
-   Path : constant String := AWS.URL.Pathname (URL);
+   Path : constant String := Format_Path (AWS.URL.Pathname (URL));
    Iter : Path_Parsers.Iterator_Type;
 
    function Param (S : String; Def : String := "") return String
    is
       T : constant String := AWS.URL.Parameter (URL, S);
    begin
-      if T = "" then
+      if T /= "" then
          return T;
       else
          return Def;
@@ -64,8 +75,8 @@ is
    Col_Regexp  : constant String := Next_Path_Element;
    Row_1       : constant String := Next_Path_Element;
    Row_2       : constant String := Next_Path_Element;
-   Inclusive_1 : constant Boolean := Param (From_Excl_Param) /= Yes_Value;
-   Inclusive_2 : constant Boolean := Param (To_Excl_Param) /= Yes_Value;
+   Incl_1      : constant Boolean := Param (From_Excl_Param) /= Yes_Value;
+   Incl_2      : constant Boolean := Param (To_Excl_Param) /= Yes_Value;
    Offset      : constant Natural := Param (Offset_Param, 0);
    Count       : constant Natural := Param (Count_Param, Natural'Last);
 begin
@@ -84,19 +95,26 @@ begin
          end if;
       end Row_2;
 
-      use REST.Maps.Cursors;
+      use type DB.Maps.Map_Ref_Type;
 
       Map    : constant Maps.Map_Ref_Type := Maps.Map_By_Name (Map_Name);
-      Cursor : constant DB.Maps.Cursor_Ref_Type := Map.New_Cursor_Ref
-        (Thread_Safe   => False,
-         Lower_Bound   => Bound (Row_1, Inclusive_1, Lower => True),
-         Upper_Bound   => Bound (Row_2, Inclusive_2, Lower => False),
-         Column_Regexp => Col_Regexp);
-      Writer : constant Output_Formats.Writer_Ref_Type :=
-        new Output_Formats.JSON.Writer_Type;
+      Writer : Output_Formats.Writer_Ref_Type;
    begin
+      if Map = null then
+         Success := False;
+         return;
+      end if;
+      Writer := new Output_Formats.JSON.Writer_Type;
       Output_Formats.Initialize_Writer
-        (Writer, Cursor, Free_On_Close => True, Max_Objects => Count);
+        (Writer            => Writer,
+         Map               => Map,
+         URL_Path          => Ada.Strings.Unbounded.To_Unbounded_String (Path),
+         Offset            => Offset,
+         Lower_Bound       => Maps.Cursors.Bound (Row_1, Incl_1, Lower => True),
+         Upper_Bound       => Maps.Cursors.Bound (Row_2, Incl_2, Lower => False),
+         Has_Column_Regexp => Col_Regexp /= "*",
+         Column_Regexp     => Col_Regexp,
+         Max_Objects       => Count);
       Response := AWS.Response.Stream
         (Content_Type => Writer.Content_Type,
          Handle       => Writer,

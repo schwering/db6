@@ -58,7 +58,6 @@ package body REST.Log is
       --Ada.Text_IO.New_Line;
       Ada.Text_IO.Put (Msg);
       Ada.Text_IO.New_Line;
-      Ada.Text_IO.New_Line;
    end Log_To_Stdout;
 
 

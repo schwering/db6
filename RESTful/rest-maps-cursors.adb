@@ -4,6 +4,7 @@
 --
 -- Copyright 2008, 2009, 2010 Christoph Schwering
 
+with Ada.Containers.Vectors;
 with Ada.Unchecked_Deallocation;
 
 with DB.Utils.Regexps.Cache;
@@ -12,63 +13,18 @@ with REST.Log;
 
 package body REST.Maps.Cursors is
 
-   procedure Free is new Ada.Unchecked_Deallocation
-     (Cursor_Type, Cursor_Ref_Type);
-
-
-   task body Killer_Task_Type
-   is
-      Self     : Cursor_Ref_Type;
-      Continue : Boolean := True;
-      Free     : Boolean := False;
-   begin
-      accept Start (Cursor : in Cursor_Ref_Type) do
-         Self := Cursor;
-      end Start;
-      while Continue loop
-         select
-               accept Stop do
-                  Continue := True;
-               end Stop;
-            or delay 60.0;
-                  Continue := False;
-                  Free     := True;
-         end select;
-      end loop;
-      if Free then
-         Trash.Throw_Away (Self);
-      end if;
-   end Killer_Task_Type;
-
+   ----------
+   -- Cursor cache.
 
    protected body Cursors is
 
       procedure Put (Cursor : in not null Cursor_Ref_Type)
       is
-         pragma Precondition (Cursor.Released);
-         use type Maps.Cursor;
-         C : constant Maps.Cursor := Maps.Find (Map, Cursor.URL_Path);
+         pragma Precondition (not Cursor.Released);
       begin
-         if C /= Maps.No_Element then
-            declare
-               procedure Append_Cursor
-                 (Key   : in     Unbounded_String;
-                  Value : in out Vectors.Vector)
-               is
-                  pragma Unreferenced (Key);
-               begin
-                  Vectors.Append (Value, Cursor);
-               end Append_Cursor;
-            begin
-               Maps.Update_Element (Map, C, Append_Cursor'Access);
-            end;
-         else
-            declare
-               V : constant Vectors.Vector := Vectors.To_Vector (Cursor, 1);
-            begin
-               Maps.Insert (Map, Cursor.URL_Path, V);
-            end;
-         end if;
+         Cursor.Released  := True;
+         Cursor.Last_Used := Ada.Calendar.Clock;
+         Multisets.Insert (Map, Cursor);
       end Put;
 
 
@@ -77,114 +33,282 @@ package body REST.Maps.Cursors is
          Offset   : in  Natural;
          Cursor   : out Cursor_Ref_Type)
       is
-         procedure Extract_Cursor
-           (Key   : in     Unbounded_String;
-            Value : in out Vectors.Vector)
-         is
-            pragma Unreferenced (Key);
-            use type Vectors.Cursor;
-            C : Vectors.Cursor := Vectors.First (Value);
-         begin
-            while C /= Vectors.No_Element loop
-               exit when Vectors.Element (C).Offset = Offset;
-               Vectors.Next (C);
-            end loop;
-            if C /= Vectors.No_Element then
-               Cursor := Vectors.Element (C);
-               Vectors.Delete (Value, C);
-            else
-               Cursor := null;
-            end if;
-         end Extract_Cursor;
-
-         use type Maps.Cursor;
-         C : constant Maps.Cursor := Maps.Find (Map, URL_Path);
+         procedure Free is new Ada.Unchecked_Deallocation
+           (Cursor_Type, Cursor_Ref_Type);
+         use type Multisets.Cursor;
+         Needle : Cursor_Ref_Type;
+         C      : Multisets.Cursor;
       begin
-         if C /= Maps.No_Element then
-            Maps.Update_Element (Map, C, Extract_Cursor'Access);
+         Needle := new Cursor_Type'(Search_Only => True,
+                                    URL_Path    => URL_Path,
+                                    Offset      => Offset,
+                                    others      => <>);
+         C := Multisets.Find (Map, Needle);
+         Free (Needle);
+         if C /= Multisets.No_Element then
+            Cursor := Multisets.Element (C);
+            Cursor.Released := False;
+            Multisets.Delete (Map, C);
          else
             Cursor := null;
          end if;
+      exception
+         when others =>
+            Free (Needle);
+            raise;
       end Get;
 
 
-      procedure Kill (Cursor : in out Cursor_Ref_Type; Success : out Boolean) is
-      begin
-         Get (Cursor.URL_Path, Cursor.Offset, Cursor);
-         if Cursor /= null then
-            Finalize (Cursor);
-            Success := True;
-         else
-            Success := False;
-         end if;
-      end Kill;
-
-
-      procedure Kill_All
+      procedure Clean
       is
-         procedure Visit (C : Maps.Cursor)
-         is
-            procedure Finalize (C : Vectors.Cursor)
-            is
-               Ptr : Cursor_Ref_Type := Vectors.Element (C);
-            begin
-               Free (Ptr);
-            end Finalize;
+         package Vectors is new Ada.Containers.Vectors
+           (Positive, Cursor_Ref_Type);
+
+         function Too_Old (Cursor : not null Cursor_Ref_Type) return Boolean is
+            use type Ada.Calendar.Time;
          begin
-            Vectors.Iterate (Maps.Element (C), Finalize'Access);
-         end Visit;
+            return Ada.Calendar.Clock - Cursor.Last_Used > Timeout;
+         end Too_Old;
+
+         Delete : Vectors.Vector;
       begin
-         Maps.Iterate (Map, Visit'Access);
-      end Kill_All;
+         declare
+            use type Multisets.Cursor;
+            Cursor : Cursor_Ref_Type;
+            C      : Multisets.Cursor := Multisets.First (Map);
+         begin
+            while C /= Multisets.No_Element loop
+               Cursor := Multisets.Element (C);
+               pragma Assert (Cursor.Released);
+               if Too_Old (Cursor) then
+                  Vectors.Append (Delete, Cursor);
+               end if;
+              C := Multisets.Next (C);
+            end loop;
+         end;
+
+         if Vectors.Is_Empty (Delete) then
+            Log.Info ("Clean didn't find any old cursors");
+         end if;
+
+         declare
+            use type Vectors.Cursor;
+            Cursor : Cursor_Ref_Type;
+            C      : Vectors.Cursor := Vectors.First (Delete);
+         begin
+            while C /= Vectors.No_Element loop
+               Cursor := Vectors.Element (C);
+               Log.Info ("Finalized cursor for URL "&
+                         To_String (Cursor.URL_Path) &" with offset"&
+                         Natural'Image (Cursor.Offset));
+               Multisets.Delete (Map, Cursor);
+               Finalize (Cursor);
+               Vectors.Next (C);
+            end loop;
+         end;
+      end Clean;
 
    end Cursors;
 
 
-   protected body Trash is
+   ----------
+   -- Cleaner task
 
-      function Is_Full return Boolean
-      is
-         Full : Boolean := False;
-      begin
-         for I in Cursors'Range loop
-            Full := Full and Cursors (I) /= null;
-         end loop;
-         return Full;
-      end Is_Full;
+   task Clean_Task;
 
-
-      entry Throw_Away (Cursor : in not null Cursor_Ref_Type)
-         when not Is_Full is
-      begin
-         for I in Cursors'Range loop
-            if Cursors (I) = null then
-               Cursors (I) := Cursor;
-               exit;
-            end if;
-         end loop;
-      end Throw_Away;
-
-
-      entry Empty when Is_Full is
-      begin
-         for I in 1 .. Cursors'Last loop
-            if Cursors (I) /= null and then Cursors (I).Killer'Terminated then
-               Free (Cursors (I));
-            end if;
-         end loop;
-      end Empty;
-
-   end Trash;
-
-
-   task body Cleaner_Task is
+   task body Clean_Task is
    begin
       loop
-         Trash.Empty;
-         Log.Info ("Emptied trash");
+         delay Timeout;
+         Cursors.Clean;
       end loop;
-   end Cleaner_Task;
+   end Clean_Task;
 
+
+   ----------
+   -- Cursor operations.
+
+   function New_Cursor
+     (Map               : not null DB.Maps.Map_Ref_Type;
+      URL_Path          : Unbounded_String;
+      Offset            : Natural;
+      Lower             : DB.Maps.Bound_Type;
+      Upper             : DB.Maps.Bound_Type;
+      Has_Column_Regexp : Boolean;
+      Column_Regexp     : String)
+      return Cursor_Ref_Type
+   is
+      function Regexp return DB.Utils.Regexps.Regexp_Type is
+      begin
+         if Has_Column_Regexp then
+            return DB.Utils.Regexps.Cache.Compile (Column_Regexp);
+         else
+            return DB.Utils.Regexps.Empty_Regexp;
+         end if;
+      end Regexp;
+
+      Cursor : Cursor_Ref_Type;
+   begin
+      Cursors.Get (URL_Path, Offset, Cursor);
+      if Cursor /= null then
+         pragma Assert (not Cursor.Released);
+         Log.Info ("Reusing cached cursor for URL "&
+                   To_String (Cursor.URL_Path) &" with offset"&
+                   Natural'Image (Cursor.Offset));
+         return Cursor;
+      else
+         Cursor := new Cursor_Type'
+           (Search_Only       => False,
+            URL_Path          => URL_Path,
+            Cursor            => Map.New_Cursor_Ref
+                                 (Thread_Safe   => False,
+                                  Lower_Bound   => Lower,
+                                  Upper_Bound   => Upper,
+                                  Column_Regexp => Column_Regexp),
+            Offset            => 0,
+            Has_Column_Regexp => Has_Column_Regexp,
+            Column_Regexp     => Regexp,
+            Reuse_Last        => False,
+            Has_Last          => False,
+            Last_Key          => DB.Types.Keys.Null_Key,
+            Last_Value        => DB.Types.Values.Nothing_Value,
+            Last_Used         => <>,
+            Released          => False);
+         Log.Info ("Created new cursor for URL "&
+                   To_String (Cursor.URL_Path) &" with offset"&
+                   Natural'Image (Cursor.Offset) &", still has to "&
+                   "be moved to offset");
+         for I in 1 .. Offset loop
+            declare
+               EOF : Boolean;
+            begin
+               Next (Cursor, null, EOF);
+               exit when EOF;
+            end;
+         end loop;
+         return Cursor;
+      end if;
+   end New_Cursor;
+
+
+   procedure Release (Cursor : in not null Cursor_Ref_Type) is
+   begin
+      Cursors.Put (Cursor);
+      Log.Info ("Released cursor for URL "&
+                To_String (Cursor.URL_Path) &" with offset"&
+                Natural'Image (Cursor.Offset));
+   exception
+      when E : others =>
+         Log.Error (E);
+         raise;
+   end Release;
+
+
+   procedure Next
+     (Cursor  : in out Cursor_Ref_Type;
+      Process : access procedure
+                        (Key   : in DB.Types.Keys.Key_Type;
+                         Value : in DB.Types.Values.Value_Type);
+      EOF     :    out Boolean)
+   is
+      use type DB.Maps.State_Type;
+      use type DB.Types.Keys.Rows.String_Type;
+      use type DB.Types.Keys.Columns.String_Type;
+
+      procedure Next_Pair
+        (Key     : out DB.Types.Keys.Key_Type;
+         Value   : out DB.Types.Values.Value_Type;
+         EOF     : out Boolean) is
+      begin
+         if Cursor.Reuse_Last then
+            Cursor.Reuse_Last := False;
+            Cursor.Has_Last   := False;
+            Key               := Cursor.Last_Key;
+            Value             := Cursor.Last_Value;
+            EOF               := False;
+         else
+            declare
+               use type DB.Maps.State_Type;
+               State : DB.Maps.State_Type;
+            begin
+               Cursor.Cursor.Next (Key, Value, State);
+               EOF := State /= DB.Maps.Success;
+            end;
+         end if;
+      end Next_Pair;
+
+      Key   : DB.Types.Keys.Key_Type;
+      Value : DB.Types.Values.Value_Type;
+   begin
+      loop
+         <<Next_Iteration>>
+         Next_Pair (Key, Value, EOF);
+         exit when EOF;
+
+         if Cursor.Has_Last and then
+            Cursor.Last_Key.Row = Key.Row and then
+            Cursor.Last_Key.Column = Key.Column
+         then
+            goto Next_Iteration;
+            -- We only take the most up-to-date version of each column.
+         end if;
+
+         Cursor.Reuse_Last := Cursor.Has_Last and then
+                              Key.Row /= Cursor.Last_Key.Row;
+         Cursor.Has_Last   := True;
+         Cursor.Last_Key   := Key;
+         Cursor.Last_Value := Value;
+         exit when Cursor.Reuse_Last;
+         -- Break after one object.
+
+         if Process /= null then
+            Process (Key, Value);
+         end if;
+      end loop;
+
+      if EOF then
+         Finalize (Cursor);
+      else
+         Cursor.Offset := Cursor.Offset + 1;
+      end if;
+   end Next;
+
+
+   procedure Increment_Offset
+     (Cursor : in not null Cursor_Ref_Type) is
+   begin
+      Cursor.Offset := Cursor.Offset + 1;
+   end Increment_Offset;
+
+
+   procedure Push_Back
+     (Cursor : in not null Cursor_Ref_Type;
+      Key    : in          DB.Types.Keys.Key_Type;
+      Value  : in          DB.Types.Values.Value_Type)
+   is
+      pragma Precondition (not Cursor.Has_Last);
+   begin
+      Cursor.Has_Last   := True;
+      Cursor.Last_Key   := Key;
+      Cursor.Last_Value := Value;
+   end Push_Back;
+
+
+   procedure Finalize (Cursor : in out Cursor_Ref_Type)
+   is
+      use type DB.Maps.Cursor_Ref_Type;
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Cursor_Type, Cursor_Ref_Type);
+   begin
+      if Cursor.Cursor /= null then
+         Cursor.Cursor.Finalize;
+      end if;
+      Free (Cursor);
+   end Finalize;
+
+
+   ----------
+   -- Utility functions.
 
    function Bound
      (Row       : String;
@@ -232,103 +356,22 @@ package body REST.Maps.Cursors is
    end Bound;
 
 
-   function New_Cursor
-     (Map           : not null DB.Maps.Map_Ref_Type;
-      URL_Path      : Unbounded_String;
-      Offset        : Natural;
-      Lower         : DB.Maps.Bound_Type;
-      Upper         : DB.Maps.Bound_Type;
-      Column_Regexp : String)
-      return Cursor_Ref_Type
-   is
-      Cursor : Cursor_Ref_Type;
+   function Less (A, B : Cursor_Ref_Type) return Boolean is
    begin
-      Cursors.Get (URL_Path, Offset, Cursor);
-      if Cursor /= null then
-         pragma Assert (not Cursor.Released);
-         Cursor.Released := False;
-         return Cursor;
+      return A.URL_Path < B.URL_Path or else
+            (A.URL_Path = B.URL_Path and then A.Offset < B.Offset);
+   end Less;
+
+
+   function Equal (A, B : Cursor_Ref_Type) return Boolean is
+   begin
+      if A.Search_Only or B.Search_Only then
+         return A = B or else
+               (A.URL_Path = B.URL_Path and then A.Offset = B.Offset);
       else
-         Cursor := new Cursor_Type'
-           (URL_Path      => URL_Path,
-            Cursor        => Map.New_Cursor_Ref
-                              (Thread_Safe   => False,
-                               Lower_Bound   => Lower,
-                               Upper_Bound   => Upper,
-                               Column_Regexp => Column_Regexp),
-            Offset        => 0,
-            Column_Regexp => DB.Utils.Regexps.Cache.Compile (Column_Regexp),
-            Has_Last      => False,
-            Last_Key      => DB.Types.Keys.Null_Key,
-            Last_Value    => DB.Types.Values.Nothing_Value,
-            Released      => False,
-            Killer        => <>);
-         Cursor.Killer.Start (Cursor);
-         return Cursor;
+         return A = B;
       end if;
-   end New_Cursor;
-
-
-   procedure Release_Cursor (Cursor : in not null Cursor_Ref_Type) is
-   begin
-      Cursor.Released := True;
-      Cursors.Put (Cursor);
-   end Release_Cursor;
-
-
-   procedure Next
-     (Cursor  : in out Cursor_Ref_Type;
-      Key     :    out DB.Types.Keys.Key_Type;
-      Value   :    out DB.Types.Values.Value_Type;
-      Success :    out Boolean) is
-   begin
-      if Cursor.Has_Last then
-         Cursor.Has_Last := False;
-         Cursor.Offset   := Cursor.Offset + 1;
-         Key             := Cursor.Last_Key;
-         Value           := Cursor.Last_Value;
-         Success         := True;
-      else
-         declare
-            use type DB.Maps.State_Type;
-            State : DB.Maps.State_Type;
-         begin
-            Cursor.Cursor.Next (Key, Value, State);
-            Success := State = DB.Maps.Success;
-            if Success then
-               Cursor.Offset := Cursor.Offset + 1;
-            else
-               Finalize (Cursor);
-            end if;
-         end;
-      end if;
-   end Next;
-
-
-   procedure Push_Back
-     (Cursor : in not null Cursor_Ref_Type;
-      Key    : in          DB.Types.Keys.Key_Type;
-      Value  : in          DB.Types.Values.Value_Type)
-   is
-      pragma Precondition (not Cursor.Has_Last);
-   begin
-      Cursor.Has_Last   := True;
-      Cursor.Last_Key   := Key;
-      Cursor.Last_Value := Value;
-      Cursor.Offset     := Cursor.Offset - 1;
-   end Push_Back;
-
-
-   procedure Finalize (Cursor : in out Cursor_Ref_Type)
-   is
-      pragma Precondition (Cursor.Released);
-      use type DB.Maps.Cursor_Ref_Type;
-   begin
-      if Cursor.Cursor /= null then
-         Cursor.Cursor.Finalize;
-      end if;
-      Free (Cursor);
-   end Finalize;
+   end Equal;
 
 end REST.Maps.Cursors;
 

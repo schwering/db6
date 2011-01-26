@@ -14,12 +14,10 @@ package body REST.Output_Formats is
 
    task body Populator_Type
    is
-      Writer           : Writer_Ref_Type := null;
-      Max_Objects      : Positive;
-      N_Objects        : Natural := 0;
-      Last_Key         : DB.Types.Keys.Key_Type := DB.Types.Keys.Null_Key;
-      Last_Initialized : Boolean := False;
-      Cancelled        : Boolean := False;
+      use type Maps.Cursors.Cursor_Ref_Type;
+      Writer      : Writer_Ref_Type := null;
+      Max_Objects : Positive;
+      Cancelled   : Boolean := False;
    begin
       select
          accept Initialize
@@ -41,61 +39,43 @@ package body REST.Output_Formats is
 
       Writer.Start_Anonymous_Object;
 
-      loop
-         <<Next_Iteration>>
+      for I in 1 .. Max_Objects loop
+         select
+            accept Stop do
+               Log.Info ("Cancelling thread");
+               Cancelled := True;
+               requeue Stop; -- for final Stop
+            end Stop;
+         else
+            null;
+         end select;
+         exit when Cancelled;
+         exit when Queues.Is_Final (Writer.Queue);
+         exit when Writer.Cursor = null; -- Cursor might be null from beginning
+
          declare
-            use type DB.Types.Keys.Rows.String_Type;
-            use type DB.Types.Keys.Columns.String_Type;
-            use type DB.Maps.State_Type;
-            Key   : DB.Types.Keys.Key_Type;
-            Value : DB.Types.Values.Value_Type;
-            State : DB.Maps.State_Type;
+            Object_Initialized : Boolean := False;
+
+            procedure Serialize_Object
+              (Key   : in DB.Types.Keys.Key_Type;
+               Value : in DB.Types.Values.Value_Type) is
+            begin
+               if not Object_Initialized then
+                  Object_Initialized := True;
+                  Writer.Start_Object (DB.Maps.Row_To_String (Key.Row));
+               end if;
+               Writer.Put_Value (DB.Maps.Column_To_String (Key.Column), Value);
+            end Serialize_Object;
+
+            EOF : Boolean;
          begin
-            select
-               accept Stop do
-                  Log.Info ("Cancelling thread");
-                  Cancelled := True;
-                  requeue Stop; -- for final Stop
-               end Stop;
-            else
-               null;
-            end select;
-            exit when Cancelled;
-            exit when N_Objects >= Max_Objects;
-            exit when Queues.Is_Final (Writer.Queue);
-
-            Writer.Cursor.Next (Key, Value, State);
-            exit when State /= DB.Maps.Success;
-
-            if Last_Initialized and then
-               Last_Key.Row = Key.Row and then
-               Last_Key.Column = Key.Column
-            then
-               -- We only take the most up-to-date version of each key.
-               goto Next_Iteration;
-            end if;
-
-            if not Last_Initialized then
-               Writer.Start_Object (DB.Maps.Row_To_String (Key.Row));
-            elsif Last_Key.Row /= Key.Row then
-               N_Objects := N_Objects + 1;
-               exit when N_Objects >= Max_Objects;
+            Maps.Cursors.Next (Writer.Cursor, Serialize_Object'Access, EOF);
+            if Object_Initialized then
                Writer.End_Object;
-               Writer.Start_Object (DB.Maps.Row_To_String (Key.Row));
             end if;
-
-            Writer.Put_Value
-              (DB.Maps.Column_To_String (Key.Column), Value);
-
-            Last_Key         := Key;
-            Last_Initialized := True;
+            exit when EOF;
          end;
       end loop;
-
-      if Last_Initialized then
-         -- Finish last object.
-         Writer.End_Object;
-      end if;
 
       Writer.End_Object;
       Queues.Mark_Final (Writer.Queue);
@@ -111,18 +91,24 @@ package body REST.Output_Formats is
 
 
    procedure Initialize_Writer
-     (Writer        : in Writer_Ref_Type;
-      Cursor        : in DB.Maps.Cursor_Ref_Type;
-      Free_On_Close : in Boolean;
-      Max_Objects   : in Natural) is
+     (Writer            : in Writer_Ref_Type;
+      Map               : in REST.Maps.Map_Ref_Type;
+      URL_Path          : in Ada.Strings.Unbounded.Unbounded_String;
+      Offset            : in Natural;
+      Lower_Bound       : in DB.Maps.Bound_Type;
+      Upper_Bound       : in DB.Maps.Bound_Type;
+      Has_Column_Regexp : in Boolean;
+      Column_Regexp     : in String;
+      Max_Objects       : in Natural) is
    begin
       if Writer.Initialized then
          raise Stream_Error;
       end if;
-      Writer.Initialized   := True;
-      Writer.Cursor        := Cursor;
-      Writer.Self          := Writer;
-      Writer.Free_On_Close := Free_On_Close;
+      Writer.Initialized := True;
+      Writer.Self := Writer;
+      Writer.Cursor := Maps.Cursors.New_Cursor
+         (Map, URL_Path, Offset, Lower_Bound, Upper_Bound,
+          Has_Column_Regexp, Column_Regexp);
       Writer.Populator.Initialize (Writer, Max_Objects);
    end Initialize_Writer;
 
@@ -157,10 +143,12 @@ package body REST.Output_Formats is
    end Read;
 
 
-   procedure Close (Resource : in out Writer_Type) is
+   procedure Close (Resource : in out Writer_Type)
+   is
+      use type Maps.Cursors.Cursor_Ref_Type;
    begin
-      Log.Info ("Closing stream (queue final = "&
-        Queues.Is_Final (Resource.Queue)'Img &")");
+      --Log.Info ("Closing stream (queue final = "&
+        --Queues.Is_Final (Resource.Queue)'Img &")");
       -- How should the server be stopped if he is trying to Enqueue something
       -- and the queue is full? We would either have to abort or have a timeout
       -- in the enqueue statement. The latter sucks because the vast majority
@@ -168,14 +156,13 @@ package body REST.Output_Formats is
       -- overhead.
       Resource.Populator.Stop;
       Queues.Mark_Final (Resource.Queue);
-      if Resource.Free_On_Close then
-         declare
-            procedure Free is new Ada.Unchecked_Deallocation
-              (DB.Maps.Cursor_Type'Class, DB.Maps.Cursor_Ref_Type);
-         begin
-            Free (Resource.Cursor);
-         end;
+      if Resource.Cursor /= null then
+         Maps.Cursors.Release (Resource.Cursor);
       end if;
+   exception
+      when E : others =>
+         Log.Error (E);
+         raise;
    end Close;
 
 
