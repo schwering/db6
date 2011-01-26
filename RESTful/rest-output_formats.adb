@@ -4,8 +4,6 @@
 --
 -- Copyright 2010--2011 Christoph Schwering
 
-with Ada.Unchecked_Deallocation;
-
 with DB.Types.Keys;
 
 with REST.Log;

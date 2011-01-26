@@ -211,7 +211,6 @@ package body REST.Maps.Cursors is
                          Value : in DB.Types.Values.Value_Type);
       EOF     :    out Boolean)
    is
-      use type DB.Maps.State_Type;
       use type DB.Types.Keys.Rows.String_Type;
       use type DB.Types.Keys.Columns.String_Type;
 

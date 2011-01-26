@@ -6,8 +6,6 @@
 
 with Ada.Characters.Handling;
 
-with DB.Types.Values;
-
 package body REST.Output_Formats.JSON is
 
    function Content_Type (Writer : Writer_Type) return String
