@@ -24,5 +24,17 @@ package body REST is
       end if;
    end Make_Key;
 
+
+   function Img (N : Integer) return String
+   is
+      S : constant String := Integer'Image (N);
+   begin
+      if S (S'First) = ' ' then
+         return S (S'First + 1 .. S'Last);
+      else
+         return S;
+      end if;
+   end Img;
+
 end REST;
 

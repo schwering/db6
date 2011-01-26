@@ -87,10 +87,6 @@ package body REST.Maps.Cursors is
             end loop;
          end;
 
-         if Vectors.Is_Empty (Delete) then
-            Log.Info ("Clean didn't find any old cursors");
-         end if;
-
          declare
             use type Vectors.Cursor;
             Cursor : Cursor_Ref_Type;

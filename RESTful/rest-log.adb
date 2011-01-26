@@ -36,18 +36,6 @@ package body REST.Log is
    end Now;
 
 
-   function Img (N : Integer) return String
-   is
-      S : constant String := Integer'Image (N);
-   begin
-      if S (S'First) = ' ' then
-         return S (S'First + 1 .. S'Last);
-      else
-         return S;
-      end if;
-   end Img;
-
-
    procedure Log_To_Stdout
      (Msg    : in String;
       Source : in String := GNAT.Source_Info.File;

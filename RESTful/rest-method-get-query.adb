@@ -83,24 +83,19 @@ is
    Incl_1      : constant Boolean := Param (From_Excl_Param) /= Yes_Value;
    Incl_2      : constant Boolean := Param (To_Excl_Param) /= Yes_Value;
    Offset      : constant Natural := Param (Offset_Param, 0);
-   Count       : constant Natural := Param (Count_Param, Natural'Last);
+   Count       : constant Natural := Param (Count_Param, Default_Count);
 
    function Next_URL return Unbounded_String is
    begin
-      if Count = Natural'Last then
+      if Count >= Natural'Last then
          return To_Unbounded_String ("");
       else
          declare
             Next_URL   : AWS.URL.Object := URL;
             Parameters : AWS.Parameters.List := AWS.URL.Parameters (URL);
-            Offset_Str : constant String := Natural'Image (Offset + Count);
-            First      : Positive := Offset_Str'First;
+            Offset_Str : constant String := Img (Offset + Count);
          begin
-            while Offset_Str (First) = ' ' loop
-               First := First + 1;
-            end loop;
-            AWS.Parameters.Set.Update
-              (Parameters, Offset_Param, Offset_Str (First .. Offset_Str'Last));
+            AWS.Parameters.Set.Update (Parameters, Offset_Param, Offset_Str);
             AWS.URL.Set.Parameters (Next_URL, Parameters);
             return To_Unbounded_String (AWS.URL.URL (Next_URL));
          end;

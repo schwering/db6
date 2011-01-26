@@ -19,13 +19,18 @@ package REST is
    From_Excl_Param : constant String := "excl1";
    To_Excl_Param   : constant String := "excl2";
    Yes_Value       : constant String := "y";
+
    Infinity_Row    : constant String := "_inf";
-   Next_URL_Key    : constant String := "_next";
+   Next_URL_Key    : constant String := "_succ";
+
+   Default_Count   : constant Positive := 5;
 
    function Make_Key
      (Key : String;
       Max : Boolean := False)
       return DB.Types.Keys.Key_Type;
+
+   function Img (N : Integer) return String;
 
 end REST;
 
