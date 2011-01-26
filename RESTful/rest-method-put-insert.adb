@@ -16,6 +16,7 @@ with AWS.URL;
 with DB.Maps;
 with DB.Types.Keys;
 with DB.Types.Values;
+with DB.Types.Times;
 
 with REST.Input_Formats;
 with REST.Log;
@@ -57,6 +58,7 @@ begin
    declare
       use type DB.Maps.State_Type;
 
+      Time  : constant DB.Types.Times.Time_Type := DB.Types.Times.Now; 
       Map   : constant Maps.Map_Ref_Type := Maps.Map_By_Name (Map_Name);
       State : DB.Maps.State_Type;
 
@@ -201,7 +203,7 @@ begin
          end if;
          declare
             Key : constant DB.Types.Keys.Key_Type :=
-              DB.Maps.Strings_To_Key (Handler.Row.all, Handler.Column.all);
+              Make_Key (Handler.Row.all, Handler.Column.all, Time);
          begin
             Map.Append (Key, Val, State);
             if State /= DB.Maps.Success then
@@ -222,7 +224,7 @@ begin
          declare
             Col : String renames Key;
             Key : constant DB.Types.Keys.Key_Type :=
-              DB.Maps.Strings_To_Key (Handler.Row.all, Col);
+              Make_Key (Handler.Row.all, Col, Time);
          begin
             Map.Replace (Key, Val, State);
             if State /= DB.Maps.Success then

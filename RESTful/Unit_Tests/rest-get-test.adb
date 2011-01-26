@@ -18,6 +18,7 @@ with AWS.Server;
 with DB.Maps;
 with DB.Types.Keys;
 with DB.Types.Values;
+with DB.Types.Times;
 
 with REST.Method;
 with REST.Maps.Test_Utils; use REST.Maps.Test_Utils;
@@ -46,8 +47,9 @@ package body REST.Get.Test is
          declare
             use DB.Types.Values;
             use type DB.Maps.State_Type;
+            Time  : constant DB.Types.Times.Time_Type := DB.Types.Times.Now; 
             Key   : constant DB.Types.Keys.Key_Type := 
-               DB.Maps.Strings_To_Key (TS (KVs (I).Row), TS (KVs (I).Column));
+               Make_Key (TS (KVs (I).Row), TS (KVs (I).Column), Time);
             Val   : constant String := TS (KVs (I).Value);
             State : DB.Maps.State_Type;
          begin
@@ -79,9 +81,11 @@ package body REST.Get.Test is
                   Map.Insert (Key, Nothing_Value, State);
                when others =>
                   Assert (False, "Value '"& Val &"' invalid");
+                  State := DB.Maps.Failure;
             end case;
             Assert (State = DB.Maps.Success,
-                    "Insertion of "& TS (KVs (I).Row) &" / "&
+                    "Insertion of "&
+                    TS (KVs (I).Row) &" / "&
                     TS (KVs (I).Column) &" / "&
                     TS (KVs (I).Value) &" failed");
          end;
@@ -153,7 +157,8 @@ package body REST.Get.Test is
       declare
          Response : constant AWS.Response.Data :=
             AWS.Client.Get
-              (URL (Table, "*", Row_1, Row_2, Excl_1, Excl_2, Count));
+              (URL (Table, Everything_Regexp,
+                    Row_1, Row_2, Excl_1, Excl_2, Count));
          Data : constant String := AWS.Response.Message_Body (Response);
          Last_Row             : Unbounded_String;
          Last_Row_Initialized : Boolean := False;
@@ -182,7 +187,8 @@ package body REST.Get.Test is
                           JSON_Contains (Data, Row, Col, Val),
                           "Body doesn't contain "& Row &" / "& Col &" / "&
                           Val &"("& Row_Count'Img &")"& ASCII.LF &
-                          URL (Table, "*", Row_1, Row_2, Excl_1, Excl_2, Count)
+                          URL (Table, Everything_Regexp, Row_1, Row_2,
+                               Excl_1, Excl_2, Count)
                           & ASCII.LF & Data);
                end;
             end if;

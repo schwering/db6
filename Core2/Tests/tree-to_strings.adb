@@ -16,9 +16,9 @@ package body Tree.To_Strings is
    end To_String;
 
 
-   function To_String (Time : DB.Types.Times.Number_Type) return String is
+   function To_String (Time : DB.Types.Times.Time_Type) return String is
    begin
-      return DB.Types.Times.Number_Type'Image(Time);
+      return DB.Types.Times.Time_Type'Image(Time);
    end To_String;
 
 

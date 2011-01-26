@@ -8,7 +8,7 @@ package body DB.Types.Keys is
 
    function Null_Key return Key_Type is
    begin
-      return (Rows.Empty_String, Columns.Empty_String, Times.Number_Type'Last);
+      return (Rows.Empty_String, Columns.Empty_String, Times.Time_Type'Last);
    end Null_Key;
 
 
@@ -18,7 +18,9 @@ package body DB.Types.Keys is
    renames Rows."=";
 
 
-   function "<" (Left, Right : Key_Type) return Boolean is
+   function "<" (Left, Right : Key_Type) return Boolean
+   is
+      use type Times.Time_Type;
    begin
       if Left.Row < Right.Row then
          return True;
@@ -34,7 +36,9 @@ package body DB.Types.Keys is
    end "<";
 
 
-   function "<=" (Left, Right : Key_Type) return Boolean is
+   function "<=" (Left, Right : Key_Type) return Boolean
+   is
+      use type Times.Time_Type;
    begin
       if Left.Row < Right.Row then
          return True;
@@ -55,7 +59,7 @@ package body DB.Types.Keys is
       pragma Warnings (Off);
       use type Rows.String_Type;
       use type Columns.String_Type;
-      use type Times.Number_Type;
+      use type Times.Time_Type;
       pragma Warnings (On);
    begin
       return Left.Row = Right.Row and then
@@ -77,7 +81,7 @@ package body DB.Types.Keys is
       if C /= Utils.Equal then
          return C;
       end if;
-      C := Times.Compare (Left.Time, Right.Time);
+      C := Time_Serialization.Compare (Left.Time, Right.Time);
       case C is
          when Utils.Less    => return Utils.Greater;
          when Utils.Equal   => return Utils.Equal;
@@ -90,7 +94,7 @@ package body DB.Types.Keys is
    begin
       return Read_Context_Type'(Row_Serialization.New_Read_Context,
                                 Column_Serialization.New_Read_Context,
-                                Times.New_Read_Context);
+                                Time_Serialization.New_Read_Context);
    end New_Read_Context;
 
 
@@ -98,7 +102,7 @@ package body DB.Types.Keys is
    begin
       return Write_Context_Type'(Row_Serialization.New_Write_Context,
                                  Column_Serialization.New_Write_Context,
-                                 Times.New_Write_Context);
+                                 Time_Serialization.New_Write_Context);
    end New_Write_Context;
 
 
@@ -108,7 +112,7 @@ package body DB.Types.Keys is
    begin
       return Row_Serialization.Size_Bound (Key.Row) +
              Column_Serialization.Size_Bound (Key.Column) +
-             Times.Size_Bound (Key.Time);
+             Time_Serialization.Size_Bound (Key.Time);
    end Size_Bound;
 
 
@@ -121,7 +125,7 @@ package body DB.Types.Keys is
       Row_Serialization.Write (Context.Row_Context, Block, Cursor, Key.Row);
       Column_Serialization.Write (Context.Column_Context, Block, Cursor,
                                   Key.Column);
-      Times.Write (Context.Time_Context, Block, Cursor, Key.Time);
+      Time_Serialization.Write (Context.Time_Context, Block, Cursor, Key.Time);
    end Write;
 
 
@@ -134,7 +138,7 @@ package body DB.Types.Keys is
       Row_Serialization.Read (Context.Row_Context, Block, Cursor, Key.Row);
       Column_Serialization.Read (Context.Column_Context, Block, Cursor,
                                  Key.Column);
-      Times.Read (Context.Time_Context, Block, Cursor, Key.Time);
+      Time_Serialization.Read (Context.Time_Context, Block, Cursor, Key.Time);
    end Read;
 
 
@@ -148,7 +152,7 @@ package body DB.Types.Keys is
       Read (Context, Block, Cursor, Key);
       --Row_Serialization.Skip (Context.Row_Context, Block, Cursor);
       --Column_Serialization.Skip (Context.Column_Context, Block, Cursor);
-      --Times.Skip (Context.Time_Context, Block, Cursor);
+      --Time_Serialization.Skip (Context.Time_Context, Block, Cursor);
    end Skip;
 
 
@@ -188,7 +192,7 @@ package body DB.Types.Keys is
    begin
       return "('"& String (Rows.To_Buffer (Key.Row)) &"', "&
               "'"& String (Columns.To_Buffer (Key.Column)) &"', "&
-                   Times.Number_Type'Image (Key.Time) &")";
+                   Times.Time_Type'Image (Key.Time) &")";
    end Image;
 
 end DB.Types.Keys;

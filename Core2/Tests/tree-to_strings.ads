@@ -19,7 +19,7 @@ package Tree.To_Strings is
    function To_String (S : DB.Types.Strings.Unbounded.String_Type)
       return String;
 
-   function To_String (Time : DB.Types.Times.Number_Type)
+   function To_String (Time : DB.Types.Times.Time_Type)
       return String;
 
    function To_String (Key : DB.Types.Keys.Key_Type)

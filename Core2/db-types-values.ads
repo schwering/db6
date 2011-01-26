@@ -16,7 +16,7 @@ with DB.Types.Strings.Bounded;
 with DB.Types.Strings.Unbounded;
 
 package DB.Types.Values is
-   pragma Preelaborate;
+   pragma Elaborate_Body;
 
    package Bounded_Strings_Serialization
    renames Strings.Bounded.Uncompressed;

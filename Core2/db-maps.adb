@@ -108,46 +108,5 @@ package body DB.Maps is
                          Key        => Key);
    end New_Bound;
 
-
-   function Row_To_String (Row : Keys.Rows.String_Type) return String is
-   begin
-      return String (DB.Types.Keys.Rows.To_Buffer (Row));
-   end Row_To_String;
-
-
-   function Column_To_String
-     (Column : Keys.Columns.String_Type)
-      return String is
-   begin
-      return String (DB.Types.Keys.Columns.To_Buffer (Column));
-   end Column_To_String;
-
-
-   function String_To_Row (S : String) return Keys.Rows.String_Type is
-   begin
-      return DB.Types.Keys.Rows.New_String
-        (Keys.Rows.Indefinite_Buffer_Type (S));
-   end String_To_Row;
-
-
-   function String_To_Column (S : String) return Keys.Columns.String_Type is
-   begin
-      return DB.Types.Keys.Columns.New_String
-         (Keys.Columns.Indefinite_Buffer_Type (S));
-   end String_To_Column;
-
-
-   function Strings_To_Key (Row : String; Column : String) return Keys.Key_Type
-   is
-      function now return Interfaces.C.int;
-      pragma Import (C, now, "db_maps_now");
-
-      Seconds : constant Interfaces.C.int := now;
-   begin
-      return (String_To_Row (Row),
-              String_To_Column (Column),
-              Keys.Times.Number_Type (Seconds));
-   end Strings_To_Key;
-
 end DB.Maps;
 

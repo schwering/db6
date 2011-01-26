@@ -5,6 +5,7 @@
 -- Copyright 2010--2011 Christoph Schwering
 
 with DB.Types.Keys;
+with DB.Types.Times;
 
 package REST is
 
@@ -31,7 +32,12 @@ package REST is
    Certificate_Filename : constant String := "SSL/aws.pem";
 
    function Make_Key
-     (Key : String;
+     (Row, Column : String;
+      Time        : DB.Types.Times.Time_Type)
+      return DB.Types.Keys.Key_Type;
+
+   function Make_Key
+     (Row : String;
       Max : Boolean := False)
       return DB.Types.Keys.Key_Type;
 

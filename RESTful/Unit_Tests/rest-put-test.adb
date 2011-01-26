@@ -20,6 +20,7 @@ with AWS.Server;
 with DB.Maps;
 with DB.Types.Keys;
 with DB.Types.Values;
+with DB.Types.Times;
 
 with REST.Maps.Test_Utils; use REST.Maps.Test_Utils;
 
@@ -142,9 +143,11 @@ package body REST.Put.Test is
          for I in Key_Values'Range loop
             declare
                use type DB.Maps.State_Type;
-               Key : constant DB.Types.Keys.Key_Type :=
-                  DB.Maps.Strings_To_Key (TS (Key_Values (I).Row),
-                                          TS (Key_Values (I).Column));
+               Time  : constant DB.Types.Times.Time_Type := DB.Types.Times.Now; 
+               Key   : constant DB.Types.Keys.Key_Type :=
+                  Make_Key (TS (Key_Values (I).Row),
+                            TS (Key_Values (I).Column),
+                            Time);
                Value : DB.Types.Values.Value_Type;
                State : DB.Maps.State_Type;
             begin

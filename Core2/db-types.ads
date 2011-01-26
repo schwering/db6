@@ -6,8 +6,5 @@
 
 package DB.Types is
    pragma Pure;
-
-   type Time_Type is mod 2**64;
-
 end DB.Types;
 

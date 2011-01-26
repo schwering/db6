@@ -58,14 +58,14 @@ package body REST.Output_Formats is
             Object_Initialized : Boolean := False;
 
             procedure Serialize_Object
-              (Key   : in DB.Types.Keys.Key_Type;
-               Value : in DB.Types.Values.Value_Type) is
+              (Key : in DB.Types.Keys.Key_Type;
+               Val : in DB.Types.Values.Value_Type) is
             begin
                if not Object_Initialized then
                   Object_Initialized := True;
-                  Writer.Start_Object (DB.Maps.Row_To_String (Key.Row));
+                  Writer.Start_Object (DB.Types.Keys.Rows.Image (Key.Row));
                end if;
-               Writer.Put_Value (DB.Maps.Column_To_String (Key.Column), Value);
+               Writer.Put_Value (DB.Types.Keys.Columns.Image (Key.Column), Val);
             end Serialize_Object;
 
             EOF : Boolean;

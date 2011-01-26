@@ -46,13 +46,6 @@ package DB.Maps is
 
    use Types;
 
-   function Row_To_String (Row : Keys.Rows.String_Type) return String;
-   function Column_To_String (Column : Keys.Columns.String_Type) return String;
-   function String_To_Row (S : String) return Keys.Rows.String_Type;
-   function String_To_Column (S : String) return Keys.Columns.String_Type;
-   function Strings_To_Key (Row : String; Column : String) return Keys.Key_Type;
-
-
    ----------
    -- Map initialization operations.
 

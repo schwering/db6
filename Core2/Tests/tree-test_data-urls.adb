@@ -273,7 +273,7 @@ package body Tree.Test_Data.URLs is
       DB.Locks.Mutexes.Lock(Mutex);
       KV.Key.Row := Row_Makers.Make_String(I);
       KV.Key.Column := Column_Makers.Make_String(I*I);
-      KV.Key.Time := DB.Types.Times.Number_Type(I);
+      KV.Key.Time := DB.Types.Times.Time_Type(I);
       KV.Value := Make_Value(I);
       Current_KV := Current_KV + 1;
       DB.Locks.Mutexes.Unlock(Mutex);

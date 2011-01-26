@@ -24,7 +24,7 @@ package body DB.Maps.Bloom.Test is
    begin
       return (Keys.Rows.New_String (Keys.Rows.Indefinite_Buffer_Type (Row)),
               Keys.Columns.New_String (Keys.Rows.Indefinite_Buffer_Type (Col)),
-              Keys.Times.Number_Type (Time));
+              Keys.Times.Time_Type (Time));
    end New_Key;
 
 
@@ -304,7 +304,7 @@ package body DB.Maps.Bloom.Test is
             end if;
          end;
       end loop;
-      Put_Line ("kollision : No_Collision: "&
+      Put_Line ("Collision : No_Collision: "&
                 Collision'Img &" :"& No_Collision'Img);
       Assert (Collision < No_Collision,
               "There are more collisions ("& Collision'Img &") than "&

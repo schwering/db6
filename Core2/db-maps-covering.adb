@@ -528,9 +528,7 @@ package body DB.Maps.Covering is
      (Map   : in out Map_Type;
       Key   : in     Keys.Key_Type;
       Value :    out Values.Value_Type;
-      State :    out State_Type)
-   is
-      C : constant String := Column_To_String (Key.Column);
+      State :    out State_Type) is
    begin
       for I in Map.Slices'Range loop
          if Matches (Key.Column, Map.Slices (I).Guard) then
@@ -580,7 +578,6 @@ package body DB.Maps.Covering is
       Value : in     Values.Value_Type;
       State :    out State_Type)
    is
-      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -605,7 +602,6 @@ package body DB.Maps.Covering is
       Old_Value :    out Values.Value_Type;
       State     :    out State_Type)
    is
-      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -628,7 +624,6 @@ package body DB.Maps.Covering is
       Value : in     Values.Value_Type;
       State :    out State_Type)
    is
-      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -653,7 +648,6 @@ package body DB.Maps.Covering is
       Old_Value :    out Values.Value_Type;
       State     :    out State_Type)
    is
-      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -676,7 +670,6 @@ package body DB.Maps.Covering is
       Value : in     Values.Value_Type;
       State :    out State_Type)
    is
-      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;
@@ -699,7 +692,6 @@ package body DB.Maps.Covering is
       Value :    out Values.Value_Type;
       State :    out State_Type)
    is
-      C       : constant String := Column_To_String (Key.Column);
       Matched : Boolean := False;
    begin
       State := Failure;

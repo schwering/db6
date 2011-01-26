@@ -11,40 +11,41 @@ with DB.Types.Times;
 with DB.Utils;
 
 package DB.Types.Keys is
-   pragma Preelaborate;
+   pragma Elaborate_Body;
 
    package Rows                 renames Strings.Bounded;
    package Columns              renames Strings.Bounded;
    package Times                renames Types.Times;
    package Row_Serialization    renames Rows.Uncompressed;
    package Column_Serialization renames Columns.Uncompressed;
+   package Time_Serialization   renames Types.Times.Serialization;
 
 
    type Key_Type is
       record
          Row    : Rows.String_Type;
          Column : Columns.String_Type;
-         Time   : Times.Number_Type;
+         Time   : Times.Time_Type;
       end record;
 
    type Read_Context_Type is
       record
          Row_Context    : Row_Serialization.Read_Context_Type;
          Column_Context : Column_Serialization.Read_Context_Type;
-         Time_Context   : Times.Read_Context_Type;
+         Time_Context   : Time_Serialization.Read_Context_Type;
       end record;
 
    type Write_Context_Type is
       record
          Row_Context    : Row_Serialization.Write_Context_Type;
          Column_Context : Column_Serialization.Write_Context_Type;
-         Time_Context   : Times.Write_Context_Type;
+         Time_Context   : Time_Serialization.Write_Context_Type;
       end record;
 
    Is_Context_Free_Serialization : constant Boolean :=
       Row_Serialization.Is_Context_Free_Serialization and
       Column_Serialization.Is_Context_Free_Serialization and
-      Times.Is_Context_Free_Serialization;
+      Time_Serialization.Is_Context_Free_Serialization;
 
 
    function Null_Key return Key_Type;

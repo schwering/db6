@@ -154,7 +154,7 @@ package body Tree.Test_Data.Pseudo_Random is
          I : constant Positive :=
             Positive((Current_KV mod Types.Count_Type(Key_Value_Pairs'Length)) + 1);
       begin
-         Key_Value_Pairs(I).Key.Time := DB.Types.Times.Number_Type(Current_KV);
+         Key_Value_Pairs(I).Key.Time := DB.Types.Times.Time_Type(Current_KV);
          Key_Value_Pairs(I).Value := Make_Value(Current_KV);
          Current_KV := Current_KV + 1;
          KV := Key_Value_Pairs(I);
