@@ -63,23 +63,6 @@ package REST.Maps.Cursors is
    -- necessary. Furthermore, in this case the resources held by Cursor are
    -- freed and Cursor is set to null.
 
-   procedure Increment_Offset
-     (Cursor : in not null Cursor_Ref_Type);
-   -- Increments the offset by one.
-   -- The offset will remain together with Cursor will remain after Cursor
-   -- is released for some time, and subsequent New_Cursor queries might return
-   -- Cursor again if the offset (and URL_Path) match.
-
-   procedure Push_Back
-     (Cursor : in not null Cursor_Ref_Type;
-      Key    : in          DB.Types.Keys.Key_Type;
-      Value  : in          DB.Types.Values.Value_Type);
-   -- Pushes back the given Key/Value pair to the cursor.
-   -- No second Push_Back may be issued directly after one; in between, there
-   -- must be one or more Next calls.
-   -- This should be called after Next returned a Key/Value pair which denotes
-   -- the end of processing the cursor for now.
-
 private
    Timeout : constant Duration := 60.0;
 

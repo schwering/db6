@@ -236,8 +236,9 @@ package body REST.Maps.Cursors is
         (DB.Types.Keys.Columns.String_Type, DB.Types.Keys.Columns.First,
          DB.Types.Keys.Columns.Last, DB.Types.Keys.Columns.Element);
 
-      Key   : DB.Types.Keys.Key_Type;
-      Value : DB.Types.Values.Value_Type;
+      Key     : DB.Types.Keys.Key_Type;
+      Value   : DB.Types.Values.Value_Type;
+      Matched : Boolean := False;
    begin
       loop
          <<Next_Iteration>>
@@ -252,7 +253,7 @@ package body REST.Maps.Cursors is
             -- We only take the most up-to-date version of each column.
          end if;
 
-         Cursor.Reuse_Last := Cursor.Has_Last and then
+         Cursor.Reuse_Last := Matched and then Cursor.Has_Last and then
                               Key.Row /= Cursor.Last_Key.Row;
          Cursor.Has_Last   := True;
          Cursor.Last_Key   := Key;
@@ -260,11 +261,13 @@ package body REST.Maps.Cursors is
          exit when Cursor.Reuse_Last;
          -- Break after one object.
 
-         if Process /= null and then
-            (not Cursor.Has_Column_Regexp or else
-             Match (Key.Column, Cursor.Column_Regexp))
+         if not Cursor.Has_Column_Regexp or else
+            Match (Key.Column, Cursor.Column_Regexp)
          then
-            Process (Key, Value);
+            if Process /= null then
+               Process (Key, Value);
+            end if;
+            Matched := True;
          end if;
       end loop;
 
@@ -273,26 +276,6 @@ package body REST.Maps.Cursors is
          Finalize (Cursor);
       end if;
    end Next;
-
-
-   procedure Increment_Offset
-     (Cursor : in not null Cursor_Ref_Type) is
-   begin
-      Cursor.Offset := Cursor.Offset + 1;
-   end Increment_Offset;
-
-
-   procedure Push_Back
-     (Cursor : in not null Cursor_Ref_Type;
-      Key    : in          DB.Types.Keys.Key_Type;
-      Value  : in          DB.Types.Values.Value_Type)
-   is
-      pragma Precondition (not Cursor.Has_Last);
-   begin
-      Cursor.Has_Last   := True;
-      Cursor.Last_Key   := Key;
-      Cursor.Last_Value := Value;
-   end Push_Back;
 
 
    procedure Finalize (Cursor : in out Cursor_Ref_Type)
