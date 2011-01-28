@@ -22,7 +22,7 @@ with REST.Maps;
 with REST.Maps.Cursors;
 with REST.Path_Parsers;
 
-separate (REST.Method.Get)
+separate (REST.Handler.Get)
 procedure Query
    (Request  : in  AWS.Status.Data;
     Response : out AWS.Response.Data;

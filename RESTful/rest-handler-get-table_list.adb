@@ -12,7 +12,7 @@ with AWS.URL;
 
 with REST.Maps;
 
-separate (REST.Method.Get)
+separate (REST.Handler.Get)
 procedure Table_List
    (Request  : in  AWS.Status.Data;
     Response : out AWS.Response.Data;

@@ -23,7 +23,7 @@ with REST.Log;
 with REST.Maps;
 with REST.Path_Parsers;
 
-separate (REST.Method.Put)
+separate (REST.Handler.Put)
 procedure Insert
    (Request  : in  AWS.Status.Data;
     Response : out AWS.Response.Data;

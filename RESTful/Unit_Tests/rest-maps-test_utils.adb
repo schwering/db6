@@ -11,7 +11,7 @@ with Interfaces.C;
 
 with AWS.Net;
 
-with REST.Method;
+with REST.Handler;
 with REST.Handler;
 with REST.Log;
 

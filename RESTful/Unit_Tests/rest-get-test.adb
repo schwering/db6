@@ -20,7 +20,7 @@ with DB.Types.Keys;
 with DB.Types.Values;
 with DB.Types.Times;
 
-with REST.Method;
+with REST.Handler;
 with REST.Maps.Test_Utils; use REST.Maps.Test_Utils;
 
 package body REST.Get.Test is

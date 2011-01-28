@@ -10,7 +10,7 @@ with AWS.Response;
 
 with REST.Log;
 
-function REST.Method.Post (Request : AWS.Status.Data) return AWS.Response.Data
+function REST.Handler.Post (Request : AWS.Status.Data) return AWS.Response.Data
 is
    procedure Debug
      (Request  : in  AWS.Status.Data;
@@ -46,6 +46,6 @@ begin
    return AWS.Response.Build
      (Status_Code  => AWS.Messages.S500,
       Content_Type => "text/plain",
-      Message_Body => "No handler in REST.Method.Post found");
-end REST.Method.Post;
+      Message_Body => "No handler in REST.Handler.Post found");
+end REST.Handler.Post;
 

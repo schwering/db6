@@ -7,5 +7,5 @@
 with AWS.Status;
 with AWS.Response;
 
-function REST.Method.Head (Request : AWS.Status.Data) return AWS.Response.Data;
+function REST.Handler.Head (Request : AWS.Status.Data) return AWS.Response.Data;
 

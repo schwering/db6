@@ -12,7 +12,7 @@ with AWS.URL;
 
 with REST.Path_Parsers;
 
-separate (REST.Method.Get)
+separate (REST.Handler.Get)
 procedure Debug
    (Request  : in  AWS.Status.Data;
     Response : out AWS.Response.Data;
