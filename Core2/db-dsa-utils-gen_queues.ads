@@ -21,12 +21,9 @@ package DB.DSA.Utils.Gen_Queues is
 
    procedure Enqueue
      (Q     : in out Queue_Type;
-      Items : in     Item_Array_Type;
-      Last  :    out Natural);
-   -- Enqueues one or more elements of Items or blocks until enough space for at
-   -- least one element is available. Last is set to the index of the last
-   -- enqueued element. However, it is not guaranteed that all enqueueable
-   -- elements are enqueued.
+      Items : in     Item_Array_Type);
+   -- Enqueues all Items. This might involve multiple operations blocking that
+   -- enqueue sub-arrays of Items.
 
    procedure Dequeue
      (Q       : in out Queue_Type;

@@ -4,9 +4,10 @@
 --
 -- Copyright 2010--2011 Christoph Schwering
 
-with Ada.Containers.Ordered_Maps;
-with Ada.Strings;
-with Ada.Strings.Bounded;
+private with Ada.Containers.Ordered_Maps;
+private with Ada.Strings;
+private with Ada.Strings.Bounded;
+private with Ada.Strings.Unbounded;
 
 with DB.Maps;
 
@@ -19,7 +20,11 @@ package REST.Maps is
 
    function Map_By_Name (Name : String) return Map_Ref_Type;
 
+   function Is_Valid_User (User, Password : String) return Boolean;
+
 private
+   use Ada.Strings.Unbounded;
+
    package Map_Names is new Ada.Strings.Bounded.Generic_Bounded_Length (32);
    subtype Map_Name_Type is Map_Names.Bounded_String;
 

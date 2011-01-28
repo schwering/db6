@@ -95,13 +95,9 @@ package body REST.Output_Formats.BSON is
                      Queues.Item_Array_Type'Component_Size); 
       Buf : Queues.Item_Array_Type (Str'Range);
       for Buf'Address use Str'Address;
-      Last : Natural;
    begin
       pragma Assert (Str'Size = Buf'Size);
-      loop
-         Queues.Enqueue (Resource.Queue, Buf, Last);
-         exit when Last = Buf'Last;
-      end loop;
+      Queues.Enqueue (Resource.Queue, Buf);
    end Emit;
 
 

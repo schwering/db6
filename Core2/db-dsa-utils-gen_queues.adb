@@ -26,14 +26,15 @@ package body DB.DSA.Utils.Gen_Queues is
 
    procedure Enqueue
      (Q     : in out Queue_Type;
-      Items : in     Item_Array_Type;
-      Last  :    out Natural) is
+      Items : in     Item_Array_Type)
+   is
+      Last : Natural := Items'First;
    begin
-      if Items'Length = 0 then
-         Last := Items'Last;
-      else
-         Q.Enqueue (Items, Last);
-      end if;
+      loop
+         Q.Enqueue (Items (Last .. Items'Last), Last);
+         exit when Last = Items'Last;
+         Last := Last + 1;
+      end loop;
    end Enqueue;
 
 
@@ -49,8 +50,16 @@ package body DB.DSA.Utils.Gen_Queues is
    procedure Dequeue
      (Q     : in out Queue_Type;
       Items :    out Item_Array_Type;
-      Last  :    out Natural) is
+      Last  :    out Natural)
+   is
+      --Success : Boolean;
    begin
+      --Last := Items'First - 1;
+      --for I in Items'Range loop
+         --Q.Dequeue (Items (I), Success);
+         --exit when not Success;
+         --Last := I;
+      --end loop;
       if Items'Length = 0 then
          Last := Items'Last;
       else
@@ -103,20 +112,30 @@ package body DB.DSA.Utils.Gen_Queues is
       is
          From   : Index_Type;
          Max_To : Index_Type;
-         Count  : Natural;
+         Length : Natural;
          To     : Index_Type;
       begin
          if Head <= Tail then
             From   := Tail;
             Max_To := Arr'Last;
+            if Head = Arr'First then
+               Max_To := Max_To - 1;
+            end if;
+            -- Avoids the special case in which the complete queue is filled
+            -- at once. In this case, it is always Head = Arr'First.
          else
             From   := Tail;
-            Max_To := Head - 1;
+            Max_To := Head - 2;
+            -- Proof why Max_To >= 0, i.e. valid:
+            -- 1. The queue is not full, this implies Tail + 1 /= Head.
+            -- 2. In this branch, we have 0 <= Tail < Head.
+            -- 3. Facts 1. and 2. together give 0 < Tail + 1 < Head, which
+            --    implies 1 < Head, i.e. Head >= 2, i.e. Head - 2 >= 0.
          end if;
-         Count := Natural'Min (Items'Length, Max_To - From + 1);
-         To    := From + Count - 1;
-         Last  := Items'First + Count - 1;
-         Tail  := Succ (To);
+         Length := Natural'Min (Items'Length, Max_To - From + 1);
+         To     := From + Length - 1;
+         Last   := Items'First + Length - 1;
+         Tail   := Succ (To);
          Arr (From .. To) := Items (Items'First .. Last);
       end Enqueue;
 
@@ -137,10 +156,10 @@ package body DB.DSA.Utils.Gen_Queues is
       entry Dequeue (Items : out Item_Array_Type; Last : out Natural)
          when Final or not Is_Empty
       is
-         From     : Index_Type;
-         Max_To   : Index_Type;
-         Count    : Natural;
-         To       : Index_Type;
+         From   : Index_Type;
+         Max_To : Index_Type;
+         Count  : Natural;
+         To     : Index_Type;
       begin
          if Head <= Tail then
             From   := Head;
@@ -171,12 +190,14 @@ package body DB.DSA.Utils.Gen_Queues is
 
       function Is_Full return Boolean is
       begin
+         pragma Assert ((Head = Succ (Tail)) = (Size = Queue_Size));
          return Head = Succ (Tail);
       end Is_Full;
 
 
       function Is_Empty return Boolean is
       begin
+         pragma Assert ((Head = Tail) = (Size = 0));
          return Head = Tail;
       end Is_Empty;
 
@@ -186,7 +207,8 @@ package body DB.DSA.Utils.Gen_Queues is
          if Head <= Tail then
             return Natural (Tail) - Natural (Head);
          else
-            return Natural (Arr'Last) - Natural (Head) + Natural (Tail);
+            return Natural (Arr'Last) - Natural (Head) + 1 +
+                   Natural (Tail) - Natural (Arr'First);
          end if;
       end Size;
 

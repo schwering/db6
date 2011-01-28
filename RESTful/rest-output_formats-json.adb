@@ -5,6 +5,8 @@
 -- Copyright 2010--2011 Christoph Schwering
 
 with Ada.Characters.Handling;
+with Ada.Unchecked_Conversion;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body REST.Output_Formats.JSON is
 
@@ -22,15 +24,17 @@ package body REST.Output_Formats.JSON is
    is
       pragma Assert (String'Component_Size =
                      Queues.Item_Array_Type'Component_Size); 
-      Buf : Queues.Item_Array_Type (Str'Range);
-      for Buf'Address use Str'Address;
-      Last : Natural;
+      subtype Def_Str_Type is String (Str'Range);
+      subtype Def_Buf_Type is Queues.Item_Array_Type (Str'Range);
+      function Convert is new Ada.Unchecked_Conversion
+        (Def_Str_Type, Def_Buf_Type);
+      Buf  : constant Queues.Item_Array_Type := Convert (Str);
+      Last : Natural := Buf'First;
    begin
       pragma Assert (Str'Size = Buf'Size);
-      loop
-         Queues.Enqueue (Resource.Queue, Buf, Last);
-         exit when Last = Buf'Last;
-      end loop;
+      pragma Assert (Str'First = Buf'First);
+      pragma Assert (Str'Last = Buf'Last);
+      Queues.Enqueue (Resource.Queue, Buf);
    end Emit;
 
 

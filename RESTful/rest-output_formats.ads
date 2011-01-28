@@ -148,7 +148,7 @@ package REST.Output_Formats is
 
 private
    package Queues is new DB.DSA.Utils.Gen_Queues
-     (Queue_Size => 1024,
+     (Queue_Size => 1023,
       Item_Type  => AS.Stream_Element);
 
    task type Populator_Type is

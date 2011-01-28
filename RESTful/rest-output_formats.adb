@@ -4,6 +4,9 @@
 --
 -- Copyright 2010--2011 Christoph Schwering
 
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Unchecked_Conversion;
+
 with DB.Types.Keys;
 
 with REST.Log;
@@ -130,25 +133,28 @@ package body REST.Output_Formats is
       pragma Assert (Buffer'Component_Size =
                      Queues.Item_Array_Type'Component_Size); 
       use type AS.Stream_Element_Offset;
-      Q_Buf : Queues.Item_Array_Type
-        (Natural (Buffer'First) .. Natural (Buffer'Last));
-      for Q_Buf'Address use Buffer'Address;
-      Q_From : Positive := Q_Buf'First;
-      Q_Last : Natural;
+      Q_Buffer : Queues.Item_Array_Type (1 .. Buffer'Length);
+      Q_From   : Positive := Q_Buffer'First;
+      Q_Last   : Natural;
    begin
-      pragma Assert (Buffer'Size = Q_Buf'Size);
+      pragma Assert (Buffer'Size = Q_Buffer'Size);
       if Buffer'Length = 0 then
          Last := Buffer'First - 1;
          return;
       end if;
 
       loop
-         Queues.Dequeue (Resource.Queue, Q_Buf (Q_From .. Q_Buf'Last), Q_Last);
-         exit when Q_Last < Q_From;
+         Queues.Dequeue
+           (Resource.Queue, Q_Buffer (Q_From .. Q_Buffer'Last), Q_Last);
+         exit when Q_Last not in Q_From .. Q_Buffer'Last;
          Q_From := Q_Last + 1;
       end loop;
 
-      Last := AS.Stream_Element_Offset (Q_Last);
+      Last := AS.Stream_Element_Offset
+        (Buffer'First + AS.Stream_Element_Offset (Q_Last - Q_Buffer'First));
+      for I in Buffer'First .. Last loop
+         Buffer (I) := Q_Buffer (Q_Buffer'First + Natural (I - Buffer'First));
+      end loop;
    end Read;
 
 

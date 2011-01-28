@@ -68,5 +68,24 @@ package body REST.Maps is
       return Maps.Element (Name);
    end Map_By_Name;
 
+
+   package User_Maps is new Ada.Containers.Ordered_Maps
+     (Unbounded_String, Unbounded_String);
+
+   Users : User_Maps.Map;
+
+   function Is_Valid_User (User, Password : String) return Boolean
+   is
+      use type User_Maps.Cursor;
+      C : constant User_Maps.Cursor :=
+        User_Maps.Find (Users, To_Unbounded_String (User));
+   begin
+      return C /= User_Maps.No_Element and then
+             To_String (User_Maps.Element (C)) = Password;
+   end Is_Valid_User;
+
+begin
+   User_Maps.Insert
+     (Users, To_Unbounded_String ("chs"), To_Unbounded_String ("bla")); 
 end REST.Maps;
 

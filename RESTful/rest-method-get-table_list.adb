@@ -19,11 +19,25 @@ procedure Table_List
     Success  : out Boolean)
 is
    use Ada.Strings.Unbounded;
+
+   function User_Password (URL : AWS.URL.Object) return String
+   is
+      User     : constant String := AWS.URL.User (URL);
+      Password : constant String := AWS.URL.Password (URL);
+   begin
+      if User = "" and then Password = "" then
+         return "";
+      else
+         return User & ':' & Password & '@';
+      end if;
+   end User_Password;
+
    URL        : constant AWS.URL.Object := AWS.Status.URI (Request);
    P          : constant String := AWS.URL.Pathname (URL);
    URL_Prefix : constant String := AWS.URL.Protocol_Name (URL) &"://"&
-                                   AWS.URL.Host (URL) &":"&
-                                   AWS.URL.Port (URL) &"/";
+                                   User_Password (URL) &
+                                   AWS.URL.Host (URL) &
+                                   AWS.URL.Port_Not_Default (URL) &"/";
    URL_Suffix : constant String := "/"& Everything_Regexp &"/"& Infinity_Row &
                                    "/"& Infinity_Row &
                                    "?"& Count_Param &"="& Img (Default_Count);
