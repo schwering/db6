@@ -236,6 +236,8 @@ package body REST.Maps.Cursors is
         (DB.Types.Keys.Columns.String_Type, DB.Types.Keys.Columns.First,
          DB.Types.Keys.Columns.Last, DB.Types.Keys.Columns.Element);
 
+      use type DB.Types.Times.Time_Type;
+
       Key     : DB.Types.Keys.Key_Type;
       Value   : DB.Types.Values.Value_Type;
       Matched : Boolean := False;
@@ -247,7 +249,8 @@ package body REST.Maps.Cursors is
 
          if Cursor.Has_Last and then
             Cursor.Last_Key.Row = Key.Row and then
-            Cursor.Last_Key.Column = Key.Column
+            Cursor.Last_Key.Column = Key.Column and then
+            Cursor.Last_Key.Time < Key.Time
          then
             goto Next_Iteration;
             -- We only take the most up-to-date version of each column.
