@@ -1,5 +1,3 @@
-with DB.Types.Values;
-
 package body Tree.Types is
 
    function New_Value (S : String) return Value_Type is

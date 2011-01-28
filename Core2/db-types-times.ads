@@ -7,14 +7,14 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
-with DB.Types.Gen_Numbers;
+with DB.Types.Gen_Discretes;
 
 package DB.Types.Times is
    pragma Elaborate_Body;
 
    type Time_Type is mod 2**32;
 
-   package Serialization is new Gen_Numbers (Time_Type);
+   package Serialization is new Gen_Discretes (Time_Type);
 
    function Now return Time_Type;
 

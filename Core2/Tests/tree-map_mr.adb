@@ -14,7 +14,7 @@ with DB.Blocks.Gen_Values_Signature;
 with DB.Blocks.Local_IO;
 with DB.Maps;
 with DB.Types.Keys;
-with DB.Types.Gen_Numbers;
+with DB.Types.Gen_Discretes;
 
 with DB.Locks.Mutexes;
 
@@ -55,7 +55,7 @@ procedure Tree.Map_MR is
             Write_Context_Type => Rows.Uncompressed.Write_Context_Type,
             Compare            => Rows.Compare);
 
-         package Value_IO is new DB.Types.Gen_Numbers(Intermediate_Value_Type);
+         package Value_IO is new DB.Types.Gen_Discretes (Intermediate_Value_Type);
          use Value_IO;
 
          package Intermediate_Values is new DB.Blocks.Gen_Values_Signature
