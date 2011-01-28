@@ -32,11 +32,6 @@ begin
                                   Integer'Image (P) &" failed");
       end;
    end loop;
-
-   declare
-      C : Character;
-   begin
-      Ada.Text_IO.Get (C);
-   end;
+   AWS.Server.Wait (AWS.Server.Q_Key_Pressed);
 end REST.Main;
 
