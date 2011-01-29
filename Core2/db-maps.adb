@@ -4,8 +4,6 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
-with Interfaces.C;
-
 with DB.Maps.Bloom;
 with DB.Maps.Bounded;
 with DB.Maps.Covering;

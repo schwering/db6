@@ -4,7 +4,6 @@
 --
 -- Copyright 2011 Christoph Schwering
 
-with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
 with DB.DSA.Utils.Gen_Small_LRU_Caches;
