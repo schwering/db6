@@ -264,7 +264,7 @@ package body Cursors is
             Searches.Search_Node
               (Tree, Old_Key, Cursor.Node, Cursor.Index, State);
 
-            if Cursor.Index <= Nodes.Degree (Cursor.Node) then
+            if Nodes.Is_Valid (Cursor.Index) then
                State := Success;
             else
                -- Move right until a non-empty node is found.
@@ -340,7 +340,7 @@ package body Cursors is
          Searches.Search_Node
            (Tree, Cursor.Lower_Bound.Key, Cursor.Node, Cursor.Index, State);
 
-         if Cursor.Index <= Nodes.Degree (Cursor.Node) then
+         if Nodes.Is_Valid (Cursor.Index) then
             State := Success;
          else
             -- Move right until a non-empty node is found.

@@ -545,14 +545,26 @@ package body DB.Maps.Covering is
       Key   : in     Keys.Key_Type;
       Ceil  :    out Keys.Key_Type;
       Value :    out Values.Value_Type;
-      State :    out State_Type) is
+      State :    out State_Type)
+   is
+      use type Keys.Key_Type;
+      First : Cover_Index_Type := Map.Cover'Last;
    begin
+      State := Failure;
       if Map.Cover'Length = 0 then
          raise Map_Error;
       end if;
-      Map.Slices (Map.Cover (Map.Cover'First)).Map.Ceiling
-        (Key, Ceil, Value, State);
-      for I in Map.Cover'First + 1 .. Map.Cover'Last loop
+
+      for I in Map.Cover'Range loop
+         Map.Slices (Map.Cover (I)).Map.Ceiling
+           (Key, Ceil, Value, State);
+         if State = Success then
+            First := I + 1;
+            exit;
+         end if;
+      end loop;
+
+      for I in First .. Map.Cover'Last loop
          declare
             use type Utils.Comparison_Result_Type;
             This_Ceil  : Keys.Key_Type;
@@ -577,14 +589,26 @@ package body DB.Maps.Covering is
      (Map   : in out Map_Type;
       Key   :    out Keys.Key_Type;
       Value :    out Values.Value_Type;
-      State :    out State_Type) is
+      State :    out State_Type)
+   is
+      First : Cover_Index_Type := Map.Cover'Last;
    begin
+      State := Failure;
       if Map.Cover'Length = 0 then
          raise Map_Error;
       end if;
+
+      for I in Map.Cover'Range loop
+         Map.Slices (Map.Cover (I)).Map.Search_Minimum (Key, Value, State);
+         if State = Success then
+            First := I + 1;
+            exit;
+         end if;
+      end loop;
+
       Map.Slices (Map.Cover (Map.Cover'First)).Map.Search_Minimum
         (Key, Value, State);
-      for I in Map.Cover'First + 1 .. Map.Cover'Last loop
+      for I in First .. Map.Cover'Last loop
          declare
             use type Utils.Comparison_Result_Type;
             This_Key   : Keys.Key_Type;

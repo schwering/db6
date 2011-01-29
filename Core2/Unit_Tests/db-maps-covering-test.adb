@@ -150,11 +150,11 @@ package body DB.Maps.Covering.Test is
             Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
             Map.Ceiling (New_Key (I), C, V, S);
-            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
-                                 "the map");
-            Assert (C = New_Key (I), "The ceiling of "&
+            Assert (S = Success, "Ceiling of "& Keys.Image (New_Key (I)) &
+                                 " is not in the map");
+            Assert (New_Key (I) = C, "The ceiling of "&
                                      Keys.Image (New_Key (I)) &" is not "&
-                                     Keys.Image (C));
+                                     Keys.Image (C) & I'Img);
          end;
       end loop;
    end;
@@ -178,9 +178,9 @@ package body DB.Maps.Covering.Test is
             Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
             Map.Ceiling (New_Key (I), C, V, S);
-            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
-                                 "the map");
-            Assert (C = New_Key (I), "The ceiling of "&
+            Assert (S = Success, "Ceiling of "& Keys.Image (New_Key (I)) &
+                                 " is not in the map");
+            Assert (New_Key (I) = C, "The ceiling of "&
                                      Keys.Image (New_Key (I)) &" is not "&
                                      Keys.Image (C));
          end;
@@ -203,7 +203,7 @@ package body DB.Maps.Covering.Test is
          Map.Ceiling (New_Key (I), C, V, S);
          Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                               "the map");
-         Assert (C = New_Key (I), "The ceiling of "&
+         Assert (New_Key (I) <= C, "The ceiling of "&
                                   Keys.Image (New_Key (I)) &" is not "&
                                   Keys.Image (C));
       end loop;
@@ -224,7 +224,7 @@ package body DB.Maps.Covering.Test is
          Map.Ceiling (New_Key (I), C, V, S);
          Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                               "the map");
-         Assert (C = New_Key (I), "The ceiling of "&
+         Assert (New_Key (I) = C, "The ceiling of "&
                                   Keys.Image (New_Key (I)) &" is not "&
                                   Keys.Image (C));
       end loop;
@@ -257,10 +257,8 @@ package body DB.Maps.Covering.Test is
                                  " be deleted from the map with value "&
                                  Values.Image (New_Value (I)));
          end if;
-         if I < Loop_Count then
-            Map.Ceiling (New_Key (I), C, V, S);
-            Assert (S = Success, "Ceiling of "& Keys.Image (New_Key (I)) &
-                                 " is not in the map");
+         Map.Ceiling (New_Key (I), C, V, S);
+         if S = Success then
             Assert (New_Key (I) <= C, "The ceiling of "&
                                       Keys.Image (New_Key (I)) &" is not "&
                                       "less or equal to "& Keys.Image (C));

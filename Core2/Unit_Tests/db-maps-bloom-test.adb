@@ -121,8 +121,8 @@ package body DB.Maps.Bloom.Test is
             Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
             Map.Ceiling (New_Key (I), C, V, S);
-            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
-                                 "the map");
+            Assert (S = Success, "Ceiling of "& Keys.Image (New_Key (I)) &
+                                 " is not in the map");
             Assert (C = New_Key (I), "The ceiling of "&
                                      Keys.Image (New_Key (I)) &" is not "&
                                      Keys.Image (C));
@@ -151,8 +151,8 @@ package body DB.Maps.Bloom.Test is
             Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
             Map.Ceiling (New_Key (I), C, V, S);
-            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
-                                 "the map");
+            Assert (S = Success, "Ceiling of "& Keys.Image (New_Key (I)) &
+                                 " is not in the map");
             Assert (C = New_Key (I), "The ceiling of "&
                                      Keys.Image (New_Key (I)) &" is not "&
                                      Keys.Image (C));
@@ -230,10 +230,8 @@ package body DB.Maps.Bloom.Test is
                                  " be deleted from the map with value "&
                                  Values.Image (New_Value (I)));
          end if;
-         if I < Loop_Count then
-            Map.Ceiling (New_Key (I), C, V, S);
-            Assert (S = Success, "Ceiling of "& Keys.Image (New_Key (I)) &
-                                 " is not in the map");
+         Map.Ceiling (New_Key (I), C, V, S);
+         if S = Success then
             Assert (New_Key (I) <= C, "The ceiling of "&
                                       Keys.Image (New_Key (I)) &" is not "&
                                       "less or equal to "& Keys.Image (C));

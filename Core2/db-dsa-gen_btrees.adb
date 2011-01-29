@@ -63,7 +63,7 @@ package body DB.DSA.Gen_BTrees is
         (Tree  : in out Tree_Type;
          Key   : in     Keys.Key_Type;
          N     :    out Nodes.Node_Type;
-         Index :    out Nodes.Valid_Index_Type;
+         Index :    out Nodes.Index_Type;
          State :    out State_Type);
 
       procedure Search
