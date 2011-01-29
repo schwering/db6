@@ -63,6 +63,9 @@ package REST.Maps.Cursors is
    -- necessary. Furthermore, in this case the resources held by Cursor are
    -- freed and Cursor is set to null.
 
+   procedure Finalize_Package;
+   -- Terminates an internal task and frees the acquired resources.
+
 private
    Timeout : constant Duration := 60.0;
 
@@ -104,7 +107,7 @@ private
       -- The cursor must match URL_Path, i.e. the bounds must be correct, and
       -- the Offset must match.
 
-      procedure Clean;
+      procedure Clean (Force : in Boolean := False);
 
    private
       Map : Multisets.Set;

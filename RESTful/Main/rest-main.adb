@@ -4,6 +4,7 @@ with AWS.Net;
 with AWS.Server;
 
 with REST.Handler;
+with REST.Maps.Cursors;
 
 procedure REST.Main is
    Port : constant := 8080;
@@ -32,6 +33,10 @@ begin
                                   Integer'Image (P) &" failed");
       end;
    end loop;
+
    AWS.Server.Wait (AWS.Server.Q_Key_Pressed);
+
+   REST.Maps.Cursors.Finalize_Package;
+
 end REST.Main;
 

@@ -59,7 +59,7 @@ package body REST.Maps.Cursors is
       end Get;
 
 
-      procedure Clean
+      procedure Clean (Force : in Boolean := False)
       is
          package Vectors is new Ada.Containers.Vectors
            (Positive, Cursor_Ref_Type);
@@ -80,7 +80,7 @@ package body REST.Maps.Cursors is
             while C /= Multisets.No_Element loop
                Cursor := Multisets.Element (C);
                pragma Assert (Cursor.Released);
-               if Too_Old (Cursor) then
+               if Force or Too_Old (Cursor) then
                   Vectors.Append (Delete, Cursor);
                end if;
               C := Multisets.Next (C);
@@ -110,12 +110,21 @@ package body REST.Maps.Cursors is
    ----------
    -- Cleaner task
 
-   task Clean_Task;
+   task Clean_Task is
+      entry Stop;
+   end Clean_Task;
 
    task body Clean_Task is
+      Break : Boolean := False;
    begin
       loop
-         delay Timeout;
+         select
+               accept Stop do
+                  Break := True;
+               end Stop;
+            or delay Timeout;
+         end select;
+         exit when Break;
          Cursors.Clean;
       end loop;
    end Clean_Task;
@@ -292,6 +301,13 @@ package body REST.Maps.Cursors is
       end if;
       Free (Cursor);
    end Finalize;
+
+
+   procedure Finalize_Package is
+   begin
+      Clean_Task.Stop;
+      Cursors.Clean (Force => True);
+   end Finalize_Package;
 
 
    ----------
