@@ -56,29 +56,49 @@ package body REST.Get.Test is
             case Val (Val'First) is
                when ''' =>
                   Map.Insert
-                    (Key,
-                     New_Value (Val (Val'First+1 ..  Val'Last-1)),
-                     State);
+                    (Key, New_Value (Val (Val'First+1 ..  Val'Last-1)), State);
                when '0' .. '9' =>
                   Map.Insert
-                    (Key,
-                     New_Value
-                       (Long_Integers.Discrete_Type'Value (Val)),
+                    (Key, New_Value (Long_Integers.Discrete_Type'Value (Val)),
                      State);
                when '-' =>
                   Map.Insert
-                    (Key,
-                     New_Value
-                       (Long_Reals.Real_Type'Value (Val)),
-                     State);
+                    (Key, New_Value (Long_Reals.Real_Type'Value (Val)), State);
                when 't' | 'f' =>
                   Map.Insert
-                    (Key,
-                     New_Value
-                       (Booleans.Discrete_Type'Value (Val)),
+                    (Key, New_Value (Booleans.Discrete_Type'Value (Val)),
                      State);
                when 'n' =>
                   Map.Insert (Key, Nothing_Value, State);
+               when 'k' =>
+                  declare
+                     Key_First, Value_First : Natural := 0;
+                     Key_Last,  Value_Last  : Natural := 0;
+                     Key_Value : DB.Types.Keys.Key_Type;
+                  begin
+                     for I in Val'Range loop
+                        if Val (I) = '"' then
+                           if Key_First = 0 then
+                              Key_First := I + 1;
+                           elsif Key_Last = 0 then
+                              Key_Last := I - 1;
+                           elsif Value_First = 0 then
+                              Value_First := I + 1;
+                           elsif Value_Last = 0 then
+                              Value_Last := I - 1;
+                           end if;
+                        end if;
+                     end loop;
+                     Key_Value.Row := DB.Types.Keys.Rows.New_String
+                       (DB.Types.Keys.Rows.Indefinite_Buffer_Type
+                          (Val (Key_First .. Key_Last)));
+                     Key_Value.Column := DB.Types.Keys.Columns.New_String
+                       (DB.Types.Keys.Columns.Indefinite_Buffer_Type
+                          (Val (Value_First .. Value_Last)));
+                     Key_Value.Time := DB.Types.Times.Latest_Time;
+                     Map.Insert
+                       (Key, DB.Types.Values.New_Value (Key_Value), State);
+                  end;
                when others =>
                   Assert (False, "Value '"& Val &"' invalid");
                   State := DB.Maps.Failure;
@@ -111,7 +131,8 @@ package body REST.Get.Test is
       KV ("person6", "gehalt", "-1.234"),
       KV ("person6", "doof", "true"),
       KV ("person6", "klug", "false"),
-      KV ("person6", "auto", "null"));
+      KV ("person6", "auto", "null"),
+      KV ("person6", "reference", "key(""Sergey"", ""Brin"")"));
 
 
    function JSON_Contains (Data, Row, Col, Val : String) return Boolean is

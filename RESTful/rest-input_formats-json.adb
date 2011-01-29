@@ -4,8 +4,6 @@
 --
 -- Copyright 2010--2011 Christoph Schwering
 
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Ada.Strings.Unbounded;
 
 with REST.Log;
@@ -98,12 +96,57 @@ package body REST.Input_Formats.JSON is
             Next (Parser, Request, T (I), EOF);
             if EOF then
                Token := Error;
-               REST.Log.Info ("JSON: EOF during keyword");
+               REST.Log.Info ("JSON: EOF during keyword "& S);
                return T (T'First .. I);
             end if;
          end loop;
          return T;
       end Parse;
+
+      function Parse_Key return DB.Types.Keys.Key_Type
+      is
+         Key : DB.Types.Keys.Key_Type;
+      begin
+         declare
+            S : constant String := Parse ("key(");
+            pragma Unreferenced (S);
+         begin
+            if EOF then
+               return DB.Types.Keys.Null_Key;
+            end if;
+         end;
+
+         Next (Parser, Request, Char, EOF);
+         if EOF then
+            return DB.Types.Keys.Null_Key;
+         end if;
+         -- Required by Parse_String to have Char initialized correctly
+         Key.Row := DB.Types.Keys.Rows.New_String
+           (DB.Types.Keys.Rows.Indefinite_Buffer_Type (Parse_String));
+         if EOF then
+            return DB.Types.Keys.Null_Key;
+         end if;
+
+         Skip (Parser, Request, Whitespace);
+         Next (Parser, Request, Char, EOF);
+         if EOF then
+            return DB.Types.Keys.Null_Key;
+         end if;
+         -- Required by Parse_String to have Char initialized correctly
+         Key.Column := DB.Types.Keys.Columns.New_String
+           (DB.Types.Keys.Columns.Indefinite_Buffer_Type (Parse_String));
+         if EOF then
+            return DB.Types.Keys.Null_Key;
+         end if;
+
+         Key.Time := DB.Types.Times.Latest_Time;
+
+         Next (Parser, Request, Char, EOF);
+         if EOF or else Char /= ')' then
+            return DB.Types.Keys.Null_Key;
+         end if;
+         return Key;
+      end Parse_Key;
 
    begin
       Skip (Parser, Request, Whitespace);
@@ -224,6 +267,18 @@ package body REST.Input_Formats.JSON is
                Token := Value;
                Parser.Expect_Key := True;
                Parser.Set_Value (Parse ("null"));
+            end if;
+         when 'k' =>
+            if Parser.Level not in Parser.Is_Array'Range then
+               Token := Error;
+               REST.Log.Info ("JSON: indentation level out of range");
+            elsif Parser.Expect_Key then
+               Token := Error;
+               REST.Log.Info ("JSON: expecting a key, found a null");
+            else
+               Token := Value;
+               Parser.Expect_Key := True;
+               Parser.Set_Value (Parse_Key);
             end if;
          when others =>
             Token := Error;

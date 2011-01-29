@@ -164,18 +164,25 @@ package body REST.Output_Formats.JSON is
       Emit (Resource, """");
       Emit (Resource, Escape (Key));
       Emit (Resource, """ : ");
-      if Value.Tag = DB.Types.Values.Bounded_String_Value or
-         Value.Tag = DB.Types.Values.Unbounded_String_Value
-      then
-         Emit (Resource, """");
-         Emit (Resource, Escape (DB.Types.Values.Image (Value)));
-         Emit (Resource, """");
-      elsif Value.Tag = DB.Types.Values.Boolean_Value then
-         Emit (Resource, Ada.Characters.Handling.To_Lower (DB.Types.Values.Image
-           (Value)));
-      else
-         Emit (Resource, DB.Types.Values.Image (Value));
-      end if;
+      case Value.Tag is
+         when DB.Types.Values.Bounded_String_Value |
+              DB.Types.Values.Unbounded_String_Value =>
+            Emit (Resource, """");
+            Emit (Resource, Escape (DB.Types.Values.Image (Value)));
+            Emit (Resource, """");
+         when DB.Types.Values.Key_Value =>
+            Emit (Resource, "key(""");
+            Emit (Resource, Escape (DB.Types.Keys.Rows.Image (Value.Key.Row)));
+            Emit (Resource, """, """);
+            Emit (Resource, Escape
+              (DB.Types.Keys.Columns.Image (Value.Key.Column)));
+            Emit (Resource, """)");
+         when DB.Types.Values.Boolean_Value =>
+            Emit (Resource, Ada.Characters.Handling.To_Lower
+               (DB.Types.Values.Image (Value)));
+         when others =>
+            Emit (Resource, DB.Types.Values.Image (Value));
+      end case;
       Resource.Comma := True;
    end Put_Value;
 

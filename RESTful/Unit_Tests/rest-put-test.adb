@@ -186,7 +186,8 @@ package body REST.Put.Test is
             KV ("person6", "gehalt", "1.234"),
             KV ("person6", "doof", "true"),
             KV ("person6", "klug", "false"),
-            KV ("person6", "auto", "null")),
+            KV ("person6", "auto", "null"),
+            KV ("person6", "reference", "key('Sergey','Brin')")),
            Nested => False);
    exception
       when E : others =>
@@ -220,7 +221,8 @@ package body REST.Put.Test is
             KV ("person6", "gehalt", "1.234"),
             KV ("person6", "doof", "true"),
             KV ("person6", "klug", "false"),
-            KV ("person6", "auto", "null")),
+            KV ("person6", "auto", "null"),
+            KV ("person6", "reference", "key('Sergey','Brin')")),
            Nested => True);
    exception
       when E : others =>
