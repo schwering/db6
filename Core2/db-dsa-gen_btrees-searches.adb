@@ -109,6 +109,40 @@ package body Searches is
    end Search;
 
 
+   procedure Ceiling
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Ceil  :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type)
+   is
+      use type Nodes.Degree_Type;
+      N : Nodes.RO_Node_Type;
+      I : Nodes.Valid_Index_Type;
+   begin
+      Search_Node (Tree, Key, N, I, State);
+      if I <= Nodes.Degree (N) then
+         Ceil  := Nodes.Key (N, I);
+         State := Success;
+      else
+         -- Move right until a non-empty node is found.
+         loop
+            if Nodes.Degree (N) > 0 then
+               I     := 1;
+               Ceil  := Nodes.Key (N, I);
+               State := Success;
+               exit;
+            end if;
+            if not Nodes.Is_Valid (Nodes.Link (N)) then
+               State := Failure;
+               exit;
+            end if;
+            Read_Node (Tree, Nodes.Valid_Link (N), N);
+         end loop;
+      end if;
+   end Ceiling;
+
+
    procedure Search_Minimum_Node
      (Tree  : in out Tree_Type;
       N     :    out Nodes.Node_Type;

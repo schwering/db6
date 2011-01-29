@@ -540,6 +540,40 @@ package body DB.Maps.Covering is
    end Search;
 
 
+   procedure Ceiling
+     (Map   : in out Map_Type;
+      Key   : in     Keys.Key_Type;
+      Ceil  :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type) is
+   begin
+      if Map.Cover'Length = 0 then
+         raise Map_Error;
+      end if;
+      Map.Slices (Map.Cover (Map.Cover'First)).Map.Ceiling
+        (Key, Ceil, Value, State);
+      for I in Map.Cover'First + 1 .. Map.Cover'Last loop
+         declare
+            use type Utils.Comparison_Result_Type;
+            This_Ceil  : Keys.Key_Type;
+            This_Value : Values.Value_Type;
+            This_State : State_Type;
+         begin
+            Map.Slices (Map.Cover (I)).Map.Ceiling
+              (Key, This_Ceil, This_Value, This_State);
+            if This_State = Success and then
+               Keys.Compare (This_Ceil, Ceil) = Utils.Less
+            then
+               Ceil  := This_Ceil;
+               Value := This_Value;
+               State := This_State;
+            end if;
+         end;
+      end loop;
+      raise Map_Error;
+   end Ceiling;
+
+
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Keys.Key_Type;
@@ -561,7 +595,8 @@ package body DB.Maps.Covering is
             Map.Slices (Map.Cover (I)).Map.Search_Minimum
               (This_Key, This_Value, This_State);
             if This_State = Success and then
-               Keys.Compare (This_Key, Key) = Utils.Less then
+               Keys.Compare (This_Key, Key) = Utils.Less
+            then
                Key   := This_Key;
                Value := This_Value;
                State := This_State;

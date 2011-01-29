@@ -142,11 +142,19 @@ package body DB.Maps.Covering.Test is
                               Keys.Image (New_Key (I)) &"  /  "&
                               Values.Image (New_Value (I)));
          declare
+            use type Keys.Key_Type;
+            C : Keys.Key_Type;
             V : Values.Value_Type;
          begin
             Map.Search (New_Key (I), V, S);
             Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
+            Map.Ceiling (New_Key (I), C, V, S);
+            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
+                                 "the map");
+            Assert (C = New_Key (I), "The ceiling of "&
+                                     Keys.Image (New_Key (I)) &" is not "&
+                                     Keys.Image (C));
          end;
       end loop;
    end;
@@ -162,11 +170,19 @@ package body DB.Maps.Covering.Test is
                               Keys.Image (New_Key (I)) &"  /  "&
                               Values.Image (New_Value (I)));
          declare
+            use type Keys.Key_Type;
+            C : Keys.Key_Type;
             V : Values.Value_Type;
          begin
             Map.Search (New_Key (I), V, S);
             Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
+            Map.Ceiling (New_Key (I), C, V, S);
+            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
+                                 "the map");
+            Assert (C = New_Key (I), "The ceiling of "&
+                                     Keys.Image (New_Key (I)) &" is not "&
+                                     Keys.Image (C));
          end;
       end loop;
    end;
@@ -174,6 +190,9 @@ package body DB.Maps.Covering.Test is
 
    procedure Anti_Inserts (Map : in out Maps.Map_Type'Class)
    is
+      use type Keys.Key_Type;
+      C : Keys.Key_Type;
+      V : Values.Value_Type;
       S : State_Type;
    begin
       for I in 1 .. Loop_Count loop
@@ -181,12 +200,20 @@ package body DB.Maps.Covering.Test is
          Assert (S = Failure, "Duplicate insertion successful: "&
                               Keys.Image (New_Key (I)) &"  /  "&
                               Values.Image (New_Value (I)));
+         Map.Ceiling (New_Key (I), C, V, S);
+         Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
+                              "the map");
+         Assert (C = New_Key (I), "The ceiling of "&
+                                  Keys.Image (New_Key (I)) &" is not "&
+                                  Keys.Image (C));
       end loop;
    end;
 
 
    procedure Searches (Map : in out Maps.Map_Type'Class)
    is
+      use type Keys.Key_Type;
+      C : Keys.Key_Type;
       V : Values.Value_Type;
       S : State_Type;
    begin
@@ -194,6 +221,12 @@ package body DB.Maps.Covering.Test is
          Map.Search (New_Key (I), V, S);
          Assert (S = Success, "Search failed: "&
                               Keys.Image (New_Key (I)));
+         Map.Ceiling (New_Key (I), C, V, S);
+         Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
+                              "the map");
+         Assert (C = New_Key (I), "The ceiling of "&
+                                  Keys.Image (New_Key (I)) &" is not "&
+                                  Keys.Image (C));
       end loop;
    end;
 
@@ -201,6 +234,9 @@ package body DB.Maps.Covering.Test is
    procedure Deletes (Map         : in out Maps.Map_Type'Class;
                       Anti_Search : in     Boolean)
    is
+      use type Keys.Key_Type;
+      use type Values.Value_Type;
+      C : Keys.Key_Type;
       V : Values.Value_Type;
       S : State_Type;
    begin
@@ -220,6 +256,14 @@ package body DB.Maps.Covering.Test is
             Assert (S = Failure, Keys.Image (New_Key (I)) &" could still"&
                                  " be deleted from the map with value "&
                                  Values.Image (New_Value (I)));
+         end if;
+         if I < Loop_Count then
+            Map.Ceiling (New_Key (I), C, V, S);
+            Assert (S = Success, "Ceiling of "& Keys.Image (New_Key (I)) &
+                                 " is not in the map");
+            Assert (New_Key (I) <= C, "The ceiling of "&
+                                      Keys.Image (New_Key (I)) &" is not "&
+                                      "less or equal to "& Keys.Image (C));
          end if;
       end loop;
    end;

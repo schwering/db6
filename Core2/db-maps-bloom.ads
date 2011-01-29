@@ -56,6 +56,14 @@ package DB.Maps.Bloom is
       return Boolean;
 
    overriding
+   procedure Ceiling
+     (Map   : in out Map_Type;
+      Key   : in     Keys.Key_Type;
+      Ceil  :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type);
+
+   overriding
    procedure Search
      (Map   : in out Map_Type;
       Key   : in     Keys.Key_Type;

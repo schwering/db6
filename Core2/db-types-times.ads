@@ -14,9 +14,13 @@ package DB.Types.Times is
 
    type Time_Type is mod 2**32;
 
+   Latest_Time : constant Time_Type := Time_Type'Last;
+
    package Serialization is new Gen_Discretes (Time_Type);
 
    function Now return Time_Type;
+   function Image (Time : Time_Type) return String
+   renames Serialization.Image;
 
 end DB.Types.Times;
 

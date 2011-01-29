@@ -116,6 +116,14 @@ package DB.DSA.Gen_BTrees is
    -- This procedure never blocks because it uses no locks (as long as
    -- Block_IO.Read and Block_IO.Write do not block).
 
+   procedure Ceiling
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Ceil  :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type);
+   -- Searches the minimum 
+
    procedure Search_Minimum
      (Tree  : in out Tree_Type;
       Key   :    out Keys.Key_Type;

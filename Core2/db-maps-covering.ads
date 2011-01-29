@@ -71,6 +71,14 @@ package DB.Maps.Covering is
       State :    out State_Type);
 
    overriding
+   procedure Ceiling
+     (Map   : in out Map_Type;
+      Key   : in     Keys.Key_Type;
+      Ceil  :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type);
+
+   overriding
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Keys.Key_Type;

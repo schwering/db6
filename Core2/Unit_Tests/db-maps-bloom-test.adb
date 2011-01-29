@@ -113,11 +113,19 @@ package body DB.Maps.Bloom.Test is
          Assert (Bloom_Filters.Contains (Map.Filter, New_Key (I)),
                  "Bloom filter doesn't contain "& Keys.Image (New_Key (I)));
          declare
+            use type Keys.Key_Type;
+            C : Keys.Key_Type;
             V : Values.Value_Type;
          begin
             Map.Search (New_Key (I), V, S);
             Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
+            Map.Ceiling (New_Key (I), C, V, S);
+            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
+                                 "the map");
+            Assert (C = New_Key (I), "The ceiling of "&
+                                     Keys.Image (New_Key (I)) &" is not "&
+                                     Keys.Image (C));
          end;
       end loop;
    end;
@@ -135,11 +143,19 @@ package body DB.Maps.Bloom.Test is
          Assert (Bloom_Filters.Contains (Map.Filter, New_Key (I)),
                  "Bloom filter doesn't contain "& Keys.Image (New_Key (I)));
          declare
+            use type Keys.Key_Type;
+            C : Keys.Key_Type;
             V : Values.Value_Type;
          begin
             Map.Search (New_Key (I), V, S);
             Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
                                  "the map");
+            Map.Ceiling (New_Key (I), C, V, S);
+            Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
+                                 "the map");
+            Assert (C = New_Key (I), "The ceiling of "&
+                                     Keys.Image (New_Key (I)) &" is not "&
+                                     Keys.Image (C));
          end;
       end loop;
    end;
@@ -147,6 +163,9 @@ package body DB.Maps.Bloom.Test is
 
    procedure Anti_Inserts (Map : in out Map_Type)
    is
+      use type Keys.Key_Type;
+      C : Keys.Key_Type;
+      V : Values.Value_Type;
       S : State_Type;
    begin
       for I in 1 .. Loop_Count loop
@@ -154,12 +173,20 @@ package body DB.Maps.Bloom.Test is
          Assert (S = Failure, "Duplicate insertion successful: "&
                               Keys.Image (New_Key (I)) &"  /  "&
                               Values.Image (New_Value (I)));
+         Map.Ceiling (New_Key (I), C, V, S);
+         Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
+                              "the map");
+         Assert (C = New_Key (I), "The ceiling of "&
+                                  Keys.Image (New_Key (I)) &" is not "&
+                                  Keys.Image (C));
       end loop;
    end;
 
 
    procedure Searches (Map : in out Map_Type)
    is
+      use type Keys.Key_Type;
+      C : Keys.Key_Type;
       V : Values.Value_Type;
       S : State_Type;
    begin
@@ -167,6 +194,12 @@ package body DB.Maps.Bloom.Test is
          Map.Search (New_Key (I), V, S);
          Assert (S = Success, "Search failed: "&
                               Keys.Image (New_Key (I)));
+         Map.Ceiling (New_Key (I), C, V, S);
+         Assert (S = Success, Keys.Image (New_Key (I)) &" is not in "&
+                              "the map");
+         Assert (C = New_Key (I), "The ceiling of "&
+                                  Keys.Image (New_Key (I)) &" is not "&
+                                  Keys.Image (C));
       end loop;
    end;
 
@@ -174,7 +207,9 @@ package body DB.Maps.Bloom.Test is
    procedure Deletes (Map         : in out Map_Type;
                       Anti_Search : in     Boolean)
    is
+      use type Keys.Key_Type;
       use type Values.Value_Type;
+      C : Keys.Key_Type;
       V : Values.Value_Type;
       S : State_Type;
    begin
@@ -195,6 +230,14 @@ package body DB.Maps.Bloom.Test is
                                  " be deleted from the map with value "&
                                  Values.Image (New_Value (I)));
          end if;
+         if I < Loop_Count then
+            Map.Ceiling (New_Key (I), C, V, S);
+            Assert (S = Success, "Ceiling of "& Keys.Image (New_Key (I)) &
+                                 " is not in the map");
+            Assert (New_Key (I) <= C, "The ceiling of "&
+                                      Keys.Image (New_Key (I)) &" is not "&
+                                      "less or equal to "& Keys.Image (C));
+         end if;
       end loop;
    end;
 
@@ -203,6 +246,8 @@ package body DB.Maps.Bloom.Test is
                            First : in     Integer;
                            Last  : in     Integer)
    is
+      use type Keys.Key_Type;
+      C : Keys.Key_Type;
       V : Values.Value_Type;
       S : State_Type;
    begin
@@ -221,6 +266,12 @@ package body DB.Maps.Bloom.Test is
          Map.Search (New_Key (I), V, S);
          Assert (S = Failure, "Item in range still exists "& I'Img &" "&
                               Keys.Image (New_Key (I)));
+         Map.Ceiling (New_Key (I), C, V, S);
+         if S = Success then
+            Assert (New_Key (I) <= C, "The ceiling of "&
+                                      Keys.Image (New_Key (I)) &" is not "&
+                                      "less or equal to "& Keys.Image (C));
+         end if;
       end loop;
    end;
 
@@ -229,6 +280,8 @@ package body DB.Maps.Bloom.Test is
                                       First : in     Integer;
                                       Last  : in     Integer)
    is
+      use type Keys.Key_Type;
+      C : Keys.Key_Type;
       V : Values.Value_Type;
       S : State_Type;
    begin
@@ -270,6 +323,12 @@ package body DB.Maps.Bloom.Test is
          Map.Search (New_Key (I), V, S);
          Assert (S = Failure, "Item in range still exists "&
                               Keys.Image (New_Key (I)));
+         Map.Ceiling (New_Key (I), C, V, S);
+          if S = Success then
+            Assert (New_Key (I) <= C, "The ceiling of "&
+                                      Keys.Image (New_Key (I)) &" is not "&
+                                      "less or equal to "& Keys.Image (C));
+         end if;
       end loop;
    end;
 

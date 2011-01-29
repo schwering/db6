@@ -118,6 +118,20 @@ package body DB.Maps.Bounded is
    end Search;
 
 
+   procedure Ceiling
+     (Map   : in out Map_Type;
+      Key   : in     Keys.Key_Type;
+      Ceil  :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type)
+   is
+      S : BTrees.State_Type;
+   begin
+      BTrees.Ceiling (Map.Tree, Key, Ceil, Value, S);
+      State := To_State (S);
+   end Ceiling;
+
+
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Keys.Key_Type;

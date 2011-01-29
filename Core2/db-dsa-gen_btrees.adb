@@ -72,6 +72,13 @@ package body DB.DSA.Gen_BTrees is
          Value :    out Values.Value_Type;
          State :    out State_Type);
 
+      procedure Ceiling
+        (Tree  : in out Tree_Type;
+         Key   : in     Keys.Key_Type;
+         Ceil  :    out Keys.Key_Type;
+         Value :    out Values.Value_Type;
+         State :    out State_Type);
+
       procedure Search_Minimum_Node
         (Tree  : in out Tree_Type;
          N     :    out Nodes.Node_Type;
@@ -365,6 +372,15 @@ package body DB.DSA.Gen_BTrees is
       Value :    out Values.Value_Type;
       State :    out State_Type)
    renames Searches.Search;
+
+
+   procedure Ceiling
+     (Tree  : in out Tree_Type;
+      Key   : in     Keys.Key_Type;
+      Ceil  :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type)
+   renames Searches.Ceiling;
 
 
    procedure Search_Minimum

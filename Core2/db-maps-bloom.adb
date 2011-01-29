@@ -108,6 +108,17 @@ package body DB.Maps.Bloom is
    end Search;
 
 
+   procedure Ceiling
+     (Map   : in out Map_Type;
+      Key   : in     Keys.Key_Type;
+      Ceil  :    out Keys.Key_Type;
+      Value :    out Values.Value_Type;
+      State :    out State_Type) is
+   begin
+      Map.Map.Ceiling (Key, Ceil, Value, State);
+   end Ceiling;
+
+
    procedure Search_Minimum
      (Map   : in out Map_Type;
       Key   :    out Keys.Key_Type;
