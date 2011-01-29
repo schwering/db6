@@ -570,7 +570,6 @@ package body DB.Maps.Covering is
             end if;
          end;
       end loop;
-      raise Map_Error;
    end Ceiling;
 
 
@@ -603,7 +602,6 @@ package body DB.Maps.Covering is
             end if;
          end;
       end loop;
-      raise Map_Error;
    end Search_Minimum;
 
 
