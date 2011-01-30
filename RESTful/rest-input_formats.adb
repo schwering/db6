@@ -216,14 +216,6 @@ package body REST.Input_Formats is
    end Set_Value;
 
 
-   procedure Set_Value
-      (Parser : in out Parser_Type;
-       Value  : in     DB.Types.Keys.Key_Type) is
-   begin
-      Parser.The_Value := DB.Types.Values.New_Value (Value);
-   end Set_Value;
-
-
    procedure Unset_Key (Parser : in out Parser_Type)
    is
       procedure Free is new Ada.Unchecked_Deallocation

@@ -131,8 +131,7 @@ package body REST.Get.Test is
       KV ("person6", "gehalt", "-1.234"),
       KV ("person6", "doof", "true"),
       KV ("person6", "klug", "false"),
-      KV ("person6", "auto", "null"),
-      KV ("person6", "reference", "key(""Sergey"", ""Brin"")"));
+      KV ("person6", "auto", "null"));
 
 
    function JSON_Contains (Data, Row, Col, Val : String) return Boolean is

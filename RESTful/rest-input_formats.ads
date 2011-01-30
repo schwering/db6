@@ -111,9 +111,6 @@ private
 
    procedure Set_Key (Parser : in out Parser_Type; Key : in String);
    procedure Set_Value (Parser : in out Parser_Type; Value : in String);
-   procedure Set_Value
-      (Parser : in out Parser_Type;
-       Value  : in     DB.Types.Keys.Key_Type);
 
    procedure Unset_Key (Parser : in out Parser_Type);
 

@@ -170,13 +170,6 @@ package body REST.Output_Formats.JSON is
             Emit (Resource, """");
             Emit (Resource, Escape (DB.Types.Values.Image (Value)));
             Emit (Resource, """");
-         when DB.Types.Values.Key_Value =>
-            Emit (Resource, "key(""");
-            Emit (Resource, Escape (DB.Types.Keys.Rows.Image (Value.Key.Row)));
-            Emit (Resource, """, """);
-            Emit (Resource, Escape
-              (DB.Types.Keys.Columns.Image (Value.Key.Column)));
-            Emit (Resource, """)");
          when DB.Types.Values.Boolean_Value =>
             Emit (Resource, Ada.Characters.Handling.To_Lower
                (DB.Types.Values.Image (Value)));
