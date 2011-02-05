@@ -13,6 +13,7 @@ package REST is
    Stream_Error               : exception;
    Malformed_Input_Data_Error : exception;
    Insertion_Error            : exception;
+   Deletion_Error             : exception;
 
    Count_Param          : constant String := "n";
    Offset_Param         : constant String := "o";
