@@ -1,6 +1,6 @@
 -- Abstract:
 --
--- Queries a map.
+-- Deletes an object a map.
 --
 -- Copyright 2010--2011 Christoph Schwering
 
