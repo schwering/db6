@@ -11,8 +11,8 @@ is
    function Convert_To_Long_Integer is
       new Ada.Unchecked_Conversion (Object_Type, Long_Integer);
    pragma Warnings (On);
-   Size : constant Blocks.Size_Type
-        := Blocks.Bits_To_Units (Object_Type'Size);
+   Size : constant Blocks.Size_Type :=
+      Blocks.Bits_To_Units (Object_Type'Size);
 begin
    if Size = Blocks.Bits_To_Units (Integer'Size) then
       return Integer'Image (Convert_To_Integer (O));

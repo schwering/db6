@@ -21,7 +21,6 @@ package body DB.Blocks.Local_IO is
 
    procedure Create_And_Open_Temporary (ID : in String; File : out File_Type) is
    begin
-      declare
       begin
          Create (ID, File);
       exception

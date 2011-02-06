@@ -241,7 +241,6 @@ package body Stacks is
       if Nodes.Is_Valid (Nodes.Link (N)) then
          -- Lock root to enforce that it is the first node in the stack.
          Lock (Tree, N_A);
-         declare
          begin
             Read_Node (Tree, N_A, N);
             pragma Assert (not Nodes.Is_Valid (Nodes.Link (N)));
@@ -364,7 +363,6 @@ package body Stacks is
 
          Level : Nodes.Level_Type;
       begin
-         declare
          begin
             Pop (Stack, N_A, Level);
             Move_Right (Tree, Stack, Level, N_A, N);
@@ -442,7 +440,6 @@ package body Stacks is
                I     : Nodes.Index_Type;
                N     : Nodes.RW_Node_Type;
             begin
-               declare
                begin
                   Pop_Inner (L_A, N_A, N_Old);
                exception
@@ -469,7 +466,6 @@ package body Stacks is
          use type Nodes.Degree_Type;
       begin
          if Nodes.Is_Safe (N, Is_Root => Is_Empty (Stack)) then
-            declare
             begin
                Write_Node (Tree, N_A, N);
             exception
@@ -495,7 +491,6 @@ package body Stacks is
                Nodes.Set_Link (R, Nodes.Link (N));
                Write_New_Node (Tree, R_A, R);
                Lock (Tree, R_A);
-               declare
                begin
                   Nodes.Set_Link (L, R_A);
                   Write_Node (Tree, L_A, L);

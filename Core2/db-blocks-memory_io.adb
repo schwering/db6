@@ -205,7 +205,6 @@ package body DB.Blocks.Memory_IO is
       use type Blocks.Block_Type;
    begin
       if Address > File.Maximum then -- not thread-safe (that's intended)
-         declare
          begin
             Locks.Mutexes.Lock (File.Mutex);
             File.Maximum := Address;

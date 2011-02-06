@@ -83,7 +83,6 @@ package body DB.Utils.Timers is
          raise Timer_Error;
       end if;
 
-      declare
       begin
          return Timer.CPU_Duration;
       end;
@@ -96,7 +95,6 @@ package body DB.Utils.Timers is
          raise Timer_Error;
       end if;
 
-      declare
       begin
          return Timer.Real_Duration;
       end;
