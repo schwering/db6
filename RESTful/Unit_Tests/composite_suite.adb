@@ -8,6 +8,7 @@ with REST.Input_Formats.JSON.Test.Suite;
 with REST.Output_Formats.JSON.Test.Suite;
 with REST.Put.Test.Suite;
 with REST.Get.Test.Suite;
+with REST.Delete.Test.Suite;
 
 package body Composite_Suite is
 
@@ -19,6 +20,7 @@ package body Composite_Suite is
       Res.Add_Test (REST.Output_Formats.JSON.Test.Suite.Suite);
       Res.Add_Test (REST.Put.Test.Suite.Suite);
       Res.Add_Test (REST.Get.Test.Suite.Suite);
+      Res.Add_Test (REST.Delete.Test.Suite.Suite);
       return Res;
    end Suite;
 

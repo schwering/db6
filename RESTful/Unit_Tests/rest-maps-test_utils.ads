@@ -32,12 +32,12 @@ package REST.Maps.Test_Utils is
 
    function KV (Row, Column, Value : String) return Key_Value_Type;
 
-   function URL (Table : String; Row : String := "") return String;
+   function URL (Table : String; Row_1, Row_2 : String := "") return String;
    function URL (Table : String; Row : Unbounded_String) return String;
    function URL
      (Table, Col_Regexp, Row_1, Row_2 : String;
-      Excl_1 : Boolean := True;
-      Excl_2 : Boolean := True;
+      Excl_1 : Boolean := False;
+      Excl_2 : Boolean := False;
       Count  : Natural := 100)
       return String;
 

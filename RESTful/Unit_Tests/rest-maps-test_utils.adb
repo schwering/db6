@@ -35,9 +35,10 @@ package body REST.Maps.Test_Utils is
    end KV;
 
 
-   function URL (Table : String; Row : String := "") return String is
+   function URL (Table : String; Row_1, Row_2 : String := "") return String is
    begin
-      return "http://localhost:"& Img (Port) &"/"& Table &"/"& Row;
+      return "http://localhost:"& Img (Port) &
+             "/"& Table &"/"& Row_1 &"/"& Row_2;
    end URL;
 
 
@@ -49,8 +50,8 @@ package body REST.Maps.Test_Utils is
 
    function URL
      (Table, Col_Regexp, Row_1, Row_2 : String;
-      Excl_1 : Boolean := True;
-      Excl_2 : Boolean := True;
+      Excl_1 : Boolean := False;
+      Excl_2 : Boolean := False;
       Count  : Natural := 100)
       return String
    is
