@@ -13,25 +13,18 @@ package DB.Blocks is
    subtype Size_Type is System.Storage_Elements.Storage_Offset;
    use type Size_Type;
 
-   Block_Size : constant := 4 * 1024;
+   Block_Size    : constant := 2**(2 + 10);     -- 4k
+   Last_Position : constant := 2**(4 + 10) - 1; -- 8k - 1
+   -- Block_Size is the count of bytes written to disk at once, whereas
+   -- Last_Position is maximum position allowed in block-arrays. Last_Position
+   -- must be greater than Block_Size in order to allow blocks which are
+   -- truncated before actually being written.
 
-   Storage_Unit : constant Size_Type := System.Storage_Unit;
-
-   Last_Position : constant := 2**14 - 1;
    type Base_Position_Type is range 0 .. Last_Position;
-   for Base_Position_Type'Size use 15;
-   -- Base_Position_Type is intended to have some overflow space, for example
-   -- for applications that use Base_Block_Type greater than disk Block_Types
-   -- that are truncated to Block_Types before being written to disk. It's
-   -- limited to 15 bits because this allows Base_Block_Types of 16383 bytes,
-   -- hence almost 4 times the size of a normal Block_Size. However, there is
-   -- still one bit free if someone wants to store an additional boolean in a
-   -- packed record together with a Base_Position_Type.
-
+   for Base_Position_Type'Size use 16;
    subtype Position_Type is Base_Position_Type range 0 .. Block_Size + 1;
 
    subtype Base_Index_Type is Base_Position_Type range 1 .. Last_Position;
-
    subtype Index_Type is Base_Index_Type range 1 .. Block_Size;
 
    type Base_Block_Type is
