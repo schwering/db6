@@ -58,23 +58,48 @@ package body REST.Output_Formats is
          exit when Writer.Cursor = null; -- Cursor might be null from beginning
 
          declare
-            Object_Initialized : Boolean := False;
+            use type DB.Types.Keys.Columns.String_Type;
+            In_Object        : Boolean := False;
+            In_Array         : Boolean := False;
+            Have_Last_Column : Boolean := False;
+            Last_Column      : DB.Types.Keys.Columns.String_Type;
 
             procedure Serialize_Object
               (Key : in DB.Types.Keys.Key_Type;
                Val : in DB.Types.Values.Value_Type) is
             begin
-               if not Object_Initialized then
-                  Object_Initialized := True;
+               -- XXX TODO this doesn't work, because the first object of the
+               -- array would always be processed with Put_Value.
+               if not In_Object then
+                  In_Object := True;
                   Writer.Start_Object (DB.Types.Keys.Rows.Image (Key.Row));
                end if;
-               Writer.Put_Value (DB.Types.Keys.Columns.Image (Key.Column), Val);
+               if not Have_Last_Column or Last_Column /= Key.Column then
+                  if In_Array then
+                     Writer.End_Array;
+                     In_Array := False;
+                  end if;
+                  Writer.Put_Value
+                    (DB.Types.Keys.Columns.Image (Key.Column), Val);
+               else
+                  if not In_Array then
+                     In_Array := True;
+                     Writer.Start_Array
+                       (DB.Types.Keys.Columns.Image (Key.Column));
+                  end if;
+                  Writer.Put_Anonymous_Value (Val);
+               end if;
+               Have_Last_Column := True;
+               Last_Column      := Key.Column;
             end Serialize_Object;
 
             EOF : Boolean;
          begin
             Maps.Cursors.Next (Writer.Cursor, Serialize_Object'Access, EOF);
-            if Object_Initialized then
+            if In_Array then
+               Writer.End_Array;
+            end if;
+            if In_Object then
                Writer.End_Object;
             end if;
             exit when EOF;

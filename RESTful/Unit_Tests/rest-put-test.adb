@@ -161,33 +161,35 @@ package body REST.Put.Test is
    end Put;
 
 
+   Test_Key_Values : constant Key_Value_Array_Type :=
+     (KV ("mensch1", "vorname", "'Sergey'"),
+      KV ("mensch1", "nachname", "'Brin'"),
+      KV ("mensch1", "alter", "37"),
+      KV ("mensch2", "vorname", "'Larry'"),
+      KV ("mensch2", "nachname", "'Page'"),
+      KV ("mensch2", "alter", "37"),
+      KV ("mensch3", "vorname", "'Julietta'"),
+      KV ("mensch3", "nachname", "'Youtubehausenspetergoogle'"),
+      KV ("mensch3", "alter", "25"),
+      KV ("mensch4", "vorname", "'Eva'"),
+      KV ("mensch4", "nachname", "'Gruenwaldenshausen'"),
+      KV ("mensch4", "alter", "26"),
+      KV ("mensch5", "vorname", "'Rudi'"),
+      KV ("mensch5", "nachname", "'Fichtenwald'"),
+      KV ("mensch5", "alter", "24"),
+      KV ("person6", "gehalt", "1.234"),
+      KV ("person6", "doof", "true"),
+      KV ("person6", "klug", "false"),
+      KV ("person6", "auto", "null"));
+
+
    procedure Test_Flat (T : in out Test_Type)
    is
       pragma Unreferenced (T);
       WS : AWS.Server.HTTP;
    begin
       Start_Server (WS);
-      Put ("test",
-           (KV ("mensch1", "vorname", "'Sergey'"),
-            KV ("mensch1", "nachname", "'Brin'"),
-            KV ("mensch1", "alter", "37"),
-            KV ("mensch2", "vorname", "'Larry'"),
-            KV ("mensch2", "nachname", "'Page'"),
-            KV ("mensch2", "alter", "37"),
-            KV ("mensch3", "vorname", "'Julietta'"),
-            KV ("mensch3", "nachname", "'Youtubehausenspetergoogle'"),
-            KV ("mensch3", "alter", "25"),
-            KV ("mensch4", "vorname", "'Eva'"),
-            KV ("mensch4", "nachname", "'Gruenwaldenshausen'"),
-            KV ("mensch4", "alter", "26"),
-            KV ("mensch5", "vorname", "'Rudi'"),
-            KV ("mensch5", "nachname", "'Fichtenwald'"),
-            KV ("mensch5", "alter", "24"),
-            KV ("person6", "gehalt", "1.234"),
-            KV ("person6", "doof", "true"),
-            KV ("person6", "klug", "false"),
-            KV ("person6", "auto", "null")),
-           Nested => False);
+      Put ("test", Test_Key_Values, Nested => False);
    exception
       when E : others =>
          Put_Line (Exception_Information (E));
@@ -201,27 +203,7 @@ package body REST.Put.Test is
       WS : AWS.Server.HTTP;
    begin
       Start_Server (WS);
-      Put ("test",
-           (KV ("person1", "vorname", "'Sergey'"),
-            KV ("person1", "nachname", "'Brin'"),
-            KV ("person1", "alter", "37"),
-            KV ("person2", "vorname", "'Larry'"),
-            KV ("person2", "nachname", "'Page'"),
-            KV ("person2", "alter", "37"),
-            KV ("person3", "vorname", "'Julietta'"),
-            KV ("person3", "nachname", "'Youtubehausenspetergoogle'"),
-            KV ("person3", "alter", "25"),
-            KV ("person4", "vorname", "'Eva'"),
-            KV ("person4", "nachname", "'Gruenwaldenshausen'"),
-            KV ("person4", "alter", "26"),
-            KV ("person5", "vorname", "'Rudi'"),
-            KV ("person5", "nachname", "'Fichtenwald'"),
-            KV ("person5", "alter", "24"),
-            KV ("person6", "gehalt", "1.234"),
-            KV ("person6", "doof", "true"),
-            KV ("person6", "klug", "false"),
-            KV ("person6", "auto", "null")),
-           Nested => True);
+      Put ("test", Test_Key_Values, Nested => True);
    exception
       when E : others =>
          Put_Line (Exception_Information (E));
@@ -255,6 +237,19 @@ package body REST.Put.Test is
          Put_Line (Exception_Information (E));
          raise;
    end Test_Nested_Empty;
+
+
+   procedure Test_Array (T : in out Test_Type)
+   is
+      pragma Unreferenced (T);
+      WS : AWS.Server.HTTP;
+   begin
+      Start_Server (WS);
+   exception
+      when E : others =>
+         Put_Line (Exception_Information (E));
+         raise;
+   end Test_Array;
 
 end REST.Put.Test;
 
