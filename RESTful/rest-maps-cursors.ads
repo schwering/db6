@@ -67,7 +67,7 @@ package REST.Maps.Cursors is
    -- Terminates an internal task and frees the acquired resources.
 
 private
-   Timeout : constant Duration := 60.0;
+   Timeout : constant Duration := 5.0;
 
    type Cursor_Self_Ref_Type is access all Cursor_Type;
 
