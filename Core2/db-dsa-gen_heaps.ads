@@ -9,6 +9,11 @@
 -- transaction-oriented heap implementation which had more sophisticated
 -- features like memory reclaiming.
 --
+-- Design Notes:
+--
+-- How should a reorganize procedure work? A problem is that this would change
+-- the addresses, which are used somewhere else at the same time!
+--
 -- Copyright 2008--2011 Christoph Schwering
 
 with DB.Blocks;
@@ -42,6 +47,8 @@ package DB.DSA.Gen_Heaps is
    pragma Preelaborate;
 
    type Heap_Type is limited private;
+   type Valid_Address_Type is private;
+   type State_Type is (Success, Error);
 
    procedure Create
      (Heap : in out Heap_Type;
@@ -64,41 +71,42 @@ package DB.DSA.Gen_Heaps is
      (Heap : in out Heap_Type);
    -- Finalizes Heap, i.e. closes opened files.
 
-   type Valid_Address_Type is
-      record
-         Address  : Block_IO.Valid_Address_Type;
-         Position : Blocks.Index_Type;
-      end record;
-
-   type State_Type is (Success, Error);
-
    procedure Read
-     (Heap    : in out Heap_Type;
-      Address : in     Valid_Address_Type;
-      Item    :    out Item_Type;
-      State   :    out State_Type);
-   -- Reads the Item stored at Address or sets State = Failure if no such item
-   -- exists. This procedure has undefined behaviour if Address doesn't actually
-   -- point to the beginning of an item but somewhere into the data of an item.
+     (Heap  : in out Heap_Type;
+      Start : in     Valid_Address_Type;
+      Item  :    out Item_Type;
+      State :    out State_Type);
+   -- Reads the Item stored at address Start or sets State = Failure if no such
+   -- item exists. This procedure has undefined behaviour if Start doesn't
+   -- actually point to the beginning of an item but somewhere into the data of
+   -- an item.
 
    procedure Append
      (Heap    : in out Heap_Type;
       Item    : in     Item_Type;
-      Address : in     Valid_Address_Type;
+      Start   : in     Valid_Address_Type;
       State   :    out State_Type);
-   -- Appends Item at Address or sets State = Failure
+   -- Appends Item at Start or sets State = Failure
 
    procedure Delete
-     (Heap    : in out Heap_Type;
-      Address : in     Valid_Address_Type;
-      State   :    out State_Type);
-   -- Deletes Item at Address by overwriting its contents with zeros.
+     (Heap  : in out Heap_Type;
+      Start : in     Valid_Address_Type;
+      State :    out State_Type);
+   -- Deletes Item at Start by overwriting its contents with zeros.
    -- State = Failure if no item exists on Address.
 
 private
    type Heap_Type is
       record
-         null;
+         File        : Block_IO.File_Type;
+         Initialized : Boolean := False;
+         Finalized   : Boolean := False;
+      end record;
+
+   type Valid_Address_Type is
+      record
+         Address  : Block_IO.Valid_Address_Type;
+         Position : Blocks.Index_Type;
       end record;
 
 end DB.DSA.Gen_Heaps;
