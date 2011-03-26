@@ -63,15 +63,22 @@ package DB.Blocks is
       return Cursor_Type;
 
    function Is_Valid (Cursor : Cursor_Type) return Boolean;
+   -- Indicates whether or not the given Cursor is at a valid or not.
+   -- Invalid positions denote that a written or read object did not fit into
+   -- the cursor.
+   -- Operations on invalid cursors might raise exceptions, hence the user
+   -- should always validate.
 
    function Is_Valid (Position : Base_Position_Type) return Boolean;
+   -- Indicates whether or not the given Position is valid or not.
+   -- Invalid positions denote that a written or read object did not fit into
+   -- the cursor.
 
    function Position (Cursor : Cursor_Type) return Base_Position_Type;
+   -- Returns the current position of the cursor.
 
-   function Remaining_Space
-     (Block  : Base_Block_Type;
-      Cursor : Cursor_Type)
-      return Size_Type;
+   function Remaining_Space (Cursor : Cursor_Type) return Size_Type;
+   -- Returns the number of units that can be written to or read from Cursor.
 
    function Moved_Since
      (Cursor : Cursor_Type;
@@ -127,6 +134,8 @@ package DB.Blocks is
      (Block  : in out Base_Block_Type;
       Cursor : in out Cursor_Type;
       Item   : in     Item_Type);
+   -- Writes Item to Block at the position denoted by Cursor.
+   -- If Cursor is invalid, the behavior is undefined. Use Is_Valid.
 
    generic
       type Item_Type is private;
@@ -134,12 +143,16 @@ package DB.Blocks is
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type;
       Item   :    out Item_Type);
+   -- Reads Item from Block at the position denoted by Cursor.
+   -- If Cursor is invalid, the behavior is undefined. Use Is_Valid.
 
    generic
       type Item_Type is private;
    procedure Skip
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type);
+   -- Skips an item of Item_Type from Block at the position denoted by Cursor.
+   -- If Cursor is invalid, the behavior is undefined. Use Is_Valid.
 
    generic
       type Index_Type is (<>);

@@ -72,10 +72,7 @@ package body DB.Blocks is
    end Position;
 
 
-   function Remaining_Space
-     (Block  : Base_Block_Type;
-      Cursor : Cursor_Type)
-      return Size_Type
+   function Remaining_Space (Cursor : Cursor_Type) return Size_Type
    is
       pragma Precondition (Is_Valid (Cursor));
    begin

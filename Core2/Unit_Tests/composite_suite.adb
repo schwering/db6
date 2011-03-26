@@ -4,6 +4,7 @@
 --
 -- Copyright 2008--2011 Christoph Schwering
 
+with DB.Blocks.Test.Suite;
 with DB.Locks.Mutexes.Test.Suite;
 with DB.Maps.Bloom.Test.Suite;
 with DB.Maps.Bounded.Test.Suite;
@@ -21,6 +22,7 @@ package body Composite_Suite is
    is
       Res : constant Access_Test_Suite := New_Suite;
    begin
+      Res.Add_Test (DB.Blocks.Test.Suite.Suite);
       Res.Add_Test (DB.Locks.Mutexes.Test.Suite.Suite);
       Res.Add_Test (DB.DSA.Utils.Binary_Heaps.Test.Suite.Suite);
       Res.Add_Test (DB.DSA.Utils.Small_LRU_Caches.Test.Suite.Suite);
