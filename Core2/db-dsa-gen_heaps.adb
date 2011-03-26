@@ -70,7 +70,7 @@ package body DB.DSA.Gen_Heaps is
       Read_Item : loop
          Block_IO.Read (Heap.File, Address, Block);
          declare
-            Cursor : Blocks.Cursor_Type := Blocks.New_Cursor (Position);
+            Cursor : Blocks.Cursor_Type := Blocks.New_Cursor (Block, Position);
             Done   : Boolean;
          begin
             Eat_Block : loop

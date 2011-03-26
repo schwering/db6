@@ -43,11 +43,14 @@ package body DB.Blocks is
    end Reset_Free_Space_Of_Block;
 
 
-   function New_Cursor (Start : Base_Position_Type) return Cursor_Type
+   function New_Cursor
+     (Block : Base_Block_Type;
+      Start : Base_Position_Type)
+      return Cursor_Type
    is
       pragma Precondition (Start /= Invalid_Position);
    begin
-      return Cursor_Type'(Pos => Start);
+      return Cursor_Type'(Pos => Start, Last => Block'Last);
    end New_Cursor;
 
 
@@ -76,7 +79,7 @@ package body DB.Blocks is
    is
       pragma Precondition (Is_Valid (Cursor));
    begin
-      return Size_Type (Block'Last - Cursor.Pos + 1);
+      return Size_Type (Cursor.Last - Cursor.Pos + 1);
    end Remaining_Space;
 
 
@@ -97,9 +100,25 @@ package body DB.Blocks is
    end Bits_To_Units;
 
 
+   procedure Restrict
+     (Cursor : in out Cursor_Type;
+      Last   : in     Base_Position_Type) is
+   begin
+      Cursor.Last := Base_Position_Type'Min (Last, Cursor.Last);
+   end Restrict;
+
+
+   procedure Unrestrict
+     (Cursor : in out Cursor_Type;
+      Block  : in     Base_Block_Type) is
+   begin
+      Cursor.Last := Block'Last;
+   end Unrestrict;
+
+
    procedure Reset (Block : in out Base_Block_Type) is
    begin
-      Block (Block'Range) := (others => Storage_Element_Type'First);
+      Block (Block'Range) := (others => 0);
    end Reset;
 
 
@@ -147,10 +166,11 @@ package body DB.Blocks is
    begin
       declare
          subtype Block_Range is
-            Integer range Integer (Block'First) ..  Integer (Block'Last);
+            Integer range Integer (Block'First) .. Integer (Cursor.Last);
       begin
          if Integer (Cursor.Pos) not in Block_Range or
-            Integer (Cursor.Pos) + Integer (Len) - 1 not in Block_Range then
+            Integer (Cursor.Pos) + Integer (Len) - 1 not in Block_Range
+         then
             Cursor.Pos := Invalid_Position;
             pragma Assert (Cursor.Pos not in Block'Range);
             return;
@@ -173,10 +193,11 @@ package body DB.Blocks is
    begin
       declare
          subtype Block_Range is
-            Integer range Integer (Block'First) .. Integer (Block'Last);
+            Integer range Integer (Block'First) .. Integer (Cursor.Last);
       begin
          if Integer (Cursor.Pos) not in Block_Range or
-            Integer (Cursor.Pos) + Integer (Len) - 1 not in Block_Range then
+            Integer (Cursor.Pos) + Integer (Len) - 1 not in Block_Range
+         then
             Cursor.Pos := Invalid_Position;
             pragma Assert (Cursor.Pos not in Block'Range);
             return;
@@ -196,10 +217,11 @@ package body DB.Blocks is
    begin
       declare
          subtype Block_Range is
-            Integer range Integer (Block'First) ..  Integer (Block'Last);
+            Integer range Integer (Block'First) .. Integer (Cursor.Last);
       begin
          if Integer (Cursor.Pos) not in Block_Range or
-            Integer (Cursor.Pos) + Integer (Len) - 1 not in Block_Range then
+            Integer (Cursor.Pos) + Integer (Len) - 1 not in Block_Range
+         then
             Cursor.Pos := Invalid_Position;
             pragma Assert (Cursor.Pos not in Block'Range);
             return;

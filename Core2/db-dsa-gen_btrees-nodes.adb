@@ -54,9 +54,14 @@ package body Nodes is
       function Effective_Block_Space
         return Blocks.Base_Position_Type;
 
+      function Max_Entry_Size return Blocks.Base_Position_Type;
+
       function Max_Key_Size
-        (Max_Entry_Size : Blocks.Base_Position_Type;
-         Max_Value_Size : Blocks.Base_Position_Type)
+        (Max_Value_Size : Blocks.Base_Position_Type)
+         return Blocks.Base_Position_Type;
+
+      function Max_Value_Size
+        (Max_Key_Size : Blocks.Base_Position_Type)
          return Blocks.Base_Position_Type;
 
       function Last_Used_Index
@@ -168,6 +173,9 @@ package body Nodes is
          pragma Inline (Entries_Size);
          pragma Inline (Total_Size);
          pragma Inline (Effective_Block_Space);
+         pragma Inline (Max_Entry_Size);
+         pragma Inline (Max_Key_Size);
+         pragma Inline (Max_Value_Size);
          pragma Inline (Last_Used_Index);
          pragma Inline (Init_Block);
          pragma Inline (Is_Ok);
@@ -334,7 +342,7 @@ package body Nodes is
       is
          pragma Inline (New_Cursor_From);
       begin
-         return Blocks.New_Cursor (Entry_From_Pos (Block, Index));
+         return Blocks.New_Cursor (Block, Entry_From_Pos (Block, Index));
       end New_Cursor_From;
 
 
@@ -405,9 +413,14 @@ package body Nodes is
       end Effective_Block_Space;
 
 
+      function Max_Entry_Size return Blocks.Base_Position_Type is
+      begin
+         return Phys.Effective_Block_Space * 1 / 4;
+      end Max_Entry_Size;
+
+
       function Max_Key_Size
-        (Max_Entry_Size : Blocks.Base_Position_Type;
-         Max_Value_Size : Blocks.Base_Position_Type)
+        (Max_Value_Size : Blocks.Base_Position_Type)
          return Blocks.Base_Position_Type is
       begin
          if Size_Of_Child > Max_Value_Size then
@@ -416,6 +429,14 @@ package body Nodes is
             return Max_Entry_Size - Max_Value_Size - Size_Of_Position;
          end if;
       end Max_Key_Size;
+
+
+      function Max_Value_Size
+        (Max_Key_Size : Blocks.Base_Position_Type)
+         return Blocks.Base_Position_Type is
+      begin
+         return Max_Entry_Size - Max_Key_Size - Size_Of_Position;
+      end Max_Value_Size;
 
 
       function Last_Used_Index
@@ -647,6 +668,7 @@ package body Nodes is
          if not Success then
             return;
          end if;
+
          Keys.Read (Key_Context, Block, Cursor, Key);
          Success := Blocks.Is_Valid (Cursor);
       end Read_Key;
@@ -667,11 +689,13 @@ package body Nodes is
          if not Success then
             return;
          end if;
+
          Keys.Skip (Key_Context, Block, Cursor);
          Success := Blocks.Is_Valid (Cursor);
          if not Success then
             return;
          end if;
+
          Read_Child (Block, Cursor, Child);
          Success := Blocks.Is_Valid (Cursor);
       end Read_Child;
@@ -692,11 +716,13 @@ package body Nodes is
          if not Success then
             return;
          end if;
+
          Keys.Skip (Key_Context, Block, Cursor);
          Success := Blocks.Is_Valid (Cursor);
          if not Success then
             return;
          end if;
+
          Values.Read (Value_Context, Block, Cursor, Value);
          Success := Blocks.Is_Valid (Cursor);
       end Read_Value;
@@ -718,11 +744,13 @@ package body Nodes is
          if not Success then
             return;
          end if;
+
          Keys.Read (Key_Context, Block, Cursor, Key);
          Success := Blocks.Is_Valid (Cursor);
          if not Success then
             return;
          end if;
+
          Read_Child (Block, Cursor, Child);
          Success := Blocks.Is_Valid (Cursor);
       end Read_Entry;
@@ -744,11 +772,13 @@ package body Nodes is
          if not Success then
             return;
          end if;
+
          Keys.Read (Key_Context, Block, Cursor, Key);
          Success := Blocks.Is_Valid (Cursor);
          if not Success then
             return;
          end if;
+
          Values.Read (Value_Context, Block, Cursor, Value);
          Success := Blocks.Is_Valid (Cursor);
       end Read_Entry;
@@ -766,6 +796,7 @@ package body Nodes is
             Success := False;
             return;
          end if;
+
          declare
             Index  : constant Valid_Index_Type := 1;
             Cursor : Blocks.Cursor_Type := New_Cursor_From (Block, Index);
@@ -795,16 +826,19 @@ package body Nodes is
             Phys.Set_Ok (Block, False);
             return;
          end if;
+
          Keys.Write (Key_Context, Block, Cursor, Key);
          if not Blocks.Is_Valid (Cursor) then
             Phys.Set_Ok (Block, False);
             return;
          end if;
+
          Write_Child (Block, Cursor, Child);
          if not Blocks.Is_Valid (Cursor) then
             Phys.Set_Ok (Block, False);
             return;
          end if;
+
          declare
             Size : constant Blocks.Base_Position_Type :=
                Blocks.Position (Cursor) - Entry_From_Pos (Block, Index);
@@ -823,22 +857,34 @@ package body Nodes is
          Value         : in     Values.Value_Type)
       is
          pragma Precondition (Level (Block) = Leaf_Level);
-         Cursor : Blocks.Cursor_Type := New_Cursor_From (Block, Index);
+         use type Blocks.Size_Type;
+         Cursor    : Blocks.Cursor_Type := New_Cursor_From (Block, Index);
+         From_Key  : Blocks.Base_Position_Type;
+         To_Key    : Blocks.Base_Position_Type;
+         Max_Value : Blocks.Base_Position_Type;
       begin
          if not Blocks.Is_Valid (Cursor) then
             Phys.Set_Ok (Block, False);
             return;
          end if;
+
+         From_Key := Blocks.Position (Cursor);
          Keys.Write (Key_Context, Block, Cursor, Key);
          if not Blocks.Is_Valid (Cursor) then
             Phys.Set_Ok (Block, False);
             return;
          end if;
+         To_Key := Blocks.Position (Cursor);
+
+         Max_Value := Max_Value_Size (To_Key - From_Key + 1);
+         Blocks.Restrict (Cursor, Blocks.Position (Cursor) + Max_Value - 1);
          Values.Write (Value_Context, Block, Cursor, Value);
          if not Blocks.Is_Valid (Cursor) then
             Phys.Set_Ok (Block, False);
             return;
          end if;
+         Blocks.Unrestrict (Cursor, Block);
+
          declare
             Size : constant Blocks.Base_Position_Type :=
                Blocks.Position (Cursor) - Entry_From_Pos (Block, Index);
@@ -862,11 +908,13 @@ package body Nodes is
             Phys.Set_Ok (Block, False);
             return;
          end if;
+
          Keys.Write (Key_Context, Block, Cursor, High_Key);
          if not Blocks.Is_Valid (Cursor) then
             Phys.Set_Ok (Block, False);
             return;
          end if;
+
          declare
             Size : constant Blocks.Base_Position_Type :=
                Blocks.Position (Cursor) - Entry_From_Pos (Block, Index);
@@ -1874,16 +1922,22 @@ package body Nodes is
      (Max_Value_Size : Blocks.Size_Type)
       return Blocks.Size_Type
    is
-      use type Blocks.Base_Position_Type;
-      Max_Entry_Size        : constant Blocks.Base_Position_Type :=
-         Phys.Effective_Block_Space * 1 / 4;
       Max_Value_Size_As_Pos : constant Blocks.Position_Type :=
          Blocks.Base_Position_Type (Max_Value_Size);
    begin
-      return Blocks.Size_Type
-               (Phys.Max_Key_Size (Max_Entry_Size => Max_Entry_Size,
-                                   Max_Value_Size => Max_Value_Size_As_Pos));
+      return Blocks.Size_Type (Phys.Max_Key_Size (Max_Value_Size_As_Pos));
    end Max_Key_Size;
+
+
+   function Max_Value_Size
+     (Max_Key_Size : Blocks.Size_Type)
+      return Blocks.Size_Type
+   is
+      Max_Key_Size_As_Pos : constant Blocks.Position_Type :=
+         Blocks.Base_Position_Type (Max_Key_Size);
+   begin
+      return Blocks.Size_Type (Phys.Max_Value_Size (Max_Key_Size_As_Pos));
+   end Max_Value_Size;
 
 
    function To_Block

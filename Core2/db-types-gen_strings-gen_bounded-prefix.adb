@@ -123,7 +123,7 @@ package body Prefix is
             Read_Info (Block, Cursor, Info);
             declare
                Cursor2 : Blocks.Cursor_Type :=
-                 Blocks.New_Cursor (Info.Position);
+                 Blocks.New_Cursor (Block, Info.Position);
                Pred    : String_Type;
                Succ    : String_Type;
             begin

@@ -57,7 +57,10 @@ package DB.Blocks is
    -- to the To_Block functions, this is done to prepare the block for being
    -- written to disk.
 
-   function New_Cursor (Start : Base_Position_Type) return Cursor_Type;
+   function New_Cursor
+     (Block : Base_Block_Type;
+      Start : Base_Position_Type)
+      return Cursor_Type;
 
    function Is_Valid (Cursor : Cursor_Type) return Boolean;
 
@@ -74,11 +77,29 @@ package DB.Blocks is
      (Cursor : Cursor_Type;
       Since  : Base_Position_Type)
       return Size_Type;
+   -- Returns by how many units the cursor was moved since it was at position
+   -- Since.
 
    function Bits_To_Units (Bits : Size_Type) return Size_Type;
    pragma Pure_Function (Bits_To_Units);
+   -- Determines how many bytes are needed to store Bits bits.
+
+   procedure Restrict
+     (Cursor : in out Cursor_Type;
+      Last   : in     Base_Position_Type);
+   -- Restricts the last index of the cursor to Last.
+   -- Validations of Cursor with Is_Valid should be done before calling
+   -- Unrestrict.
+
+   procedure Unrestrict
+     (Cursor : in out Cursor_Type;
+      Block  : in     Base_Block_Type);
+   -- Resets any restrictions on Cursor's last index to Block'Last.
+   -- Validations of Cursor with Is_Valid should be done before calling
+   -- Unrestrict.
 
    procedure Reset (Block : in out Base_Block_Type);
+   -- Sets all bytes of Block to zero.
 
    generic
       type Item_Type is private;
@@ -166,8 +187,9 @@ private
 
    type Cursor_Type is
       record
-         Pos : Base_Position_Type := Base_Index_Type'First;
-         -- Pos = Block'Last + 1 means that the last write was successful,
+         Pos  : Base_Position_Type := Base_Index_Type'First;
+         Last : Base_Position_Type := Base_Index_Type'Last;
+         -- Pos = Cursor.Last + 1 means that the last write was successful,
          -- but no more data can be written, while
          -- Pos = 0 means that the Cursor has become invalid, which can
          -- be the case due to a write of data that does not fit in the

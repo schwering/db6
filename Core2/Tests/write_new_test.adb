@@ -55,7 +55,7 @@ begin
                A  : IO.Valid_Address_Type;
                B1 : Blocks.Block_Type;
                B2 : Blocks.Block_Type;
-               C  : Blocks.Cursor_Type := Blocks.New_Cursor(B1'First);
+               C  : Blocks.Cursor_Type := Blocks.New_Cursor(B1, B1'First);
             begin
                Write_Integer(B1, C, I);
                IO.Write_New_Block(F, A, B1);
