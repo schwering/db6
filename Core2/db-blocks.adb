@@ -35,14 +35,6 @@ package body DB.Blocks is
    end To_Block;
 
 
-   procedure Reset_Free_Space_Of_Block
-     (Block     : in out Base_Block_Type;
-      Last_Used : in     Base_Position_Type) is
-   begin
-      Block (Last_Used + 1 .. Block_Type'Last) := (others => 0);
-   end Reset_Free_Space_Of_Block;
-
-
    function New_Cursor
      (Block : Base_Block_Type;
       Start : Base_Position_Type)
@@ -56,13 +48,7 @@ package body DB.Blocks is
 
    function Is_Valid (Cursor : Cursor_Type) return Boolean is
    begin
-      return Is_Valid (Cursor.Pos);
-   end Is_Valid;
-
-
-   function Is_Valid (Position : Base_Position_Type) return Boolean is
-   begin
-      return Position /= Invalid_Position;
+      return Cursor.Pos /= Invalid_Position;
    end Is_Valid;
 
 
@@ -117,6 +103,14 @@ package body DB.Blocks is
    begin
       Block (Block'Range) := (others => 0);
    end Reset;
+
+
+   procedure Reset_Free_Space_Of_Block
+     (Block     : in out Base_Block_Type;
+      Last_Used : in     Base_Position_Type) is
+   begin
+      Block (Last_Used + 1 .. Block_Type'Last) := (others => 0);
+   end Reset_Free_Space_Of_Block;
 
 
    function Size_Of (Item : Item_Type) return Size_Type is

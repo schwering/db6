@@ -14,7 +14,7 @@ package DB.Blocks is
    use type Size_Type;
 
    Block_Size    : constant := 2**(2 + 10);     -- 4k
-   Last_Position : constant := 2**(4 + 10) - 1; -- 8k - 1
+   Last_Position : constant := 2**(6 + 10) - 1; -- 64k - 1
    -- Block_Size is the count of bytes written to disk at once, whereas
    -- Last_Position is maximum position allowed in block-arrays. Last_Position
    -- must be greater than Block_Size in order to allow blocks which are
@@ -50,13 +50,6 @@ package DB.Blocks is
    -- storage elements to zero. The latter is done because the block will
    -- probably be written to disk.
 
-   procedure Reset_Free_Space_Of_Block
-     (Block     : in out Base_Block_Type;
-      Last_Used : in     Base_Position_Type);
-   -- Resets the bytes behind Last_Used until the Block_Size-th byte. Similarly
-   -- to the To_Block functions, this is done to prepare the block for being
-   -- written to disk.
-
    function New_Cursor
      (Block : Base_Block_Type;
       Start : Base_Position_Type)
@@ -68,11 +61,6 @@ package DB.Blocks is
    -- the cursor.
    -- Operations on invalid cursors might raise exceptions, hence the user
    -- should always validate.
-
-   function Is_Valid (Position : Base_Position_Type) return Boolean;
-   -- Indicates whether or not the given Position is valid or not.
-   -- Invalid positions denote that a written or read object did not fit into
-   -- the cursor.
 
    function Position (Cursor : Cursor_Type) return Base_Position_Type;
    -- Returns the current position of the cursor.
@@ -107,6 +95,13 @@ package DB.Blocks is
 
    procedure Reset (Block : in out Base_Block_Type);
    -- Sets all bytes of Block to zero.
+
+   procedure Reset_Free_Space_Of_Block
+     (Block     : in out Base_Block_Type;
+      Last_Used : in     Base_Position_Type);
+   -- Resets the bytes behind Last_Used until the Block_Size-th byte. Similarly
+   -- to the To_Block functions, this is done to prepare the block for being
+   -- written to disk.
 
    generic
       type Item_Type is private;
@@ -216,6 +211,7 @@ private
    pragma Inline (Moved_Since);
    pragma Inline (Bits_To_Units);
    pragma Inline (Reset);
+   pragma Inline (Reset_Free_Space_Of_Block);
    pragma Inline (Size_Of);
    pragma Inline (Write);
    pragma Inline (Write_At);
