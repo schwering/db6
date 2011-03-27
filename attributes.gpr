@@ -70,9 +70,13 @@ project Attributes is
    package Linker is
       case Build is
          when "release" =>
+            for Default_Switches ("Ada") use
+               ("-d8m");          -- stack size per thread
          when "debug" =>
             for Default_Switches ("Ada") use
-               ("");--"-fprofile-arcs"); -- for code coverage with gcov
+               ("-d8m");          -- stack size per thread
+               --("");
+               --("-fprofile-arcs"); -- for code coverage with gcov
       end case;
    end Linker;
 
