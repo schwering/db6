@@ -82,7 +82,7 @@ package body Deletions is
          State : out State_Type)
       is
          use type Nodes.Degree_Type;
-         I : constant Nodes.Index_Type := Nodes.Key_Position (N_Old, Key);
+         I : constant Nodes.Extended_Index_Type := Nodes.Key_Position (N_Old, Key);
       begin
          if Nodes.Is_Valid (I) and then Key = Nodes.Key (N_Old, I) then
             N     := Nodes.Deletion (N_Old, I);
@@ -138,7 +138,7 @@ package body Deletions is
          State : out State_Type)
       is
          use type Nodes.Degree_Type;
-         I : Nodes.Index_Type := Nodes.Key_Position (N_Old, Key);
+         I : Nodes.Extended_Index_Type := Nodes.Key_Position (N_Old, Key);
       begin
          Last_Leaf := not Nodes.Is_Valid (Nodes.Link (N_Old));
 

@@ -385,7 +385,7 @@ package body Stacks is
             declare
                N_A   : Nodes.Valid_Address_Type;
                N_Old : Nodes.RW_Node_Type;
-               I     : Nodes.Valid_Index_Type;
+               I     : Nodes.Index_Type;
                N     : Nodes.RW_Node_Type;
             begin
                Pop_Inner (C_A, N_A, N_Old);
@@ -434,10 +434,10 @@ package body Stacks is
          else
             -- Update high key of L and insert high key of R.
             declare
-               use type Nodes.Index_Type;
+               use type Nodes.Extended_Index_Type;
                N_A   : Nodes.Valid_Address_Type;
                N_Old : Nodes.RW_Node_Type;
-               I     : Nodes.Index_Type;
+               I     : Nodes.Extended_Index_Type;
                N     : Nodes.RW_Node_Type;
             begin
                begin
@@ -482,7 +482,7 @@ package body Stacks is
             end if;
          else
             declare
-               I : constant Nodes.Valid_Index_Type := Nodes.Split_Position (N);
+               I : constant Nodes.Index_Type := Nodes.Split_Position (N);
                L : Nodes.RW_Node_Type := Nodes.Copy (N, 1, I - 1);
                R : Nodes.RW_Node_Type := Nodes.Copy (N, I, Nodes.Degree (N));
                L_A : Nodes.Valid_Address_Type renames N_A;
@@ -517,7 +517,7 @@ package body Stacks is
    is
       pragma Precondition (Tree.Initialized);
 
-      use type Nodes.Valid_Index_Type;
+      use type Nodes.Index_Type;
       use type Blocks.Size_Type;
 
       procedure Move_Right is new Gen_Rebuilding_Move_Right (Exit_Cond);

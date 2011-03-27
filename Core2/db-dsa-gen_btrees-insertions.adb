@@ -44,9 +44,9 @@ package body Insertions is
             V : Values.Value_Type)
             return Boolean
          is
-            use type Nodes.Index_Type;
+            use type Nodes.Extended_Index_Type;
             use type Nodes.Validation_State_Type;
-            I : Nodes.Index_Type;
+            I : Nodes.Extended_Index_Type;
          begin
             I := Nodes.Key_Position (N, K);
             if not Nodes.Is_Valid (I) then
@@ -92,7 +92,7 @@ package body Insertions is
          State : out State_Type)
       is
          use type Nodes.Degree_Type;
-         I : Nodes.Index_Type;
+         I : Nodes.Extended_Index_Type;
       begin
          I := Nodes.Key_Position (N_Old, Key);
          if not Nodes.Is_Valid (I) then
@@ -129,7 +129,7 @@ package body Insertions is
          State : out State_Type)
       is
          use type Nodes.Degree_Type;
-         I : Nodes.Index_Type;
+         I : Nodes.Extended_Index_Type;
       begin
          I := Nodes.Key_Position (N_Old, Key);
          if not Nodes.Is_Valid (I) then
@@ -168,7 +168,7 @@ package body Insertions is
          State : out State_Type)
       is
          use type Nodes.Degree_Type;
-         I : Nodes.Index_Type;
+         I : Nodes.Extended_Index_Type;
       begin
          I := Nodes.Key_Position (N_Old, Key);
          if not Nodes.Is_Valid (I) then
@@ -204,7 +204,7 @@ package body Insertions is
          State : out State_Type)
       is
          use type Nodes.Degree_Type;
-         I : Nodes.Index_Type;
+         I : Nodes.Extended_Index_Type;
       begin
          I := Nodes.Key_Position (N_Old, Key);
          if not Nodes.Is_Valid (I) then
@@ -242,7 +242,7 @@ package body Insertions is
          State : out State_Type)
       is
          use type Nodes.Degree_Type;
-         I : Nodes.Index_Type;
+         I : Nodes.Extended_Index_Type;
       begin
          I := Nodes.Key_Position (N_Old, Key);
          if not Nodes.Is_Valid (I) then

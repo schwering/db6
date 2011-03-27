@@ -31,7 +31,7 @@ package body Searches is
      (Tree  : in out Tree_Type;
       Key   : in     Keys.Key_Type;
       N     :    out Nodes.Node_Type;
-      Index :    out Nodes.Index_Type;
+      Index :    out Nodes.Extended_Index_Type;
       State :    out State_Type)
    is
       pragma Precondition (Tree.Initialized);
@@ -94,7 +94,7 @@ package body Searches is
       State :    out State_Type)
    is
       N : Nodes.RO_Node_Type;
-      I : Nodes.Index_Type;
+      I : Nodes.Extended_Index_Type;
    begin
       Search_Node (Tree, Key, N, I, State);
       if State = Success then
@@ -112,7 +112,7 @@ package body Searches is
    is
       use type Utils.Comparison_Result_Type;
       N : Nodes.RO_Node_Type;
-      I : Nodes.Index_Type;
+      I : Nodes.Extended_Index_Type;
    begin
       Search_Node (Tree, Key, N, I, State);
       if Nodes.Is_Valid (I) then
@@ -142,7 +142,7 @@ package body Searches is
    procedure Search_Minimum_Node
      (Tree  : in out Tree_Type;
       N     :    out Nodes.Node_Type;
-      Index :    out Nodes.Valid_Index_Type;
+      Index :    out Nodes.Index_Type;
       State :    out State_Type)
    is
       pragma Precondition (Tree.Initialized);
@@ -176,7 +176,7 @@ package body Searches is
       State :    out State_Type)
    is
       N : Nodes.RO_Node_Type;
-      I : Nodes.Valid_Index_Type;
+      I : Nodes.Index_Type;
    begin
       Search_Minimum_Node (Tree, N, I, State);
       if State = Success then

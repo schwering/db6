@@ -63,7 +63,7 @@ package body DB.DSA.Gen_BTrees is
         (Tree  : in out Tree_Type;
          Key   : in     Keys.Key_Type;
          N     :    out Nodes.Node_Type;
-         Index :    out Nodes.Index_Type;
+         Index :    out Nodes.Extended_Index_Type;
          State :    out State_Type);
 
       procedure Search
@@ -82,7 +82,7 @@ package body DB.DSA.Gen_BTrees is
       procedure Search_Minimum_Node
         (Tree  : in out Tree_Type;
          N     :    out Nodes.Node_Type;
-         Index :    out Nodes.Valid_Index_Type;
+         Index :    out Nodes.Index_Type;
          State :    out State_Type);
 
       procedure Search_Minimum
@@ -280,7 +280,7 @@ package body DB.DSA.Gen_BTrees is
       return Nodes.Valid_Address_Type
    is
       pragma Assert (Nodes.Is_Inner (N));
-      I : constant Nodes.Index_Type := Nodes.Key_Position (N, Key);
+      I : constant Nodes.Extended_Index_Type := Nodes.Key_Position (N, Key);
    begin
       if Nodes.Is_Valid (I) then
          return Nodes.Child (N, I);

@@ -311,8 +311,8 @@ private
       type Level_Type is range 0 .. 255;
       for Level_Type'Size use 8;
 
-      subtype Index_Type is Degree_Type range 0 .. Degree_Type'Last;
-      subtype Valid_Index_Type is Index_Type range 1 .. Index_Type'Last;
+      subtype Extended_Index_Type is Degree_Type range 0 .. Degree_Type'Last;
+      subtype Index_Type is Extended_Index_Type range 1 .. Extended_Index_Type'Last;
 
       subtype Address_Type is Block_IO.Address_Type;
       subtype Valid_Address_Type is Block_IO.Valid_Address_Type;
@@ -326,7 +326,7 @@ private
       type State_Type is (Valid, Too_Small, Too_Large);
       subtype Validation_State_Type is State_Type;
 
-      Invalid_Index   : constant Index_Type := Index_Type'First;
+      Invalid_Index   : constant Extended_Index_Type := Extended_Index_Type'First;
       Invalid_Address : constant Address_Type :=
          Address_Type (Block_IO.Invalid_Address);
       Leaf_Level      : constant Level_Type := Level_Type'First;
@@ -360,9 +360,9 @@ private
       -- Converts the given address to a valid one.
 
       function Is_Valid
-        (Index : Index_Type)
+        (Index : Extended_Index_Type)
          return Boolean;
-      -- Returns true if the given index is inside Valid_Index_Type range.
+      -- Returns true if the given index is inside Index_Type range.
 
       ----------
       -- General and accessor subprograms.
@@ -428,7 +428,7 @@ private
 
       procedure Get_Key
         (Node        : in     Node_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Key         :    out Keys.Key_Type;
          Key_Context : in out Keys.Read_Context_Type);
       -- Gets the Index-th key. This function is defined for both,
@@ -436,14 +436,14 @@ private
 
       function Key
         (Node  : Node_Type;
-         Index : Valid_Index_Type)
+         Index : Index_Type)
          return Keys.Key_Type;
       -- Returns the Index-th key. This function is defined for both,
       -- leaves and inner nodes.
 
       procedure Get_Child
         (Node        : in     Node_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Child       :    out Valid_Address_Type;
          Key_Context : in out Keys.Read_Context_Type);
       -- Gets the Index-th child address. This function is defined for
@@ -451,14 +451,14 @@ private
 
       function Child
         (Node  : Node_Type;
-         Index : Valid_Index_Type)
+         Index : Index_Type)
          return Valid_Address_Type;
       -- Returns the Index-th child address. This function is defined for
       -- inner nodes only.
 
       procedure Get_Value
         (Node          : in     Node_Type;
-         Index         : in     Valid_Index_Type;
+         Index         : in     Index_Type;
          Value         :    out Values.Value_Type;
          Key_Context   : in out Keys.Read_Context_Type;
          Value_Context : in out Values.Read_Context_Type);
@@ -466,20 +466,20 @@ private
 
       function Value
         (Node  : Node_Type;
-         Index : Valid_Index_Type)
+         Index : Index_Type)
          return Values.Value_Type;
       -- Returns the Index-th value. This function is defined for leaves.
 
       function Key_Position
         (Node : Node_Type;
          Key  : Keys.Key_Type)
-         return Index_Type;
+         return Extended_Index_Type;
       -- Returns the (first) position of the given key or returns Invalid_Index.
 
       function Child_Position
         (Node  : Node_Type;
          Child : Valid_Address_Type)
-         return Index_Type;
+         return Extended_Index_Type;
       -- Returns the position of the given child or returns Invalid_Index.
 
       --------- -
@@ -497,14 +497,14 @@ private
 
       function Split_Position
         (Node : Node_Type)
-         return Valid_Index_Type;
+         return Index_Type;
       -- Returns the position for a split. This position is the index of the
       -- first entry which should be (the first) member of the right node after
       -- the split.
 
       function Insertion
         (Node  : Node_Type;
-         Index : Valid_Index_Type;
+         Index : Index_Type;
          Key   : Keys.Key_Type;
          Child : Valid_Address_Type)
          return RW_Node_Type;
@@ -513,7 +513,7 @@ private
 
       function Insertion
         (Node  : Node_Type;
-         Index : Valid_Index_Type;
+         Index : Index_Type;
          Key   : Keys.Key_Type;
          Value : Values.Value_Type)
          return RW_Node_Type;
@@ -522,7 +522,7 @@ private
 
       function Substitution
         (Node  : Node_Type;
-         Index : Valid_Index_Type;
+         Index : Index_Type;
          Key   : Keys.Key_Type;
          Child : Valid_Address_Type)
          return RW_Node_Type;
@@ -531,7 +531,7 @@ private
 
       function Substitution
         (Node  : Node_Type;
-         Index : Valid_Index_Type;
+         Index : Index_Type;
          Key   : Keys.Key_Type;
          Value : Values.Value_Type)
          return RW_Node_Type;
@@ -540,15 +540,15 @@ private
 
       function Deletion
         (Node  : Node_Type;
-         Index : Valid_Index_Type)
+         Index : Index_Type)
          return RW_Node_Type;
       -- Returns the node that results from the deletion of the Index-th child.
       -- This function works for both, leaves and inner nodes.
 
       function Copy
         (Node : Node_Type;
-         From : Valid_Index_Type;
-         To   : Index_Type)
+         From : Index_Type;
+         To   : Extended_Index_Type)
          return RW_Node_Type;
       -- Returns a copy of the node which is trimmed to the entries From .. To.
       -- This function works for both, leaves and inner nodes.
@@ -684,7 +684,7 @@ private
          Node               : Nodes.RW_Node_Type;
          Key_Context        : Keys.Read_Context_Type;
          Value_Context      : Values.Read_Context_Type;
-         Index              : Nodes.Index_Type;
+         Index              : Nodes.Extended_Index_Type;
          Key                : Keys.Key_Type;
          Force_Recalibrate  : Boolean := False;
          Owning_Tree        : Tree_Ref_Type;

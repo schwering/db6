@@ -27,20 +27,20 @@ package body Nodes is
    -- The layout of a Block, i.e. a byte sequence is the following:
    -- 1. Meta_Data
    -- a) If Degree (N) > 0:
-   --    2. If Is_Leaf (N): Degree (N) times Index_Type (end position of entry)
+   --    2. If Is_Leaf (N): Degree (N) times Extended_Index_Type (end position of entry)
    --                       where an entry is either (Key, Child) or
   --                        (Key, Value)
    --    3. If Is_Leaf (N): Key1, Value1, ..., Key_|N|, Value_|N|
    --       Else:           Key1, Child_Addr_1, ..., Key_|N|, Child_Addr_|N|
    -- b) If Degree (N) = 0:
-   --    2. Index_Type (end position of high key)
+   --    2. Extended_Index_Type (end position of high key)
    --    3. If Has_High_Key (N): High_Key
    package Phys is
       pragma Elaborate_Body;
 
       function Entry_Size
         (Block : Blocks.Base_Block_Type;
-         Index : Valid_Index_Type)
+         Index : Index_Type)
          return Blocks.Base_Position_Type;
 
       function Entries_Size
@@ -106,14 +106,14 @@ package body Nodes is
       procedure Read_Key
         (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Key         :    out Keys.Key_Type;
          Success     :    out Boolean);
 
       procedure Read_Child
         (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean);
 
@@ -121,14 +121,14 @@ package body Nodes is
         (Key_Context   : in out Keys.Read_Context_Type;
          Value_Context : in out Values.Read_Context_Type;
          Block         : in     Blocks.Base_Block_Type;
-         Index         : in     Valid_Index_Type;
+         Index         : in     Index_Type;
          Value         :    out Values.Value_Type;
          Success       :    out Boolean);
 
       procedure Read_Entry
         (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Key         :    out Keys.Key_Type;
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean);
@@ -137,7 +137,7 @@ package body Nodes is
         (Key_Context   : in out Keys.Read_Context_Type;
          Value_Context : in out Values.Read_Context_Type;
          Block         : in     Blocks.Base_Block_Type;
-         Index         : in     Valid_Index_Type;
+         Index         : in     Index_Type;
          Key           :    out Keys.Key_Type;
          Value         :    out Values.Value_Type;
          Success       :    out Boolean);
@@ -151,7 +151,7 @@ package body Nodes is
       procedure Write_Entry
         (Key_Context : in out Keys.Write_Context_Type;
          Block       : in out Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Key         : in     Keys.Key_Type;
          Child       : in     Valid_Address_Type);
 
@@ -159,7 +159,7 @@ package body Nodes is
         (Key_Context   : in out Keys.Write_Context_Type;
          Value_Context : in out Values.Write_Context_Type;
          Block         : in out Blocks.Base_Block_Type;
-         Index         : in     Valid_Index_Type;
+         Index         : in     Index_Type;
          Key           : in     Keys.Key_Type;
          Value         : in     Values.Value_Type);
 
@@ -264,7 +264,7 @@ package body Nodes is
 
 
       function "*"
-        (I : Valid_Index_Type;
+        (I : Index_Type;
          J : Blocks.Base_Index_Type)
          return Blocks.Base_Index_Type
       is
@@ -275,7 +275,7 @@ package body Nodes is
 
 
       function Pos_From_Pos
-        (Entry_Index : Valid_Index_Type)
+        (Entry_Index : Index_Type)
          return Blocks.Base_Index_Type
       is
          pragma Inline (Pos_From_Pos);
@@ -289,7 +289,7 @@ package body Nodes is
 
 
       function Pos_To_Pos
-        (Entry_Index : Valid_Index_Type)
+        (Entry_Index : Index_Type)
          return Blocks.Base_Index_Type
       is
          pragma Inline (Pos_To_Pos);
@@ -300,7 +300,7 @@ package body Nodes is
 
       function Entry_To_Pos
         (Block       : Blocks.Base_Block_Type;
-         Entry_Index : Valid_Index_Type)
+         Entry_Index : Index_Type)
          return Blocks.Base_Index_Type
       is
          pragma Inline (Entry_To_Pos);
@@ -318,7 +318,7 @@ package body Nodes is
 
       function Entry_From_Pos
         (Block       : Blocks.Base_Block_Type;
-         Entry_Index : Valid_Index_Type)
+         Entry_Index : Index_Type)
          return Blocks.Base_Position_Type
       is
          pragma Inline (Entry_From_Pos);
@@ -337,7 +337,7 @@ package body Nodes is
 
       function New_Cursor_From
         (Block : Blocks.Base_Block_Type;
-         Index : Valid_Index_Type)
+         Index : Index_Type)
          return Blocks.Cursor_Type
       is
          pragma Inline (New_Cursor_From);
@@ -348,7 +348,7 @@ package body Nodes is
 
       procedure Set_Entry_Size
         (Block         : in out Blocks.Base_Block_Type;
-         Entry_Index   : in     Valid_Index_Type;
+         Entry_Index   : in     Index_Type;
          Raw_Data_Size : in     Blocks.Base_Position_Type)
       is
          pragma Inline (Set_Entry_Size);
@@ -373,7 +373,7 @@ package body Nodes is
 
       function Entry_Size
         (Block : Blocks.Base_Block_Type;
-         Index : Valid_Index_Type)
+         Index : Index_Type)
          return Blocks.Base_Position_Type is
       begin
          return Entry_To_Pos (Block, Index) -
@@ -658,7 +658,7 @@ package body Nodes is
       procedure Read_Key
         (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Key         :    out Keys.Key_Type;
          Success     :    out Boolean)
       is
@@ -677,7 +677,7 @@ package body Nodes is
       procedure Read_Child
         (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
       is
@@ -705,7 +705,7 @@ package body Nodes is
         (Key_Context   : in out Keys.Read_Context_Type;
          Value_Context : in out Values.Read_Context_Type;
          Block         : in     Blocks.Base_Block_Type;
-         Index         : in     Valid_Index_Type;
+         Index         : in     Index_Type;
          Value         :    out Values.Value_Type;
          Success       :    out Boolean)
       is
@@ -731,7 +731,7 @@ package body Nodes is
       procedure Read_Entry
         (Key_Context : in out Keys.Read_Context_Type;
          Block       : in     Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Key         :    out Keys.Key_Type;
          Child       :    out Valid_Address_Type;
          Success     :    out Boolean)
@@ -760,7 +760,7 @@ package body Nodes is
         (Key_Context   : in out Keys.Read_Context_Type;
          Value_Context : in out Values.Read_Context_Type;
          Block         : in     Blocks.Base_Block_Type;
-         Index         : in     Valid_Index_Type;
+         Index         : in     Index_Type;
          Key           :    out Keys.Key_Type;
          Value         :    out Values.Value_Type;
          Success       :    out Boolean)
@@ -798,7 +798,7 @@ package body Nodes is
          end if;
 
          declare
-            Index  : constant Valid_Index_Type := 1;
+            Index  : constant Index_Type := 1;
             Cursor : Blocks.Cursor_Type := New_Cursor_From (Block, Index);
          begin
             Success := Blocks.Is_Valid (Cursor);
@@ -814,7 +814,7 @@ package body Nodes is
       procedure Write_Entry
         (Key_Context : in out Keys.Write_Context_Type;
          Block       : in out Blocks.Base_Block_Type;
-         Index       : in     Valid_Index_Type;
+         Index       : in     Index_Type;
          Key         : in     Keys.Key_Type;
          Child       : in     Valid_Address_Type)
       is
@@ -852,7 +852,7 @@ package body Nodes is
         (Key_Context   : in out Keys.Write_Context_Type;
          Value_Context : in out Values.Write_Context_Type;
          Block         : in out Blocks.Base_Block_Type;
-         Index         : in     Valid_Index_Type;
+         Index         : in     Index_Type;
          Key           : in     Keys.Key_Type;
          Value         : in     Values.Value_Type)
       is
@@ -901,7 +901,7 @@ package body Nodes is
       is
          pragma Precondition (Degree (Block) = 0);
          pragma Precondition (Has_High_Key (Block));
-         Index  : constant Valid_Index_Type := 1;
+         Index  : constant Index_Type := 1;
          Cursor : Blocks.Cursor_Type := New_Cursor_From (Block, Index);
       begin
          if not Blocks.Is_Valid (Cursor) then
@@ -964,7 +964,7 @@ package body Nodes is
 
 
    function Is_Valid
-     (Index : Index_Type)
+     (Index : Extended_Index_Type)
       return Boolean is
    begin
       return Index /= Invalid_Index;
@@ -1137,7 +1137,7 @@ package body Nodes is
 
    procedure Get_Key
      (Node        : in     Node_Type;
-      Index       : in     Valid_Index_Type;
+      Index       : in     Index_Type;
       Key         :    out Keys.Key_Type;
       Key_Context : in out Keys.Read_Context_Type)
    is
@@ -1156,7 +1156,7 @@ package body Nodes is
 
    function Key
      (Node  : Node_Type;
-      Index : Valid_Index_Type)
+      Index : Index_Type)
       return Keys.Key_Type
    is
       Key         : Keys.Key_Type;
@@ -1169,7 +1169,7 @@ package body Nodes is
 
    procedure Get_Child
      (Node        : in     Node_Type;
-      Index       : in     Valid_Index_Type;
+      Index       : in     Index_Type;
       Child       :    out Valid_Address_Type;
       Key_Context : in out Keys.Read_Context_Type)
    is
@@ -1190,7 +1190,7 @@ package body Nodes is
 
    function Child
      (Node  : Node_Type;
-      Index : Valid_Index_Type)
+      Index : Index_Type)
       return Valid_Address_Type
    is
       Child       : Valid_Address_Type;
@@ -1203,7 +1203,7 @@ package body Nodes is
 
    procedure Get_Value
      (Node          : in     Node_Type;
-      Index         : in     Valid_Index_Type;
+      Index         : in     Index_Type;
       Value         :    out Values.Value_Type;
       Key_Context   : in out Keys.Read_Context_Type;
       Value_Context : in out Values.Read_Context_Type)
@@ -1224,7 +1224,7 @@ package body Nodes is
 
    function Value
      (Node  : Node_Type;
-      Index : Valid_Index_Type)
+      Index : Index_Type)
       return Values.Value_Type
    is
       pragma Precondition (Is_Ok (Node));
@@ -1243,13 +1243,13 @@ package body Nodes is
    function Key_Position
      (Node : Node_Type;
       Key  : Keys.Key_Type)
-      return Index_Type
+      return Extended_Index_Type
    is
       Key_Context : Keys.Read_Context_Type := Keys.New_Read_Context;
 
       function Get_Key
         (Node  : Node_Type;
-         Index : Index_Type)
+         Index : Extended_Index_Type)
          return Keys.Key_Type
       is
          Key : Keys.Key_Type;
@@ -1262,7 +1262,7 @@ package body Nodes is
       function Key_Position_Uniform_Binary
         (Node : Node_Type;
          Key  : Keys.Key_Type)
-         return Index_Type
+         return Extended_Index_Type
       is
          pragma Inline (Key_Position_Uniform_Binary);
          pragma Precondition (Is_Ok (Node));
@@ -1272,12 +1272,12 @@ package body Nodes is
                procedure Find is new
                Utils.Binary_Search.Uniform_Find_Less_Or_Equal
                  (Container_Type      => Node_Type,
-                  Extended_Index_Type => Index_Type,
+                  Extended_Index_Type => Extended_Index_Type,
                   Invalid_Index       => Invalid_Index,
                   Item_Type           => Keys.Key_Type,
                   Get                 => Get_Key,
                   Compare             => Keys.Compare);
-               Index : Index_Type;
+               Index : Extended_Index_Type;
             begin
                Find (Node, 1, Degree (Node), Key, Index);
                if Is_Valid (Index) then
@@ -1295,7 +1295,7 @@ package body Nodes is
       function Key_Position_Binary
         (Node : Node_Type;
          Key  : Keys.Key_Type)
-         return Index_Type
+         return Extended_Index_Type
       is
          pragma Inline (Key_Position_Binary);
          pragma Precondition (Is_Ok (Node));
@@ -1304,11 +1304,11 @@ package body Nodes is
             declare
                procedure Find is new Utils.Binary_Search.Find_Less_Or_Equal
                  (Container_Type => Node_Type,
-                  Index_Type     => Valid_Index_Type,
+                  Index_Type     => Index_Type,
                   Item_Type      => Keys.Key_Type,
                   Get            => Get_Key,
                   "<="           => "<=");
-               Index : Index_Type;
+               Index : Extended_Index_Type;
                Found : Boolean;
             begin
                Find (Node, 1, Degree (Node), Key, Found, Index);
@@ -1327,7 +1327,7 @@ package body Nodes is
       function Key_Position_Linear
         (Node : Node_Type;
          Key  : Keys.Key_Type)
-         return Index_Type
+         return Extended_Index_Type
       is
          pragma Inline (Key_Position_Linear);
          pragma Precondition (Is_Ok (Node));
@@ -1350,7 +1350,7 @@ package body Nodes is
    function Child_Position
      (Node  : Node_Type;
       Child : Valid_Address_Type)
-      return Index_Type
+      return Extended_Index_Type
    is
       pragma Precondition (Is_Ok (Node));
    begin
@@ -1388,7 +1388,7 @@ package body Nodes is
 
    function Split_Position
      (Node : Node_Type)
-      return Valid_Index_Type
+      return Index_Type
    is
       pragma Precondition (Is_Ok (Node));
 
@@ -1418,7 +1418,7 @@ package body Nodes is
    procedure Copy_Entry
      (Node              : in out RW_Node_Type;
       Source            : in     Node_Type;
-      Index             : in     Valid_Index_Type;
+      Index             : in     Index_Type;
       Key_Read_Context  : in out Keys.Read_Context_Type;
       Key_Write_Context : in out Keys.Write_Context_Type;
       Shift_By          : in     Integer := 0)
@@ -1426,8 +1426,8 @@ package body Nodes is
       pragma Precondition (Is_Ok (Node));
       pragma Precondition (Is_Inner (Node));
 
-      New_Index : constant Valid_Index_Type :=
-         Valid_Index_Type (Integer (Index) + Shift_By);
+      New_Index : constant Index_Type :=
+         Index_Type (Integer (Index) + Shift_By);
       Key       : Keys.Key_Type;
       Child     : Valid_Address_Type;
       Success   : Boolean;
@@ -1446,7 +1446,7 @@ package body Nodes is
    procedure Copy_Entry
      (Node                : in out RW_Node_Type;
       Source              : in     Node_Type;
-      Index               : in     Valid_Index_Type;
+      Index               : in     Index_Type;
       Key_Read_Context    : in out Keys.Read_Context_Type;
       Key_Write_Context   : in out Keys.Write_Context_Type;
       Value_Read_Context  : in out Values.Read_Context_Type;
@@ -1456,8 +1456,8 @@ package body Nodes is
       pragma Precondition (Is_Ok (Node));
       pragma Precondition (Is_Leaf (Node));
 
-      New_Index : constant Valid_Index_Type :=
-         Valid_Index_Type (Integer (Index) + Shift_By);
+      New_Index : constant Index_Type :=
+         Index_Type (Integer (Index) + Shift_By);
       Key       : Keys.Key_Type;
       Value     : Values.Value_Type;
       Success   : Boolean;
@@ -1475,7 +1475,7 @@ package body Nodes is
 
    function Insertion
      (Node  : Node_Type;
-      Index : Valid_Index_Type;
+      Index : Index_Type;
       Key   : Keys.Key_Type;
       Child : Valid_Address_Type)
       return RW_Node_Type
@@ -1515,7 +1515,7 @@ package body Nodes is
 
    function Insertion
      (Node  : Node_Type;
-      Index : Valid_Index_Type;
+      Index : Index_Type;
       Key   : Keys.Key_Type;
       Value : Values.Value_Type)
       return RW_Node_Type
@@ -1560,7 +1560,7 @@ package body Nodes is
 
    function Substitution
      (Node  : Node_Type;
-      Index : Valid_Index_Type;
+      Index : Index_Type;
       Key   : Keys.Key_Type;
       Child : Valid_Address_Type)
       return RW_Node_Type
@@ -1601,7 +1601,7 @@ package body Nodes is
 
    function Substitution
      (Node  : Node_Type;
-      Index : Valid_Index_Type;
+      Index : Index_Type;
       Key   : Keys.Key_Type;
       Value : Values.Value_Type)
       return RW_Node_Type
@@ -1646,7 +1646,7 @@ package body Nodes is
 
    function Deletion
      (Node  : Node_Type;
-      Index : Valid_Index_Type)
+      Index : Index_Type)
       return RW_Node_Type
    is
       pragma Precondition (Is_Ok (Node));
@@ -1713,8 +1713,8 @@ package body Nodes is
 
    function Copy
      (Node : Node_Type;
-      From : Valid_Index_Type;
-      To   : Index_Type)
+      From : Index_Type;
+      To   : Extended_Index_Type)
       return RW_Node_Type is
    begin
       if not Is_Ok (Node) then
