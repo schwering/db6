@@ -4,12 +4,14 @@ with Tree.Types;
 private
 package Tree.Test_Data is
 
+   Block_Size : constant := 4096;
+
    Max_Value_Size : constant := 2 + 4 + 4;
    --                           ^VT ^VL ^VB
 
    Max_Key_Size : constant :=
-      (DB.Blocks.Block_Size - 9) * 1/4 - 2 - Max_Value_Size
-   --                         ^M    ^B   ^P
+      (Block_Size - 9) * 1/4 - 2 - Max_Value_Size
+   --               ^M    ^B   ^P
    ;-- + 1; -- to enforce heaped map
 
    Max_String_Length : constant := (Max_Key_Size - 4 - 8) / 2;
