@@ -312,7 +312,8 @@ private
       for Level_Type'Size use 8;
 
       subtype Extended_Index_Type is Degree_Type range 0 .. Degree_Type'Last;
-      subtype Index_Type is Extended_Index_Type range 1 .. Extended_Index_Type'Last;
+      subtype Index_Type is
+         Extended_Index_Type range 1 .. Extended_Index_Type'Last;
 
       subtype Address_Type is Block_IO.Address_Type;
       subtype Valid_Address_Type is Block_IO.Valid_Address_Type;
@@ -326,10 +327,11 @@ private
       type State_Type is (Valid, Too_Small, Too_Large);
       subtype Validation_State_Type is State_Type;
 
-      Invalid_Index   : constant Extended_Index_Type := Extended_Index_Type'First;
-      Invalid_Address : constant Address_Type :=
-         Address_Type (Block_IO.Invalid_Address);
-      Leaf_Level      : constant Level_Type := Level_Type'First;
+      Invalid_Index : constant Extended_Index_Type := Extended_Index_Type'First;
+
+      Invalid_Address : constant Address_Type := Block_IO.Invalid_Address;
+
+      Leaf_Level : constant Level_Type := Level_Type'First;
 
       ----------
       -- Address functions.

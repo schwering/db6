@@ -27,9 +27,9 @@ package body Nodes is
    -- The layout of a Block, i.e. a byte sequence is the following:
    -- 1. Meta_Data
    -- a) If Degree (N) > 0:
-   --    2. If Is_Leaf (N): Degree (N) times Extended_Index_Type (end position of entry)
-   --                       where an entry is either (Key, Child) or
-  --                        (Key, Value)
+   --    2. If Is_Leaf (N): Degree (N) times Extended_Index_Type (end position
+   --                       of entry) where an entry is either (Key, Child) or
+   --                       (Key, Value)
    --    3. If Is_Leaf (N): Key1, Value1, ..., Key_|N|, Value_|N|
    --       Else:           Key1, Child_Addr_1, ..., Key_|N|, Child_Addr_|N|
    -- b) If Degree (N) = 0:
