@@ -17,14 +17,14 @@ C1=1k
 #    three blocks of insertions)
 C="$BIN $IO $FILE $IMPL $GEN 0\
         \
-	Insert,$C1,Cont\
+	Append,$C1,Cont\
 	Search,$C1,Reset\
         \
-	Insert,$C1,Cont\
+	Append,$C1,Cont\
 	Search,$C1,Reset\
 	Search,$C1,Cont\
         \
-	Insert,$C1,Cont\
+	Append,$C1,Cont\
 	Search,$C1,Reset\
 	Search,$C1,Cont\
 	Search,$C1,Cont\
