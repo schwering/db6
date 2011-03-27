@@ -36,7 +36,8 @@ C="$BIN $IO $FILE $IMPL $GEN 0\
 	Search,$C1,Cont\
 	Search,$C1,Cont\
         
-        Check,1,Cont"
+        Check,1,Cont\
+        Stats,1,Cont"
 echo $C
 $C
 
