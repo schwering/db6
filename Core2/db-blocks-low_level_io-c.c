@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -17,21 +18,9 @@
 #endif
 
 #ifndef O_DIRECT
-  //#error O_DIRECT not available
+  #error O_DIRECT not available
   #define O_DIRECT	0
 #endif
-
-/*
-#if defined(DB_DIRECT_IO) && !defined(O_DIRECT)
-  #error Cannot surpass systems cache because O_DIRECT is not available.
-#endif
-
-#ifdef DB_DIRECT_IO
-  #define DIRECT_IO_FLAG	O_DIRECT
-#else
-  #define DIRECT_IO_FLAG	0
-#endif
-*/
 
 
 /* second argument for open() */
@@ -64,6 +53,10 @@ const int db_blocks_low_level_io_file_mode = FILE_MODE;
 #endif
 
 
+/********************
+ * Internal locking *
+ ********************/
+
 /* The IO lock is used to ensure that during one read no write can happen.
  * This would lead to invalid blocks returned from the read operation.
  * For this purpose, the locks could be more fine-grained.
@@ -74,7 +67,7 @@ const int db_blocks_low_level_io_file_mode = FILE_MODE;
 static pthread_mutex_t mutex;
 static bool mutex_initialized = false;
 
-static inline void io_lock_init()
+static inline void init_io_lock()
 {
 	if (!mutex_initialized) {
 		pthread_mutex_init(&mutex, NULL);
@@ -93,9 +86,13 @@ static inline void io_unlock()
 }
 
 
+/*************************
+ * General file handling *
+ *************************/
+
 int db_blocks_low_level_io_open(char *path, int flags, int mode)
 {
-	io_lock_init();
+	init_io_lock();
 	return open(path, flags, mode);
 }
 
@@ -112,6 +109,16 @@ int db_blocks_low_level_io_close(int fd)
 	io_unlock();
 	return retval;
 }
+
+off64_t db_blocks_low_level_io_seek_end(int fd)
+{
+	return lseek64(fd, 0, SEEK_END);
+}
+
+
+/**********************
+ * Default read/write *
+ **********************/
 
 ssize_t db_blocks_low_level_io_read(int fd, void *buf, size_t nbytes,
 		off64_t offset)
@@ -149,6 +156,75 @@ off64_t db_blocks_low_level_io_write_new(int fd, const void *buf,
 	return offset;
 }
 
+
+/*********************
+ * Direct read/write *
+ *********************/
+
+
+static void *aligned_buf = NULL;
+static size_t aligned_nbytes = 0;
+
+static inline void init_aligned_buf(size_t nbytes)
+{
+#ifndef HAVE_POSIX_MEMALIGN
+	assert(false);
+#else
+	if (aligned_nbytes < nbytes) {
+		free(aligned_buf);
+		posix_memalign(&aligned_buf, 512, nbytes);
+		aligned_nbytes = nbytes;
+	}
+#endif
+}
+
+ssize_t db_blocks_low_level_io_read_direct(int fd, void *buf, size_t nbytes,
+		off64_t offset)
+{
+	ssize_t retval;
+	io_lock();
+	init_aligned_buf(nbytes);
+	retval = pread(fd, aligned_buf, nbytes, offset);
+	memcpy(buf, aligned_buf, nbytes);
+	io_unlock();
+	return retval;
+}
+
+ssize_t db_blocks_low_level_io_write_direct(int fd, const void *buf,
+		size_t nbytes, off64_t offset)
+{
+	ssize_t retval;
+	io_lock();
+	init_aligned_buf(nbytes);
+	memcpy(aligned_buf, buf, nbytes);
+	retval = pwrite(fd, aligned_buf, nbytes, offset);
+	io_unlock();
+	return retval;
+}
+
+off64_t db_blocks_low_level_io_write_new_direct(int fd, const void *buf,
+		size_t nbytes)
+{
+	off64_t offset;
+
+	io_lock();
+	offset = lseek64(fd, 0, SEEK_END);
+	if (offset == (off64_t)-1) {
+		io_unlock();
+		return (off64_t)-1;
+	}
+	init_aligned_buf(nbytes);
+	memcpy(aligned_buf, buf, nbytes);
+	pwrite(fd, aligned_buf, nbytes, offset);
+	io_unlock();
+	return offset;
+}
+
+
+/*******************
+ * In-file locking *
+ *******************/
+
 static int lock(int fd, off64_t offset, size_t len)
 {
 	int cmd;
@@ -175,11 +251,6 @@ static int unlock(int fd, off64_t offset, size_t len)
 	lock.l_len = len;
 	//lock.l_pid = getpid();
 	return fcntl(fd, cmd, &lock) != -1;
-}
-
-off64_t db_blocks_low_level_io_seek_end(int fd)
-{
-	return lseek64(fd, 0, SEEK_END);
 }
 
 int db_blocks_low_level_io_lock(int fd, off64_t offset, size_t len)

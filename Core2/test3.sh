@@ -4,7 +4,7 @@ BIN=bin/debug/./tree_test
 FILE=`cat .temp_path`btree
 IMPL=btree
 GEN="pseudorandom"
-C1=10k 
+C1=1k 
 # 1. Simple insertions and check
 # 2. Some more insertions and check for both
 # 3. Some mor insertions and check for all three
@@ -34,7 +34,9 @@ C="$BIN $IO $FILE $IMPL $GEN 0\
 	Search,$C1,Cont\
 	Antisearch,$C1,Reset\
 	Search,$C1,Cont\
-	Search,$C1,Cont"
+	Search,$C1,Cont\
+        
+        Check,1,Cont"
 echo $C
 $C
 
