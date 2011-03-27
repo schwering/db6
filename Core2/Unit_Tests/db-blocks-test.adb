@@ -52,72 +52,77 @@ package body DB.Blocks.Test is
                  Size_Type'Image (B'Length / 2));
          Unrestrict (C, B);
          Assert (Remaining_Space (C) = B'Length, "Unrestrict didn't work");
-         Restrict (C, B'Length * 2);
+         Restrict (C, B'Length + 100);
          Assert (Remaining_Space (C) = B'Length, "Remaining_Space not "&
                  "restricted to block length");
 
          for I in B'Range loop
+            if I mod 2**10 = 0 then
+              Put_Line ("Cursor test"& I'Img &" /"& B'Last'Img);
+            end if;
             Write (B, C, Byte'Last);
             Assert (Is_Valid (C), "Cursor not valid");
             Assert (Remaining_Space (C) = Size_Type (B'Length - I),
                     "Remaining_Space not correct");
 
-            declare
-               D : Cursor_Type := New_Cursor (B, B'First);
-               X : Byte;
-            begin
-               Reset_Free_Space_Of_Block (B, Position (C));
-               for J in B'First .. I loop
-                  Read (B, D, X);
-                  Assert (Is_Valid (D), "Cursor not valid");
-                  Assert (X = Byte'Last, "Read wrong item "& X'Img);
-               end loop;
-               for J in I + 1 .. B'Last loop
-                  Read (B, D, X);
-                  Assert (Is_Valid (D), "Cursor not valid");
-                  Assert (X = 0, "Read wrong item "& X'Img);
-               end loop;
-            end;
-
-            declare
-               D : Cursor_Type := New_Cursor (B, B'First);
-               X : Byte;
-            begin
-               Restrict (D, Position (C) - 1);
-               for J in B'First .. I loop
-                  Read (B, D, X);
-                  Assert (Is_Valid (D), "Cursor not valid");
-                  Assert (X = Byte'Last, "Read wrong item "& X'Img);
-               end loop;
+            if I mod (Block_Size / 2**7) = 0 then
                declare
-                  E : Cursor_Type := D;
+                  D : Cursor_Type := New_Cursor (B, B'First);
+                  X : Byte;
                begin
+                  Reset_Free_Space_Of_Block (B, Position (C));
+                  for J in B'First .. I loop
+                     Read (B, D, X);
+                     Assert (Is_Valid (D), "Cursor not valid");
+                     Assert (X = Byte'Last, "Read wrong item "& X'Img);
+                  end loop;
                   for J in I + 1 .. B'Last loop
-                     Read (B, E, X);
-                     Assert (not Is_Valid (E),
-                             "Cursor valid after read in restricted area");
-                     exit;
+                     Read (B, D, X);
+                     Assert (Is_Valid (D), "Cursor not valid");
+                     Assert (X = 0, "Read wrong item "& X'Img);
                   end loop;
                end;
+
                declare
-                  E : Cursor_Type := D;
+                  D : Cursor_Type := New_Cursor (B, B'First);
+                  X : Byte;
                begin
-                  X := Byte'Last;
+                  Restrict (D, Position (C) - 1);
+                  for J in B'First .. I loop
+                     Read (B, D, X);
+                     Assert (Is_Valid (D), "Cursor not valid");
+                     Assert (X = Byte'Last, "Read wrong item "& X'Img);
+                  end loop;
+                  declare
+                     E : Cursor_Type := D;
+                  begin
+                     for J in I + 1 .. B'Last loop
+                        Read (B, E, X);
+                        Assert (not Is_Valid (E),
+                                "Cursor valid after read in restricted area");
+                        exit;
+                     end loop;
+                  end;
+                  declare
+                     E : Cursor_Type := D;
+                  begin
+                     X := Byte'Last;
+                     for J in I + 1 .. B'Last loop
+                        Write (B, E, X);
+                        Assert (not Is_Valid (E),
+                                "Cursor valid after write in restricted area");
+                        exit;
+                     end loop;
+                  end;
+                  Unrestrict (D, B);
+
                   for J in I + 1 .. B'Last loop
-                     Write (B, E, X);
-                     Assert (not Is_Valid (E),
-                             "Cursor valid after write in restricted area");
-                     exit;
+                     Read (B, D, X);
+                     Assert (Is_Valid (D), "Cursor not valid");
+                     Assert (X = 0, "Read wrong item "& X'Img);
                   end loop;
                end;
-               Unrestrict (D, B);
-
-               for J in I + 1 .. B'Last loop
-                  Read (B, D, X);
-                  Assert (Is_Valid (D), "Cursor not valid");
-                  Assert (X = 0, "Read wrong item "& X'Img);
-               end loop;
-            end;
+            end if;
          end loop;
       end Test;
 
