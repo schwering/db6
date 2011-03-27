@@ -44,7 +44,7 @@ package body Tree.Jobs is
       Real_Duration : constant Time_Type := Real_Time(Timer);
    begin
       Put("{");
-      Put("""action: """& Action &""", ");
+      Put("""action"": """& Action &""", ");
       Put("""count"": "& Trim(Types.Count_Type'Image(Count)) &", ");
       Put("""taskCount"": "& Trim(Positive'Image(Conc_Deg)) &", ");
       Put("""dataReset"": "& To_Lower(Boolean'Image(Reset)) &", ");

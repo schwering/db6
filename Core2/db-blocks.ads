@@ -57,28 +57,56 @@ package DB.Blocks is
    -- to the To_Block functions, this is done to prepare the block for being
    -- written to disk.
 
-   function New_Cursor (Start : Base_Position_Type) return Cursor_Type;
+   function New_Cursor
+     (Block : Base_Block_Type;
+      Start : Base_Position_Type)
+      return Cursor_Type;
 
    function Is_Valid (Cursor : Cursor_Type) return Boolean;
+   -- Indicates whether or not the given Cursor is at a valid or not.
+   -- Invalid positions denote that a written or read object did not fit into
+   -- the cursor.
+   -- Operations on invalid cursors might raise exceptions, hence the user
+   -- should always validate.
 
    function Is_Valid (Position : Base_Position_Type) return Boolean;
+   -- Indicates whether or not the given Position is valid or not.
+   -- Invalid positions denote that a written or read object did not fit into
+   -- the cursor.
 
    function Position (Cursor : Cursor_Type) return Base_Position_Type;
+   -- Returns the current position of the cursor.
 
-   function Remaining_Space
-     (Block  : Base_Block_Type;
-      Cursor : Cursor_Type)
-      return Size_Type;
+   function Remaining_Space (Cursor : Cursor_Type) return Size_Type;
+   -- Returns the number of units that can be written to or read from Cursor.
 
    function Moved_Since
      (Cursor : Cursor_Type;
       Since  : Base_Position_Type)
       return Size_Type;
+   -- Returns by how many units the cursor was moved since it was at position
+   -- Since.
 
    function Bits_To_Units (Bits : Size_Type) return Size_Type;
    pragma Pure_Function (Bits_To_Units);
+   -- Determines how many bytes are needed to store Bits bits.
+
+   procedure Restrict
+     (Cursor : in out Cursor_Type;
+      Last   : in     Base_Position_Type);
+   -- Restricts the last index of the cursor to Last.
+   -- Validations of Cursor with Is_Valid should be done before calling
+   -- Unrestrict.
+
+   procedure Unrestrict
+     (Cursor : in out Cursor_Type;
+      Block  : in     Base_Block_Type);
+   -- Resets any restrictions on Cursor's last index to Block'Last.
+   -- Validations of Cursor with Is_Valid should be done before calling
+   -- Unrestrict.
 
    procedure Reset (Block : in out Base_Block_Type);
+   -- Sets all bytes of Block to zero.
 
    generic
       type Item_Type is private;
@@ -106,6 +134,8 @@ package DB.Blocks is
      (Block  : in out Base_Block_Type;
       Cursor : in out Cursor_Type;
       Item   : in     Item_Type);
+   -- Writes Item to Block at the position denoted by Cursor.
+   -- If Cursor is invalid, the behavior is undefined. Use Is_Valid.
 
    generic
       type Item_Type is private;
@@ -113,12 +143,16 @@ package DB.Blocks is
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type;
       Item   :    out Item_Type);
+   -- Reads Item from Block at the position denoted by Cursor.
+   -- If Cursor is invalid, the behavior is undefined. Use Is_Valid.
 
    generic
       type Item_Type is private;
    procedure Skip
      (Block  : in     Base_Block_Type;
       Cursor : in out Cursor_Type);
+   -- Skips an item of Item_Type from Block at the position denoted by Cursor.
+   -- If Cursor is invalid, the behavior is undefined. Use Is_Valid.
 
    generic
       type Index_Type is (<>);
@@ -166,8 +200,9 @@ private
 
    type Cursor_Type is
       record
-         Pos : Base_Position_Type := Base_Index_Type'First;
-         -- Pos = Block'Last + 1 means that the last write was successful,
+         Pos  : Base_Position_Type := Base_Index_Type'First;
+         Last : Base_Position_Type := Base_Index_Type'Last;
+         -- Pos = Cursor.Last + 1 means that the last write was successful,
          -- but no more data can be written, while
          -- Pos = 0 means that the Cursor has become invalid, which can
          -- be the case due to a write of data that does not fit in the

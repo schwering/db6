@@ -588,6 +588,10 @@ private
         (Max_Value_Size : Blocks.Size_Type)
          return Blocks.Size_Type;
 
+      function Max_Value_Size
+        (Max_Key_Size : Blocks.Size_Type)
+         return Blocks.Size_Type;
+
       function To_Block
         (Node : Node_Type)
          return Blocks.Block_Type;
@@ -612,6 +616,8 @@ private
       pragma Inline (Is_Valid);
       pragma Inline (To_Valid_Address);
       pragma Inline (To_Address);
+      pragma Inline (Max_Key_Size);
+      pragma Inline (Max_Value_Size);
       pragma Inline (To_Block);
    end Nodes;
 
