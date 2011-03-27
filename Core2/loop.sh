@@ -5,10 +5,11 @@ outf=".out"
 while [ ! -n "$out" ]
 do
         echo "Executing $cmd"
-        sh -c "$cmd" 2>&1 >"$outf"
+        sh -c "$cmd" 2>&1 >>"$outf"
         retval=$?
-        echo $retval
-        cat "$outf"
+        echo "Return value: $retval"
+        echo "Last 50 lines of output:"
+        tail -n 50 "$outf"
         if [ "$retval" -gt 0 ]
         then
                 echo "Unsuccessful exit"
