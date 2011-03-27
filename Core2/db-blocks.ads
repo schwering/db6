@@ -2,6 +2,39 @@
 --
 -- Disk block container.
 --
+-- Design Notes:
+--
+-- A crucial number is Block_Size. As pointed out below, Last_Position depends
+-- on Block_Size, because a Base_Block_Type should provide some overflow space.
+--
+-- The native block size of disks is usually 4k (2**12 bytes). Since hard disks
+-- spend most time seeking for addresses, bigger consecutive blocks are
+-- interesting, too. An analysis is complicated by the fact that the seek time
+-- is compensated by the IO cache for small files. Hence, the following tests
+-- were carried out with direct IO (see the Low_Level_IO package and the
+-- underlying C functions with the O_DIRECT flag).
+-- The run test was a small set of append, delete and search operations of the
+-- Gen_BTrees package (test3.sh).
+--
+--        Total   | Append   | Delete   | Search
+-- ---------------+----------+---------+---------
+-- 4k:   36m 38s  |  5m 15s  |  3m 35s  |  1m 41s
+-- 32k:  25m 15s  |  3m 27s  |  2m  7s  |  1m 19s
+-- 64k:  25m 15s  |  3m 27s  |  2m  7s  |  1m 19s
+-- 128k: 18m 25s  |  3m  1s  |  2m 38s  |     45s
+-- 256k: 18m 54s  |  3m 14s  |  2m 59s  |     45s
+--
+-- The advantage of 32k or less is that the size fits into 16-bit-integer;
+-- bigger blocks require 24-bit-integers. This should explain why 64k is worse
+-- than 32k.
+-- The disadvantage of large blocks is the risk of stack overflows. The test
+-- crashed for 512k and upwards.
+-- An advantage of big blocks is probably better compression.
+--
+-- As a consequence of this test, 128k is currently chosen as block size.
+-- For small files, when the IO cache prevents seek times from dominating the IO
+-- access time, 128k is a good deal worse than 4k or so.
+--
 -- Copyright 2008--2011 Christoph Schwering
 
 with System.Storage_Elements;
@@ -13,22 +46,21 @@ package DB.Blocks is
    subtype Size_Type is System.Storage_Elements.Storage_Offset;
    use type Size_Type;
 
-   Block_Size    : constant := 2**(2 + 10);     -- 4k
-   Last_Position : constant := 2**(6 + 10) - 1; -- 64k - 1
+   Block_Size    : constant := 2**(7 + 10);     -- 128k
+   Last_Position : constant := 2**(8 + 10) - 1; -- 256k - 1
    -- Block_Size is the count of bytes written to disk at once, whereas
    -- Last_Position is maximum position allowed in block-arrays. Last_Position
    -- must be greater than Block_Size in order to allow blocks which are
    -- truncated before actually being written.
 
    type Base_Position_Type is range 0 .. Last_Position;
-   for Base_Position_Type'Size use 16;
-   subtype Position_Type is Base_Position_Type range 0 .. Block_Size + 1;
-
+   for Base_Position_Type'Size use 24;
    subtype Base_Index_Type is Base_Position_Type range 1 .. Last_Position;
-   subtype Index_Type is Base_Index_Type range 1 .. Block_Size;
-
    type Base_Block_Type is
       array (Base_Index_Type range <>) of aliased Storage_Element_Type;
+
+   subtype Position_Type is Base_Position_Type range 0 .. Block_Size + 1;
+   subtype Index_Type is Base_Index_Type range 1 .. Block_Size;
    subtype Block_Type is Base_Block_Type (Index_Type);
 
    type Cursor_Type (<>) is limited private;
