@@ -16,13 +16,13 @@
 -- The run test was a small set of append, delete and search operations of the
 -- Gen_BTrees package (test3.sh).
 --
---        Total   | Append   | Delete   | Search
--- ---------------+----------+---------+---------
--- 4k:   36m 38s  |  5m 15s  |  3m 35s  |  1m 41s
--- 32k:  25m 15s  |  3m 27s  |  2m  7s  |  1m 19s
--- 64k:  25m 15s  |  3m 27s  |  2m  7s  |  1m 19s
--- 128k: 18m 25s  |  3m  1s  |  2m 38s  |     45s
--- 256k: 18m 54s  |  3m 14s  |  2m 59s  |     45s
+--   Size   |   Total   |  Append  |  Delete  |  Search
+-- ---------+-----------+----------+----------+----------
+--   4k     |  36m 38s  |  5m 15s  |  3m 35s  |  1m 41s
+--   32k    |  25m 15s  |  3m 27s  |  2m  7s  |  1m 19s
+--   64k    |  25m 15s  |  3m 27s  |  2m  7s  |  1m 19s
+--   128k   |  18m 25s  |  3m  1s  |  2m 38s  |     45s
+--   256k   |  18m 54s  |  3m 14s  |  2m 59s  |     45s
 --
 -- The advantage of 32k or less is that the size fits into 16-bit-integer;
 -- bigger blocks require 24-bit-integers. This should explain why 64k is worse
