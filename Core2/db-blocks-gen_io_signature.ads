@@ -120,19 +120,17 @@ generic
      (File    : in out File_Type;
       Address : in     Valid_Address_Type);
    -- Locks the block at the given Address. Blocks until the lock is available.
-   -- Otherwise raises IO_Error.
-   -- TODO XXX In fact, this may *never* raise an error, does it? We have to
-   -- think about this very carefully and re-design gen_btrees-insert.adb
-   -- respectively.
+   -- May never raise an error.
+   -- XXX Errors are very critical with respect to DB.DSA.Gen_BTrees.Stacks.
+   -- See the comment there.
 
    with procedure Unlock
      (File    : in out File_Type;
       Address : in     Valid_Address_Type);
    -- Unlocks the lock held on the block at Address.
-   -- Otherwise raises IO_Error.
-   -- TODO XXX In fact, this may *never* raise an error, does it? We have to
-   -- think about this very carefully and re-design gen_btrees-insert.adb
-   -- respectively.
+   -- May never raise an error.
+   -- XXX Errors are very critical with respect to DB.DSA.Gen_BTrees.Stacks.
+   -- See the comment there.
 
    pragma Warnings (On);
 

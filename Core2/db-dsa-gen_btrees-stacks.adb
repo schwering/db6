@@ -85,8 +85,15 @@
 -- * Do not expect exceptions from any functions, including Nodes.Insertion
 --   etc., as they indicate really serious problems in the tree structure or the
 --   code.
--- * XXX Expect exceptions from Lock/Unlock or not? Or only from Lock but not
---   Unlock? Or success-parameter? Very difficult.
+-- * Do not expect exceptions of any kind from Lock/Unlock operations.
+--   At the moment, this is backed by Gen_IO_Signatures requirement that
+--   Lock/Unlock must be exception-safe.
+--   XXX Real world might require some kind of error handling in case of a
+--       network IO implementation. For example, the connection might break
+--       down. A straightforward way not to have an exception and still get the
+--       lock would be to wait until the remote computer is reachable again. But
+--       this depending on the architecture, this might be never the case, and
+--       turning an exception into nontermination doesn't look like a good deal.
 --
 -- Copyright 2008--2011 Christoph Schwering
 
