@@ -122,7 +122,10 @@ package DB.DSA.Gen_BTrees is
       Ceil  :    out Keys.Key_Type;
       Value :    out Values.Value_Type;
       State :    out State_Type);
-   -- Searches the minimum 
+   -- Searches the minimum existent key that is equal to or greater than Key or
+   -- sets State = Failure if there is no key equal to or greater than Key.
+   -- This procedure never blocks because it uses no locks (as long as
+   -- Block_IO.Read and Block_IO.Write do not block).
 
    procedure Search_Minimum
      (Tree  : in out Tree_Type;

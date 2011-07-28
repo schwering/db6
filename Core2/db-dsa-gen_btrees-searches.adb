@@ -10,8 +10,8 @@
 -- is used for the Search and Ceiling operations and Cursor's Search_Lower_Bound
 -- and Recalibrate. While in the first case, we want an exact match and only and
 -- exact match, in the other cases we want the minimum existent key that is
--- greater than the parameter Key -- i.e. the ceiling.  From this position on we
--- move to the right to satisfy the condition.
+-- equal to or greater than the parameter Key -- i.e. the ceiling. From this
+-- position on we move to the right to satisfy the condition.
 --
 -- Care needs to be taken to handle empty nodes correctly. For this reason,
 -- Search_Node still sets State to Success only if an exact match is found, but
