@@ -7,6 +7,9 @@
 --
 -- If Contains (Item) returns True, the item may be absent (the reason is hash
 -- collisions). If Contains (Item) returns False, this answer is fool-proof.
+-- In other words, Contains (Item) is simply the negation of Absent (Item).
+--
+-- Concurrent operations are safe.
 --
 -- Design Notes:
 --
