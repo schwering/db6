@@ -1,12 +1,6 @@
 -- Abstract:
 --
--- Generic Bloom filter implementation.
---
--- If Absent (Item) returns True, then Item is guaranteed to be absent. On the
--- other hand, if Absent (Item) returns False, Item might still be present.
---
--- If Contains (Item) returns True, the item may be absent (the reason is hash
--- collisions). If Contains (Item) returns False, this answer is fool-proof.
+-- Memory-kept least-recently-used (LRU) cache.
 --
 -- Design Notes:
 --
